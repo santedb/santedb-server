@@ -33,10 +33,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         }
 
         /// <inheritdoc/>
-        protected override Organization DoConvertToInformationModel(DataContext context, DbEntityVersion dbModel, params Object[] referenceObjects)
+        internal override Organization DoConvertSubclassData(DataContext context, Organization modelData, DbEntityVersion dbModel, params object[] referenceObjects)
         {
-            var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
-
             var organizationData = referenceObjects.OfType<DbOrganization>().FirstOrDefault();
             if (organizationData == null)
             {
@@ -47,13 +45,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             switch (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
                 case LoadMode.FullLoad:
-                    retVal.IndustryConcept = this.GetRelatedPersistenceService<Concept>().Get(context, organizationData.IndustryConceptKey);
-                    retVal.SetLoaded(nameof(Organization.IndustryConcept));
+                    modelData.IndustryConcept = this.GetRelatedPersistenceService<Concept>().Get(context, organizationData.IndustryConceptKey);
+                    modelData.SetLoaded(o => o.IndustryConcept);
                     break;
             }
-            retVal.CopyObjectData(this.m_modelMapper.MapDomainInstance<DbOrganization, Organization>(organizationData));
-
-            return retVal;
+            return modelData.CopyObjectData(this.m_modelMapper.MapDomainInstance<DbOrganization, Organization>(organizationData), false, declaredOnly: true);
         }
     }
 }

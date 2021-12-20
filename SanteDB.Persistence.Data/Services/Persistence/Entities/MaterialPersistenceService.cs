@@ -32,10 +32,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         }
 
         /// <inheritdoc/>
-        protected override Material DoConvertToInformationModel(DataContext context, DbEntityVersion dbModel, params Object[] referenceObjects)
+        /// </summary>
+        internal override Material DoConvertSubclassData(DataContext context, Material modelData, DbEntityVersion dbModel, params object[] referenceObjects)
         {
-            var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
-
             var materialData = referenceObjects.OfType<DbMaterial>().FirstOrDefault();
             if (materialData == null)
             {
@@ -46,16 +45,15 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             switch (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
                 case LoadMode.FullLoad:
-                    retVal.FormConcept = this.GetRelatedPersistenceService<Concept>().Get(context, materialData.FormConceptKey);
-                    retVal.SetLoaded(nameof(Material.FormConcept));
-                    retVal.QuantityConcept = this.GetRelatedPersistenceService<Concept>().Get(context, materialData.QuantityConceptKey);
-                    retVal.SetLoaded(nameof(Material.QuantityConcept));
+                    modelData.FormConcept = this.GetRelatedPersistenceService<Concept>().Get(context, materialData.FormConceptKey);
+                    modelData.SetLoaded(o => o.FormConcept);
+                    modelData.QuantityConcept = this.GetRelatedPersistenceService<Concept>().Get(context, materialData.QuantityConceptKey);
+                    modelData.SetLoaded(o => o.QuantityConcept);
                     break;
             }
 
-            retVal.CopyObjectData(this.m_modelMapper.MapDomainInstance<DbMaterial, Material>(materialData));
-
-            return retVal;
+            return modelData.CopyObjectData(this.m_modelMapper.MapDomainInstance<DbMaterial, Material>(materialData), false, declaredOnly: true);
+            
         }
     }
 }

@@ -10,7 +10,7 @@ namespace SanteDB.Server.Core.Configuration
     /// File system queue configuration section
     /// </summary>
     [Obsolete("Use SanteDB.Core.Configuration.FileSystemQueueConfigurationSection", true)]
-    public class FileSystemQueueConfigurationSection : SanteDB.Core.Configuration.FileSystemQueueConfigurationSection
+    public class FileSystemQueueConfigurationSection : SanteDB.Core.Configuration.FileSystemDispatcherQueueConfigurationSection
     {
     }
 }

@@ -26,9 +26,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         {
         }
 
-        /// <summary>
-        /// Before persisting the data to the database
-        /// </summary>
+        /// <inheritdoc/>
         protected override DeviceEntity BeforePersisting(DataContext context, DeviceEntity data)
         {
             data.SecurityDeviceKey = this.EnsureExists(context, data.SecurityDevice)?.Key ?? data.SecurityDeviceKey;
@@ -37,19 +35,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         }
 
         /// <inheritdoc/>
-        protected override DeviceEntity DoInsertModel(DataContext context, DeviceEntity data)
+        internal override DeviceEntity DoConvertSubclassData(DataContext context, DeviceEntity modelData, DbEntityVersion dbModel, params object[] referenceObjects)
         {
-            var retVal = base.DoInsertModel(context, data);
 
-            return retVal;
-        }
-
-        /// <summary>
-        /// Convert to information model
-        /// </summary>
-        protected override DeviceEntity DoConvertToInformationModel(DataContext context, DbEntityVersion dbModel, params object[] referenceObjects)
-        {
-            var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
             var dbDevice = referenceObjects.OfType<DbDeviceEntity>().FirstOrDefault();
             if (dbDevice == null)
             {
@@ -60,27 +48,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             switch (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
                 case LoadMode.FullLoad:
-                    retVal.SecurityDevice = this.GetRelatedPersistenceService<SecurityDevice>().Get(context, dbDevice.SecurityDeviceKey);
-                    retVal.SetLoaded(nameof(DeviceEntity.SecurityDevice));
-                    goto case LoadMode.SyncLoad;
-                case LoadMode.SyncLoad:
-                    if (dbModel.GeoTagKey.HasValue)
-                    {
-                        var dbGeoTag = referenceObjects.OfType<DbGeoTag>().FirstOrDefault();
-                        if (dbGeoTag == null)
-                        {
-                            this.m_tracer.TraceWarning("Using slow geo-tag reference of device");
-                            dbGeoTag = context.FirstOrDefault<DbGeoTag>(o => o.Key == dbModel.GeoTagKey);
-                        }
-                        retVal.GeoTag = this.GetRelatedMappingProvider<GeoTag>().ToModelInstance(context, dbGeoTag);
-                        retVal.SetLoaded(nameof(DeviceEntity.GeoTag));
-                    }
-                    goto case LoadMode.QuickLoad;
-                case LoadMode.QuickLoad:
-                    retVal.CopyObjectData(this.m_modelMapper.MapDomainInstance<DbDeviceEntity, DeviceEntity>(dbDevice));
-                    break;
+                    modelData.SecurityDevice = this.GetRelatedPersistenceService<SecurityDevice>().Get(context, dbDevice.SecurityDeviceKey);
+                    modelData.SetLoaded(o => o.SecurityDevice);
+                    break;   
             }
-            return retVal;
+
+            return modelData.CopyObjectData(this.m_modelMapper.MapDomainInstance<DbDeviceEntity, DeviceEntity>(dbDevice), false, declaredOnly: true);
+
         }
     }
 }

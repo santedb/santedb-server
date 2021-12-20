@@ -118,54 +118,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         }
 
         /// <summary>
-        /// Convert data to information model
+        /// Convert the sub-class information (not needed as Entity is not a subclass of Entity it is an Entity)
         /// </summary>
-        protected override Entity DoConvertToInformationModel(DataContext context, DbEntityVersion dbModel, params Object[] referenceObjects)
+        internal override Entity DoConvertSubclassData(DataContext context, Entity modelData, DbEntityVersion dbModel, params object[] referenceObjects)
         {
-            switch (dbModel.ClassConceptKey.ToString().ToLowerInvariant())
-            {
-                case EntityClassKeyStrings.Place:
-                case EntityClassKeyStrings.CityOrTown:
-                case EntityClassKeyStrings.Country:
-                case EntityClassKeyStrings.CountyOrParish:
-                case EntityClassKeyStrings.PrecinctOrBorough:
-                case EntityClassKeyStrings.State:
-                case EntityClassKeyStrings.ServiceDeliveryLocation:
-                    return this.GetRelatedMappingProvider<Place>().ToModelInstance(context, dbModel);
-
-                case EntityClassKeyStrings.Container:
-                    return this.GetRelatedMappingProvider<Container>().ToModelInstance(context, dbModel);
-
-                case EntityClassKeyStrings.NonLivingSubject:
-                    return this.GetRelatedMappingProvider<ApplicationEntity>().ToModelInstance(context, dbModel);
-
-                case EntityClassKeyStrings.Device:
-                    return this.GetRelatedMappingProvider<DeviceEntity>().ToModelInstance(context, dbModel);
-
-                case EntityClassKeyStrings.ManufacturedMaterial:
-                    return this.GetRelatedMappingProvider<ManufacturedMaterial>().ToModelInstance(context, dbModel);
-
-                case EntityClassKeyStrings.Material:
-                    return this.GetRelatedMappingProvider<Material>().ToModelInstance(context, dbModel);
-
-                case EntityClassKeyStrings.Organization:
-                    return this.GetRelatedMappingProvider<Organization>().ToModelInstance(context, dbModel);
-
-                case EntityClassKeyStrings.Patient:
-                    return this.GetRelatedMappingProvider<Patient>().ToModelInstance(context, dbModel);
-
-                case EntityClassKeyStrings.Person:
-                    return this.GetRelatedMappingProvider<Person>().ToModelInstance(context, dbModel);
-
-                case EntityClassKeyStrings.Provider:
-                    return this.GetRelatedMappingProvider<Provider>().ToModelInstance(context, dbModel);
-
-                case EntityClassKeyStrings.UserEntity:
-                    return this.GetRelatedMappingProvider<UserEntity>().ToModelInstance(context, dbModel);
-
-                default:
-                    return base.DoConvertToInformationModel(context, dbModel, null);
-            }
+            return modelData;
         }
     }
 }

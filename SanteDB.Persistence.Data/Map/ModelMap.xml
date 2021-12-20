@@ -241,6 +241,12 @@
     <property modelName="VersionKey" domainName="ParentKey" />
   </class>
 
+  <!-- Container Maps -->
+  <class modelClass="SanteDB.Core.Model.Entities.Container, SanteDB.Core.Model, Version=1.1.0.0"
+       domainClass="SanteDB.Persistence.Data.Model.Entities.DbContainer, SanteDB.Persistence.Data, Version=0.5.0.0">
+    <property modelName="VersionKey" domainName="ParentKey" />
+  </class>
+
   <class modelClass="SanteDB.Core.Model.Entities.PersonLanguageCommunication, SanteDB.Core.Model, Version=1.1.0.0"
        domainClass="SanteDB.Persistence.Data.Model.Entities.DbPersonLanguageCommunication, SanteDB.Persistence.Data, Version=0.5.0.0">
     <property modelName="SourceEntityKey" domainName="SourceKey" />

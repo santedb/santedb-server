@@ -40,7 +40,7 @@ namespace SanteDB.Server.Core.Services.Impl
     /// Represents a file system queue that monitors directories
     /// </summary>
     [Obsolete("Use SanteDB.Core.Services.Impl.FileSystemQueueService", true)]
-    public class FileSystemQueueService : SanteDB.Core.Services.Impl.FileSystemQueueService
+    public class FileSystemQueueService : SanteDB.Core.Services.Impl.FileSystemDispatcherQueueService
     {
         /// <summary>
         /// DI constructor

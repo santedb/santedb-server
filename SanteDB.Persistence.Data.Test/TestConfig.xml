@@ -92,7 +92,7 @@
            fuzzyTotal="false"
            readWriteConnectionString="TEST_CONNECTION"
            readOnlyConnectionString="TEST_CONNECTION"
-           traceSql="true"
+           traceSql="false"
            providerType="FirebirdSQL"
            versioning="default"
            staOnly="false"

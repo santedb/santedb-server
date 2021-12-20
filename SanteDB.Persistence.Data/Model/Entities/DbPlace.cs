@@ -19,6 +19,7 @@
 
 using SanteDB.Core.Model.Constants;
 using SanteDB.OrmLite.Attributes;
+using SanteDB.Persistence.Data.Model.DataType;
 using System;
 
 namespace SanteDB.Persistence.Data.Model.Entities
@@ -58,5 +59,6 @@ namespace SanteDB.Persistence.Data.Model.Entities
         /// </summary>
         [Column("mob_ind")]
         public bool IsMobile { get; set; }
+
     }
 }

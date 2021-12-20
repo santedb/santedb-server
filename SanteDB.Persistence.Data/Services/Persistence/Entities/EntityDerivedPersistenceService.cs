@@ -27,12 +27,89 @@ using System.Text.RegularExpressions;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Entities
 {
+
+    /// <summary>
+    /// Entity derived persistence service which is responsible for persisting entities which have an intermediary table
+    /// </summary>
+    /// <remarks>This class is used for higher level entities where the entity is comprised of three sub-tables where 
+    /// <typeparamref name="TDbTopLevelTable"/> links to <see cref="DbEntityVersion"/> via <typeparamref name="TDbEntitySubTable"/></remarks>
+    /// <typeparam name="TEntity">The type of model entity this table handles</typeparam>
+    /// <typeparam name="TDbEntitySubTable">The sub-table which points to <see cref="DbEntityVersion"/></typeparam>
+    /// <typeparam name="TDbTopLevelTable">The top level table which <typeparamref name="TEntity"/> stores its data</typeparam>
+    public abstract class EntityDerivedPersistenceService<TEntity, TDbTopLevelTable, TDbEntitySubTable> : EntityDerivedPersistenceService<TEntity, TDbEntitySubTable>
+        where TEntity : Entity, IVersionedEntity, new()
+        where TDbEntitySubTable : DbEntitySubTable, new()
+        where TDbTopLevelTable : DbEntitySubTable, new()
+    {
+        /// <summary>
+        /// DI constructor
+        /// </summary>
+        protected EntityDerivedPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
+        {
+        }
+
+        /// <inheritdoc/>
+        public override IOrmResultSet ExecuteQueryOrm(DataContext context, Expression<Func<TEntity, bool>> query)
+        {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
+            }
+            else if (query == null)
+            {
+                throw new ArgumentNullException(nameof(query), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
+            }
+
+            // Perform sub query
+            return base.DoQueryInternalAs<CompositeResult<DbEntityVersion, TDbEntitySubTable, TDbTopLevelTable>>(context, query, (o) =>
+            {
+                var columns = TableMapping.Get(typeof(TDbEntitySubTable)).Columns.Union(
+                        TableMapping.Get(typeof(DbEntityVersion)).Columns, new ColumnMapping.ColumnComparer()
+                        ).Union(TableMapping.Get(typeof(TDbTopLevelTable)).Columns, new ColumnMapping.ColumnComparer());
+                var retVal = context.CreateSqlStatement().SelectFrom(typeof(DbEntityVersion), columns.ToArray())
+                    .InnerJoin<DbEntityVersion, TDbEntitySubTable>(q => q.VersionKey, q => q.ParentKey)
+                    .InnerJoin<TDbEntitySubTable, TDbTopLevelTable>(q => q.ParentKey, q => q.ParentKey);
+                return retVal;
+            });
+        }
+
+        /// <inheritdoc/>
+        protected override TEntity DoInsertModel(DataContext context, TEntity data)
+        {
+            var retVal = base.DoInsertModel(context, data);
+            var dbSubInstance = this.m_modelMapper.MapModelInstance<TEntity, TDbTopLevelTable>(data);
+            dbSubInstance.ParentKey = retVal.VersionKey.Value;
+            dbSubInstance = context.Insert(dbSubInstance);
+            retVal.CopyObjectData(this.m_modelMapper.MapDomainInstance<TDbTopLevelTable, TEntity>(dbSubInstance), overwritePopulatedWithNull: false, declaredOnly: true);
+            return retVal;
+        }
+
+        /// <inheritdoc/>
+        protected override TEntity DoUpdateModel(DataContext context, TEntity data)
+        {
+            var retVal = base.DoUpdateModel(context, data);
+            // Update sub entity table
+            var dbSubEntity = this.m_modelMapper.MapModelInstance<TEntity, TDbTopLevelTable>(data);
+            dbSubEntity.ParentKey = retVal.VersionKey.Value;
+            if (this.m_configuration.VersioningPolicy.HasFlag(Configuration.AdoVersioningPolicyFlags.FullVersioning))
+            {
+                dbSubEntity = context.Insert(dbSubEntity);
+            }
+            else
+            {
+                dbSubEntity = context.Update(dbSubEntity);
+            }
+            retVal.CopyObjectData(this.m_modelMapper.MapDomainInstance<TDbTopLevelTable, TEntity>(dbSubEntity), false, declaredOnly: true);
+            return retVal;
+        }
+    }
+
     /// <summary>
     /// Entity derived persistence service with one sub entity table
     /// </summary>
     /// <typeparam name="TEntity">The model type of entity</typeparam>
     /// <typeparam name="TDbEntitySubTable">The sub table instance</typeparam>
-    public class EntityDerivedPersistenceService<TEntity, TDbEntitySubTable> : EntityDerivedPersistenceService<TEntity>
+    public abstract class EntityDerivedPersistenceService<TEntity, TDbEntitySubTable> : EntityDerivedPersistenceService<TEntity>
         where TEntity : Entity, IVersionedEntity, new()
         where TDbEntitySubTable : DbEntitySubTable, new()
     {
@@ -41,14 +118,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// </summary>
         public EntityDerivedPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
-        }
-
-        /// <summary>
-        /// Perform a delete of references
-        /// </summary>
-        protected override void DoDeleteReferencesInternal(DataContext context, Guid key)
-        {
-            base.DoDeleteReferencesInternal(context, key);
         }
 
         /// <inheritdoc/>
@@ -108,7 +177,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
     /// <summary>
     /// Persistence service that is responsible for storing and retrieving entities
     /// </summary>
-    public class EntityDerivedPersistenceService<TEntity> : VersionedDataPersistenceService<TEntity, DbEntityVersion, DbEntity>
+    public abstract class EntityDerivedPersistenceService<TEntity> : VersionedDataPersistenceService<TEntity, DbEntityVersion, DbEntity>, IHasSubclassConversion
         where TEntity : Entity, IVersionedEntity, new()
     {
         /// <summary>
@@ -139,6 +208,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             context.Delete<DbTelecomAddress>(o => o.SourceKey == key);
             context.Delete<DbDeviceEntity>(o => o.ParentKey == key);
             context.Delete<DbPatient>(o => o.ParentKey == key);
+            context.Delete<DbContainer>(o => o.ParentKey == key);
             context.Delete<DbProvider>(o => o.ParentKey == key);
             context.Delete<DbUserEntity>(o => o.ParentKey == key);
             context.Delete<DbPerson>(o => o.ParentKey == key);
@@ -191,6 +261,15 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         }
 
         /// <summary>
+        /// Convert the sub-class data of the return value
+        /// </summary>
+        /// <param name="context">The context on which the data is being retrieved</param>
+        /// <param name="dbModel">The model which was retrieved</param>
+        /// <param name="modelData">The model data which has already be constructed</param>
+        /// <param name="referenceObjects">The referenced objects</param>
+        internal abstract TEntity DoConvertSubclassData(DataContext context, TEntity modelData, DbEntityVersion dbModel, params object[] referenceObjects);
+
+        /// <summary>
         /// Convert the data model back to information model
         /// </summary>
         protected override TEntity DoConvertToInformationModel(DataContext context, DbEntityVersion dbModel, params Object[] referenceObjects)
@@ -241,7 +320,78 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                     break;
             }
 
-            return retVal;
+
+            // Load geotagging data
+            if (dbModel.GeoTagKey.HasValue && (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy) >= LoadMode.SyncLoad)
+            {
+                var dbGeoTag = referenceObjects.OfType<DbGeoTag>().FirstOrDefault();
+                if (dbGeoTag == null)
+                {
+                    this.m_tracer.TraceWarning("Using slow geo-tag reference of device");
+                    dbGeoTag = context.FirstOrDefault<DbGeoTag>(o => o.Key == dbModel.GeoTagKey);
+                }
+                retVal.GeoTag = this.GetRelatedMappingProvider<GeoTag>().ToModelInstance(context, dbGeoTag);
+                retVal.SetLoaded(o => o.GeoTag);
+            }
+
+            // switch the class concept
+            // this code ensures that no matter where the entry point is into the persistence layer, that the proper return 
+            // class is loaded based on the class code of the data being saved
+            IAdoPersistenceProvider subClassProvider = null;
+            switch (dbModel.ClassConceptKey.ToString().ToLowerInvariant())
+            {
+                case EntityClassKeyStrings.CityOrTown:
+                case EntityClassKeyStrings.Country:
+                case EntityClassKeyStrings.CountyOrParish:
+                case EntityClassKeyStrings.Place:
+                case EntityClassKeyStrings.PrecinctOrBorough:
+                case EntityClassKeyStrings.ServiceDeliveryLocation:
+                case EntityClassKeyStrings.State:
+                    {
+                        subClassProvider = this.GetRelatedPersistenceService<Place>();
+                        break;
+                    }
+                case EntityClassKeyStrings.ManufacturedMaterial:
+                    {
+                        subClassProvider = this.GetRelatedPersistenceService<ManufacturedMaterial>();
+                        break;
+                    }
+                case EntityClassKeyStrings.Material:
+                    {
+                        subClassProvider = this.GetRelatedPersistenceService<Material>();
+                        break;
+                    }
+                case EntityClassKeyStrings.NonLivingSubject:
+                    {
+                        subClassProvider = this.GetRelatedPersistenceService<ApplicationEntity>();
+                        break;
+                    }
+                case EntityClassKeyStrings.Device:
+                    {
+                        subClassProvider = this.GetRelatedPersistenceService<DeviceEntity>();
+
+                        break;
+                    }
+                case EntityClassKeyStrings.Organization:
+                    {
+                        subClassProvider = this.GetRelatedPersistenceService<Organization>();
+                        break;
+                    }
+                case EntityClassKeyStrings.Container:
+                    {
+                        subClassProvider = this.GetRelatedPersistenceService<Container>();
+                        break;
+                    }
+            }
+
+            if(subClassProvider is IHasSubclassConversion edps)
+            {
+                return (TEntity)edps.Convert(context, retVal, dbModel, referenceObjects);
+            }
+            else
+            {
+                return retVal;
+            }
         }
 
         /// <summary>
@@ -361,6 +511,16 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             }
 
             return retVal;
+        }
+
+        /// <summary>
+        /// Convert the object to the subclass
+        /// </summary>
+        public object Convert(DataContext context, object existingModel, object dbModel, params object[] referenceObjects)
+        {
+            // Convert
+            var retVal = existingModel.Convert<TEntity>();
+            return this.DoConvertSubclassData(context, retVal, (DbEntityVersion)dbModel, referenceObjects);
         }
     }
 }

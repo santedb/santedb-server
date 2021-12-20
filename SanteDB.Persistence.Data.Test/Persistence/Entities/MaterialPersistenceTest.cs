@@ -69,7 +69,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 Assert.AreEqual(1, afterInsert.Quantity);
 
                 // Now we want to query
-                var afterQuery = base.TestQuery<Material>(o => o.IsAdministrative == true && o.FormConcept.Mnemonic == "AdministrableDrugForm-OralDrops" && o.QuantityConcept.Mnemonic == "UnitOfMeasure-Dose", 1).AsResultSet().First();
+                var afterQuery = base.TestQuery<Material>(o => o.Names.Any(n=>n.Component.Any(c=>c.Value == "Oral Polio Vaccine")) && o.IsAdministrative == true && o.FormConcept.Mnemonic == "AdministrableDrugForm-OralDrops" && o.QuantityConcept.Mnemonic == "UnitOfMeasure-Dose", 1).AsResultSet().First();
                 Assert.AreEqual(new DateTime(2021, 01, 01), afterQuery.ExpiryDate);
                 Assert.IsTrue(afterQuery.IsAdministrative);
                 Assert.AreEqual(Guid.Parse("66cbce3a-2e77-401d-95d8-ee0361f4f076"), afterQuery.FormConceptKey);
@@ -91,8 +91,8 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 Assert.AreEqual(Guid.Parse("af3a5fa5-7889-45f3-8809-2294129d49c8"), afterUpdate.FormConceptKey);
 
                 var date = new DateTime(2021, 01, 01);
-                afterQuery = base.TestQuery<Material>(o => o.ExpiryDate >= date && o.FormConcept.Mnemonic == "AdministrableDrugForm-OralDrops", 0).AsResultSet().FirstOrDefault();
-                afterQuery = base.TestQuery<Material>(o => o.ExpiryDate >= date && o.FormConcept.Mnemonic == "AdministrableDrugForm-OticDrops", 1).AsResultSet().FirstOrDefault();
+                afterQuery = base.TestQuery<Material>(o => o.Names.Any(n => n.Component.Any(c => c.Value == "Oral Polio Vaccine")) && o.ExpiryDate >= date && o.FormConcept.Mnemonic == "AdministrableDrugForm-OralDrops", 0).AsResultSet().FirstOrDefault();
+                afterQuery = base.TestQuery<Material>(o => o.Names.Any(n => n.Component.Any(c => c.Value == "Oral Polio Vaccine")) && o.ExpiryDate >= date && o.FormConcept.Mnemonic == "AdministrableDrugForm-OticDrops", 1).AsResultSet().FirstOrDefault();
                 Assert.AreEqual(new DateTime(2021, 07, 01), afterQuery.ExpiryDate);
                 Assert.IsTrue(afterQuery.IsAdministrative);
                 Assert.AreEqual(Guid.Parse("af3a5fa5-7889-45f3-8809-2294129d49c8"), afterQuery.FormConceptKey);
@@ -146,6 +146,13 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                     return o;
                 });
                 Assert.AreEqual(new DateTime(2021, 07, 01), (afterUpdate as Material).ExpiryDate);
+
+                afterQuery = base.TestQuery<Entity>(o => o.Names.Any(n => n.Component.Any(c => c.Value == "Inactivated Polio Vaccine")), 1).AsResultSet().First();
+                Assert.IsNull(afterQuery.Names);
+                Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Names).Count);
+                Assert.IsInstanceOf<Material>(afterQuery);
+                Assert.AreEqual(Guid.Parse("9902267c-8f77-4233-bfd3-e6b068ab326a"), (afterQuery as Material).FormConceptKey);
+                Assert.AreEqual(new DateTime(2021, 07, 01), (afterQuery as Material).ExpiryDate);
             }
         }
     }

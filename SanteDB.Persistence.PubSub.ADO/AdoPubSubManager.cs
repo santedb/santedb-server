@@ -63,7 +63,7 @@ namespace SanteDB.Persistence.PubSub.ADO
         /// <summary>
         /// Gets the query persistence service
         /// </summary>
-        public IQueryPersistenceService QueryPersistence => throw new NotSupportedException();
+        public IQueryPersistenceService QueryPersistence => this.m_queryPersistence;
 
         // Load mapper
         private ModelMapper m_mapper = new ModelMapper(typeof(AdoPubSubManager).Assembly.GetManifestResourceStream("SanteDB.Persistence.PubSub.ADO.Data.Map.ModelMap.xml"), "PubSubModelMap");
@@ -86,6 +86,9 @@ namespace SanteDB.Persistence.PubSub.ADO
         // Policy enforcement
         private IPolicyEnforcementService m_policyEnforcementService;
 
+        // Query persistence service
+        private IQueryPersistenceService m_queryPersistence;
+        
         /// <summary>
         /// Creates a new instance of this pub-sub manager
         /// </summary>
@@ -93,7 +96,8 @@ namespace SanteDB.Persistence.PubSub.ADO
             IPolicyEnforcementService policyEnforcementService,
             IConfigurationManager configurationManager,
             ISecurityRepositoryService securityRepository,
-            IDataCachingService cachingService)
+            IDataCachingService cachingService,
+            IQueryPersistenceService queryPersistence)
         {
             this.m_cache = cachingService;
             this.m_serviceManager = serviceManager;
@@ -102,6 +106,7 @@ namespace SanteDB.Persistence.PubSub.ADO
             this.m_securityRepository = securityRepository;
             this.m_serviceManager = serviceManager;
             this.m_configuration.Provider.UpgradeSchema("SanteDB.Persistence.PubSub.ADO");
+            this.m_queryPersistence = queryPersistence;
         }
 
         // Ado Pub Sub Manager Tracer source
@@ -183,7 +188,7 @@ namespace SanteDB.Persistence.PubSub.ADO
         private PubSubChannelDefinition MapInstance(DataContext context, DbChannel domainInstance)
         {
             var retVal = this.m_mapper.MapDomainInstance<DbChannel, PubSubChannelDefinition>(domainInstance);
-            retVal.DispatcherFactoryTypeXml = domainInstance.DispatchFactoryType; // TODO: Refactor this mapping to a fn
+            retVal.DispatcherFactoryId = domainInstance.DispatchFactoryType; // TODO: Refactor this mapping to a fn
             retVal.Endpoint = domainInstance.Endpoint;
             retVal.Settings = context.Query<DbChannelSetting>(r => r.ChannelKey == retVal.Key).ToList().Select(r => new PubSubChannelSetting() { Name = r.Name, Value = r.Value }).ToList();
             return retVal;
@@ -194,75 +199,8 @@ namespace SanteDB.Persistence.PubSub.ADO
         /// </summary>
         public PubSubChannelDefinition RegisterChannel(string name, Type dispatcherFactory, Uri endpoint, IDictionary<string, string> settings)
         {
-            if (String.IsNullOrEmpty(name))
-            {
-                throw new ArgumentNullException(nameof(name));
-            }
-            else if (dispatcherFactory == null)
-            {
-                throw new ArgumentNullException(nameof(dispatcherFactory));
-            }
-            else if (endpoint == null)
-            {
-                throw new ArgumentNullException(nameof(endpoint));
-            }
-
-            // Validate state
-            this.m_policyEnforcementService.Demand(PermissionPolicyIdentifiers.CreatePubSubSubscription);
-            if (!typeof(IPubSubDispatcherFactory).IsAssignableFrom(dispatcherFactory))
-                throw new InvalidOperationException("Dispatcher factory is of invalid type");
-
-            var channel = new PubSubChannelDefinition()
-            {
-                Name = name,
-                DispatcherFactoryTypeXml = dispatcherFactory.AssemblyQualifiedName,
-                Endpoint = endpoint.ToString(),
-                IsActive = false,
-                Settings = settings.Select(o => new PubSubChannelSetting() { Name = o.Key, Value = o.Value }).ToList()
-            };
-
-            using (var conn = this.m_configuration.Provider.GetWriteConnection())
-            {
-                try
-                {
-                    conn.Open();
-                    using (var tx = conn.BeginTransaction())
-                    {
-                        var dbChannel = this.m_mapper.MapModelInstance<PubSubChannelDefinition, DbChannel>(channel);
-                        dbChannel.Endpoint = channel.Endpoint.ToString();
-
-                        // Get the authorship
-                        var se = this.m_securityRepository.GetSecurityEntity(AuthenticationContext.Current.Principal);
-                        if (se == null)
-                        {
-                            throw new KeyNotFoundException($"Unable to determine structure data for {AuthenticationContext.Current.Principal.Identity.Name}");
-                        }
-
-                        dbChannel.CreatedByKey = se.Key.Value;
-                        dbChannel.CreationTime = DateTimeOffset.Now;
-                        dbChannel = conn.Insert(dbChannel);
-
-                        // Insert settings
-                        foreach (var itm in channel.Settings)
-                            conn.Insert(new DbChannelSetting()
-                            {
-                                ChannelKey = dbChannel.Key.Value,
-                                Name = itm.Name,
-                                Value = itm.Value
-                            });
-
-                        tx.Commit();
-                        channel = this.MapInstance(conn, dbChannel);
-
-                        this.m_cache?.Add(channel);
-                        return channel;
-                    }
-                }
-                catch (Exception e)
-                {
-                    throw new Exception($"Error creating channel {channel}", e);
-                }
-            }
+            var channelId = DispatcherFactoryUtil.FindDispatcherFactoryByType(dispatcherFactory);
+            return this.RegisterChannel(name, channelId.Id, endpoint, settings);
         }
 
         /// <summary>
@@ -347,9 +285,13 @@ namespace SanteDB.Persistence.PubSub.ADO
                     }
                     subscription.ObsoletedByKey = dbExisting.ObsoletedByKey = se.Key.Value;
                     subscription.ObsoletionTime = dbExisting.ObsoletionTime = DateTimeOffset.Now;
+                    subscription.IsActive = false;
                     conn.Update(dbExisting);
                     this.m_cache.Remove(key);
-                    return this.MapInstance(conn, dbExisting);
+
+                    var retVal = this.MapInstance(conn, dbExisting);
+                    this.UnSubscribed?.Invoke(this, new DataPersistedEventArgs<PubSubSubscriptionDefinition>(retVal, TransactionMode.Commit, AuthenticationContext.Current.Principal));
+                    return retVal;
                 }
                 catch (Exception e)
                 {
@@ -364,7 +306,7 @@ namespace SanteDB.Persistence.PubSub.ADO
         private PubSubSubscriptionDefinition MapInstance(DataContext context, DbSubscription domainInstance)
         {
             var retVal = this.m_mapper.MapDomainInstance<DbSubscription, PubSubSubscriptionDefinition>(domainInstance);
-            retVal.ResourceTypeXml = domainInstance.ResourceType;
+            retVal.ResourceTypeName = domainInstance.ResourceType;
             retVal.Filter = context.Query<DbSubscriptionFilter>(r => r.SubscriptionKey == domainInstance.Key).Select(r => r.Filter).ToList();
 
             return retVal;
@@ -373,9 +315,80 @@ namespace SanteDB.Persistence.PubSub.ADO
         /// <summary>
         /// Register the specified channel
         /// </summary>
-        public PubSubChannelDefinition RegisterChannel(string name, Uri endpoint, IDictionary<string, string> settings)
+        public PubSubChannelDefinition RegisterChannel(string name, string dispatcherFactoryId, Uri endpoint, IDictionary<string, string> settings)
         {
-            return this.RegisterChannel(name, this.FindDispatcherFactory(endpoint).GetType(), endpoint, settings);
+            if (String.IsNullOrEmpty(name))
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
+            else if (String.IsNullOrEmpty(dispatcherFactoryId))
+            {
+                var dispatchFactory = DispatcherFactoryUtil.FindDispatcherFactoryByUri(endpoint);
+                if (dispatchFactory == null)
+                {
+                    throw new InvalidOperationException("Cannot find dispatcher factory for scheme!");
+                }
+                dispatcherFactoryId = dispatchFactory.Id;
+            }
+            else if (endpoint == null)
+            {
+                throw new ArgumentNullException(nameof(endpoint));
+            }
+
+            // Validate state
+            this.m_policyEnforcementService.Demand(PermissionPolicyIdentifiers.CreatePubSubSubscription);
+
+            var channel = new PubSubChannelDefinition()
+            {
+                Name = name,
+                DispatcherFactoryId = dispatcherFactoryId,
+                Endpoint = endpoint.ToString(),
+                IsActive = false,
+                Settings = settings.Select(o => new PubSubChannelSetting() { Name = o.Key, Value = o.Value }).ToList()
+            };
+
+            using (var conn = this.m_configuration.Provider.GetWriteConnection())
+            {
+                try
+                {
+                    conn.Open();
+                    using (var tx = conn.BeginTransaction())
+                    {
+                        var dbChannel = this.m_mapper.MapModelInstance<PubSubChannelDefinition, DbChannel>(channel);
+                        dbChannel.Endpoint = channel.Endpoint.ToString();
+
+                        // Get the authorship
+                        var se = this.m_securityRepository.GetSecurityEntity(AuthenticationContext.Current.Principal);
+                        if (se == null)
+                        {
+                            throw new KeyNotFoundException($"Unable to determine structure data for {AuthenticationContext.Current.Principal.Identity.Name}");
+                        }
+
+                        dbChannel.CreatedByKey = se.Key.Value;
+                        dbChannel.CreationTime = DateTimeOffset.Now;
+                        dbChannel = conn.Insert(dbChannel);
+
+                        // Insert settings
+                        foreach (var itm in channel.Settings)
+                            conn.Insert(new DbChannelSetting()
+                            {
+                                ChannelKey = dbChannel.Key.Value,
+                                Name = itm.Name,
+                                Value = itm.Value
+                            });
+
+                        tx.Commit();
+                        channel = this.MapInstance(conn, dbChannel);
+
+                        this.m_cache?.Add(channel);
+                        return channel;
+                    }
+                }
+                catch (Exception e)
+                {
+                    throw new Exception($"Error creating channel {channel}", e);
+                }
+            }
         }
 
         /// <summary>
@@ -492,14 +505,14 @@ namespace SanteDB.Persistence.PubSub.ADO
             {
                 ChannelKey = channelId,
                 Event = events,
-                Filter = String.IsNullOrEmpty(hdsiFilter) ? null : new List<string>() { hdsiFilter },
+                Filter = String.IsNullOrEmpty(hdsiFilter) ? null : new List<string>(hdsiFilter.Split('&')),
                 IsActive = false,
                 Name = name,
                 Description = description,
                 SupportContact = supportAddress,
-                NotBefore = notBefore,
-                NotAfter = notAfter,
-                ResourceTypeXml = modelType.GetSerializationName()
+                NotBefore = notBefore?.DateTime,
+                NotAfter = notAfter?.DateTime,
+                ResourceTypeName = modelType.GetSerializationName()
             };
 
             var preEvent = new DataPersistingEventArgs<PubSubSubscriptionDefinition>(subscription, TransactionMode.Commit, AuthenticationContext.Current.Principal);
@@ -574,37 +587,40 @@ namespace SanteDB.Persistence.PubSub.ADO
                         if (dbExisting == null)
                             throw new KeyNotFoundException($"Subscription {key} not found");
 
-                        var retVal = new PubSubSubscriptionDefinition();
                         // Get the authorship
                         var se = this.m_securityRepository.GetSecurityEntity(AuthenticationContext.Current.Principal);
                         if (se == null)
                         {
                             throw new KeyNotFoundException($"Unable to determine structure data for {AuthenticationContext.Current.Principal.Identity.Name}");
                         }
+
                         dbExisting.UpdatedByKey = se.Key.Value;
                         dbExisting.UpdatedTime = DateTimeOffset.Now;
                         dbExisting.ObsoletedByKey = null;
                         dbExisting.ObsoletionTime = null;
                         dbExisting.ObsoletedBySpecified = dbExisting.ObsoletionTimeSpecified = true;
-                        dbExisting.Name = retVal.Name = name;
+                        dbExisting.Name = name;
                         dbExisting.IsActive = false; // we disable the subscription to allow for review
-                        dbExisting.NotAfter = retVal.NotAfter = notAfter;
-                        dbExisting.NotBefore = retVal.NotBefore = notBefore;
+                        dbExisting.NotAfter = notAfter;
+                        dbExisting.NotBefore = notBefore;
                         dbExisting.Description = description;
                         dbExisting.SupportContact = supportAddress;
                         dbExisting.Event = (int)events;
 
                         conn.Update(dbExisting);
-                        conn.Delete<DbSubscriptionFilter>(o => o.SubscriptionKey == retVal.Key);
+                        conn.Delete<DbSubscriptionFilter>(o => o.SubscriptionKey == dbExisting.Key);
                         // Insert settings
-                        conn.Insert(new DbSubscriptionFilter()
+                        conn.InsertAll(hdsiFilter.Split('&').Select(s => new DbSubscriptionFilter()
                         {
                             SubscriptionKey = dbExisting.Key.Value,
-                            Filter = hdsiFilter
-                        });
+                            Filter = s
+                        }));
 
+                        var retVal = this.MapInstance(conn, dbExisting);
                         this.m_cache?.Add(retVal);
                         tx.Commit();
+                        this.Subscribed?.Invoke(this, new DataPersistedEventArgs<PubSubSubscriptionDefinition>(retVal, TransactionMode.Commit, AuthenticationContext.Current.Principal));
+
                         return this.MapInstance(conn, dbExisting);
                     }
                 }
@@ -796,40 +812,5 @@ namespace SanteDB.Persistence.PubSub.ADO
             return results.Skip(offset).Take(count);
         }
 
-        /// <summary>
-        /// Get all factories
-        /// </summary>
-        private IDictionary<String, IPubSubDispatcherFactory> GetFactories()
-        {
-            if (this.m_factories == null)
-            {
-                this.m_factories = this.m_serviceManager.GetAllTypes()
-                    .Where(t => typeof(IPubSubDispatcherFactory).IsAssignableFrom(t) && !t.IsAbstract && !t.IsAbstract)
-                    .Select(t => this.m_serviceManager.CreateInjected(t))
-                    .OfType<IPubSubDispatcherFactory>()
-                    .SelectMany(f => f.Schemes.Select(s => new { Scheme = s, Factory = f }))
-                    .ToDictionary(k => k.Scheme, f => f.Factory);
-            }
-            return this.m_factories;
-        }
-
-        /// <summary>
-        /// Finds an implementation of the IDisptacherFactory which works for the specified URI
-        /// </summary>
-        public IPubSubDispatcherFactory FindDispatcherFactory(Uri targetUri)
-        {
-            this.GetFactories().TryGetValue(targetUri.Scheme, out IPubSubDispatcherFactory retVal);
-            return retVal;
-        }
-
-        /// <summary>
-        /// Get dispatcher factory by type
-        /// </summary>
-        public IPubSubDispatcherFactory GetDispatcherFactory(Type factoryType)
-        {
-            // TODO: Optimize this , basically this ensures that the factory type is not
-            // initialized more than once.
-            return this.GetFactories().Values.FirstOrDefault(o => o.GetType() == factoryType);
-        }
     }
 }

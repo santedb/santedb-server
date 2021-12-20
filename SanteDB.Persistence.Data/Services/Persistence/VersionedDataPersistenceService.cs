@@ -635,7 +635,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Update the internal
         /// </summary>
-        protected virtual IEnumerable<TAssociativeTable> UpdateInternalVersoinedAssociations<TAssociativeTable>(DataContext context, Guid sourceKey, int versionSequence, IEnumerable<TAssociativeTable> associations)
+        protected virtual IEnumerable<TAssociativeTable> UpdateInternalVersoinedAssociations<TAssociativeTable>(DataContext context, Guid sourceKey, long versionSequence, IEnumerable<TAssociativeTable> associations)
             where TAssociativeTable : IDbVersionedAssociation, new()
         {
             if (sourceKey == Guid.Empty)

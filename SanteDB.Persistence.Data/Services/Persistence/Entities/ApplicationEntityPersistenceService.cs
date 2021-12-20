@@ -33,12 +33,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             return base.BeforePersisting(context, data);
         }
 
-        /// <summary>
-        /// Convert to information model
-        /// </summary>
-        protected override ApplicationEntity DoConvertToInformationModel(DataContext context, DbEntityVersion dbModel, params object[] referenceObjects)
+        /// <inheritdoc/>
+        internal override ApplicationEntity DoConvertSubclassData(DataContext context, ApplicationEntity modelData, DbEntityVersion dbModel, params object[] referenceObjects)
         {
-            var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
+
             var dbApplication = referenceObjects.OfType<DbApplicationEntity>().FirstOrDefault();
             if (dbApplication == null)
             {
@@ -49,13 +47,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             switch (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
                 case LoadMode.FullLoad:
-                    retVal.SecurityApplication = this.GetRelatedPersistenceService<SecurityApplication>().Get(context, dbApplication.SecurityApplicationKey);
-                    retVal.SetLoaded(nameof(ApplicationEntity.SecurityApplication));
+                    modelData.SecurityApplication = this.GetRelatedPersistenceService<SecurityApplication>().Get(context, dbApplication.SecurityApplicationKey);
+                    modelData.SetLoaded(o => o.SecurityApplication);
                     break;
             }
 
-            retVal.CopyObjectData(this.m_modelMapper.MapDomainInstance<DbApplicationEntity, ApplicationEntity>(dbApplication));
-            return retVal;
+            return modelData.CopyObjectData(this.m_modelMapper.MapDomainInstance<DbApplicationEntity, ApplicationEntity>(dbApplication), false, declaredOnly: true);
+
         }
     }
 }

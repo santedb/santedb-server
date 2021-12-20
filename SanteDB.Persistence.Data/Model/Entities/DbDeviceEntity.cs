@@ -64,10 +64,5 @@ namespace SanteDB.Persistence.Data.Model.Entities
             set;
         }
 
-        /// <summary>
-        /// Gets the geo tag
-        /// </summary>
-        [Column("geo_id"), ForeignKey(typeof(DbGeoTag), nameof(DbGeoTag.Key))]
-        public Guid? GeoTagKey { get; set; }
     }
 }
