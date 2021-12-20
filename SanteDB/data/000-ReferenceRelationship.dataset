@@ -24,7 +24,10 @@
         <language>en</language>
         <value>Equivalent Entity</value>
       </name>
-      <referenceTerm>0FFAD58D-21B5-4C17-B3F4-9CAA0C570EF3</referenceTerm>
+      <referenceTerm>
+        <term>0FFAD58D-21B5-4C17-B3F4-9CAA0C570EF3</term>
+        <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+      </referenceTerm>
     </Concept>
   </update>
 
@@ -52,7 +55,10 @@
         <language>en</language>
         <value>Equivalent Entity</value>
       </name>
-      <referenceTerm>0FFAD58D-21B5-4C17-B3F4-9CAA0C570EF3</referenceTerm>
+      <referenceTerm>
+        <term>0FFAD58D-21B5-4C17-B3F4-9CAA0C570EF3</term>
+        <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+      </referenceTerm>
     </Concept>
   </update>
 
@@ -80,7 +86,10 @@
         <language>en</language>
         <value>Has Generalization</value>
       </name>
-      <referenceTerm>3760B686-5A03-426F-BE88-0011242DFD33</referenceTerm>
+      <referenceTerm>
+        <term>3760B686-5A03-426F-BE88-0011242DFD33</term>
+        <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+      </referenceTerm>
     </Concept>
   </update>
 
@@ -108,7 +117,12 @@
         <language>en</language>
         <value>Has Content</value>
       </name>
-      <referenceTerm>EEF84F30-8579-49DC-80D4-C33A8489DCAD</referenceTerm>
+
+      <referenceTerm>
+        <term>EEF84F30-8579-49DC-80D4-C33A8489DCAD</term>
+        <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+      </referenceTerm>
+
     </Concept>
   </update>
 
@@ -136,13 +150,18 @@
         <language>en</language>
         <value>Has Ingredient</value>
       </name>
-      <referenceTerm>DF4B6C22-7A0F-40D4-A2E2-65D0E20DB861</referenceTerm>
+
+
+      <referenceTerm>
+        <term>DF4B6C22-7A0F-40D4-A2E2-65D0E20DB861</term>
+        <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+      </referenceTerm>
     </Concept>
   </update>
 
   <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
-      <id>CF9082DA-5648-48BD-BC1B-063EC02AC2E0</id>
+      <id>ca290ed0-330c-49e7-a644-3e52728cfc0f</id>
       <mnemonic>PART</mnemonic>
       <codeSystem>ff12d77b-625d-497a-8794-c3726942b113</codeSystem>
       <name>
@@ -164,7 +183,11 @@
         <language>en</language>
         <value>Has Part</value>
       </name>
-      <referenceTerm>CF9082DA-5648-48BD-BC1B-063EC02AC2E0</referenceTerm>
+
+      <referenceTerm>
+        <term>ca290ed0-330c-49e7-a644-3e52728cfc0f</term>
+        <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+      </referenceTerm>
     </Concept>
   </update>
 
