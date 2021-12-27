@@ -18,7 +18,7 @@ namespace SanteDB.Persistence.Data.Test
     /// <summary>
     /// Test ADO policy information service.
     /// </summary>
-    [TestFixture(Category = "Persistence", TestName = "ADO Policy Provider")]
+    [TestFixture(Category = "Persistence")]
     [ExcludeFromCodeCoverage]
     public class AdoPolicyInformationTest : DataPersistenceTest
     {

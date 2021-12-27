@@ -60,6 +60,7 @@
     <Compile Include="Persistence\Entities\ContainerPersistenceTest.cs" />
     <Compile Include="Persistence\Entities\MaterialPersistenceTest.cs" />
     <Compile Include="Persistence\Entities\OrganizationPersistenceTest.cs" />
+    <Compile Include="Persistence\Entities\PersonPersistenceTest.cs" />
     <Compile Include="Persistence\Entities\PlacePersistenceTest.cs" />
     <Compile Include="Persistence\IdentifierTypePersistenceServiceTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

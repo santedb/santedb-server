@@ -18,7 +18,7 @@ namespace SanteDB.Persistence.Data.Test
     /// <summary>
     /// Device identity provider test
     /// </summary>
-    [TestFixture(Category = "Persistence", TestName = "ADO Dev Identity Provider")]
+    [TestFixture(Category = "Persistence")]
     [ExcludeFromCodeCoverage]
     public class AdoDeviceIdentityProviderTest : DataPersistenceTest
     {

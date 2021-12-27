@@ -14,7 +14,7 @@ namespace SanteDB.Persistence.Data.Test
     /// <summary>
     /// ADO Role Provider
     /// </summary>
-    [TestFixture(Category = "Persistence", TestName = "ADO Role Provider")]
+    [TestFixture(Category = "Persistence")]
     [ExcludeFromCodeCoverage]
     public class AdoRoleProviderTest : DataPersistenceTest
     {

@@ -9,6 +9,7 @@ using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Interfaces;
+using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
@@ -350,44 +351,46 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                 case EntityClassKeyStrings.PrecinctOrBorough:
                 case EntityClassKeyStrings.ServiceDeliveryLocation:
                 case EntityClassKeyStrings.State:
-                    {
                         subClassProvider = this.GetRelatedPersistenceService<Place>();
                         break;
-                    }
                 case EntityClassKeyStrings.ManufacturedMaterial:
-                    {
                         subClassProvider = this.GetRelatedPersistenceService<ManufacturedMaterial>();
                         break;
-                    }
                 case EntityClassKeyStrings.Material:
-                    {
                         subClassProvider = this.GetRelatedPersistenceService<Material>();
                         break;
-                    }
                 case EntityClassKeyStrings.NonLivingSubject:
-                    {
                         subClassProvider = this.GetRelatedPersistenceService<ApplicationEntity>();
                         break;
-                    }
                 case EntityClassKeyStrings.Device:
-                    {
                         subClassProvider = this.GetRelatedPersistenceService<DeviceEntity>();
-
                         break;
-                    }
                 case EntityClassKeyStrings.Organization:
-                    {
                         subClassProvider = this.GetRelatedPersistenceService<Organization>();
                         break;
-                    }
                 case EntityClassKeyStrings.Container:
-                    {
                         subClassProvider = this.GetRelatedPersistenceService<Container>();
                         break;
-                    }
+                case EntityClassKeyStrings.Person:
+                    subClassProvider = this.GetRelatedPersistenceService<Person>();
+                    break;
+                case EntityClassKeyStrings.UserEntity:
+                    subClassProvider = this.GetRelatedPersistenceService<UserEntity>();
+                    break;
+                case EntityClassKeyStrings.Patient:
+                    subClassProvider = this.GetRelatedPersistenceService<Patient>();
+                    break;
+                case EntityClassKeyStrings.Provider:
+                    subClassProvider = this.GetRelatedPersistenceService<Provider>();
+                    break;
+                case EntityClassKeyStrings.Food:
+                case EntityClassKeyStrings.Animal:
+                    subClassProvider = this.GetRelatedPersistenceService<NonPersonLivingSubject>();
+                    break;
+
             }
 
-            if(subClassProvider is IHasSubclassConversion edps)
+            if (subClassProvider is IHasSubclassConversion edps)
             {
                 return (TEntity)edps.Convert(context, retVal, dbModel, referenceObjects);
             }

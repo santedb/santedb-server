@@ -15,7 +15,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
     /// <summary>
     /// Identifier type persistence
     /// </summary>
-    [TestFixture(Category = "Persistence", TestName = "ADO Identifier Types")]
+    [TestFixture(Category = "Persistence")]
     [ExcludeFromCodeCoverage]
     public class IdentifierTypePersistenceServiceTest : DataPersistenceTest
     {

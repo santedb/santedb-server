@@ -16,7 +16,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
     /// <summary>
     /// Test for persistence of materials
     /// </summary>
-    [TestFixture(Category = "Persistence", TestName = "ADO Manufactured Material Entity")]
+    [TestFixture(Category = "Persistence")]
     [ExcludeFromCodeCoverage]
     public class ManufacturedMaterialPersistenceTest : DataPersistenceTest
     {

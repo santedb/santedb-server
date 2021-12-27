@@ -16,7 +16,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
     /// <summary>
     /// Tests the assigning authority persistence service
     /// </summary>
-    [TestFixture(Category = "Persistence", TestName = "ADO CodeSystem")]
+    [TestFixture(Category = "Persistence")]
     [ExcludeFromCodeCoverage]
     public class CodeSystemPersistenceTest : DataPersistenceTest
     {

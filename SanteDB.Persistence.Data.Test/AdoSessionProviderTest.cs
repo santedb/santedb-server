@@ -22,7 +22,7 @@ namespace SanteDB.Persistence.Data.Test
     /// <summary>
     /// ADO Policy Information Service Test Suite
     /// </summary>
-    [TestFixture(Category = "Persistence", TestName = "ADO Session Provider Test")]
+    [TestFixture(Category = "Persistence")]
     [ExcludeFromCodeCoverage]
     public class AdoSessionProviderTest : DataPersistenceTest
     {

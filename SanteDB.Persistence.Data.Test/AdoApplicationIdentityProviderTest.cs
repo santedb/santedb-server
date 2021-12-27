@@ -18,7 +18,7 @@ namespace SanteDB.Persistence.Data.Test
     /// <summary>
     /// Application identity provider test
     /// </summary>
-    [TestFixture(Category = "Persistence", TestName = "ADO App Identity Provider")]
+    [TestFixture(Category = "Persistence")]
     [ExcludeFromCodeCoverage]
     public class AdoApplicationIdentityProviderTest : DataPersistenceTest
     {

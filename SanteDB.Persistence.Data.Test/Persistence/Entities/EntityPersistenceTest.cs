@@ -21,7 +21,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
     /// <summary>
     /// Tests for entities
     /// </summary>
-    [TestFixture(Category = "Persistence", TestName = "ADO Entity")]
+    [TestFixture(Category = "Persistence")]
     [ExcludeFromCodeCoverage]
     public class EntityPersistenceTest : DataPersistenceTest
     {

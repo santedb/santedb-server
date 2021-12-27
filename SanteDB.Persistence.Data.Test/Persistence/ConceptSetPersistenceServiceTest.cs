@@ -14,7 +14,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
     /// <summary>
     /// Test fixture
     /// </summary>
-    [TestFixture(Category = "Persistence", TestName = "ADO Concept Set")]
+    [TestFixture(Category = "Persistence")]
     [ExcludeFromCodeCoverage]
     public class ConceptSetPersistenceServiceTest : DataPersistenceTest
     {
