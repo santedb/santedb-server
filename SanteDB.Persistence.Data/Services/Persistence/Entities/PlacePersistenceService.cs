@@ -20,15 +20,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         {
         }
 
-        /// <summary>
-        /// Ensure dependent objects are stored
-        /// </summary>
-        protected override Place BeforePersisting(DataContext context, Place data)
-        {
-            data.GeoTagKey = this.EnsureExists(context, data.GeoTag)?.Key ?? data.GeoTagKey; 
-            return base.BeforePersisting(context, data);
-        }
-
         /// <inheritdoc />
         protected override Place DoInsertModel(DataContext context, Place data)
         {
@@ -37,6 +28,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             if(data.Services != null)
             {
                 retVal.Services = this.UpdateModelVersionedAssociations(context, retVal, data.Services).ToList();
+                retVal.SetLoaded(o => o.Services);
             }
 
             return retVal;
@@ -50,6 +42,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             if (data.Services != null)
             {
                 retVal.Services = this.UpdateModelVersionedAssociations(context, retVal, data.Services).ToList();
+                retVal.SetLoaded(o => o.Services);
             }
 
             return retVal;

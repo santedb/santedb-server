@@ -75,6 +75,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             if (data.DisplayNames != null)
             {
                 retVal.DisplayNames = base.UpdateModelAssociations(context, retVal, data.DisplayNames).ToList();
+                retVal.SetLoaded(o => o.DisplayNames);
+
             }
 
             return retVal;
@@ -90,6 +92,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             if (data.DisplayNames != null)
             {
                 retVal.DisplayNames = base.UpdateModelAssociations(context, retVal, data.DisplayNames).ToList();
+                retVal.SetLoaded(o => o.DisplayNames);
+
             }
 
             return retVal;

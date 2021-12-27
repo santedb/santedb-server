@@ -63,6 +63,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             if (data.ConceptNames != null)
             {
                 retVal.ConceptNames = base.UpdateModelVersionedAssociations<ConceptName>(context, retVal, data.ConceptNames).ToList();
+                retVal.SetLoaded(o => o.ConceptNames);
+
             }
 
             // Concept sets
@@ -80,12 +82,16 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             if (data.ReferenceTerms != null)
             {
                 retVal.ReferenceTerms = base.UpdateModelVersionedAssociations<ConceptReferenceTerm>(context, retVal, data.ReferenceTerms).ToList();
+                retVal.SetLoaded(o => o.ReferenceTerms);
+
             }
 
             // Relationships
             if (data.Relationship != null)
             {
-                retVal.Relationship = base.UpdateModelVersionedAssociations<ConceptRelationship>(context, retVal, data.Relationship).ToList();
+                retVal.Relationship = base.UpdateModelVersionedAssociations<ConceptRelationship>(context, retVal, data.Relationship).ToList(); 
+                retVal.SetLoaded(o => o.Relationship);
+
             }
             return retVal;
         }
@@ -101,6 +107,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             if (data.ConceptNames != null)
             {
                 retVal.ConceptNames = base.UpdateModelVersionedAssociations<ConceptName>(context, retVal, data.ConceptNames).ToList();
+                retVal.SetLoaded(o => o.ConceptNames);
+
             }
 
             // Update concept sets
@@ -118,12 +126,16 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             if (data.ReferenceTerms != null)
             {
                 retVal.ReferenceTerms = base.UpdateModelVersionedAssociations<ConceptReferenceTerm>(context, retVal, data.ReferenceTerms).ToList();
+                retVal.SetLoaded(o => o.ReferenceTerms);
+
             }
 
             // Relationships
             if (data.Relationship != null)
             {
                 retVal.Relationship = base.UpdateModelVersionedAssociations<ConceptRelationship>(context, retVal, data.Relationship).ToList();
+                retVal.SetLoaded(o => o.Relationship);
+
             }
 
             return retVal;

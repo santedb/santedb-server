@@ -43,6 +43,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             if (data.Component != null)
             {
                 retVal.Component = this.UpdateModelAssociations(context, retVal, data.Component).ToList();
+                retVal.SetLoaded(o => o.Component);
             }
 
             return retVal;
@@ -58,6 +59,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             if (data.Component != null)
             {
                 retVal.Component = this.UpdateModelAssociations(context, retVal, data.Component).ToList();
+                retVal.SetLoaded(o => o.Component);
             }
 
             return retVal;
