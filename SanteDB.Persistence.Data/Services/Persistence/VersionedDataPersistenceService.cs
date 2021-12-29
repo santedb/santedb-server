@@ -30,6 +30,16 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         where TDbModel : DbVersionedData, IDbHasStatus, new()
         where TDbKeyModel : DbIdentified, new()
     {
+
+
+        /// <summary>
+        /// Perform a copy of the existing version inforamtion to a new version
+        /// </summary>
+        /// <param name="context">The context on which the records should be inserted</param>
+        /// <param name="previousVersionKey">The previous version to be copied</param>
+        /// <param name="newVersionKey">The new version key to be copied to</param>
+        protected abstract void DoCopyVersionInternal(DataContext context, Guid previousVersionKey, Guid newVersionKey);
+
         /// <summary>
         /// Generate the specified constructor
         /// </summary>
@@ -322,7 +332,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
                 newVersion.ObsoletedByKeySpecified = model.ObsoletionTimeSpecified = true;
                 newVersion.VersionKey = Guid.NewGuid();
-                return context.Insert(newVersion);
+
+                var retVal =context.Insert(newVersion); // Insert the core version
+
+                // Copy a new version of dependent tables
+                this.DoCopyVersionInternal(context, retVal.ReplacesVersionKey.GetValueOrDefault(), retVal.VersionKey);
+
+                return retVal;
 #if DEBUG
             }
             finally
@@ -385,13 +401,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                         case DeleteMode.NullifyDelete:
                         case DeleteMode.ObsoleteDelete:
                         case DeleteMode.LogicalDelete:
-                            context.InsertAll(
-                                context.UpdateAll<TDbModel>(context.Query<TDbModel>(domainExpression), o =>
+                            
+                            foreach(var newVersion in context.InsertAll(
+                                context.UpdateAll<TDbModel>(context.Query<TDbModel>(domainExpression), o => // Update the current version
                                 {
                                     o.ObsoletionTime = DateTimeOffset.Now;
                                     o.ObsoletedByKey = context.ContextId;
                                     return o;
-                                }).Select(o =>
+                                }).Select(o => // Insert a new version
                                 {
                                     o.VersionSequenceId = null;
                                     o.ReplacesVersionKey = o.VersionKey;
@@ -402,7 +419,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                                         deletionMode == DeleteMode.ObsoleteDelete ? StatusKeys.Obsolete : StatusKeys.Inactive;
                                     return o;
                                 })
-                            );
+                            ))
+                            {
+                                this.DoCopyVersionInternal(context, newVersion.ReplacesVersionKey.GetValueOrDefault(), newVersion.VersionKey);
+                            }
+
                             break;
 
                         case DeleteMode.PermanentDelete:

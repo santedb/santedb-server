@@ -50,6 +50,19 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         }
 
         /// <inheritdoc/>
+        protected override void DoCopyVersionInternal(DataContext context, Guid previousVersionKey, Guid newVersionKey)
+        {
+            base.DoCopyVersionInternal(context, previousVersionKey, newVersionKey);
+            var existingVersion = context.FirstOrDefault<TDbTopLevelTable>(o => o.ParentKey == previousVersionKey);
+            if (existingVersion == null)
+            {
+                existingVersion = new TDbTopLevelTable();
+            }
+            existingVersion.ParentKey = newVersionKey;
+            context.Insert(existingVersion);
+        }
+
+        /// <inheritdoc/>
         public override IOrmResultSet ExecuteQueryOrm(DataContext context, Expression<Func<TEntity, bool>> query)
         {
             if (context == null)
@@ -114,6 +127,19 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         where TEntity : Entity, IVersionedEntity, new()
         where TDbEntitySubTable : DbEntitySubTable, new()
     {
+
+        /// <inheritdoc />
+        protected override void DoCopyVersionInternal(DataContext context, Guid previousVersionKey, Guid newVersionKey)
+        {
+            var existingVersion = context.FirstOrDefault<TDbEntitySubTable>(o => o.ParentKey == previousVersionKey);
+            if (existingVersion == null)
+            {
+                existingVersion = new TDbEntitySubTable();
+            }
+            existingVersion.ParentKey = newVersionKey;
+            context.Insert(existingVersion);
+        }
+
         /// <summary>
         /// Creates a dependency injected
         /// </summary>
@@ -351,26 +377,26 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                 case EntityClassKeyStrings.PrecinctOrBorough:
                 case EntityClassKeyStrings.ServiceDeliveryLocation:
                 case EntityClassKeyStrings.State:
-                        subClassProvider = this.GetRelatedPersistenceService<Place>();
-                        break;
+                    subClassProvider = this.GetRelatedPersistenceService<Place>();
+                    break;
                 case EntityClassKeyStrings.ManufacturedMaterial:
-                        subClassProvider = this.GetRelatedPersistenceService<ManufacturedMaterial>();
-                        break;
+                    subClassProvider = this.GetRelatedPersistenceService<ManufacturedMaterial>();
+                    break;
                 case EntityClassKeyStrings.Material:
-                        subClassProvider = this.GetRelatedPersistenceService<Material>();
-                        break;
+                    subClassProvider = this.GetRelatedPersistenceService<Material>();
+                    break;
                 case EntityClassKeyStrings.NonLivingSubject:
-                        subClassProvider = this.GetRelatedPersistenceService<ApplicationEntity>();
-                        break;
+                    subClassProvider = this.GetRelatedPersistenceService<ApplicationEntity>();
+                    break;
                 case EntityClassKeyStrings.Device:
-                        subClassProvider = this.GetRelatedPersistenceService<DeviceEntity>();
-                        break;
+                    subClassProvider = this.GetRelatedPersistenceService<DeviceEntity>();
+                    break;
                 case EntityClassKeyStrings.Organization:
-                        subClassProvider = this.GetRelatedPersistenceService<Organization>();
-                        break;
+                    subClassProvider = this.GetRelatedPersistenceService<Organization>();
+                    break;
                 case EntityClassKeyStrings.Container:
-                        subClassProvider = this.GetRelatedPersistenceService<Container>();
-                        break;
+                    subClassProvider = this.GetRelatedPersistenceService<Container>();
+                    break;
                 case EntityClassKeyStrings.Person:
                     subClassProvider = this.GetRelatedPersistenceService<Person>();
                     break;
@@ -476,7 +502,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// </summary>
         protected override TEntity DoUpdateModel(DataContext context, TEntity data)
         {
-            
+
             var retVal = base.DoUpdateModel(context, data);
 
             if (data.Addresses != null)
