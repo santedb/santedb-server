@@ -34,9 +34,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         }
 
         /// <inheritdoc/>
-        internal override ApplicationEntity DoConvertSubclassData(DataContext context, ApplicationEntity modelData, DbEntityVersion dbModel, params object[] referenceObjects)
+        protected override ApplicationEntity DoConvertToInformationModelEx(DataContext context,  DbEntityVersion dbModel, params object[] referenceObjects)
         {
 
+            var modelData = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
             var dbApplication = referenceObjects.OfType<DbApplicationEntity>().FirstOrDefault();
             if (dbApplication == null)
             {

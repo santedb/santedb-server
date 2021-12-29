@@ -50,7 +50,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
 
         /// <summary>
         /// Perform the update
-        /// </summary>
+        /// </summary>ialpers
         protected override TModel DoUpdateModel(DataContext context, TModel data)
         {
             var retVal = base.DoUpdateModel(context, data);
@@ -65,8 +65,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         }
 
         /// <inheritdoc/>
-        internal override TModel DoConvertSubclassData(DataContext context, TModel modelData, DbEntityVersion dbModel, params object[] referenceObjects)
+        protected override TModel DoConvertToInformationModelEx(DataContext context,  DbEntityVersion dbModel, params object[] referenceObjects)
         {
+            var modelData = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
             var personData = referenceObjects.OfType<DbPerson>().FirstOrDefault();
             if (personData == null)
             {

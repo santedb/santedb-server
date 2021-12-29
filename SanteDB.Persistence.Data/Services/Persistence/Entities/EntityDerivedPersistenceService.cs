@@ -210,7 +210,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
     /// <summary>
     /// Persistence service that is responsible for storing and retrieving entities
     /// </summary>
-    public abstract class EntityDerivedPersistenceService<TEntity> : VersionedDataPersistenceService<TEntity, DbEntityVersion, DbEntity>, IHasSubclassConversion
+    public abstract class EntityDerivedPersistenceService<TEntity> : VersionedDataPersistenceService<TEntity, DbEntityVersion, DbEntity>, IAdoClassMapper
         where TEntity : Entity, IVersionedEntity, new()
     {
 
@@ -338,18 +338,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         }
 
         /// <summary>
-        /// Convert the sub-class data of the return value
+        /// Perform the mapping of the instance to appropriate class
         /// </summary>
         /// <param name="context">The context on which the data is being retrieved</param>
         /// <param name="dbModel">The model which was retrieved</param>
-        /// <param name="modelData">The model data which has already be constructed</param>
         /// <param name="referenceObjects">The referenced objects</param>
-        internal abstract TEntity DoConvertSubclassData(DataContext context, TEntity modelData, DbEntityVersion dbModel, params object[] referenceObjects);
-
-        /// <summary>
-        /// Convert the data model back to information model
-        /// </summary>
-        protected override TEntity DoConvertToInformationModel(DataContext context, DbEntityVersion dbModel, params Object[] referenceObjects)
+        protected virtual TEntity DoConvertToInformationModelEx(DataContext context, DbEntityVersion dbModel, params object[] referenceObjects)
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
 
@@ -410,18 +404,23 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                     break;
             }
 
+            return retVal;
+        }
 
-            // switch the class concept
-            // this code ensures that no matter where the entry point is into the persistence layer, that the proper return 
-            // class is loaded based on the class code of the data being saved
-            if (this.TryGetSubclassPersister(dbModel.ClassConceptKey, out var subClassProvider) && subClassProvider is IHasSubclassConversion edps)
+        /// <summary>
+        /// Convert the data model back to information model
+        /// </summary>
+        protected override TEntity DoConvertToInformationModel(DataContext context, DbEntityVersion dbModel, params Object[] referenceObjects)
+        {
+            if (this.TryGetSubclassPersister(dbModel.ClassConceptKey, out var subClassProvider) && subClassProvider is IAdoClassMapper edps)
             {
-                return (TEntity)edps.Convert(context, retVal, dbModel, referenceObjects);
+                return (TEntity)edps.MapToModelInstanceEx(context, dbModel, referenceObjects);
             }
-            else
+            else 
             {
-                return retVal;
+                return this.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
             }
+           
         }
 
         /// <summary>
@@ -563,13 +562,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         }
 
         /// <summary>
-        /// Convert the object to the subclass
+        /// Map to model instance
         /// </summary>
-        public object Convert(DataContext context, object existingModel, object dbModel, params object[] referenceObjects)
-        {
-            // Convert
-            var retVal = existingModel.Convert<TEntity>();
-            return this.DoConvertSubclassData(context, retVal, (DbEntityVersion)dbModel, referenceObjects);
-        }
+        object IAdoClassMapper.MapToModelInstanceEx(DataContext context, object dbModel, params object[] referenceObjects) => this.DoConvertToInformationModelEx(context, (DbEntityVersion)dbModel, referenceObjects);
+
     }
 }

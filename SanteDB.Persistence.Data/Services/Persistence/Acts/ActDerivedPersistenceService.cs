@@ -113,7 +113,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
     /// Persistence service that is responsible for the storing and retrieving of acts
     /// </summary>
     /// <typeparam name="TAct">The model type of act</typeparam>
-    public abstract class ActDerivedPersistenceService<TAct> : VersionedDataPersistenceService<TAct, DbActVersion, DbAct>, IHasSubclassConversion
+    public abstract class ActDerivedPersistenceService<TAct> : VersionedDataPersistenceService<TAct, DbActVersion, DbAct>, IAdoClassMapper
         where TAct : Act, IVersionedEntity, new()
     {
 
@@ -244,8 +244,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         /// <returns>The converted subclass</returns>
         internal abstract TAct DoConvertSubclassData(DataContext context, TAct modelData, DbActVersion dbModel, params object[] referenceObjects);
 
-        /// <inheritdoc/>
-        protected override TAct DoConvertToInformationModel(DataContext context, DbActVersion dbModel, params object[] referenceObjects)
+        /// <summary>
+        /// Convert to appropriate sub-class model 
+        /// </summary>
+        protected virtual TAct DoConvertToInformationModelEx(DataContext context, DbActVersion dbModel, params object[] referenceObjects)
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
 
@@ -300,14 +302,21 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                     break;
             }
 
+            return retVal;
+        }
+
+        /// <inheritdoc/>
+        protected override TAct DoConvertToInformationModel(DataContext context, DbActVersion dbModel, params object[] referenceObjects)
+        {
+            
             // Get subclass persister
-            if(this.TryGetSubclassPersister(dbModel.ClassConceptKey, out var persistenceProvider) && persistenceProvider is IHasSubclassConversion edps)
+            if(this.TryGetSubclassPersister(dbModel.ClassConceptKey, out var persistenceProvider) && persistenceProvider is IAdoClassMapper edps)
             {
-                return (TAct)edps.Convert(context, retVal, dbModel, referenceObjects);
+                return (TAct)edps.MapToModelInstanceEx(context, dbModel, referenceObjects);
             }
             else
             {
-                return retVal;
+                return this.DoConvertToInformationModelEx(context, dbModel, referenceObjects) ;
             }
         }
 
@@ -428,13 +437,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         }
 
         /// <summary>
-        /// Convert the object to the subclass
+        /// Map to model instance
         /// </summary>
-        public object Convert(DataContext context, object existingModel, object dbModel, params object[] referenceObjects)
-        {
-            // Convert
-            var retVal = existingModel.Convert<TAct>();
-            return this.DoConvertSubclassData(context, retVal, (DbActVersion)dbModel, referenceObjects);
-        }
+        object IAdoClassMapper.MapToModelInstanceEx(DataContext context, object dbModel, params object[] referenceObjects) => this.DoConvertToInformationModelEx(context, (DbActVersion)dbModel, referenceObjects);
+
     }
 }

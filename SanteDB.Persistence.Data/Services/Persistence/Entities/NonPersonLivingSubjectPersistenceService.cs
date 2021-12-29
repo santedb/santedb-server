@@ -31,8 +31,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// <summary>
         /// Convert to a sub-class
         /// </summary>
-        internal override NonPersonLivingSubject DoConvertSubclassData(DataContext context, NonPersonLivingSubject modelData, DbEntityVersion dbModel, params object[] referenceObjects)
+        protected override NonPersonLivingSubject DoConvertToInformationModelEx(DataContext context, DbEntityVersion dbModel, params object[] referenceObjects)
         {
+            var modelData = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
             var nplsData = referenceObjects.OfType<DbNonPersonLivingSubject>().FirstOrDefault();
             if(nplsData == null )
             {

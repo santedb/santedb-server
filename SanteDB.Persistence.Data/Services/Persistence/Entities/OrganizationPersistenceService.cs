@@ -33,8 +33,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         }
 
         /// <inheritdoc/>
-        internal override Organization DoConvertSubclassData(DataContext context, Organization modelData, DbEntityVersion dbModel, params object[] referenceObjects)
+        protected override Organization DoConvertToInformationModelEx(DataContext context, DbEntityVersion dbModel, params object[] referenceObjects)
         {
+            var modelData = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
             var organizationData = referenceObjects.OfType<DbOrganization>().FirstOrDefault();
             if (organizationData == null)
             {

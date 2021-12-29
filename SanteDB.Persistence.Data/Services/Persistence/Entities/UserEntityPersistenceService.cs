@@ -33,9 +33,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         }
 
         /// <inheritdoc/>
-        internal override UserEntity DoConvertSubclassData(DataContext context, UserEntity modelData, DbEntityVersion dbModel, params object[] referenceObjects)
+        protected override UserEntity DoConvertToInformationModelEx(DataContext context, DbEntityVersion dbModel, params object[] referenceObjects)
         {
-            var retVal = base.DoConvertSubclassData(context, modelData, dbModel, referenceObjects);
+            var modelData = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
 
             var userData = referenceObjects.OfType<DbUserEntity>().FirstOrDefault();
             if (userData == null)
@@ -51,8 +51,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                     modelData.SetLoaded(o => o.SecurityUser);
                     break;
             }
-            retVal.SecurityUserKey = userData.SecurityUserKey;
-            return retVal;
+            modelData.SecurityUserKey = userData.SecurityUserKey;
+            return modelData;
         }
     }
 

@@ -27,7 +27,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
         [Test]
         public void TestInsertWithProper()
         {
-            using(AuthenticationContext.EnterSystemContext())
+            using (AuthenticationContext.EnterSystemContext())
             {
                 var userService = ApplicationServiceContext.Current.GetService<IIdentityProviderService>();
                 userService.CreateIdentity("TEST_USER_ENTITY", "@Foo123!", AuthenticationContext.SystemPrincipal);
@@ -67,6 +67,110 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 // Attempt lookup by user name
                 var afterQuery = base.TestQuery<UserEntity>(o => o.SecurityUser.UserName == "TEST_USER_ENTITY", 1).AsResultSet().First();
                 Assert.AreEqual(afterQuery.Key, afterInsert.Key);
+                Assert.AreEqual(1, afterQuery.LoadProperty(o => o.LanguageCommunication).Count);
+
+            }
+
+        }
+
+        /// <summary>
+        /// Ensures that persistence of user entities wotks with an improper persistence (Entity)
+        /// </summary>
+        [Test]
+        public void TestInsertWithImproperEntity()
+        {
+            using (AuthenticationContext.EnterSystemContext())
+            {
+                var userService = ApplicationServiceContext.Current.GetService<IIdentityProviderService>();
+                userService.CreateIdentity("TEST_USER_ENTITY2", "@Foo123!", AuthenticationContext.SystemPrincipal);
+                var userEntity = new UserEntity()
+                {
+                    Addresses = new List<EntityAddress>()
+                    {
+                        new EntityAddress(AddressUseKeys.HomeAddress, "123 Main Street East", "Hamilton", "ON", "CA", "L8K5N2")
+                    },
+                    Names = new List<EntityName>()
+                    {
+                        new EntityName(NameUseKeys.Legal, "Test", "User2")
+                    },
+                    LanguageCommunication = new List<PersonLanguageCommunication>()
+                    {
+                        new PersonLanguageCommunication("en", true)
+                    },
+                    SecurityUserKey = userService.GetSid("TEST_USER_ENTITY2"),
+                    DateOfBirth = new DateTime(1984, 05, 04)
+                };
+
+                // Insert user entity
+                var afterInsert = base.TestInsert<Entity>(userEntity);
+                Assert.IsInstanceOf<UserEntity>(userEntity);
+                Assert.AreEqual("TEST_USER_ENTITY2", (afterInsert as UserEntity).LoadProperty(o => o.SecurityUser).UserName);
+
+                // Attempt via the repository service
+                var securityService = ApplicationServiceContext.Current.GetService<ISecurityRepositoryService>();
+                Assert.IsNotNull(securityService);
+
+                var principal = userService.Authenticate("TEST_USER_ENTITY2", "@Foo123!");
+
+                var ue = securityService.GetUserEntity(principal.Identity);
+                Assert.AreEqual(ue.Key, afterInsert.Key);
+
+                // Attempt lookup by user name
+                var afterQuery = base.TestQuery<Entity>(o => o.Key == ue.Key, 1).AsResultSet().First();
+                Assert.IsInstanceOf<UserEntity>(afterQuery);
+                Assert.AreEqual(afterQuery.Key, afterInsert.Key);
+
+            }
+        }
+
+        /// <summary>
+        /// Ensures that persistence of user entities wotks with an improper persistence (Person)
+        /// </summary>
+        [Test]
+        public void TestInsertWithImproperPerson()
+        {
+            using (AuthenticationContext.EnterSystemContext())
+            {
+                var userService = ApplicationServiceContext.Current.GetService<IIdentityProviderService>();
+                userService.CreateIdentity("TEST_USER_ENTITY3", "@Foo123!", AuthenticationContext.SystemPrincipal);
+                var userEntity = new UserEntity()
+                {
+                    Addresses = new List<EntityAddress>()
+                    {
+                        new EntityAddress(AddressUseKeys.HomeAddress, "123 Main Street East", "Hamilton", "ON", "CA", "L8K5N2")
+                    },
+                    Names = new List<EntityName>()
+                    {
+                        new EntityName(NameUseKeys.Legal, "Test", "User3")
+                    },
+                    LanguageCommunication = new List<PersonLanguageCommunication>()
+                    {
+                        new PersonLanguageCommunication("en", true)
+                    },
+                    SecurityUserKey = userService.GetSid("TEST_USER_ENTITY3"),
+                    DateOfBirth = new DateTime(1984, 05, 04)
+                };
+
+                // Insert user entity
+                var afterInsert = base.TestInsert<Person>(userEntity);
+                Assert.IsInstanceOf<UserEntity>(userEntity);
+                Assert.AreEqual("TEST_USER_ENTITY3", (afterInsert as UserEntity).LoadProperty(o => o.SecurityUser).UserName);
+
+                // Attempt via the repository service
+                var securityService = ApplicationServiceContext.Current.GetService<ISecurityRepositoryService>();
+                Assert.IsNotNull(securityService);
+
+                var principal = userService.Authenticate("TEST_USER_ENTITY3", "@Foo123!");
+
+                var ue = securityService.GetUserEntity(principal.Identity);
+                Assert.AreEqual(ue.Key, afterInsert.Key);
+
+                // Attempt lookup by user name
+                var afterQuery = base.TestQuery<Person>(o => o.Key == ue.Key, 1).AsResultSet().First();
+                Assert.IsInstanceOf<UserEntity>(afterQuery);
+                Assert.AreEqual(afterQuery.Key, afterInsert.Key);
+                Assert.AreEqual(1, afterQuery.LoadProperty(o => o.LanguageCommunication).Count);
+
             }
         }
     }

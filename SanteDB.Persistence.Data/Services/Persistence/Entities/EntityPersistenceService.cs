@@ -132,12 +132,5 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             }
         }
 
-        /// <summary>
-        /// Convert the sub-class information (not needed as Entity is not a subclass of Entity it is an Entity)
-        /// </summary>
-        internal override Entity DoConvertSubclassData(DataContext context, Entity modelData, DbEntityVersion dbModel, params object[] referenceObjects)
-        {
-            return modelData;
-        }
     }
 }

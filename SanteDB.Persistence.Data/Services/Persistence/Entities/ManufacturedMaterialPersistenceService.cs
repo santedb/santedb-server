@@ -30,9 +30,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         }
 
         /// <inheritdoc/>
-        internal override ManufacturedMaterial DoConvertSubclassData(DataContext context, ManufacturedMaterial modelData, DbEntityVersion dbModel, params object[] referenceObjects)
+        protected override ManufacturedMaterial DoConvertToInformationModelEx(DataContext context,  DbEntityVersion dbModel, params object[] referenceObjects)
         {
-
+            var modelData = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
             // Get data material
             var manufacturedMaterialData = referenceObjects.OfType<DbManufacturedMaterial>().FirstOrDefault();
             if (manufacturedMaterialData == null)
@@ -41,11 +41,24 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                 manufacturedMaterialData = context.FirstOrDefault<DbManufacturedMaterial>(o => o.ParentKey == dbModel.VersionKey);
             }
             modelData = modelData.CopyObjectData(this.m_modelMapper.MapDomainInstance<DbManufacturedMaterial, ManufacturedMaterial>(manufacturedMaterialData), false, declaredOnly: true);
-
-            if (this.GetRelatedPersistenceService<Material>() is EntityDerivedPersistenceService<Material> edps)
+            var materialData = referenceObjects.OfType<DbMaterial>().FirstOrDefault();
+            if (materialData == null)
             {
-                modelData = (ManufacturedMaterial)edps.DoConvertSubclassData(context, modelData, dbModel, referenceObjects);
+                this.m_tracer.TraceWarning("Using slow join to DbMaterial from DbEntityVersion");
+                materialData = context.FirstOrDefault<DbMaterial>(o => o.ParentKey == dbModel.VersionKey);
             }
+
+            switch (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+            {
+                case LoadMode.FullLoad:
+                    modelData.FormConcept = this.GetRelatedPersistenceService<Concept>().Get(context, materialData.FormConceptKey);
+                    modelData.SetLoaded(o => o.FormConcept);
+                    modelData.QuantityConcept = this.GetRelatedPersistenceService<Concept>().Get(context, materialData.QuantityConceptKey);
+                    modelData.SetLoaded(o => o.QuantityConcept);
+                    break;
+            }
+
+            modelData.CopyObjectData(this.m_modelMapper.MapDomainInstance<DbMaterial, Material>(materialData), false, declaredOnly: true);
             return modelData;
         }
 

@@ -65,8 +65,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
 
         /// <inheritdoc/>
         /// </summary>
-        internal override Material DoConvertSubclassData(DataContext context, Material modelData, DbEntityVersion dbModel, params object[] referenceObjects)
+        protected override Material DoConvertToInformationModelEx(DataContext context, DbEntityVersion dbModel, params object[] referenceObjects)
         {
+            var modelData = base.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
             var materialData = referenceObjects.OfType<DbMaterial>().FirstOrDefault();
             if (materialData == null)
             {
