@@ -3,8 +3,10 @@ using SanteDB.Core.Exceptions;
 using SanteDB.Core.Extensions;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Interfaces;
+using System.Reflection;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Acts;
+using SanteDB.Core.Model.Attributes;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
@@ -131,6 +133,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         where TDbEntitySubTable : DbEntitySubTable, new()
     {
 
+
         /// <inheritdoc />
         protected override void DoCopyVersionInternal(DataContext context, Guid previousVersionKey, Guid newVersionKey)
         {
@@ -211,72 +214,39 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         where TEntity : Entity, IVersionedEntity, new()
     {
 
+        // Class key map
+        private readonly IDictionary<Guid, Type> m_classKeyMap;
+
         /// <summary>
         /// Try to resolve a persister by class concept key
         /// </summary>
-        /// <param name="classConceptKey">The class concept key to be resolved</param>
+        /// <param name="classKey">The class concept key to be resolved</param>
         /// <param name="persistenceService">The persistence service</param>
         /// <returns>True if the class key has a persister resolved</returns>
-        protected bool TryResolvePersisterByClassKey(Guid classConceptKey, out IAdoPersistenceProvider persistenceService)
+        protected bool TryGetSubclassPersister(Guid classKey, out IAdoPersistenceProvider persistenceService)
         {
-            switch (classConceptKey.ToString().ToLowerInvariant())
+            if (this.m_classKeyMap.TryGetValue(classKey, out Type modelType))
             {
-                case EntityClassKeyStrings.CityOrTown:
-                case EntityClassKeyStrings.Country:
-                case EntityClassKeyStrings.CountyOrParish:
-                case EntityClassKeyStrings.Place:
-                case EntityClassKeyStrings.PrecinctOrBorough:
-                case EntityClassKeyStrings.ServiceDeliveryLocation:
-                case EntityClassKeyStrings.State:
-                    persistenceService = this.GetRelatedPersistenceService<Place>();
-                    return true;
-                case EntityClassKeyStrings.ManufacturedMaterial:
-                    persistenceService = this.GetRelatedPersistenceService<ManufacturedMaterial>();
-                    return true;
-                case EntityClassKeyStrings.Material:
-                    persistenceService = this.GetRelatedPersistenceService<Material>();
-                    return true;
-                case EntityClassKeyStrings.NonLivingSubject:
-                    persistenceService = this.GetRelatedPersistenceService<ApplicationEntity>();
-                    return true;
-                case EntityClassKeyStrings.Device:
-                    persistenceService = this.GetRelatedPersistenceService<DeviceEntity>();
-                    return true;
-                case EntityClassKeyStrings.Organization:
-                    persistenceService = this.GetRelatedPersistenceService<Organization>();
-                    return true;
-                case EntityClassKeyStrings.Container:
-                    persistenceService = this.GetRelatedPersistenceService<Container>();
-                    return true;
-                case EntityClassKeyStrings.Person:
-                    persistenceService = this.GetRelatedPersistenceService<Person>();
-                    return true;
-                case EntityClassKeyStrings.UserEntity:
-                    persistenceService = this.GetRelatedPersistenceService<UserEntity>();
-                    return true;
-                case EntityClassKeyStrings.Patient:
-                    persistenceService = this.GetRelatedPersistenceService<Patient>();
-                    return true;
-                case EntityClassKeyStrings.Provider:
-                    persistenceService = this.GetRelatedPersistenceService<Provider>();
-                    return true;
-                case EntityClassKeyStrings.LivingSubject:
-                case EntityClassKeyStrings.Food:
-                case EntityClassKeyStrings.Animal:
-                    persistenceService = this.GetRelatedPersistenceService<NonPersonLivingSubject>();
-                    return true;
+                persistenceService = this.GetRelatedPersistenceService(modelType);
+                return true;
             }
-            persistenceService = null;
-            return false;
+            else
+            {
+                persistenceService = null;
+                return false;
+            }
         }
 
-            /// <summary>
-            /// Creates a dependency injected
-            /// </summary>
-            public EntityDerivedPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
+        /// <summary>
+        /// Creates a dependency injected
+        /// </summary>
+        public EntityDerivedPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
-
-            }
+            m_classKeyMap = AppDomain.CurrentDomain.GetAllTypes()
+               .Where(t => typeof(Entity).IsAssignableFrom(t))
+               .SelectMany(t => t.GetCustomAttributes<ClassConceptKeyAttribute>().Select(c => new { classKey = Guid.Parse(c.ClassConcept), type = t }))
+               .ToDictionary(k => k.classKey, k => k.type);
+        }
 
         /// <summary>
         /// Perform a delete references
@@ -375,33 +345,33 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             {
                 case LoadMode.FullLoad:
                     retVal.ClassConcept = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.ClassConceptKey);
-                    retVal.SetLoaded(o=>o.ClassConcept);
+                    retVal.SetLoaded(o => o.ClassConcept);
                     retVal.CreationAct = this.GetRelatedPersistenceService<Act>().Get(context, dbModel.CreationActKey.GetValueOrDefault());
-                    retVal.SetLoaded(o=>o.CreationAct);
+                    retVal.SetLoaded(o => o.CreationAct);
                     retVal.DeterminerConcept = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.DeterminerConceptKey);
-                    retVal.SetLoaded(o=>o.DeterminerConcept);
+                    retVal.SetLoaded(o => o.DeterminerConcept);
                     retVal.StatusConcept = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.StatusConceptKey);
-                    retVal.SetLoaded(o=>o.StatusConcept);
+                    retVal.SetLoaded(o => o.StatusConcept);
                     retVal.TypeConcept = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.TypeConceptKey.GetValueOrDefault());
-                    retVal.SetLoaded(o=>o.TypeConcept);
+                    retVal.SetLoaded(o => o.TypeConcept);
                     goto case LoadMode.SyncLoad;
                 case LoadMode.SyncLoad:
                     retVal.Addresses = this.GetRelatedPersistenceService<EntityAddress>().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
-                    retVal.SetLoaded(o=>o.Addresses);
+                    retVal.SetLoaded(o => o.Addresses);
                     retVal.Extensions = this.GetRelatedPersistenceService<EntityExtension>().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
-                    retVal.SetLoaded(o=>o.Extensions);
+                    retVal.SetLoaded(o => o.Extensions);
                     retVal.Identifiers = this.GetRelatedPersistenceService<EntityIdentifier>().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
-                    retVal.SetLoaded(o=>o.Identifiers);
+                    retVal.SetLoaded(o => o.Identifiers);
                     retVal.Names = this.GetRelatedPersistenceService<EntityName>().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
-                    retVal.SetLoaded(o=>o.Names);
+                    retVal.SetLoaded(o => o.Names);
                     retVal.Notes = this.GetRelatedPersistenceService<EntityNote>().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
-                    retVal.SetLoaded(o=>o.Notes);
+                    retVal.SetLoaded(o => o.Notes);
                     retVal.Relationships = this.GetRelatedPersistenceService<EntityRelationship>().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
-                    retVal.SetLoaded(o=>o.Relationships);
+                    retVal.SetLoaded(o => o.Relationships);
                     retVal.Tags = this.GetRelatedPersistenceService<EntityTag>().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
-                    retVal.SetLoaded(o=>o.Tags);
+                    retVal.SetLoaded(o => o.Tags);
                     retVal.Telecoms = this.GetRelatedPersistenceService<EntityTelecomAddress>().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
-                    retVal.SetLoaded(o=>o.Telecoms);
+                    retVal.SetLoaded(o => o.Telecoms);
 
                     if (dbModel.GeoTagKey.HasValue)
                     {
@@ -424,7 +394,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                         .ToList()
                         .Select(o => new SecurityPolicyInstance(new SecurityPolicy(o.Object2.Name, o.Object2.Oid, o.Object2.IsPublic, o.Object2.CanOverride), PolicyGrantType.Grant))
                         .ToList();
-                    retVal.SetLoaded(o=>o.Policies);
+                    retVal.SetLoaded(o => o.Policies);
                     break;
             }
 
@@ -432,7 +402,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             // switch the class concept
             // this code ensures that no matter where the entry point is into the persistence layer, that the proper return 
             // class is loaded based on the class code of the data being saved
-            if (this.TryResolvePersisterByClassKey(dbModel.ClassConceptKey, out var subClassProvider) && subClassProvider is IHasSubclassConversion edps)
+            if (this.TryGetSubclassPersister(dbModel.ClassConceptKey, out var subClassProvider) && subClassProvider is IHasSubclassConversion edps)
             {
                 return (TEntity)edps.Convert(context, retVal, dbModel, referenceObjects);
             }

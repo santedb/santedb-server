@@ -4,6 +4,7 @@
  *	<isInstalled>select ck_patch('20211229-01') from RDB$DATABASE</isInstalled>
  * </feature>
  */
+
 CREATE TABLE NAR_TBL (
 	ACT_VRSN_ID UUID NOT NULL,
 	VER VARCHAR(32),

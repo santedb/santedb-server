@@ -61,7 +61,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                 case Material material:
                     return this.GetRelatedPersistenceService<Material>().Insert(context, material);
                 default:
-                    if (this.TryResolvePersisterByClassKey(data.ClassConceptKey.GetValueOrDefault(), out var service))
+                    if (this.TryGetSubclassPersister(data.ClassConceptKey.GetValueOrDefault(), out var service))
                     {
                         return (Entity)service.Insert(context, data);
                     }
@@ -113,7 +113,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                     return this.GetRelatedPersistenceService<Material>().Update(context, material);
 
                 default:
-                    if (this.TryResolvePersisterByClassKey(data.ClassConceptKey.GetValueOrDefault(), out var service))
+                    if (this.TryGetSubclassPersister(data.ClassConceptKey.GetValueOrDefault(), out var service))
                     {
                         return (Entity)service.Update(context, data);
                     }
