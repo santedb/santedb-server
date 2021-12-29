@@ -16,6 +16,7 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
+using SanteDB.Core.Model.Constants;
 using SanteDB.OrmLite.Attributes;
 using SanteDB.Persistence.Data.Model.Security;
 using System;
@@ -29,6 +30,22 @@ namespace SanteDB.Persistence.Data.Model.Entities
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class DbUserEntity : DbPersonSubTable
     {
+        /// <summary>
+        /// Parent key
+        /// </summary>
+        [JoinFilter(PropertyName = nameof(DbEntityVersion.ClassConceptKey), Value = EntityClassKeyStrings.UserEntity)]
+        public override Guid ParentKey
+        {
+            get
+            {
+                return base.ParentKey;
+            }
+
+            set
+            {
+                base.ParentKey = value;
+            }
+        }
 
         /// <summary>
         /// Gets or sets the security user which is associated with this entity
