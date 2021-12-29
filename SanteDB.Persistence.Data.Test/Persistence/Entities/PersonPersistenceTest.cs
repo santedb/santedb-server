@@ -38,7 +38,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                     },
                     DateOfBirth = new DateTime(1990, 01, 01),
                     DateOfBirthPrecision = Core.Model.DataTypes.DatePrecision.Day,
-                    GenderConceptKey = NullReasonKeys.NotAsked,
+                    GenderConceptKey = NullReasonKeys.NoInformation,
                     Identifiers = new List<Core.Model.DataTypes.EntityIdentifier>()
                     {
                         new Core.Model.DataTypes.EntityIdentifier(AssigningAuthorityKeys.Gs1GlobalTradeIdentificationNumber, "123")
@@ -65,9 +65,9 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 var dtb = new DateTime(1990, 01, 01);
                 base.TestQuery<Person>(o => o.DateOfBirth == dtb, 1);
                 base.TestQuery<Person>(o => o.OccupationKey == occupationKey, 1);
-                base.TestQuery<Person>(o => o.GenderConceptKey == NullReasonKeys.NotAsked, 1);
+                base.TestQuery<Person>(o => o.GenderConceptKey == NullReasonKeys.NoInformation, 1);
                 base.TestQuery<Person>(o => o.OccupationKey == occupationKey && o.Template.Mnemonic == "org.santedb.template.sample.santa", 1);
-                var afterQuery = base.TestQuery<Person>(o => o.Occupation.Mnemonic == "OccupationType-BusinessFinance" && o.GenderConceptKey == NullReasonKeys.NotAsked, 1).AsResultSet().First();
+                var afterQuery = base.TestQuery<Person>(o => o.Occupation.Mnemonic == "OccupationType-BusinessFinance" && o.GenderConceptKey == NullReasonKeys.NoInformation, 1).AsResultSet().First();
 
                 Assert.IsNull(afterQuery.Names);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Names).Count);
@@ -75,7 +75,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 Assert.IsNull(afterQuery.Occupation);
                 Assert.AreEqual("OccupationType-BusinessFinance", afterQuery.LoadProperty(o => o.Occupation).Mnemonic);
                 Assert.IsNull(afterQuery.GenderConcept);
-                Assert.AreEqual("NullFlavor-NotAsked", afterQuery.LoadProperty(o => o.GenderConcept).Mnemonic);
+                Assert.AreEqual("NullFlavor-NoInformation", afterQuery.LoadProperty(o => o.GenderConcept).Mnemonic);
                 Assert.AreEqual("org.santedb.template.sample.santa", afterQuery.LoadProperty(o => o.Template).Mnemonic);
                 Assert.AreEqual(dtb, afterQuery.DateOfBirth);
                 Assert.AreEqual(DatePrecision.Day, afterQuery.DateOfBirthPrecision);
@@ -92,7 +92,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 // Should not return on old occ code
                 base.TestQuery<Person>(o => o.OccupationKey == occupationKey, 0);
                 // Should not return on old gender code
-                base.TestQuery<Person>(o => o.GenderConceptKey == NullReasonKeys.NotAsked, 0);
+                base.TestQuery<Person>(o => o.GenderConceptKey == NullReasonKeys.NoInformation, 0);
                 base.TestQuery<Person>(o => o.OccupationKey == occupationKey && o.Template.Mnemonic == "org.santedb.template.sample.santa", 0);
 
                 // Should return on new occ code

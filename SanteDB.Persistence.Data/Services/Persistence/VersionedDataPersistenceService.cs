@@ -38,7 +38,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <param name="context">The context on which the records should be inserted</param>
         /// <param name="previousVersionKey">The previous version to be copied</param>
         /// <param name="newVersionKey">The new version key to be copied to</param>
-        protected abstract void DoCopyVersionInternal(DataContext context, Guid previousVersionKey, Guid newVersionKey);
+        protected abstract void DoCopyVersionSubTableInternal(DataContext context, Guid previousVersionKey, Guid newVersionKey);
 
         /// <summary>
         /// Generate the specified constructor
@@ -333,12 +333,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 newVersion.ObsoletedByKeySpecified = model.ObsoletionTimeSpecified = true;
                 newVersion.VersionKey = Guid.NewGuid();
 
-                var retVal =context.Insert(newVersion); // Insert the core version
-
-                // Copy a new version of dependent tables
-                this.DoCopyVersionInternal(context, retVal.ReplacesVersionKey.GetValueOrDefault(), retVal.VersionKey);
-
-                return retVal;
+                return context.Insert(newVersion); // Insert the core version
 #if DEBUG
             }
             finally
@@ -421,7 +416,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                                 })
                             ))
                             {
-                                this.DoCopyVersionInternal(context, newVersion.ReplacesVersionKey.GetValueOrDefault(), newVersion.VersionKey);
+                                this.DoCopyVersionSubTableInternal(context, newVersion.ReplacesVersionKey.GetValueOrDefault(), newVersion.VersionKey);
                             }
 
                             break;
@@ -437,6 +432,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                                 // Reverse the history
                                 foreach (var ver in context.Query<TDbModel>(o => o.Key == existing.Key).OrderByDescending(o => o.VersionSequenceId).Select(o => o.VersionKey))
                                 {
+                                    this.DoDeleteReferencesInternal(context, ver);
                                     context.Delete<TDbModel>(o => o.VersionKey == ver);
                                 }
 
@@ -500,20 +496,21 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                         throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_FOUND, new { type = typeof(TModel).Name, id = key }));
                     }
 
+                    TDbModel retVal = null;
                     switch (deletionMode)
                     {
                         case DeleteMode.ObsoleteDelete:
                             existing.StatusConceptKey = StatusKeys.Obsolete;
-                            return this.DoUpdateInternal(context, existing);
-
+                            retVal = this.DoUpdateInternal(context, existing);
+                            break;
                         case DeleteMode.NullifyDelete:
                             existing.StatusConceptKey = StatusKeys.Nullified;
-                            return this.DoUpdateInternal(context, existing);
-
+                            retVal = this.DoUpdateInternal(context, existing);
+                            break;
                         case DeleteMode.LogicalDelete:
                             existing.StatusConceptKey = StatusKeys.Inactive;
-                            return this.DoUpdateInternal(context, existing);
-
+                            retVal = this.DoUpdateInternal(context, existing);
+                            break;
                         case DeleteMode.PermanentDelete:
                             existing.StatusConceptKey = StatusKeys.Purged;
                             this.DoDeleteReferencesInternal(context, existing.Key);
@@ -522,6 +519,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                             // Reverse the history
                             foreach (var ver in context.Query<TDbModel>(o => o.Key == existing.Key).OrderByDescending(o => o.VersionSequenceId).Select(o => o.VersionKey))
                             {
+                                this.DoDeleteReferencesInternal(context, ver);
                                 context.Delete<TDbModel>(o => o.VersionKey == ver);
                             }
 
@@ -539,6 +537,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                         default:
                             throw new InvalidOperationException(this.m_localizationService.GetString(ErrorMessageStrings.DATA_DELETE_MODE_SUPPORT, new { mode = deletionMode }));
                     }
+
+
+                    // Copy a new version of dependent tables
+                    this.DoCopyVersionSubTableInternal(context, retVal.ReplacesVersionKey.GetValueOrDefault(), retVal.VersionKey);
+
+                    return retVal;
+
                 }
                 else
                 {

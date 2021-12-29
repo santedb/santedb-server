@@ -42,7 +42,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
 
                 var afterQuery = base.TestQuery<NonPersonLivingSubject>(o => o.Strain.Mnemonic == "NullFlavor-NoInformation", 1).AsResultSet().First();
                 Assert.IsNull(afterQuery.Strain);
-                Assert.AreEqual("NullFlavor-NoInformation", afterQuery.LoadProperty(o => o.Strain));
+                Assert.AreEqual("NullFlavor-NoInformation", afterQuery.LoadProperty(o => o.Strain).Mnemonic);
 
                 var afterUpdate = base.TestUpdate(afterQuery, o =>
                 {

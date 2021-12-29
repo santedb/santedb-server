@@ -47,6 +47,7 @@ namespace SanteDB.Persistence.Data.Services
                 pservice.Provider = this.m_configuration.Provider;
                 serviceManager.AddServiceProvider(pservice);
             }
+            serviceManager.AddServiceProvider(typeof(TagPersistenceService));
 
             // TODO: Initialize further classes here
         }

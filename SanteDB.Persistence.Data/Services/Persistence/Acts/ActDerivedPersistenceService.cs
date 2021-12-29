@@ -43,7 +43,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         }
 
         /// <inheritdoc />
-        protected override void DoCopyVersionInternal(DataContext context, Guid previousVersionKey, Guid newVersionKey)
+        protected override void DoCopyVersionSubTableInternal(DataContext context, Guid previousVersionKey, Guid newVersionKey)
         {
             var existingVersion = context.FirstOrDefault<TDbActSubTable>(o => o.ParentKey == previousVersionKey);
             if (existingVersion == null)
@@ -126,10 +126,23 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         protected ActDerivedPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
 
-            m_classKeyMap = AppDomain.CurrentDomain.GetAllTypes()
+            var classAttributes = AppDomain.CurrentDomain.GetAllTypes()
                 .Where(t => typeof(Act).IsAssignableFrom(t))
-                .SelectMany(t => t.GetCustomAttributes<ClassConceptKeyAttribute>().Select(c => new { classKey = Guid.Parse(c.ClassConcept), type = t }))
-                .ToDictionary(k => k.classKey, k => k.type);
+                .SelectMany(t => t.GetCustomAttributes<ClassConceptKeyAttribute>(false).Select(c => new { classKey = Guid.Parse(c.ClassConcept), type = t }))
+                .ToArray();
+
+            this.m_classKeyMap = new Dictionary<Guid, Type>();
+            foreach (var ca in classAttributes)
+            {
+                if (this.m_classKeyMap.ContainsKey(ca.classKey))
+                {
+                    throw new InvalidOperationException(String.Format(ErrorMessages.DUPLICATE_CLASS_CONCEPT, ca.classKey, ca.type));
+                }
+                else
+                {
+                    this.m_classKeyMap.Add(ca.classKey, ca.type);
+                }
+            }
 
         }
 

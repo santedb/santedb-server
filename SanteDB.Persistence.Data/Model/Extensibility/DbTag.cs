@@ -104,7 +104,7 @@ namespace SanteDB.Persistence.Data.Model.Extensibility
         /// Gets or sets the source.
         /// </summary>
         /// <value>The source.</value>
-        [Column("ent_id"), ForeignKey(typeof(DbEntity), nameof(DbEntity.Key))]
+        [Column("ent_id"), ForeignKey(typeof(DbEntityVersion), nameof(DbEntity.Key))]
         public override Guid SourceKey
         {
             get;
@@ -122,7 +122,7 @@ namespace SanteDB.Persistence.Data.Model.Extensibility
         /// Gets or sets the source.
         /// </summary>
         /// <value>The source.</value>
-        [Column("act_id"), ForeignKey(typeof(DbAct), nameof(DbAct.Key))]
+        [Column("act_id"), ForeignKey(typeof(DbActVersion), nameof(DbAct.Key))]
         public override Guid SourceKey
         {
             get;

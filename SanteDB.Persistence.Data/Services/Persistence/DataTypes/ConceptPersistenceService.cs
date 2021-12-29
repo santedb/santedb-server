@@ -170,5 +170,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
 
             return retVal;
         }
+
+        /// <inheritdoc/>
+        /// <remarks>This is not required since there are no sub-tables on the concept version</remarks>
+        protected override void DoCopyVersionSubTableInternal(DataContext context, Guid previousVersionKey, Guid newVersionKey)
+        {
+        }
     }
 }
