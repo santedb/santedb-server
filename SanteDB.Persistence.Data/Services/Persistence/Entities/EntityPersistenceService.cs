@@ -1,4 +1,5 @@
-﻿using SanteDB.Core.Model.Constants;
+﻿using SanteDB.Core.Model;
+using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Services;
@@ -37,38 +38,37 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         {
             switch (data)
             {
+                case NonPersonLivingSubject npls:
+                    return this.GetRelatedPersistenceService<NonPersonLivingSubject>().Insert(context, npls);
                 case Place place:
                     return this.GetRelatedPersistenceService<Place>().Insert(context, place);
-
                 case Organization organization:
                     return this.GetRelatedPersistenceService<Organization>().Insert(context, organization);
-
                 case Patient patient:
                     return this.GetRelatedPersistenceService<Patient>().Insert(context, patient);
-
                 case Provider provider:
                     return this.GetRelatedPersistenceService<Provider>().Insert(context, provider);
-
                 case UserEntity userEntity:
                     return this.GetRelatedPersistenceService<UserEntity>().Insert(context, userEntity);
-
                 case DeviceEntity deviceEntity:
                     return this.GetRelatedPersistenceService<DeviceEntity>().Insert(context, deviceEntity);
-
                 case ApplicationEntity applicationEntity:
                     return this.GetRelatedPersistenceService<ApplicationEntity>().Insert(context, applicationEntity);
-
                 case Person person:
                     return this.GetRelatedPersistenceService<Person>().Insert(context, person);
-
                 case ManufacturedMaterial manufacturedMaterial:
                     return this.GetRelatedPersistenceService<ManufacturedMaterial>().Insert(context, manufacturedMaterial);
-
                 case Material material:
                     return this.GetRelatedPersistenceService<Material>().Insert(context, material);
-
                 default:
-                    return base.DoInsertModel(context, data);
+                    if (this.TryResolvePersisterByClassKey(data.ClassConceptKey.GetValueOrDefault(), out var service))
+                    {
+                        return (Entity)service.Insert(context, data);
+                    }
+                    else
+                    {
+                        return base.DoInsertModel(context, data);
+                    }
             }
         }
 
@@ -113,7 +113,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                     return this.GetRelatedPersistenceService<Material>().Update(context, material);
 
                 default:
-                    return base.DoUpdateModel(context, data);
+                    if (this.TryResolvePersisterByClassKey(data.ClassConceptKey.GetValueOrDefault(), out var service))
+                    {
+                        return (Entity)service.Update(context, data);
+                    }
+                    else
+                    {
+                        return base.DoUpdateModel(context, data);
+                    }
             }
         }
 

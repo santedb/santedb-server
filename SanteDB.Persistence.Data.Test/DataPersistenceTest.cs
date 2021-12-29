@@ -33,6 +33,7 @@ namespace SanteDB.Persistence.Data.Test
 
         // Ignore property
         private string[] IGNORE = new string[] {
+            "Type",
             "PreviousVersionKey",
             "Tag",
             "VersionSequence",

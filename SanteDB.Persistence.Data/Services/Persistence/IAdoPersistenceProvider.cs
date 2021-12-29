@@ -16,6 +16,18 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// Get the provider that this instance of the provider uses
         /// </summary>
         IDbProvider Provider { get; set; }
+
+
+        /// <summary>
+        /// Insert the specified object into the database
+        /// </summary>
+        object Insert(DataContext context, object data);
+
+        /// <summary>
+        /// Update the specified object in the database context
+        /// </summary>
+        object Update(DataContext context, object data);
+
     }
 
     /// <summary>

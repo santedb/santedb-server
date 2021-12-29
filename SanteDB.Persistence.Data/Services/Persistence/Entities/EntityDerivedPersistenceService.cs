@@ -42,11 +42,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         where TDbEntitySubTable : DbEntitySubTable, new()
         where TDbTopLevelTable : DbEntitySubTable, new()
     {
+
+
         /// <summary>
         /// DI constructor
         /// </summary>
         protected EntityDerivedPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
+
         }
 
         /// <inheritdoc/>
@@ -181,12 +184,73 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
     public abstract class EntityDerivedPersistenceService<TEntity> : VersionedDataPersistenceService<TEntity, DbEntityVersion, DbEntity>, IHasSubclassConversion
         where TEntity : Entity, IVersionedEntity, new()
     {
+
         /// <summary>
-        /// Creates a dependency injected
+        /// Try to resolve a persister by class concept key
         /// </summary>
-        public EntityDerivedPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
+        /// <param name="classConceptKey">The class concept key to be resolved</param>
+        /// <param name="persistenceService">The persistence service</param>
+        /// <returns>True if the class key has a persister resolved</returns>
+        protected bool TryResolvePersisterByClassKey(Guid classConceptKey, out IAdoPersistenceProvider persistenceService)
         {
+            switch (classConceptKey.ToString().ToLowerInvariant())
+            {
+                case EntityClassKeyStrings.CityOrTown:
+                case EntityClassKeyStrings.Country:
+                case EntityClassKeyStrings.CountyOrParish:
+                case EntityClassKeyStrings.Place:
+                case EntityClassKeyStrings.PrecinctOrBorough:
+                case EntityClassKeyStrings.ServiceDeliveryLocation:
+                case EntityClassKeyStrings.State:
+                    persistenceService = this.GetRelatedPersistenceService<Place>();
+                    return true;
+                case EntityClassKeyStrings.ManufacturedMaterial:
+                    persistenceService = this.GetRelatedPersistenceService<ManufacturedMaterial>();
+                    return true;
+                case EntityClassKeyStrings.Material:
+                    persistenceService = this.GetRelatedPersistenceService<Material>();
+                    return true;
+                case EntityClassKeyStrings.NonLivingSubject:
+                    persistenceService = this.GetRelatedPersistenceService<ApplicationEntity>();
+                    return true;
+                case EntityClassKeyStrings.Device:
+                    persistenceService = this.GetRelatedPersistenceService<DeviceEntity>();
+                    return true;
+                case EntityClassKeyStrings.Organization:
+                    persistenceService = this.GetRelatedPersistenceService<Organization>();
+                    return true;
+                case EntityClassKeyStrings.Container:
+                    persistenceService = this.GetRelatedPersistenceService<Container>();
+                    return true;
+                case EntityClassKeyStrings.Person:
+                    persistenceService = this.GetRelatedPersistenceService<Person>();
+                    return true;
+                case EntityClassKeyStrings.UserEntity:
+                    persistenceService = this.GetRelatedPersistenceService<UserEntity>();
+                    return true;
+                case EntityClassKeyStrings.Patient:
+                    persistenceService = this.GetRelatedPersistenceService<Patient>();
+                    return true;
+                case EntityClassKeyStrings.Provider:
+                    persistenceService = this.GetRelatedPersistenceService<Provider>();
+                    return true;
+                case EntityClassKeyStrings.LivingSubject:
+                case EntityClassKeyStrings.Food:
+                case EntityClassKeyStrings.Animal:
+                    persistenceService = this.GetRelatedPersistenceService<NonPersonLivingSubject>();
+                    return true;
+            }
+            persistenceService = null;
+            return false;
         }
+
+            /// <summary>
+            /// Creates a dependency injected
+            /// </summary>
+            public EntityDerivedPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
+        {
+
+            }
 
         /// <summary>
         /// Perform a delete references
@@ -212,6 +276,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             context.Delete<DbContainer>(o => o.ParentKey == key);
             context.Delete<DbProvider>(o => o.ParentKey == key);
             context.Delete<DbUserEntity>(o => o.ParentKey == key);
+            context.Delete<DbNonPersonLivingSubject>(o => o.ParentKey == key);
             context.Delete<DbPerson>(o => o.ParentKey == key);
             context.Delete<DbOrganization>(o => o.ParentKey == key);
             context.Delete<DbPlaceService>(o => o.SourceKey == key);
@@ -341,56 +406,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             // switch the class concept
             // this code ensures that no matter where the entry point is into the persistence layer, that the proper return 
             // class is loaded based on the class code of the data being saved
-            IAdoPersistenceProvider subClassProvider = null;
-            switch (dbModel.ClassConceptKey.ToString().ToLowerInvariant())
-            {
-                case EntityClassKeyStrings.CityOrTown:
-                case EntityClassKeyStrings.Country:
-                case EntityClassKeyStrings.CountyOrParish:
-                case EntityClassKeyStrings.Place:
-                case EntityClassKeyStrings.PrecinctOrBorough:
-                case EntityClassKeyStrings.ServiceDeliveryLocation:
-                case EntityClassKeyStrings.State:
-                        subClassProvider = this.GetRelatedPersistenceService<Place>();
-                        break;
-                case EntityClassKeyStrings.ManufacturedMaterial:
-                        subClassProvider = this.GetRelatedPersistenceService<ManufacturedMaterial>();
-                        break;
-                case EntityClassKeyStrings.Material:
-                        subClassProvider = this.GetRelatedPersistenceService<Material>();
-                        break;
-                case EntityClassKeyStrings.NonLivingSubject:
-                        subClassProvider = this.GetRelatedPersistenceService<ApplicationEntity>();
-                        break;
-                case EntityClassKeyStrings.Device:
-                        subClassProvider = this.GetRelatedPersistenceService<DeviceEntity>();
-                        break;
-                case EntityClassKeyStrings.Organization:
-                        subClassProvider = this.GetRelatedPersistenceService<Organization>();
-                        break;
-                case EntityClassKeyStrings.Container:
-                        subClassProvider = this.GetRelatedPersistenceService<Container>();
-                        break;
-                case EntityClassKeyStrings.Person:
-                    subClassProvider = this.GetRelatedPersistenceService<Person>();
-                    break;
-                case EntityClassKeyStrings.UserEntity:
-                    subClassProvider = this.GetRelatedPersistenceService<UserEntity>();
-                    break;
-                case EntityClassKeyStrings.Patient:
-                    subClassProvider = this.GetRelatedPersistenceService<Patient>();
-                    break;
-                case EntityClassKeyStrings.Provider:
-                    subClassProvider = this.GetRelatedPersistenceService<Provider>();
-                    break;
-                case EntityClassKeyStrings.Food:
-                case EntityClassKeyStrings.Animal:
-                    subClassProvider = this.GetRelatedPersistenceService<NonPersonLivingSubject>();
-                    break;
-
-            }
-
-            if (subClassProvider is IHasSubclassConversion edps)
+            if (this.TryResolvePersisterByClassKey(dbModel.ClassConceptKey, out var subClassProvider) && subClassProvider is IHasSubclassConversion edps)
             {
                 return (TEntity)edps.Convert(context, retVal, dbModel, referenceObjects);
             }
@@ -476,7 +492,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// </summary>
         protected override TEntity DoUpdateModel(DataContext context, TEntity data)
         {
-            
+
             var retVal = base.DoUpdateModel(context, data);
 
             if (data.Addresses != null)

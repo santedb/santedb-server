@@ -101,7 +101,6 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 Assert.AreEqual(NullReasonKeys.NotApplicable, afterQuery.OccupationKey);
                 Assert.AreEqual("NullFlavor-NotApplicable", afterQuery.LoadProperty(o => o.Occupation).Mnemonic);
 
-
             }
         }
 

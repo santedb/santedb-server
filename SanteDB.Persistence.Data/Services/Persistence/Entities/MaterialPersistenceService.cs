@@ -23,6 +23,38 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         {
         }
 
+        /// <summary>
+        /// Insert model class
+        /// </summary>
+        protected override Material DoInsertModel(DataContext context, Material data)
+        {
+            switch(data)
+            {
+                case Container ct:
+                    return this.GetRelatedPersistenceService<Container>().Insert(context, ct);
+                case ManufacturedMaterial mm:
+                    return this.GetRelatedPersistenceService<ManufacturedMaterial>().Insert(context, mm);
+                default:
+                    return base.DoInsertModel(context, data);
+            }
+        }
+
+        /// <summary>
+        /// Insert model class
+        /// </summary>
+        protected override Material DoUpdateModel(DataContext context, Material data)
+        {
+            switch (data)
+            {
+                case Container ct:
+                    return this.GetRelatedPersistenceService<Container>().Update(context, ct);
+                case ManufacturedMaterial mm:
+                    return this.GetRelatedPersistenceService<ManufacturedMaterial>().Update(context, mm);
+                default:
+                    return base.DoUpdateModel(context, data);
+            }
+        }
+
         /// <inheritdoc/>
         protected override Material BeforePersisting(DataContext context, Material data)
         {

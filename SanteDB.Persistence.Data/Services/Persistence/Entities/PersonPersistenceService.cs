@@ -1,6 +1,7 @@
 ﻿using SanteDB.Core.Model;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
+using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Entities;
@@ -11,6 +12,7 @@ using System.Text;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Entities
 {
+
     /// <summary>
     /// Persistence service which is responsible for managing persons
     /// </summary>
@@ -21,32 +23,60 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         {
         }
 
+        /// <inheritdoc />
+        protected override Person BeforePersisting(DataContext context, Person data)
+        {
+            data.OccupationKey = this.EnsureExists(context, data.Occupation)?.Key ?? data.OccupationKey;
+            data.GenderConceptKey = this.EnsureExists(context, data.GenderConcept)?.Key ?? data.GenderConceptKey;
+            return base.BeforePersisting(context, data);
+        }
+
         /// <inheritdoc/>
         protected override Person DoInsertModel(DataContext context, Person data)
         {
-            var retVal = base.DoInsertModel(context, data);
-
-            if(data.LanguageCommunication != null)
+            switch (data)
             {
-                retVal.LanguageCommunication = this.UpdateModelVersionedAssociations(context, retVal, data.LanguageCommunication).ToList();
-                retVal.SetLoaded(o => o.LanguageCommunication);
-            }
+                case Patient pat:
+                    return this.GetRelatedPersistenceService<Patient>().Insert(context, pat);
+                case Provider prov:
+                    return this.GetRelatedPersistenceService<Provider>().Insert(context, prov);
+                case UserEntity ue:
+                    return this.GetRelatedPersistenceService<UserEntity>().Insert(context, ue);
+                default:
+                    var retVal = base.DoInsertModel(context, data);
 
-            return retVal;
+                    if (data.LanguageCommunication != null)
+                    {
+                        retVal.LanguageCommunication = this.UpdateModelVersionedAssociations(context, retVal, data.LanguageCommunication).ToList();
+                        retVal.SetLoaded(o => o.LanguageCommunication);
+                    }
+
+                    return retVal;
+            }
         }
 
         /// <inheritdoc/>
         protected override Person DoUpdateModel(DataContext context, Person data)
         {
-            var retVal = base.DoUpdateModel(context, data);
-
-            if (data.LanguageCommunication != null)
+            switch (data)
             {
-                retVal.LanguageCommunication = this.UpdateModelVersionedAssociations(context, retVal, data.LanguageCommunication).ToList();
-                retVal.SetLoaded(o => o.LanguageCommunication);
-            }
+                case Patient pat:
+                    return this.GetRelatedPersistenceService<Patient>().Update(context, pat);
+                case Provider prov:
+                    return this.GetRelatedPersistenceService<Provider>().Update(context, prov);
+                case UserEntity ue:
+                    return this.GetRelatedPersistenceService<UserEntity>().Update(context, ue);
+                default:
+                    var retVal = base.DoUpdateModel(context, data);
 
-            return retVal;
+                    if (data.LanguageCommunication != null)
+                    {
+                        retVal.LanguageCommunication = this.UpdateModelVersionedAssociations(context, retVal, data.LanguageCommunication).ToList();
+                        retVal.SetLoaded(o => o.LanguageCommunication);
+                    }
+
+                    return retVal;
+            }
         }
 
         /// <inheritdoc/>

@@ -236,6 +236,12 @@
   </class>
 
   <!-- Person Maps -->
+  <class modelClass="SanteDB.Core.Model.Entities.NonPersonLivingSubject, SanteDB.Core.Model, Version=1.1.0.0"
+       domainClass="SanteDB.Persistence.Data.Model.Entities.DbNonPersonLivingSubject, SanteDB.Persistence.Data, Version=0.5.0.0">
+    <property modelName="VersionKey" domainName="ParentKey" />
+  </class>
+  
+  <!-- Person Maps -->
   <class modelClass="SanteDB.Core.Model.Entities.Person, SanteDB.Core.Model, Version=1.1.0.0"
        domainClass="SanteDB.Persistence.Data.Model.Entities.DbPerson, SanteDB.Persistence.Data, Version=0.5.0.0">
     <property modelName="VersionKey" domainName="ParentKey" />

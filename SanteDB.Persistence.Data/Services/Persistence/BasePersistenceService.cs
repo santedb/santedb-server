@@ -1247,9 +1247,77 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }
         }
 
+        /// <summary>
+        /// Touch the object with <paramref name="key"/> but don't update it
+        /// </summary>
+        /// <param name="key">The key of the object to touch</param>
+        /// <param name="mode">The mode (commit or rollback)</param>
+        /// <param name="principal">The user touching the object</param>
         public void Touch(Guid key, TransactionMode mode, IPrincipal principal)
         {
-            throw new NotImplementedException();
+            if (key == default(Guid))
+            {
+                throw new ArgumentNullException(nameof(key), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
+            }
+            else if (principal == null)
+            {
+                throw new ArgumentNullException(nameof(principal), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
+            }
+
+            using (var context = this.Provider.GetWriteConnection())
+            {
+                try
+                {
+                    context.Open();
+
+                    using (var tx = context.BeginTransaction())
+                    {
+                        // Establish provenance object
+                        context.EstablishProvenance(principal, null);
+
+                        // Get existing object
+                        var existing = context.FirstOrDefault<TDbModel>(o => o.Key == key);
+                        if(existing is DbVersionedData dbv)
+                        {
+                            dbv.CreatedByKey = context.ContextId;
+                            dbv.CreationTime = DateTimeOffset.Now;
+                        }
+                        else if(existing is DbNonVersionedBaseData dbn)
+                        {
+                            dbn.UpdatedByKey = context.ContextId;
+                            dbn.UpdatedTime = DateTimeOffset.Now;
+                        }
+                        else
+                        {
+                            throw new InvalidOperationException(String.Format(ErrorMessages.ARGUMENT_INCOMPATIBLE_TYPE, existing.GetType(), typeof(DbNonVersionedBaseData)));
+                        }
+
+                        context.Update(existing);
+                        if (mode == TransactionMode.Commit)
+                        {
+                            tx.Commit();
+                            this.m_dataCacheService?.Remove(key);
+                        }
+                    }
+
+                }
+                catch (DbException e)
+                {
+                    this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "Data error executing touch operation", key, e);
+                    throw this.TranslateDbException(e);
+                }
+                catch (Exception e)
+                {
+                    this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "General error executing touch operation", key, e);
+                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.DATA_GENERAL), e);
+                }
+            }
         }
+
+        /// <inheritdoc/>
+        public object Insert(DataContext context, object data) => this.DoInsertModel(context, data.Convert<TModel>());
+
+        /// <inheritdoc/>
+        public object Update(DataContext context, object data) => this.DoUpdateModel(context, data.Convert<TModel>());
     }
 }
