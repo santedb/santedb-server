@@ -310,33 +310,46 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             {
                 case LoadMode.FullLoad:
                     retVal.ClassConcept = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.ClassConceptKey);
-                    retVal.SetLoaded(nameof(Entity.ClassConcept));
+                    retVal.SetLoaded(o=>o.ClassConcept);
                     retVal.CreationAct = this.GetRelatedPersistenceService<Act>().Get(context, dbModel.CreationActKey.GetValueOrDefault());
-                    retVal.SetLoaded(nameof(Entity.CreationAct));
+                    retVal.SetLoaded(o=>o.CreationAct);
                     retVal.DeterminerConcept = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.DeterminerConceptKey);
-                    retVal.SetLoaded(nameof(Entity.DeterminerConcept));
+                    retVal.SetLoaded(o=>o.DeterminerConcept);
                     retVal.StatusConcept = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.StatusConceptKey);
-                    retVal.SetLoaded(nameof(Entity.StatusConcept));
+                    retVal.SetLoaded(o=>o.StatusConcept);
                     retVal.TypeConcept = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.TypeConceptKey.GetValueOrDefault());
-                    retVal.SetLoaded(nameof(Entity.TypeConcept));
+                    retVal.SetLoaded(o=>o.TypeConcept);
                     goto case LoadMode.SyncLoad;
                 case LoadMode.SyncLoad:
                     retVal.Addresses = this.GetRelatedPersistenceService<EntityAddress>().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
-                    retVal.SetLoaded(nameof(Entity.Addresses));
+                    retVal.SetLoaded(o=>o.Addresses);
                     retVal.Extensions = this.GetRelatedPersistenceService<EntityExtension>().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
-                    retVal.SetLoaded(nameof(Entity.Extensions));
+                    retVal.SetLoaded(o=>o.Extensions);
                     retVal.Identifiers = this.GetRelatedPersistenceService<EntityIdentifier>().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
-                    retVal.SetLoaded(nameof(Entity.Identifiers));
+                    retVal.SetLoaded(o=>o.Identifiers);
                     retVal.Names = this.GetRelatedPersistenceService<EntityName>().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
-                    retVal.SetLoaded(nameof(Entity.Names));
+                    retVal.SetLoaded(o=>o.Names);
                     retVal.Notes = this.GetRelatedPersistenceService<EntityNote>().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
-                    retVal.SetLoaded(nameof(Entity.Notes));
+                    retVal.SetLoaded(o=>o.Notes);
                     retVal.Relationships = this.GetRelatedPersistenceService<EntityRelationship>().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
-                    retVal.SetLoaded(nameof(Entity.Relationships));
+                    retVal.SetLoaded(o=>o.Relationships);
                     retVal.Tags = this.GetRelatedPersistenceService<EntityTag>().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
-                    retVal.SetLoaded(nameof(Entity.Tags));
+                    retVal.SetLoaded(o=>o.Tags);
                     retVal.Telecoms = this.GetRelatedPersistenceService<EntityTelecomAddress>().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
-                    retVal.SetLoaded(nameof(Entity.Telecoms));
+                    retVal.SetLoaded(o=>o.Telecoms);
+
+                    if (dbModel.GeoTagKey.HasValue)
+                    {
+                        var dbGeoTag = referenceObjects.OfType<DbGeoTag>().FirstOrDefault();
+                        if (dbGeoTag == null)
+                        {
+                            this.m_tracer.TraceWarning("Using slow geo-tag reference of device");
+                            dbGeoTag = context.FirstOrDefault<DbGeoTag>(o => o.Key == dbModel.GeoTagKey);
+                        }
+                        retVal.GeoTag = this.GetRelatedMappingProvider<GeoTag>().ToModelInstance(context, dbGeoTag);
+                        retVal.SetLoaded(o => o.GeoTag);
+                    }
+
                     goto case LoadMode.QuickLoad;
                 case LoadMode.QuickLoad:
                     var query = context.CreateSqlStatement<DbEntitySecurityPolicy>().SelectFrom(typeof(DbEntitySecurityPolicy), typeof(DbSecurityPolicy))
@@ -346,23 +359,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                         .ToList()
                         .Select(o => new SecurityPolicyInstance(new SecurityPolicy(o.Object2.Name, o.Object2.Oid, o.Object2.IsPublic, o.Object2.CanOverride), PolicyGrantType.Grant))
                         .ToList();
-                    retVal.SetLoaded(nameof(Entity.Policies));
+                    retVal.SetLoaded(o=>o.Policies);
                     break;
             }
 
-
-            // Load geotagging data
-            if (dbModel.GeoTagKey.HasValue && (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy) >= LoadMode.SyncLoad)
-            {
-                var dbGeoTag = referenceObjects.OfType<DbGeoTag>().FirstOrDefault();
-                if (dbGeoTag == null)
-                {
-                    this.m_tracer.TraceWarning("Using slow geo-tag reference of device");
-                    dbGeoTag = context.FirstOrDefault<DbGeoTag>(o => o.Key == dbModel.GeoTagKey);
-                }
-                retVal.GeoTag = this.GetRelatedMappingProvider<GeoTag>().ToModelInstance(context, dbGeoTag);
-                retVal.SetLoaded(o => o.GeoTag);
-            }
 
             // switch the class concept
             // this code ensures that no matter where the entry point is into the persistence layer, that the proper return 
