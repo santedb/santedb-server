@@ -41,7 +41,6 @@ namespace SanteDB.Persistence.Data.Model.Acts
             {
                 return base.ParentKey;
             }
-
             set
             {
                 base.ParentKey = value;

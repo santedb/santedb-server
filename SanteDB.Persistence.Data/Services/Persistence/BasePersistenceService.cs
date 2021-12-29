@@ -278,20 +278,29 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         }
 
         /// <summary>
-        /// Load a model object
+        /// Get related persistence service
         /// </summary>
-        protected IAdoPersistenceProvider<TRelated> GetRelatedPersistenceService<TRelated>()
+        protected IAdoPersistenceProvider<TRelated> GetRelatedPersistenceService<TRelated>() => this.GetRelatedPersistenceService(typeof(TRelated)) as IAdoPersistenceProvider<TRelated>;
+
+        /// <summary>
+        /// Get related persistence service that can store model objects of <paramref name="trelated"/>
+        /// </summary>
+        /// <param name="trelated">The related type of object</param>
+        /// <returns>The persistence provider</returns>
+        protected IAdoPersistenceProvider GetRelatedPersistenceService(Type trelated)
         {
-            if (!s_providers.TryGetValue(typeof(TRelated), out IAdoPersistenceProvider provider))
+            if (!s_providers.TryGetValue(trelated, out IAdoPersistenceProvider provider))
             {
-                provider = ApplicationServiceContext.Current.GetService<IAdoPersistenceProvider<TRelated>>();
+                var relType = typeof(IAdoPersistenceProvider<>).MakeGenericType(trelated);
+                provider = ApplicationServiceContext.Current.GetService(relType) as IAdoPersistenceProvider;
                 if (provider != null)
                 {
-                    s_providers.TryAdd(typeof(TRelated), provider);
+                    s_providers.TryAdd(trelated, provider);
                 }
             }
-            return provider as IAdoPersistenceProvider<TRelated>;
+            return provider;
         }
+
 
         /// <summary>
         /// Perform the actual insert of a model object
