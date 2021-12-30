@@ -101,7 +101,7 @@ namespace SanteDB.Persistence.Data.Model.Roles
         /// Gets or sets the ethnic group code id
         /// </summary>
         [Column("eth_grp_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
-        public Guid? EthnicGroupCodeKey { get; set; }
+        public Guid? EthnicGroupKey { get; set; }
 
         /// <summary>
         /// Gets or sets the ethnic group code id
@@ -109,6 +109,17 @@ namespace SanteDB.Persistence.Data.Model.Roles
         [Column("vip_sts_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
         public Guid? VipStatusKey { get; set; }
 
+        /// <summary>
+        /// Nationality key
+        /// </summary>
+        [Column("nat_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
+        public Guid? NationalityKey { get; set; }
+
+        /// <summary>
+        /// Gets or sets the ethnic group code id
+        /// </summary>
+        [Column("rlgn_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
+        public Guid? ReligiousAffiliationKey { get; set; }
     }
 }
 

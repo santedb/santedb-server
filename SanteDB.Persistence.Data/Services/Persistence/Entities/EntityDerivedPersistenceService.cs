@@ -352,7 +352,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                 case LoadMode.FullLoad:
                     retVal.ClassConcept = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.ClassConceptKey);
                     retVal.SetLoaded(o => o.ClassConcept);
-                    retVal.CreationAct = this.GetRelatedPersistenceService<Act>().Get(context, dbModel.CreationActKey.GetValueOrDefault());
+                    retVal.CreationAct = this.GetRelatedPersistenceService<Act>()?.Get(context, dbModel.CreationActKey.GetValueOrDefault());
                     retVal.SetLoaded(o => o.CreationAct);
                     retVal.DeterminerConcept = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.DeterminerConceptKey);
                     retVal.SetLoaded(o => o.DeterminerConcept);

@@ -4,6 +4,8 @@
  *	<isInstalled>select ck_patch('20211128-01') from RDB$DATABASE</isInstalled>
  * </feature>
  */
- alter table ent_vrsn_tbl add geo_id uuid null; --#!
+ -- OPTIONAL
+ alter table ent_vrsn_tbl add geo_id uuid; --#!
+ -- OPTIONAL
  alter table ent_vrsn_tbl add constraint fk_ent_geo_tag foreign key (geo_id) references geo_tbl(geo_id);--#!
 SELECT REG_PATCH('20211128-01') FROM RDB$DATABASE; --#!

@@ -612,7 +612,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 throw new ArgumentNullException(nameof(IdentifiedData.Key), ErrorMessages.ARGUMENT_NULL);
             }
-
             // Ensure either the relationship points to (key) (either source or target)
             associations = associations.Select(a =>
             {
@@ -621,6 +620,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 {
                     a.SourceEntityKey = data.Key;
                 }
+
                 return a;
             }).ToArray();
 
@@ -637,10 +637,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             var existing = persistenceService.Query(context, o => o.SourceEntityKey == data.Key && !o.ObsoleteVersionSequenceId.HasValue).Select(o => o.Key).ToArray();
 
             // Which are new and which are not?
-            var removedRelationships = existing.Where(o => !associations.Any(a => a.Key == o)).Select(a =>
-            {
-                return persistenceService.Delete(context, a.Value, DeleteMode.LogicalDelete);
-            });
+            var removedRelationships = existing.Where(o => !associations.Any(a => a.Key == o)).Select(a => persistenceService.Delete(context, a.Value, DeleteMode.LogicalDelete));
             var addedRelationships = associations.Where(o => !o.Key.HasValue || !existing.Any(a => a == o.Key)).Select(a =>
             {
                 a.EffectiveVersionSequenceId = data.VersionSequence;

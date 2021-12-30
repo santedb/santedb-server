@@ -152,9 +152,9 @@ namespace SanteDB.Persistence.Data.Test
             catch (AuthenticationException e) when (e.Message == this.m_localizationService.GetString(ErrorMessageStrings.AUTH_DEV_LOCKED))
             {
             }
-            catch
+            catch (Exception e)
             {
-                Assert.Fail("Improper authentication error");
+                Assert.Fail($"Improper authentication error - Expected {typeof(AuthenticationException)} but got {e.GetType()}");
             }
         }
 
@@ -232,9 +232,9 @@ namespace SanteDB.Persistence.Data.Test
             catch (AuthenticationException e) when (e.Message == this.m_localizationService.GetString(ErrorMessageStrings.AUTH_DEV_LOCKED))
             {
             }
-            catch
+            catch (Exception e)
             {
-                Assert.Fail("Wrong exception thrown");
+                Assert.Fail($"Wrong exception thrown - expected {typeof(AuthenticationException)} but got {e.GetType()}");
             }
 
             // Clear lockout
@@ -307,9 +307,9 @@ namespace SanteDB.Persistence.Data.Test
             catch (AuthenticationException e) when (e.Message == this.m_localizationService.GetString(ErrorMessageStrings.AUTH_CANCELLED))
             {
             }
-            catch
+            catch (Exception e)
             {
-                Assert.Fail("Incorrect exception thrown");
+                Assert.Fail($"Incorrect exception thrown expected {typeof(AuthenticationException)} but got {e.GetType()}");
             }
         }
     }

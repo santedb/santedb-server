@@ -13,12 +13,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
     /// <summary>
     /// Entity extension persistence service
     /// </summary>
-    public class ActExtensionPersistenceService : EntityAssociationPersistenceService<EntityExtension, DbEntityExtension>
+    public class EntityExtensionPersistenceService : EntityAssociationPersistenceService<EntityExtension, DbEntityExtension>
     {
         /// <summary>
         /// Creates a DI injected service header
         /// </summary>
-        public ActExtensionPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
+        public EntityExtensionPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
         }
     }
