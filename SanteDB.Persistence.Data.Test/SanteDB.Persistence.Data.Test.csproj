@@ -64,6 +64,7 @@
     <Compile Include="Persistence\Entities\PatientPersistenceTest.cs" />
     <Compile Include="Persistence\Entities\PersonPersistenceTest.cs" />
     <Compile Include="Persistence\Entities\PlacePersistenceTest.cs" />
+    <Compile Include="Persistence\Entities\ProviderPersistenceTest.cs" />
     <Compile Include="Persistence\Entities\UserEntityPersistenceTest.cs" />
     <Compile Include="Persistence\IdentifierTypePersistenceServiceTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

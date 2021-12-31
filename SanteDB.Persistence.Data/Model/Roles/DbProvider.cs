@@ -54,7 +54,7 @@ namespace SanteDB.Persistence.Data.Model.Roles
         /// </summary>
         /// <value>The specialty.</value>
         [Column("spec_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
-		public Guid Specialty {
+		public Guid SpecialtyKey {
 			get;
 			set;
 		}

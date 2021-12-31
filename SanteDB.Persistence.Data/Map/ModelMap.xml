@@ -278,7 +278,6 @@
   <!-- Provider Maps -->
   <class modelClass="SanteDB.Core.Model.Roles.Provider, SanteDB.Core.Model, Version=1.1.0.0"
        domainClass="SanteDB.Persistence.Data.Model.Roles.DbProvider, SanteDB.Persistence.Data, Version=0.5.0.0">
-    <property modelName="ProviderSpecialtyKey" domainName="Specialty" />
     <property modelName="VersionKey" domainName="ParentKey" />
   </class>
 
