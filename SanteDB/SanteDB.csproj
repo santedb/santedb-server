@@ -372,6 +372,9 @@
     <None Include="config\template\SanteDB MDM.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="data\000-Nationality.dataset">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <Content Include="santedb.config.nuget.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
