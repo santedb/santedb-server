@@ -43,8 +43,8 @@ namespace SanteDB.Persistence.Data.Model.Acts
         /// <summary>
         /// Gets or sets the handler identifier
         /// </summary>
-        [Column("hdlr_id"), ForeignKey(typeof(DbProtocolHandler), nameof(DbProtocolHandler.Key)), AlwaysJoin]
-        public Guid HandlerKey { get; set; }
+        [Column("hdlr_cls")]
+        public String HandlerClassName { get; set; }
 
         /// <summary>
         /// Gets or sets the OID
@@ -63,6 +63,12 @@ namespace SanteDB.Persistence.Data.Model.Acts
         /// </summary>
         [Column("rplc_proto_id")]
         public Guid? ReplacesProtocolKey { get; set; }
+
+        /// <summary>
+        /// Gets or sets the narrative description of the protocol
+        /// </summary>
+        [Column("nar_id")]
+        public Guid? NarrativeKey { get; set; }
     }
 
     /// <summary>

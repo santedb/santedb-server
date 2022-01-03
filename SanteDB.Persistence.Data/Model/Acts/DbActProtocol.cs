@@ -44,7 +44,7 @@ namespace SanteDB.Persistence.Data.Model.Acts
         /// <summary>
         /// Source key
         /// </summary>
-        [Column("act_id"), ForeignKey(typeof(DbAct), nameof(DbAct.Key)), PrimaryKey]
+        [Column("act_id"), ForeignKey(typeof(DbActVersion), nameof(DbActVersion.Key)), PrimaryKey]
         public override Guid SourceKey { get; set; }
 
         /// <summary>

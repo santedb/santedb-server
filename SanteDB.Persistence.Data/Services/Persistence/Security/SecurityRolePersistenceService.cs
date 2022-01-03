@@ -20,6 +20,5 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Security
         {
         }
 
-
     }
 }

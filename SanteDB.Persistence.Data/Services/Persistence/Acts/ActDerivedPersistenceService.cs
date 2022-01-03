@@ -222,7 +222,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             data.StatusConceptKey = this.EnsureExists(context, data.StatusConcept)?.Key ?? data.StatusConceptKey;
             data.TemplateKey = this.EnsureExists(context, data.Template)?.Key ?? data.TemplateKey;
             data.TypeConceptKey = this.EnsureExists(context, data.TypeConcept)?.Key ?? data.TypeConceptKey;
-
+            
             // Geo-tagging
             data.GeoTagKey = this.EnsureExists(context, data.GeoTag)?.Key ?? data.GeoTagKey;
 
@@ -282,7 +282,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                     retVal.SetLoaded(o => o.Tags);
                     retVal.Participations = this.GetRelatedPersistenceService<ActParticipation>().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
                     retVal.SetLoaded(o => o.Participations);
-
+                    retVal.Protocols = this.GetRelatedPersistenceService<ActProtocol>().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
+                    retVal.SetLoaded(o => o.Protocols);
                     if (dbModel.GeoTagKey.HasValue)
                     {
                         var dbGeoTag = referenceObjects.OfType<DbGeoTag>().FirstOrDefault();
@@ -381,6 +382,16 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                 retVal.SetLoaded(o => o.Participations);
             }
 
+            if(data.Protocols != null)
+            {
+                // This is a special case since the dbactprotocol <> acts are not specifically identified (they are combination)
+                retVal.Protocols = data.Protocols.Select(p => {
+                    p.SourceEntityKey = retVal.Key;
+                    return this.GetRelatedPersistenceService<ActProtocol>().Insert(context, p);
+                    }).ToList();
+                retVal.SetLoaded(o => o.Protocols);
+            }
+
             return retVal;
         }
 
@@ -437,6 +448,17 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             {
                 retVal.Participations = this.UpdateModelVersionedAssociations(context, retVal, data.Participations).ToList();
                 retVal.SetLoaded(o => o.Participations);
+            }
+
+            if (data.Protocols != null)
+            {
+                // This is a special case since the dbactprotocol <> acts are not specifically identified (they are combination)
+                context.Delete<DbActProtocol>(o => o.SourceKey == retVal.Key);
+                retVal.Protocols = data.Protocols.Select(p => {
+                    p.SourceEntityKey = retVal.Key;
+                    return this.GetRelatedPersistenceService<ActProtocol>().Insert(context, p);
+                }).ToList();
+                retVal.SetLoaded(o => o.Protocols);
             }
 
             return retVal;
