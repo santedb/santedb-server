@@ -18,7 +18,7 @@ namespace SanteDB.Persistence.Data.Services
     /// <summary>
     /// A daemon service which registers the other persistence services
     /// </summary>
-    public class AdoPersistenceService : ISqlDataPersistenceService
+    public class AdoPersistenceService : ISqlDataPersistenceService, IServiceFactory
     {
         // Gets the configuration
         private AdoPersistenceConfigurationSection m_configuration;
@@ -29,6 +29,12 @@ namespace SanteDB.Persistence.Data.Services
         // Mapper for this service
         private ModelMapper m_mapper;
 
+        // Service manager
+        private readonly IServiceManager m_serviceManager;
+
+        // Service list
+        private IList<IAdoPersistenceProvider> m_services = new List<IAdoPersistenceProvider>();
+
         /// <summary>
         /// ADO Persistence service
         /// </summary>
@@ -36,6 +42,7 @@ namespace SanteDB.Persistence.Data.Services
         {
             this.m_configuration = configManager.GetSection<AdoPersistenceConfigurationSection>();
             this.m_mapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(DataConstants.MapResourceName), "AdoModelMap");
+            this.m_serviceManager = serviceManager;
             QueryBuilder.AddQueryHacks(serviceManager.CreateAll<IQueryBuilderHack>(this.m_mapper));
 
             // Upgrade the schema
@@ -46,6 +53,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 pservice.Provider = this.m_configuration.Provider;
                 serviceManager.AddServiceProvider(pservice);
+                this.m_services.Add(pservice);
             }
             serviceManager.AddServiceProvider(typeof(TagPersistenceService));
 
@@ -90,6 +98,28 @@ namespace SanteDB.Persistence.Data.Services
                     throw new DataPersistenceException("Error executing raw SQL", e);
                 }
             }
+        }
+
+        /// <summary>
+        /// Try to create the specified service
+        /// </summary>
+        public bool TryCreateService<TService>(out TService serviceInstance)
+        {
+            if(this.TryCreateService(typeof(TService), out var strongInstance)) {
+                serviceInstance = (TService)strongInstance;
+                return true;
+            }
+            serviceInstance = default(TService);
+            return false;
+        }
+
+        /// <summary>
+        /// Try to create the specified service
+        /// </summary>
+        public bool TryCreateService(Type serviceType, out object serviceInstance)
+        {
+            serviceInstance = this.m_services.FirstOrDefault(o => serviceType.IsAssignableFrom(o.GetType()));
+            return serviceInstance != null;
         }
     }
 }

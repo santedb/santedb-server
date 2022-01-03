@@ -33,6 +33,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         protected abstract long GetCurrentVersionSequenceForSource(DataContext context, Guid sourceKey);
 
+        /// <inheritdoc/>
+        protected override bool ValidateCacheItem(TModel cacheEntry, TDbModel dataModel) => cacheEntry.EffectiveVersionSequenceId >= dataModel.EffectiveVersionSequenceId;
+
         /// <summary>
         /// Obsolete all objects
         /// </summary>

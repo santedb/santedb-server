@@ -48,6 +48,7 @@
     <Compile Include="AdoRoleProviderTest.cs" />
     <Compile Include="AdoSessionProviderTest.cs" />
     <Compile Include="DataPersistenceTest.cs" />
+    <Compile Include="Persistence\Acts\ActPersistenceTest.cs" />
     <Compile Include="Persistence\CodeSystemAuthorityPersistenceTest.cs" />
     <Compile Include="Persistence\AssigningAuthorityPersistenceTest.cs" />
     <Compile Include="Persistence\ConceptClassPersistenceTest.cs" />
@@ -87,6 +88,10 @@
     <ProjectReference Include="..\santedb-api\SanteDB.Core.Api\SanteDB.Core.Api.csproj">
       <Project>{3A45F695-47A2-464C-ACE6-BDABBFA39FBC}</Project>
       <Name>SanteDB.Core.Api</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\santedb-cache-memory\SanteDB.Caching.Memory\SanteDB.Caching.Memory.csproj">
+      <Project>{8553ABC7-ABFA-4A21-B0E8-68B7DE76129D}</Project>
+      <Name>SanteDB.Caching.Memory</Name>
     </ProjectReference>
     <ProjectReference Include="..\santedb-model\SanteDB.Core.Model\SanteDB.Core.Model.csproj">
       <Project>{f1a82a4f-4a57-47d7-ae76-444c8a4ff54a}</Project>

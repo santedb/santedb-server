@@ -29,6 +29,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         {
         }
 
+        /// <inheritdoc/>
+        protected override bool ValidateCacheItem(TModel cacheEntry, TDbModel dataModel) => cacheEntry.CreationTime >= dataModel.CreationTime;
+
         /// <summary>
         /// Perform an insert on the specified object
         /// </summary>

@@ -27,6 +27,19 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
 {
     
     /// <summary>
+    /// Generic persistence service interface which can be used for calling other act derived persistence functions
+    /// </summary>
+    internal interface IActDerivedPersistenceService
+    {
+        /// <summary>
+        /// Copy sub-version information for the specified type of data
+        /// </summary>
+        /// <param name="context">The context on which the data should be copied</param>
+        /// <param name="newVersion">The new version to copy data into</param>
+        void DoCopyVersionSubTable(DataContext context, DbActVersion newVersion);
+    }
+
+    /// <summary>
     /// An act derived persistence service where the act has a sub-table storing child data
     /// </summary>
     /// <typeparam name="TAct">The type of act being persisted</typeparam>
@@ -43,14 +56,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         }
 
         /// <inheritdoc />
-        protected override void DoCopyVersionSubTableInternal(DataContext context, Guid previousVersionKey, Guid newVersionKey)
+        protected override void DoCopyVersionSubTableInternal(DataContext context, DbActVersion newVersion)
         {
-            var existingVersion = context.FirstOrDefault<TDbActSubTable>(o => o.ParentKey == previousVersionKey);
+            var existingVersion = context.FirstOrDefault<TDbActSubTable>(o => o.ParentKey == newVersion.ReplacesVersionKey);
             if (existingVersion == null)
             {
                 existingVersion = new TDbActSubTable();
             }
-            existingVersion.ParentKey = newVersionKey;
+            existingVersion.ParentKey = newVersion.VersionKey;
             context.Insert(existingVersion);
         }
 
@@ -113,12 +126,15 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
     /// Persistence service that is responsible for the storing and retrieving of acts
     /// </summary>
     /// <typeparam name="TAct">The model type of act</typeparam>
-    public abstract class ActDerivedPersistenceService<TAct> : VersionedDataPersistenceService<TAct, DbActVersion, DbAct>, IAdoClassMapper
+    public abstract class ActDerivedPersistenceService<TAct> : VersionedDataPersistenceService<TAct, DbActVersion, DbAct>, IAdoClassMapper, IActDerivedPersistenceService
         where TAct : Act, IVersionedEntity, new()
     {
 
         // Class key map
         private readonly IDictionary<Guid, Type> m_classKeyMap;
+
+        /// <inheritdoc/>
+        void IActDerivedPersistenceService.DoCopyVersionSubTable(DataContext context, DbActVersion newVersion) => this.DoCopyVersionSubTableInternal(context, newVersion);
 
         /// <summary>
         /// Creates a dependency injected persistence service
@@ -235,16 +251,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         }
 
         /// <summary>
-        /// Convert the <paramref name="modelData"/> from a generic super-class to a more specific subclass
-        /// </summary>
-        /// <param name="context">The context on which the conversion should occur</param>
-        /// <param name="modelData">The existing superclass instance</param>
-        /// <param name="dbModel">The model loaded from the database</param>
-        /// <param name="referenceObjects">The objects that are referenced (from joins)</param>
-        /// <returns>The converted subclass</returns>
-        internal abstract TAct DoConvertSubclassData(DataContext context, TAct modelData, DbActVersion dbModel, params object[] referenceObjects);
-
-        /// <summary>
         /// Convert to appropriate sub-class model 
         /// </summary>
         protected virtual TAct DoConvertToInformationModelEx(DataContext context, DbActVersion dbModel, params object[] referenceObjects)
@@ -351,7 +357,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
 
             if (data.Policies != null)
             {
-                retVal.Policies = this.UpdateInternalAssociations(context, retVal.Key.Value, data.Policies.Select(o => new DbEntitySecurityPolicy()
+                retVal.Policies = this.UpdateInternalAssociations(context, retVal.Key.Value, data.Policies.Select(o => new DbActSecurityPolicy()
                 {
                     PolicyKey = o.PolicyKey.Value
                 }), o => o.SourceKey == retVal.Key && !o.ObsoleteVersionSequenceId.HasValue).Select(o => o.ToSecurityPolicyInstance(context)).ToList();
@@ -409,7 +415,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
 
             if (data.Policies != null)
             {
-                retVal.Policies = this.UpdateInternalAssociations(context, retVal.Key.Value, data.Policies.Select(o => new DbEntitySecurityPolicy()
+                retVal.Policies = this.UpdateInternalAssociations(context, retVal.Key.Value, data.Policies.Select(o => new DbActSecurityPolicy()
                 {
                     PolicyKey = o.PolicyKey.Value
                 }), o => o.SourceKey == retVal.Key && !o.ObsoleteVersionSequenceId.HasValue).Select(o => o.ToSecurityPolicyInstance(context)).ToList();

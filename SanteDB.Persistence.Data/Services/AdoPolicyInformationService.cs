@@ -1,4 +1,5 @@
-﻿using SanteDB.Core.Diagnostics;
+﻿using SanteDB.Core;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Model;
@@ -14,6 +15,7 @@ using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Model.Security;
 using SanteDB.Persistence.Data.Security;
+using SanteDB.Persistence.Data.Services.Persistence;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,21 +45,25 @@ namespace SanteDB.Persistence.Data.Services
 
         // Localization service
         private readonly ILocalizationService m_localizationService;
+        private readonly IAdoPersistenceProvider<Act> m_actPersistence;
 
         /// <summary>
         /// Trace source
         /// </summary>
         private readonly Tracer m_traceSource = Tracer.GetTracer(typeof(AdoPolicyInformationService));
+        private readonly IAdoPersistenceProvider<Entity> m_entityPersistence;
 
         /// <summary>
         /// Create new policy info service
         /// </summary>
-        public AdoPolicyInformationService(IConfigurationManager configurationManager, IPolicyEnforcementService pepService, ILocalizationService localizationService, IAdhocCacheService adhocCache = null)
+        public AdoPolicyInformationService(IConfigurationManager configurationManager, IPolicyEnforcementService pepService, ILocalizationService localizationService, IDataPersistenceService<Entity> entityPersistence, IDataPersistenceService<Act> actPersistence, IAdhocCacheService adhocCache = null)
         {
             this.m_policyEnforcement = pepService;
             this.m_configuration = configurationManager.GetSection<AdoPersistenceConfigurationSection>();
             this.m_adhocCache = adhocCache;
             this.m_localizationService = localizationService;
+            this.m_actPersistence = actPersistence as IAdoPersistenceProvider<Act>;
+            this.m_entityPersistence = entityPersistence as IAdoPersistenceProvider<Entity>;
         }
 
         /// <summary>
@@ -83,6 +89,8 @@ namespace SanteDB.Persistence.Data.Services
                 try
                 {
                     context.Open();
+                    context.EstablishProvenance(principal, null);
+
                     using (var tx = context.BeginTransaction())
                     {
                         var policies = context.Query<DbSecurityPolicy>(o => policyOids.Contains(o.Oid)).Select(o => o.Key).ToArray();
@@ -126,7 +134,10 @@ namespace SanteDB.Persistence.Data.Services
                                 }
                             case Entity entity:
                                 {
-                                    context.Delete<DbEntitySecurityPolicy>(o => o.SourceKey == entity.Key && policies.Contains(o.PolicyKey));
+
+                                    context.UpdateAll<DbEntitySecurityPolicy>(o => o.SourceKey == entity.Key && policies.Contains(o.PolicyKey), o=>o.ObsoleteVersionSequenceId == entity.VersionSequence);
+                                    // Touch the entity version
+                                    entity = this.m_entityPersistence.Touch(context, entity.Key.Value);
                                     context.InsertAll(policies.Select(o => new DbEntitySecurityPolicy()
                                     {
                                         EffectiveVersionSequenceId = entity.VersionSequence.Value,
@@ -137,7 +148,8 @@ namespace SanteDB.Persistence.Data.Services
                                 }
                             case Act act:
                                 {
-                                    context.Delete<DbActSecurityPolicy>(o => o.SourceKey == act.Key && policies.Contains(o.PolicyKey));
+                                    context.UpdateAll<DbActSecurityPolicy>(o => o.SourceKey == act.Key && policies.Contains(o.PolicyKey), o=> o.ObsoleteVersionSequenceId == act.VersionSequence);
+                                    act = this.m_actPersistence.Touch(context, act.Key.Value);
                                     context.InsertAll(policies.Select(o => new DbActSecurityPolicy()
                                     {
                                         SourceKey = act.Key.Value,

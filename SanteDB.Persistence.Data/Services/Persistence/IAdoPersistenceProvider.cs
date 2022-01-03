@@ -1,4 +1,5 @@
-﻿using SanteDB.Core.Model.Query;
+﻿using SanteDB.Core.Model.Acts;
+using SanteDB.Core.Model.Query;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.OrmLite.Providers;
@@ -59,5 +60,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// Perform a get on the context
         /// </summary>
         TModel Get(DataContext context, Guid key);
+
+        /// <summary>
+        /// Touch the specified object (creates a new version or updates the modified time)
+        /// </summary>
+        TModel Touch(DataContext context, Guid id);
     }
 }

@@ -330,7 +330,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 var afterFetch = fetch.First();
                 Assert.IsNull(afterFetch.Identifiers);
                 Assert.AreEqual(1, afterFetch.LoadProperty(o => o.Identifiers).Count);
-                Assert.IsNotNull(afterFetch.Identifiers[0].Authority);
+                Assert.IsNotNull(afterFetch.Identifiers[0].Authority); // Authority is always loaded
                 Assert.AreEqual("TEST_3", afterFetch.Identifiers[0].Authority.DomainName);
             }
         }

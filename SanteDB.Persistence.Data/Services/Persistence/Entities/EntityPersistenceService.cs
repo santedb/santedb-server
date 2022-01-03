@@ -23,10 +23,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
     {
 
         /// <inheritdoc/>
-        /// <remarks>This is not implemented on the entity persistence service since there are no
-        /// dependent tables</remarks>
-        protected override void DoCopyVersionSubTableInternal(DataContext context, Guid previousVersionKey, Guid newVersionKey)
+        protected override void DoCopyVersionSubTableInternal(DataContext context, DbEntityVersion newVersion)
         {
+            if(this.TryGetSubclassPersister(newVersion.ClassConceptKey, out var persistenceService) && persistenceService is IEntityDerivedPersistenceService edps)
+            {
+                edps.DoCopyVersionSubTable(context, newVersion);
+            }
         }
 
         /// <summary>

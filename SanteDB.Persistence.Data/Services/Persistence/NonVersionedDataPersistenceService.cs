@@ -6,6 +6,7 @@ using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 namespace SanteDB.Persistence.Data.Services.Persistence
@@ -24,6 +25,46 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         public NonVersionedDataPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
+        }
+
+        /// <inheritdoc/>
+        protected override bool ValidateCacheItem(TModel cacheEntry, TDbModel dataModel) => cacheEntry.UpdatedTime >= dataModel.UpdatedTime;
+
+        /// <summary>
+        /// On this class a TOUCH changes the updated time
+        /// </summary>
+        protected override TModel DoTouchModel(DataContext context, Guid key)
+        {
+
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
+            }
+
+#if DEBUG
+            Stopwatch sw = new Stopwatch();
+            try
+            {
+                sw.Start();
+#endif
+                // Get existing object
+                var existing = context.FirstOrDefault<TDbModel>(o => o.Key == key);
+
+                existing.UpdatedByKey = context.ContextId;
+                existing.UpdatedTime = DateTimeOffset.Now;
+
+                existing = context.Update(existing);
+
+                return this.DoConvertToInformationModel(context, existing);
+#if DEBUG
+            }
+            finally
+            {
+                sw.Stop();
+                this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Verbose, $"PERFORMANCE: DoTouchModel - {sw.ElapsedMilliseconds}ms", key, new StackTrace());
+            }
+#endif
+
         }
 
         /// <summary>

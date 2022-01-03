@@ -111,6 +111,10 @@
   </section>
   <section xsi:type="ApplicationServiceContextConfigurationSection" threadPoolSize="4">
     <serviceProviders>
+      <add type="SanteDB.Caching.Memory.MemoryCacheService, SanteDB.Caching.Memory" />
+      <add type="SanteDB.Caching.Memory.MemoryQueryPersistenceService, SanteDB.Caching.Memory" />
+      <add type="SanteDB.Caching.Memory.MemoryAdhocCacheService, SanteDB.Caching.Memory" />
+
       <add type="SanteDB.Persistence.Data.Test.TestQueryPersistenceService, SanteDB.Persistence.Data.Test" />
       <add type="SanteDB.Persistence.Data.Services.AdoApplicationIdentityProvider, SanteDB.Persistence.Data" />
       <add type="SanteDB.Persistence.Data.Services.AdoDeviceIdentityProvider, SanteDB.Persistence.Data" />

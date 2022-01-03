@@ -32,6 +32,19 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
 {
 
     /// <summary>
+    /// Generic persistence service interface which can be used for calling other act derived persistence functions
+    /// </summary>
+    internal interface IEntityDerivedPersistenceService
+    {
+        /// <summary>
+        /// Copy sub-version information for the specified type of data
+        /// </summary>
+        /// <param name="context">The context on which the data should be copied</param>
+        /// <param name="newVersion">The new version to copy data into</param>
+        void DoCopyVersionSubTable(DataContext context, DbEntityVersion newVersion);
+    }
+
+    /// <summary>
     /// Entity derived persistence service which is responsible for persisting entities which have an intermediary table
     /// </summary>
     /// <remarks>This class is used for higher level entities where the entity is comprised of three sub-tables where 
@@ -55,15 +68,15 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         }
 
         /// <inheritdoc/>
-        protected override void DoCopyVersionSubTableInternal(DataContext context, Guid previousVersionKey, Guid newVersionKey)
+        protected override void DoCopyVersionSubTableInternal(DataContext context, DbEntityVersion newVersion)
         {
-            base.DoCopyVersionSubTableInternal(context, previousVersionKey, newVersionKey);
-            var existingVersion = context.FirstOrDefault<TDbTopLevelTable>(o => o.ParentKey == previousVersionKey);
+            base.DoCopyVersionSubTableInternal(context, newVersion);
+            var existingVersion = context.FirstOrDefault<TDbTopLevelTable>(o => o.ParentKey == newVersion.ReplacesVersionKey);
             if (existingVersion == null)
             {
                 existingVersion = new TDbTopLevelTable();
             }
-            existingVersion.ParentKey = newVersionKey;
+            existingVersion.ParentKey = newVersion.VersionKey;
             context.Insert(existingVersion);
         }
 
@@ -135,14 +148,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
 
 
         /// <inheritdoc />
-        protected override void DoCopyVersionSubTableInternal(DataContext context, Guid previousVersionKey, Guid newVersionKey)
+        protected override void DoCopyVersionSubTableInternal(DataContext context, DbEntityVersion newVersion)
         {
-            var existingVersion = context.FirstOrDefault<TDbEntitySubTable>(o => o.ParentKey == previousVersionKey);
+            var existingVersion = context.FirstOrDefault<TDbEntitySubTable>(o => o.ParentKey == newVersion.ReplacesVersionKey);
             if (existingVersion == null)
             {
                 existingVersion = new TDbEntitySubTable();
             }
-            existingVersion.ParentKey = newVersionKey;
+            existingVersion.ParentKey = newVersion.VersionKey;
             context.Insert(existingVersion);
         }
 
@@ -210,12 +223,15 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
     /// <summary>
     /// Persistence service that is responsible for storing and retrieving entities
     /// </summary>
-    public abstract class EntityDerivedPersistenceService<TEntity> : VersionedDataPersistenceService<TEntity, DbEntityVersion, DbEntity>, IAdoClassMapper
+    public abstract class EntityDerivedPersistenceService<TEntity> : VersionedDataPersistenceService<TEntity, DbEntityVersion, DbEntity>, IAdoClassMapper, IEntityDerivedPersistenceService
         where TEntity : Entity, IVersionedEntity, new()
     {
 
         // Class key map
         private readonly IDictionary<Guid, Type> m_classKeyMap;
+
+        /// <inheritdoc/>
+        void IEntityDerivedPersistenceService.DoCopyVersionSubTable(DataContext context, DbEntityVersion newVersion) => this.DoCopyVersionSubTableInternal(context, newVersion);
 
         /// <summary>
         /// Try to resolve a persister by class concept key

@@ -50,6 +50,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         protected override void DoDeleteReferencesInternal(DataContext context, Guid key)
         { }
 
+        /// <inheritdoc/>
+        /// <remarks>There is no effective way to determine stale-ness of the cache entry here - these objects are property dependent</remarks>
+        protected override bool ValidateCacheItem(TModel cacheEntry, TDbModel dataModel) => false;
+
         /// <summary>
         /// Convert <paramref name="model" /> to a <typeparamref name="TDbModel"/>
         /// </summary>

@@ -5,6 +5,7 @@ using SanteDB.Core.Event;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Model;
+using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Map;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Security;
@@ -234,6 +235,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         protected abstract TDbModel DoDeleteInternal(DataContext context, Guid key, DeleteMode deletionMode);
 
         /// <summary>
+        /// Validate the <paramref name="cacheEntry"/> matches the version information in the database from <paramref name="dataModel"/>
+        /// </summary>
+        /// <param name="cacheEntry">The cache entry</param>
+        /// <param name="dataModel">The data model from the database</param>
+        /// <returns>True if the <paramref name="dataModel"/> matches <paramref name="cacheEntry"/>, false if the cache entry has been updated since</returns>
+        protected abstract bool ValidateCacheItem(TModel cacheEntry, TDbModel dataModel);
+
+        /// <summary>
         /// Perform an obsoletion for all objects matching <paramref name="expression"/>
         /// </summary>
         protected abstract void DoDeleteAllInternal(DataContext context, Expression<Func<TModel, bool>> expression, DeleteMode deletionMode);
@@ -336,6 +345,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Verbose, $"PERFORMANCE: DoInsertModel - {sw.ElapsedMilliseconds}ms", data, new StackTrace());
             }
 #endif
+        }
+
+        /// <summary>
+        /// Perform a touch which updates the modification time
+        /// </summary>
+        protected virtual TModel DoTouchModel(DataContext context, Guid key)
+        {
+            throw new NotSupportedException(String.Format(ErrorMessages.ARGUMENT_INCOMPATIBLE_TYPE, typeof(TDbModel), typeof(DbNonVersionedBaseData)));
         }
 
         /// <summary>
@@ -465,7 +482,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 #endif
                 // Attempt fetch from master cache
                 TModel retVal = null;
-                if (allowCached && (this.m_configuration.CachingPolicy?.Targets & AdoDataCachingPolicyTarget.ModelObjects) == AdoDataCachingPolicyTarget.ModelObjects)
+                var useCache = allowCached &&
+                    (this.m_configuration.CachingPolicy?.Targets.HasFlag(AdoDataCachingPolicyTarget.ModelObjects) == true ||
+                    (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy) <= this.m_configuration.LoadStrategy);
+
+                if (useCache)
                 {
                     retVal = this.m_dataCacheService?.GetCacheItem<TModel>(key);
                 }
@@ -482,8 +503,15 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     {
                         retVal = this.DoConvertToInformationModel(context, dbInstance);
                     }
-                }
 
+                    // Add the cache object if caching is allowed on this query and if the load strategy used is less than the load strategy which would have already 
+                    // been used to load it before
+                    if (useCache && !versionKey.HasValue)
+                    {
+                        this.m_dataCacheService?.Add(retVal);
+                    }
+                }
+                
                 return retVal;
 #if DEBUG
             }
@@ -691,8 +719,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                         if (mode == TransactionMode.Commit)
                         {
                             tx.Commit();
-                            // Cache - invalidate (force a reload)
-                            this.m_dataCacheService?.Remove(data.Key.Value);
+                           
                         }
                     }
 
@@ -950,8 +977,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                         {
                             tx.Commit();
 
-                            // Cache - invalidate
-                            this.m_dataCacheService?.Remove(data.Key.Value);
                         }
                     }
 
@@ -1044,6 +1069,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         public virtual TModel ToModelInstance(DataContext context, object result)
         {
+            var useCache = this.m_configuration.CachingPolicy?.Targets.HasFlag(AdoDataCachingPolicyTarget.ModelObjects) == true // Configuration allows caching
+                && (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy) <= this.m_configuration.LoadStrategy;
+            // TODO: Add caching here
             if (context == null)
             {
                 throw new ArgumentNullException(nameof(context), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
@@ -1054,13 +1082,43 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }
             else if (result is TDbModel dbModel)
             {
-                var retVal = this.DoConvertToInformationModel(context, dbModel);
-                return retVal;
+                // Retrieve cache version - check updated time
+                var existing = this.m_dataCacheService?.GetCacheItem<TModel>(dbModel.Key);
+                if (!useCache || existing == null || !this.ValidateCacheItem(existing, dbModel))
+                {
+                    var retVal = this.DoConvertToInformationModel(context, dbModel);
+
+                    if (useCache)
+                    {
+                        this.m_dataCacheService?.Add(retVal);
+                    }
+
+                    return retVal;
+                }
+                else
+                {
+                    return existing;
+                }
             }
             else if (result is CompositeResult composite)
             {
-                var retVal = this.DoConvertToInformationModel(context, composite.Values.OfType<TDbModel>().First(), composite.Values.ToArray());
-                return retVal;
+                var dbObject = composite.Values.OfType<TDbModel>().First();
+                var existing = this.m_dataCacheService?.GetCacheItem<TModel>(dbObject.Key);
+                if (!useCache || existing == null || !this.ValidateCacheItem(existing, dbObject))
+                {
+                    var retVal = this.DoConvertToInformationModel(context, dbObject, composite.Values.ToArray());
+
+                    if(useCache)
+                    {
+                        this.m_dataCacheService?.Add(retVal);
+                    }
+
+                    return retVal;
+                }
+                else
+                {
+                    return existing;
+                }
             }
             else
             {
@@ -1182,8 +1240,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                         if (mode == TransactionMode.Commit)
                         {
                             tx.Commit();
-                            // Cache
-                            this.m_dataCacheService?.Remove(key);
+                           
                         }
                     }
 
@@ -1262,7 +1319,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <param name="key">The key of the object to touch</param>
         /// <param name="mode">The mode (commit or rollback)</param>
         /// <param name="principal">The user touching the object</param>
-        public void Touch(Guid key, TransactionMode mode, IPrincipal principal)
+        public TModel Touch(Guid key, TransactionMode mode, IPrincipal principal)
         {
             if (key == default(Guid))
             {
@@ -1284,29 +1341,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                         // Establish provenance object
                         context.EstablishProvenance(principal, null);
 
-                        // Get existing object
-                        var existing = context.FirstOrDefault<TDbModel>(o => o.Key == key);
-                        if(existing is DbVersionedData dbv)
-                        {
-                            dbv.CreatedByKey = context.ContextId;
-                            dbv.CreationTime = DateTimeOffset.Now;
-                        }
-                        else if(existing is DbNonVersionedBaseData dbn)
-                        {
-                            dbn.UpdatedByKey = context.ContextId;
-                            dbn.UpdatedTime = DateTimeOffset.Now;
-                        }
-                        else
-                        {
-                            throw new InvalidOperationException(String.Format(ErrorMessages.ARGUMENT_INCOMPATIBLE_TYPE, existing.GetType(), typeof(DbNonVersionedBaseData)));
-                        }
+                        var retVal = this.DoTouchModel(context, key);
 
-                        context.Update(existing);
                         if (mode == TransactionMode.Commit)
                         {
                             tx.Commit();
                             this.m_dataCacheService?.Remove(key);
                         }
+                        return retVal;
                     }
 
                 }
@@ -1328,5 +1370,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
         /// <inheritdoc/>
         public object Update(DataContext context, object data) => this.DoUpdateModel(context, data.Convert<TModel>());
+
+        /// <summary>
+        /// Touch the specified object
+        /// </summary>
+        public TModel Touch(DataContext context, Guid id) => this.DoTouchModel(context, id);
     }
 }

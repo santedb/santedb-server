@@ -36,10 +36,81 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// Perform a copy of the existing version inforamtion to a new version
         /// </summary>
         /// <param name="context">The context on which the records should be inserted</param>
-        /// <param name="previousVersionKey">The previous version to be copied</param>
-        /// <param name="newVersionKey">The new version key to be copied to</param>
-        protected abstract void DoCopyVersionSubTableInternal(DataContext context, Guid previousVersionKey, Guid newVersionKey);
+        /// <param name="newVersion">The new version key to be copied to</param>
+        protected abstract void DoCopyVersionSubTableInternal(DataContext context, TDbModel newVersion);
 
+        /// <inheritdoc/>
+        protected override bool ValidateCacheItem(TModel cacheEntry, TDbModel dataModel) => cacheEntry.VersionSequence >= dataModel.VersionSequenceId;
+
+        /// <summary>
+        /// This method creates a new version from the old
+        /// </summary>
+        protected override TModel DoTouchModel(DataContext context, Guid key)
+        {
+
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
+            }
+
+#if DEBUG
+            Stopwatch sw = new Stopwatch();
+            try
+            {
+                sw.Start();
+#endif
+
+                // We don't create new versions, instead we update the current data
+                var existing = context.Query<TDbModel>(o => o.Key == key).OrderByDescending(o => o.VersionSequenceId).Skip(0).Take(2).ToArray();
+
+                if (!existing.Any())
+                {
+                    throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_FOUND, new { type = typeof(TModel).Name, id = key }));
+                }
+
+                // Are we creating a new verison? or no?
+                if (!this.m_configuration.VersioningPolicy.HasFlag(Configuration.AdoVersioningPolicyFlags.FullVersioning))
+                {
+                    if (existing.Count() > 1) // We only keep recent and last
+                    {
+                        context.Delete<TDbModel>(o => o.Key == key && o.VersionSequenceId <= existing.Last().VersionSequenceId);
+                    }
+                }
+
+                // We want to obsolete the non current version(s)
+                foreach (var itm in context.Query<TDbModel>(o => o.Key == key && !o.ObsoletionTime.HasValue))
+                {
+                    itm.ObsoletionTime = DateTimeOffset.Now;
+                    itm.ObsoletedByKey = context.ContextId;
+                    itm.ObsoletedByKeySpecified = itm.ObsoletionTimeSpecified = true;
+                    context.Update(itm);
+                }
+
+                // next - we create a new version of dbmodel
+                var newVersion = existing.First();
+                newVersion.ReplacesVersionKey = newVersion.VersionKey;
+                newVersion.CreationTime = DateTimeOffset.Now;
+                newVersion.CreatedByKey = context.ContextId;
+                newVersion.ObsoletedByKey = null;
+                newVersion.ObsoletionTime = null;
+                newVersion.VersionSequenceId = null;
+                newVersion.ObsoletedByKeySpecified = true;
+                newVersion.VersionKey = Guid.NewGuid();
+
+                context.Insert(newVersion);
+                this.DoCopyVersionSubTableInternal(context, newVersion);
+
+                return this.DoConvertToInformationModel(context, newVersion);
+#if DEBUG
+            }
+            finally
+            {
+                sw.Stop();
+                this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Verbose, $"PERFORMANCE: DoUpdateModel - {sw.ElapsedMilliseconds}ms", key, new StackTrace());
+            }
+#endif
+
+        }
         /// <summary>
         /// Generate the specified constructor
         /// </summary>
@@ -396,8 +467,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                         case DeleteMode.NullifyDelete:
                         case DeleteMode.ObsoleteDelete:
                         case DeleteMode.LogicalDelete:
-                            
-                            foreach(var newVersion in context.InsertAll(
+
+                            foreach (var newVersion in context.InsertAll(
                                 context.UpdateAll<TDbModel>(context.Query<TDbModel>(domainExpression), o => // Update the current version
                                 {
                                     o.ObsoletionTime = DateTimeOffset.Now;
@@ -412,11 +483,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                                     o.VersionKey = Guid.NewGuid();
                                     o.StatusConceptKey = deletionMode == DeleteMode.NullifyDelete ? StatusKeys.Nullified :
                                         deletionMode == DeleteMode.ObsoleteDelete ? StatusKeys.Obsolete : StatusKeys.Inactive;
+                                    this.m_dataCacheService?.Remove(o.Key);
                                     return o;
                                 })
                             ))
                             {
-                                this.DoCopyVersionSubTableInternal(context, newVersion.ReplacesVersionKey.GetValueOrDefault(), newVersion.VersionKey);
+                                this.DoCopyVersionSubTableInternal(context, newVersion);
                             }
 
                             break;
@@ -434,6 +506,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                                 {
                                     this.DoDeleteReferencesInternal(context, ver);
                                     context.Delete<TDbModel>(o => o.VersionKey == ver);
+
                                 }
 
                                 if (this.m_configuration.VersioningPolicy.HasFlag(Configuration.AdoVersioningPolicyFlags.KeepPurged))
@@ -445,6 +518,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                                 {
                                     context.Delete<TDbKeyModel>(o => o.Key == existing.Key);
                                 }
+
+                                this.m_dataCacheService.Remove(existing.Key);
+
                             }
                             break;
                     }
@@ -540,7 +616,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
 
                     // Copy a new version of dependent tables
-                    this.DoCopyVersionSubTableInternal(context, retVal.ReplacesVersionKey.GetValueOrDefault(), retVal.VersionKey);
+                    this.DoCopyVersionSubTableInternal(context, retVal);
 
                     return retVal;
 

@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using SanteDB.Caching.Memory;
 using SanteDB.Core;
 using SanteDB.Core.Interfaces;
 using SanteDB.Core.Model;
@@ -59,19 +60,19 @@ namespace SanteDB.Persistence.Data.Test
         public void Setup()
         {
             // Force load of the DLL
-           
-                var p = FirebirdSql.Data.FirebirdClient.FbCharset.Ascii;
-                TestApplicationContext.TestAssembly = typeof(DataPersistenceTest).Assembly;
-                TestApplicationContext.Initialize(TestContext.CurrentContext.TestDirectory);
-                this.m_serviceManager = ApplicationServiceContext.Current.GetService<IServiceManager>();
-                this.m_serviceManager.AddServiceProvider(typeof(TestQueryPersistenceService));
-                this.m_serviceManager.AddServiceProvider(typeof(AdoApplicationIdentityProvider));
-                this.m_serviceManager.AddServiceProvider(typeof(AdoDeviceIdentityProvider));
-                this.m_serviceManager.AddServiceProvider(typeof(AdoIdentityProvider));
-                this.m_serviceManager.AddServiceProvider(typeof(AdoSessionProvider));
-                this.m_serviceManager.AddServiceProvider(typeof(AdoPersistenceService));
-                this.m_localizationService = new TestLocalizationService();
-           
+
+            var p = FirebirdSql.Data.FirebirdClient.FbCharset.Ascii;
+            TestApplicationContext.TestAssembly = typeof(DataPersistenceTest).Assembly;
+            TestApplicationContext.Initialize(TestContext.CurrentContext.TestDirectory);
+            this.m_serviceManager = ApplicationServiceContext.Current.GetService<IServiceManager>();
+           this.m_serviceManager.AddServiceProvider(typeof(TestQueryPersistenceService));
+            this.m_serviceManager.AddServiceProvider(typeof(AdoApplicationIdentityProvider));
+            this.m_serviceManager.AddServiceProvider(typeof(AdoDeviceIdentityProvider));
+            this.m_serviceManager.AddServiceProvider(typeof(AdoIdentityProvider));
+            this.m_serviceManager.AddServiceProvider(typeof(AdoSessionProvider));
+            this.m_serviceManager.AddServiceProvider(typeof(AdoPersistenceService));
+            this.m_localizationService = new TestLocalizationService();
+
         }
 
         /// <summary>
