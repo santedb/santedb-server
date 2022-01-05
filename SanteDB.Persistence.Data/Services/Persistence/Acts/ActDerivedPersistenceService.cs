@@ -25,7 +25,7 @@ using SanteDB.Core.i18n;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Acts
 {
-    
+
     /// <summary>
     /// Generic persistence service interface which can be used for calling other act derived persistence functions
     /// </summary>
@@ -170,7 +170,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         /// <returns>True if the persistence provider was located</returns>
         protected bool TryGetSubclassPersister(Guid classKey, out IAdoPersistenceProvider persistenceProvider)
         {
-            if(this.m_classKeyMap.TryGetValue(classKey, out Type modelType))
+            if (this.m_classKeyMap.TryGetValue(classKey, out Type modelType))
             {
                 persistenceProvider = this.GetRelatedPersistenceService(modelType);
                 return true;
@@ -222,7 +222,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             data.StatusConceptKey = this.EnsureExists(context, data.StatusConcept)?.Key ?? data.StatusConceptKey;
             data.TemplateKey = this.EnsureExists(context, data.Template)?.Key ?? data.TemplateKey;
             data.TypeConceptKey = this.EnsureExists(context, data.TypeConcept)?.Key ?? data.TypeConceptKey;
-            
+
             // Geo-tagging
             data.GeoTagKey = this.EnsureExists(context, data.GeoTag)?.Key ?? data.GeoTagKey;
 
@@ -234,6 +234,18 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             }
             else if (issues.Any()) // there are non-serious issues
             {
+                if (data.Extensions == null)
+                {
+                    if (data.Key.HasValue)
+                    { // load from DB because there may be some existing stuff we don't want to erase
+                        data.Extensions = this.GetRelatedPersistenceService<ActExtension>().Query(context, o => o.SourceEntityKey == data.Key).ToList();
+                    }
+                    else
+                    {
+                        data.Extensions = new List<ActExtension>();
+                    }
+                }
+
                 var extension = data.Extensions.FirstOrDefault(o => o.ExtensionTypeKey == ExtensionTypeKeys.DataQualityExtension);
                 if (extension == null)
                 {
@@ -268,6 +280,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                     retVal.SetLoaded(o => o.StatusConcept);
                     retVal.TypeConcept = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.TypeConceptKey);
                     retVal.SetLoaded(o => o.TypeConcept);
+                    retVal.Template = this.GetRelatedPersistenceService<TemplateDefinition>().Get(context, dbModel.TemplateKey.GetValueOrDefault());
+                    retVal.SetLoaded(o => o.Template);
                     goto case LoadMode.SyncLoad;
                 case LoadMode.SyncLoad:
                     retVal.Extensions = this.GetRelatedPersistenceService<ActExtension>().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
@@ -315,15 +329,15 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         /// <inheritdoc/>
         protected override TAct DoConvertToInformationModel(DataContext context, DbActVersion dbModel, params object[] referenceObjects)
         {
-            
+
             // Get subclass persister
-            if(this.TryGetSubclassPersister(dbModel.ClassConceptKey, out var persistenceProvider) && persistenceProvider is IAdoClassMapper edps)
+            if (this.TryGetSubclassPersister(dbModel.ClassConceptKey, out var persistenceProvider) && persistenceProvider is IAdoClassMapper edps)
             {
                 return (TAct)edps.MapToModelInstanceEx(context, dbModel, referenceObjects);
             }
             else
             {
-                return this.DoConvertToInformationModelEx(context, dbModel, referenceObjects) ;
+                return this.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
             }
         }
 
@@ -382,13 +396,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                 retVal.SetLoaded(o => o.Participations);
             }
 
-            if(data.Protocols != null)
+            if (data.Protocols != null)
             {
                 // This is a special case since the dbactprotocol <> acts are not specifically identified (they are combination)
-                retVal.Protocols = data.Protocols.Select(p => {
+                retVal.Protocols = data.Protocols.Select(p =>
+                {
                     p.SourceEntityKey = retVal.Key;
                     return this.GetRelatedPersistenceService<ActProtocol>().Insert(context, p);
-                    }).ToList();
+                }).ToList();
                 retVal.SetLoaded(o => o.Protocols);
             }
 
@@ -454,7 +469,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             {
                 // This is a special case since the dbactprotocol <> acts are not specifically identified (they are combination)
                 context.Delete<DbActProtocol>(o => o.SourceKey == retVal.Key);
-                retVal.Protocols = data.Protocols.Select(p => {
+                retVal.Protocols = data.Protocols.Select(p =>
+                {
                     p.SourceEntityKey = retVal.Key;
                     return this.GetRelatedPersistenceService<ActProtocol>().Insert(context, p);
                 }).ToList();

@@ -110,6 +110,17 @@ namespace SanteDB.Persistence.Data.Configuration
                 DataObjectExpiry = new TimeSpan(0, 1, 0),
                 Targets = AdoDataCachingPolicyTarget.ModelObjects
             };
+            this.Validation = new List<AdoValidationPolicy>()
+            {
+                new AdoValidationPolicy()
+                {
+                    Authority = AdoValidationEnforcement.Loose,
+                    Scope = AdoValidationEnforcement.Loose,
+                    Uniqueness = AdoValidationEnforcement.Loose,
+                    Format = AdoValidationEnforcement.Loose,
+                    CheckDigit = AdoValidationEnforcement.Loose
+                }
+            };
         }
 
         /// <summary>

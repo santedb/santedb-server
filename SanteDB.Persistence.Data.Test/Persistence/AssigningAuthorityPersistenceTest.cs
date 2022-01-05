@@ -1,7 +1,13 @@
-﻿using NUnit.Framework;
+﻿
+using NUnit.Framework;
 using SanteDB.Core;
+using SanteDB.Core.Model;
+using SanteDB.Core.Exceptions;
+using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
+using SanteDB.Core.Model.Interfaces;
+using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using System;
@@ -10,6 +16,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SanteDB.Core.BusinessRules;
 
 namespace SanteDB.Persistence.Data.Test.Persistence
 {
@@ -18,8 +25,10 @@ namespace SanteDB.Persistence.Data.Test.Persistence
     /// </summary>
     [TestFixture(Category = "Persistence")]
     [ExcludeFromCodeCoverage]
-    public class AssigningAuthorityPersistenceTest : DataPersistenceTest
+    public class AssigningAuthorityPersistenceTest : DataPersistenceTest, IIdentifierValidator
     {
+        public string Name => throw new NotImplementedException();
+
         /// <summary>
         /// Tests that a simple assigning authority can be inserted
         /// and then retrieved
@@ -325,6 +334,177 @@ namespace SanteDB.Persistence.Data.Test.Persistence
             // Validate that AA is now found via the query method
             var aa5 = persistenceService.Query(o => o.Url == "http://google.com/test7", AuthenticationContext.SystemPrincipal);
             Assert.AreEqual(1, aa5.Count());
+        }
+
+        /// <summary>
+        /// Test the deletion of all 
+        /// </summary>
+        [Test]
+        public void TestDeleteAll()
+        {
+            using (AuthenticationContext.EnterSystemContext())
+            {
+                Enumerable.Range(1, 9).ToList().ForEach(i =>
+                 {
+                     base.TestInsert(new AssigningAuthority()
+                     {
+                         Description = "A test authority",
+                         DomainName = $"TEST_OBSOLETE_{i}",
+                         IsUnique = true,
+                         CustomValidator = "TEST.VALIDATOR",
+                         Name = $"TEST_AA_OBS_{i}",
+                         Oid = $"1.2.3.8.{i}",
+                         Url = $"http://google.com/test_obs_{i}",
+                         AuthorityScopeXml = new List<Guid>()
+                         {
+                            EntityClassKeys.Patient
+                         }
+                     });
+
+                 });
+
+                // Test query 
+                base.TestQuery<AssigningAuthority>(o => o.Oid.Contains("1.2.3.8.%"), 9);
+                base.TestQuery<AssigningAuthority>(o => o.DomainName.Contains("TEST_OBSOLETE_%"), 9);
+
+                // Now - obsolete all
+                var pservice = ApplicationServiceContext.Current.GetService<IDataPersistenceService<AssigningAuthority>>() as IDataPersistenceServiceEx<AssigningAuthority>;
+                pservice.DeleteAll(o => o.Oid.Contains("1.2.3.8.%"), TransactionMode.Commit, AuthenticationContext.SystemPrincipal, DeleteMode.LogicalDelete);
+                base.TestQuery<AssigningAuthority>(o => o.Oid.Contains("1.2.3.8.%"), 0); // No results 
+                base.TestQuery<AssigningAuthority>(o => o.Oid.Contains("1.2.3.8.%") && o.ObsoletionTime != null, 9);
+
+                // Now permadelete
+                pservice.DeleteAll(o => o.Oid.Contains("1.2.3.8.%") && o.ObsoletionTime != null, TransactionMode.Commit, AuthenticationContext.SystemPrincipal, DeleteMode.PermanentDelete);
+                base.TestQuery<AssigningAuthority>(o => o.Oid.Contains("1.2.3.8.%"), 0); // No results 
+                base.TestQuery<AssigningAuthority>(o => o.Oid.Contains("1.2.3.8.%") && o.ObsoletionTime != null, 0);
+
+                // This should succeed since we've purged
+                Enumerable.Range(1, 9).ToList().ForEach(i =>
+                {
+                    base.TestInsert(new AssigningAuthority()
+                    {
+                        Description = "A test authority",
+                        DomainName = $"TEST_OBSOLETE_{i}",
+                        IsUnique = true,
+                        CustomValidator = "TEST.VALIDATOR",
+                        Name = $"TEST_AA_OBS_{i}",
+                        Oid = $"1.2.3.8.{i}",
+                        Url = $"http://google.com/test_obs_{i}",
+                        AuthorityScopeXml = new List<Guid>()
+                         {
+                            EntityClassKeys.Animal
+                         }
+                    });
+
+                });
+
+                base.TestQuery<AssigningAuthority>(o => o.AuthorityScope.Any(s => s.Key == EntityClassKeys.Animal), 9); // 9 results 
+
+                // Now - obsolete all
+                pservice.DeleteAll(o => o.AuthorityScope.Any(s => s.Key == EntityClassKeys.Animal), TransactionMode.Commit, AuthenticationContext.SystemPrincipal, DeleteMode.LogicalDelete);
+                base.TestQuery<AssigningAuthority>(o => o.AuthorityScope.Any(s => s.Key == EntityClassKeys.Animal), 0); // No results 
+                base.TestQuery<AssigningAuthority>(o => o.AuthorityScope.Any(s => s.Key == EntityClassKeys.Animal) && o.ObsoletionTime != null, 9);
+
+                // Now permadelete
+                pservice.DeleteAll(o => o.AuthorityScope.Any(s => s.Key == EntityClassKeys.Animal) && o.ObsoletionTime != null, TransactionMode.Commit, AuthenticationContext.SystemPrincipal, DeleteMode.PermanentDelete);
+                base.TestQuery<AssigningAuthority>(o => o.AuthorityScope.Any(s => s.Key == EntityClassKeys.Animal), 0); // No results 
+                base.TestQuery<AssigningAuthority>(o => o.AuthorityScope.Any(s => s.Key == EntityClassKeys.Animal) && o.ObsoletionTime != null, 0);
+            }
+        }
+
+        /// <summary>
+        /// Tests that scope enforcement occurs
+        /// </summary>
+        [Test]
+        public void TestAuthorityEnforcement()
+        {
+            using (AuthenticationContext.EnterSystemContext())
+            {
+                // Insert an assigning authority
+                var patientsOnly = new AssigningAuthority()
+                {
+                    Description = "For Patients Only",
+                    DomainName = "TEST_AA_PATIENTS",
+                    IsUnique = true,
+                    CustomValidator = this.GetType().AssemblyQualifiedName,
+                    ValidationRegex = @"^P\d$",
+                    Name = "TEST_AA_PATIENTS",
+                    Oid = "1.2.3.999",
+                    Url = "http://google.com/patients",
+                    AuthorityScopeXml = new List<Guid>()
+                {
+                    EntityClassKeys.Patient
+                }
+                };
+
+                patientsOnly = base.TestInsert(patientsOnly);
+
+                // We SHOULD be able to register a patient having id value length = 2
+                var patient = base.TestInsert(new Patient()
+                {
+                    Identifiers = new List<EntityIdentifier>()
+                    {
+                        new EntityIdentifier(patientsOnly, "P0")
+                    }
+                });
+
+                // We should not be able to register a duplicate identifier
+                patient = base.TestInsert(new Patient()
+                {
+                    Identifiers = new List<EntityIdentifier>()
+                    {
+                        new EntityIdentifier(patientsOnly, "P0")
+                    }
+                });
+                patient = base.TestQuery<Patient>(o => o.Identifiers.Any(i => i.Value == "P0"), 2).AsResultSet().OrderByDescending(o=>o.VersionSequence).First();
+                Assert.AreEqual(1, patient.LoadProperty(o => o.Extensions).Count);
+                Assert.AreEqual(ExtensionTypeKeys.DataQualityExtension, patient.Extensions[0].ExtensionTypeKey);
+                var extension = patient.Extensions[0].GetValue<List<DetectedIssue>>();
+                Assert.IsTrue(extension.Any(r => r.Id == DataConstants.IdentifierNotUnique), "Expected a not unique issue");
+
+                // We should be able to register a identifier validation but the result should have a detected issue
+                patient = base.TestInsert(new Patient()
+                {
+                    Identifiers = new List<EntityIdentifier>()
+                    {
+                        new EntityIdentifier(patientsOnly, "P000000") // <--- THIS WILL FAIL VALIDATION
+                    }
+                });
+                patient = base.TestQuery<Patient>(o => o.Identifiers.Any(i => i.Value == "P000000"), 1).First();
+                Assert.AreEqual(1, patient.LoadProperty(o => o.Extensions).Count);
+                Assert.AreEqual(ExtensionTypeKeys.DataQualityExtension, patient.Extensions[0].ExtensionTypeKey);
+                extension = patient.Extensions[0].GetValue<List<DetectedIssue>>();
+                Assert.IsTrue(extension.Any(r => r.Id == DataConstants.IdentifierCheckDigitFailed), "Expected a check digit fail issue");
+                Assert.IsTrue(extension.Any(r => r.Id == DataConstants.IdentifierPatternFormatFail), "Expected a format fail issue");
+
+                // We should not be able to register an act with a patient identifier
+                var act = base.TestInsert(new Act()
+                {
+                    ClassConceptKey = ActClassKeys.Act,
+                    MoodConceptKey = ActMoodKeys.Eventoccurrence,
+                    ActTime = DateTimeOffset.Now,
+                    Identifiers = new List<ActIdentifier>()
+                    {
+                        new ActIdentifier(patientsOnly, "A00")
+                    }
+                });
+                act = base.TestQuery<Act>(o => o.Identifiers.Any(i => i.Value == "A00"), 1).First();
+                Assert.AreEqual(1, act.LoadProperty(o => o.Extensions).Count);
+                Assert.AreEqual(ExtensionTypeKeys.DataQualityExtension, act.Extensions[0].ExtensionTypeKey);
+                extension = act.Extensions[0].GetValue<List<DetectedIssue>>();
+                Assert.IsTrue(extension.Any(r => r.Id == DataConstants.IdentifierCheckDigitFailed), "Expected a check digit fail issue");
+                Assert.IsTrue(extension.Any(r => r.Id == DataConstants.IdentifierPatternFormatFail), "Expected a format fail issue");
+                Assert.IsTrue(extension.Any(r => r.Id == DataConstants.IdentifierInvalidTargetScope), "Expected a scope fail issue");
+
+            }
+        }
+
+        /// <summary>
+        /// Returns if the identifier is valid
+        /// </summary>
+        public bool IsValid(IExternalIdentifier id)
+        {
+            return id.Value.Length == 2;
         }
     }
 }

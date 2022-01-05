@@ -130,7 +130,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             where TToVerify : TModel, IHasIdentifiers
         {
             // Validate unique values for IDs
-            var validation = this.m_configuration.Validation.Find(o => o.Target.Type == objectToVerify.GetType());
+            var validation = this.m_configuration.Validation.Find(o => o.Target?.Type == objectToVerify.GetType()) ??
+                this.m_configuration.Validation.Find(o => o.Target == null);
             if (validation == null) // no special validation
             {
                 yield break;
@@ -160,7 +161,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
                 if (dbAuth == null)
                 {
-                    yield return new DetectedIssue(DetectedIssuePriorityType.Error, "id.aa.notFound", $"Missing assigning authority with ID {String.Join(",", objectToVerify.Identifiers.Select(o => o.Authority.Key))}", DetectedIssueKeys.SafetyConcernIssue);
+                    if (!this.m_configuration.AutoInsertChildren || id.Authority == null) // we're not inserting it and it doesn't exist - raise the alarm!
+                    {
+                        yield return new DetectedIssue(DetectedIssuePriorityType.Error, DataConstants.IdentifierDomainNotFound, $"Missing assigning authority with ID {String.Join(",", objectToVerify.Identifiers.Select(o => o.Authority.Key))}", DetectedIssueKeys.SafetyConcernIssue);
+                    }
                     continue;
                 }
                 else
@@ -195,13 +199,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     scopes.Any() && !scopes.Any(s => s.ScopeConceptKey == classObject.ClassConceptKey) // This type of identifier is not allowed to be assigned to this type of object
                     && !ownedByOthers
                     && !ownedByMe) // Unless it was already associated to another type of object related to me
-                    yield return new DetectedIssue(validation.Scope.ToPriority(), "id.target", $"Identifier of type {dbAuth.DomainName} cannot be assigned to object of type {classObject.ClassConceptKey}", DetectedIssueKeys.BusinessRuleViolationIssue);
+                    yield return new DetectedIssue(validation.Scope.ToPriority(), DataConstants.IdentifierInvalidTargetScope, $"Identifier of type {dbAuth.DomainName} cannot be assigned to object of type {classObject.ClassConceptKey}", DetectedIssueKeys.BusinessRuleViolationIssue);
 
                 // If the identity domain is unique, and we've been asked to raid identifier uq issues
                 if (dbAuth.IsUnique &&
                     ownedByOthers)
                 {
-                    yield return new DetectedIssue(validation.Uniqueness.ToPriority(), $"id.uniqueness", $"Identifier {id.Value} in domain {dbAuth.DomainName} violates unique constraint", DetectedIssueKeys.FormalConstraintIssue);
+                    yield return new DetectedIssue(validation.Uniqueness.ToPriority(), DataConstants.IdentifierNotUnique, $"Identifier {id.Value} in domain {dbAuth.DomainName} violates unique constraint", DetectedIssueKeys.FormalConstraintIssue);
                 }
 
                 if (dbAuth.AssigningApplicationKey.HasValue) // Must have permission
@@ -216,7 +220,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     {
                         id.Reliability = IdentifierReliability.Informative;
                         // Is the validation set to deny unauthorized assignment?
-                        yield return new DetectedIssue(validation.Authority.ToPriority(), $"id.authority", $"Application does not have permission to assign {dbAuth.DomainName}", DetectedIssueKeys.SecurityIssue);
+                        yield return new DetectedIssue(validation.Authority.ToPriority(), DataConstants.IdentifierNoAuthorityToAssign, $"Application does not have permission to assign {dbAuth.DomainName}", DetectedIssueKeys.SecurityIssue);
                     }
                 }
 
@@ -224,20 +228,20 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 {
                     var nonMatch = !new Regex(dbAuth.ValidationRegex).IsMatch(id.Value);
                     if (nonMatch)
-                        yield return new DetectedIssue(validation.Format.ToPriority(), $"id.format", $"Identifier {id.Value} in domain {dbAuth.DomainName} failed format validation", DetectedIssueKeys.FormalConstraintIssue);
+                        yield return new DetectedIssue(validation.Format.ToPriority(), DataConstants.IdentifierPatternFormatFail, $"Identifier {id.Value} in domain {dbAuth.DomainName} failed format validation", DetectedIssueKeys.FormalConstraintIssue);
                 }
 
-                if (validation.CheckDigit != Configuration.AdoValidationEnforcement.Off)
+                if (validation.CheckDigit != Configuration.AdoValidationEnforcement.Off && !String.IsNullOrEmpty(dbAuth.CustomValidator))
                 {
                     var type = Type.GetType(dbAuth.CustomValidator);
                     if (type == null)
                     {
-                        yield return new DetectedIssue(validation.CheckDigit.ToPriority(), "id.check.val", $"Custom validator {dbAuth.CustomValidator} not found", DetectedIssueKeys.OtherIssue);
+                        yield return new DetectedIssue(validation.CheckDigit.ToPriority(), DataConstants.IdentifierCheckProviderNotFound, $"Custom validator {dbAuth.CustomValidator} not found", DetectedIssueKeys.OtherIssue);
                     }
                     var validator = Activator.CreateInstance(type) as IIdentifierValidator;
                     if (validator?.IsValid(id) != true)
                     {
-                        yield return new DetectedIssue(validation.CheckDigit.ToPriority(), "id.check", $"Custom validator for {id.Value} in {dbAuth.DomainName} failed", DetectedIssueKeys.FormalConstraintIssue);
+                        yield return new DetectedIssue(validation.CheckDigit.ToPriority(), DataConstants.IdentifierCheckDigitFailed, $"Custom validator for {id.Value} in {dbAuth.DomainName} failed", DetectedIssueKeys.FormalConstraintIssue);
                     }
                 }
             }
@@ -526,7 +530,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     }
                 }
                 else
+                {
                     base.DoDeleteAllInternal(context, expression, DeleteMode.PermanentDelete);
+                }
 #if DEBUG
             }
             finally
@@ -704,7 +710,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             var persistenceService = base.GetRelatedPersistenceService<TModelAssociation>();
             if (persistenceService == null)
             {
-                throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.RELATED_OBJECT_NOT_AVAILABLE, new { related = typeof(TModelAssociation), source = typeof(TModel) }));
+                throw new DataPersistenceException(String.Format(ErrorMessages.RELATED_OBJECT_NOT_AVAILABLE, typeof(TModelAssociation), typeof(TModel)));
             }
 
             // Next we want to perform a relationship query to establish what is being loaded and what is being persisted

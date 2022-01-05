@@ -596,7 +596,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
 
                     if (orderBy != null && orderBy.Length > 0)
                         foreach (var ob in orderBy)
-                            sql = sql.OrderBy<DbAuditEventData>(this.m_mapper.MapModelExpression<AuditEventData, DbAuditEventData, dynamic>(ob.SortProperty), ob.SortOrder);
+                            sql = sql.OrderBy(this.m_mapper.MapModelExpression<AuditEventData, DbAuditEventData, dynamic>(ob.SortProperty), ob.SortOrder);
                     else
                         sql = sql.OrderBy<DbAuditEventData>(o => o.Timestamp, SortOrderType.OrderByDescending);
 

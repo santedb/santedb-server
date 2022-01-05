@@ -1137,7 +1137,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Map the sorting expression
         /// </summary>
-        public Expression MapPropertyExpression<TResult>(Expression<Func<TModel, TResult>> sortExpression)
+        public virtual Expression MapPropertyExpression<TResult>(Expression<Func<TModel, TResult>> sortExpression)
         {
             if (sortExpression == null)
             {

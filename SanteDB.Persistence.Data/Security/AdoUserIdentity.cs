@@ -39,6 +39,7 @@ namespace SanteDB.Persistence.Data.Security
             }
 
             this.m_securityUser = userData;
+            this.m_securityUser.Password = null;
             this.InitializeClaims();
         }
 

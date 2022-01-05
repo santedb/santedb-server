@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security;
 using System.Security.Authentication;
+using System.Security.Cryptography;
 using System.Security.Principal;
 using System.Text;
 
@@ -52,6 +53,9 @@ namespace SanteDB.Persistence.Data.Services
 
         // Locale service
         private readonly ILocalizationService m_localizationService;
+        
+        // Ad-hoc cache used to store session information
+        private readonly IAdhocCacheService m_adhocCacheService;
 
         // PEP
         private readonly IPolicyEnforcementService m_pepService;
@@ -91,7 +95,8 @@ namespace SanteDB.Persistence.Data.Services
             IPasswordHashingService passwordHashingService,
             IPolicyDecisionService policyDecisionService,
             IPolicyInformationService policyInformationService,
-            IPolicyEnforcementService policyEnforcementService)
+            IPolicyEnforcementService policyEnforcementService,
+            IAdhocCacheService adhocCache = null)
         {
             this.m_configuration = configuration.GetSection<AdoPersistenceConfigurationSection>();
             this.m_securityConfiguration = configuration.GetSection<SecurityConfigurationSection>();
@@ -101,6 +106,7 @@ namespace SanteDB.Persistence.Data.Services
             this.m_pepService = policyEnforcementService;
             this.m_pipService = policyInformationService;
             this.m_localizationService = localizationService;
+            this.m_adhocCacheService = adhocCache;
         }
 
         /// <summary>
@@ -122,6 +128,14 @@ namespace SanteDB.Persistence.Data.Services
         /// Fired when a session is abandoned
         /// </summary>
         public event EventHandler<SessionEstablishedEventArgs> Extended;
+
+        /// <summary>
+        /// Create cache key
+        /// </summary>
+        private string CreateCacheKey(Guid sessionKey)
+        {
+            return $"ado.ses.{this.m_passwordHashingService.ComputeHash(sessionKey.ToString())}";
+        }
 
         /// <summary>
         /// Extracts and validates the session token
@@ -172,6 +186,9 @@ namespace SanteDB.Persistence.Data.Services
 
                         context.Update(dbSession);
                         tx.Commit();
+
+                        this.m_adhocCacheService?.Remove(this.CreateCacheKey(sessionId));
+                        this.m_adhocCacheService?.Remove($"{this.CreateCacheKey(sessionId)}.idt");
 
                         this.Abandoned?.Invoke(this, new SessionEstablishedEventArgs(null, session, true, false, null, null));
                     }
@@ -388,7 +405,10 @@ namespace SanteDB.Persistence.Data.Services
                         var signedRefresh = refreshToken.ToByteArray().Concat(m_dataSigningService.SignData(refreshToken.ToByteArray())).ToArray();
                         var session = new AdoSecuritySession(signedToken, signedRefresh, dbSession, dbClaims);
 
+                        this.m_adhocCacheService?.Add(this.CreateCacheKey(session.Key), session, dbSession.RefreshExpiration.Subtract(DateTimeOffset.Now));
+
                         this.Established?.Invoke(this, new SessionEstablishedEventArgs(principal, session, true, isOverride, purpose, scope));
+
                         return session;
                     }
                 }
@@ -465,6 +485,8 @@ namespace SanteDB.Persistence.Data.Services
                         this.Extended?.Invoke(this, new SessionEstablishedEventArgs(null, session, true, false,
                             session.FindFirst(SanteDBClaimTypes.PurposeOfUse).Value,
                             session.Find(SanteDBClaimTypes.SanteDBScopeClaim).Select(o => o.Value).ToArray()));
+
+                        this.m_adhocCacheService?.Add(this.CreateCacheKey(session.Key), session, dbSession.RefreshExpiration.Subtract(DateTimeOffset.Now));
                         return session;
                     }
                 }
@@ -495,26 +517,34 @@ namespace SanteDB.Persistence.Data.Services
                 throw new SecuritySessionException(SessionExceptionType.SignatureFailure, this.m_localizationService.GetString(ErrorMessageStrings.SESSION_TAMPER), null);
             }
 
-            using (var context = this.m_configuration.Provider.GetReadonlyConnection())
+            var sessionInfo = this.m_adhocCacheService?.Get<AdoSecuritySession>(this.CreateCacheKey(sessionId));
+            if (sessionInfo != null)
             {
-                try
+                return new AdoSecuritySession(sessionInfo);
+            }
+            else
+            {
+                using (var context = this.m_configuration.Provider.GetReadonlyConnection())
                 {
-                    context.Open();
+                    try
+                    {
+                        context.Open();
 
-                    var dbSession = context.SingleOrDefault<DbSession>(o => o.Key == sessionId);
-                    if (dbSession == null || !allowExpired && dbSession.NotAfter < DateTimeOffset.Now)
-                    {
-                        return null;
+                        var dbSession = context.SingleOrDefault<DbSession>(o => o.Key == sessionId);
+                        if (dbSession == null || !allowExpired && dbSession.NotAfter < DateTimeOffset.Now)
+                        {
+                            return null;
+                        }
+                        else
+                        {
+                            return new AdoSecuritySession(sessionToken, null, dbSession, context.Query<DbSessionClaim>(o => o.SessionKey == dbSession.Key));
+                        }
                     }
-                    else
+                    catch (Exception e)
                     {
-                        return new AdoSecuritySession(sessionToken, null, dbSession, context.Query<DbSessionClaim>(o => o.SessionKey == dbSession.Key));
+                        this.m_tracer.TraceError("Error getting session data {0}", e);
+                        throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.SESSION_GEN_ERR), e);
                     }
-                }
-                catch (Exception e)
-                {
-                    this.m_tracer.TraceError("Error getting session data {0}", e);
-                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.SESSION_GEN_ERR), e);
                 }
             }
         }
@@ -540,84 +570,97 @@ namespace SanteDB.Persistence.Data.Services
                 throw new SecuritySessionException(SessionExceptionType.SignatureFailure, this.m_localizationService.GetString(ErrorMessageStrings.SESSION_TAMPER), null);
             }
 
-            using (var context = this.m_configuration.Provider.GetReadonlyConnection())
+
+            adoSession = this.m_adhocCacheService?.Get<AdoSecuritySession>(this.CreateCacheKey(sessionId));
+            var identities = this.m_adhocCacheService?.Get<IIdentity[]>($"{this.CreateCacheKey(sessionId)}.idt");
+            if (adoSession != null && identities != null)
             {
-                try
+                adoSession = new AdoSecuritySession(adoSession);
+                return identities.OfType<IIdentity>().ToArray();
+            }
+            else
+            {
+                using (var context = this.m_configuration.Provider.GetReadonlyConnection())
                 {
-                    context.Open();
-                    var sql = context.CreateSqlStatement<DbSession>()
-                        .SelectFrom(typeof(DbSession), typeof(DbSecurityApplication), typeof(DbSecurityUser), typeof(DbSecurityDevice))
-                        .InnerJoin<DbSecurityApplication>(o => o.ApplicationKey, o => o.Key)
-                        .Join<DbSession, DbSecurityUser>("LEFT", o => o.UserKey, o => o.Key)
-                        .Join<DbSession, DbSecurityDevice>("LEFT", o => o.DeviceKey, o => o.Key)
-                        .Where<DbSession>(o => o.Key == sessionId);
-                    var dbSession = context.FirstOrDefault<CompositeResult<DbSession, DbSecurityApplication, DbSecurityUser, DbSecurityDevice>>(sql);
+                    try
+                    {
+                        context.Open();
+                        var sql = context.CreateSqlStatement<DbSession>()
+                            .SelectFrom(typeof(DbSession), typeof(DbSecurityApplication), typeof(DbSecurityUser), typeof(DbSecurityDevice))
+                            .InnerJoin<DbSecurityApplication>(o => o.ApplicationKey, o => o.Key)
+                            .Join<DbSession, DbSecurityUser>("LEFT", o => o.UserKey, o => o.Key)
+                            .Join<DbSession, DbSecurityDevice>("LEFT", o => o.DeviceKey, o => o.Key)
+                            .Where<DbSession>(o => o.Key == sessionId);
+                        var dbSession = context.FirstOrDefault<CompositeResult<DbSession, DbSecurityApplication, DbSecurityUser, DbSecurityDevice>>(sql);
 
-                    if (dbSession == null)
-                    {
-                        throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.SESSION_TOKEN_INVALID));
-                    }
-                    else if (authenticated && dbSession.Object1.NotAfter < DateTimeOffset.Now)
-                    {
-                        throw new SecuritySessionException(SessionExceptionType.Expired, this.m_localizationService.GetString(ErrorMessageStrings.SESSION_EXPIRE), null);
-                    }
+                        if (dbSession == null)
+                        {
+                            throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.SESSION_TOKEN_INVALID));
+                        }
+                        else if (authenticated && dbSession.Object1.NotAfter < DateTimeOffset.Now)
+                        {
+                            throw new SecuritySessionException(SessionExceptionType.Expired, this.m_localizationService.GetString(ErrorMessageStrings.SESSION_EXPIRE), null);
+                        }
 
-                    adoSession = new AdoSecuritySession(session.Id, null, dbSession.Object1, context.Query<DbSessionClaim>(o => o.SessionKey == dbSession.Object1.Key));
+                        adoSession = new AdoSecuritySession(session.Id, null, dbSession.Object1, context.Query<DbSessionClaim>(o => o.SessionKey == dbSession.Object1.Key));
 
-                    // Precendence of identiites in the principal : User , App, Device
-                    var identities = new IClaimsIdentity[3];
-                    if (dbSession.Object3?.Key != null)
-                    {
-                        if (authenticated)
+                        // Precendence of identiites in the principal : User , App, Device
+                        identities = new IClaimsIdentity[3];
+                        if (dbSession.Object3?.Key != null)
                         {
-                            identities[0] = new AdoUserIdentity(dbSession.Object3, "SESSION");
+                            if (authenticated)
+                            {
+                                identities[0] = new AdoUserIdentity(dbSession.Object3, "SESSION");
+                            }
+                            else
+                            {
+                                identities[0] = new AdoUserIdentity(dbSession.Object3);
+                            }
                         }
-                        else
+                        if (dbSession.Object2?.Key != null)
                         {
-                            identities[0] = new AdoUserIdentity(dbSession.Object3);
+                            if (authenticated)
+                            {
+                                identities[1] = new AdoApplicationIdentity(dbSession.Object2, "SESSION");
+                            }
+                            else
+                            {
+                                identities[1] = new AdoApplicationIdentity(dbSession.Object2);
+                            }
                         }
-                    }
-                    if (dbSession.Object2?.Key != null)
-                    {
-                        if (authenticated)
+                        if (dbSession.Object4?.Key != null)
                         {
-                            identities[1] = new AdoApplicationIdentity(dbSession.Object2, "SESSION");
+                            if (authenticated)
+                            {
+                                identities[2] = new AdoDeviceIdentity(dbSession.Object4, "SESSION");
+                            }
+                            else
+                            {
+                                identities[2] = new AdoDeviceIdentity(dbSession.Object4);
+                            }
                         }
-                        else
-                        {
-                            identities[1] = new AdoApplicationIdentity(dbSession.Object2);
-                        }
-                    }
-                    if (dbSession.Object4?.Key != null)
-                    {
-                        if (authenticated)
-                        {
-                            identities[2] = new AdoDeviceIdentity(dbSession.Object4, "SESSION");
-                        }
-                        else
-                        {
-                            identities[2] = new AdoDeviceIdentity(dbSession.Object4);
-                        }
-                    }
 
-                    return identities.OfType<IIdentity>().ToArray();
-                }
-                catch (InvalidIdentityAuthenticationException)
-                {
-                    throw new AuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.SESSION_IDENTITY_INVALID));
-                }
-                catch (LockedIdentityAuthenticationException)
-                {
-                    throw new AuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.SESSION_IDENTITY_LOCKED));
-                }
-                catch (SecuritySessionException)
-                {
-                    throw;
-                }
-                catch (Exception e)
-                {
-                    this.m_tracer.TraceError("Error authenticating based on session data - {0}", e);
-                    throw new SecuritySessionException(SessionExceptionType.NotEstablished, this.m_localizationService.GetString(ErrorMessageStrings.SESSION_GEN_ERR), e);
+                        this.m_adhocCacheService?.Add($"{this.CreateCacheKey(sessionId)}.idt", identities);
+
+                        return identities.OfType<IIdentity>().ToArray();
+                    }
+                    catch (InvalidIdentityAuthenticationException)
+                    {
+                        throw new AuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.SESSION_IDENTITY_INVALID));
+                    }
+                    catch (LockedIdentityAuthenticationException)
+                    {
+                        throw new AuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.SESSION_IDENTITY_LOCKED));
+                    }
+                    catch (SecuritySessionException)
+                    {
+                        throw;
+                    }
+                    catch (Exception e)
+                    {
+                        this.m_tracer.TraceError("Error authenticating based on session data - {0}", e);
+                        throw new SecuritySessionException(SessionExceptionType.NotEstablished, this.m_localizationService.GetString(ErrorMessageStrings.SESSION_GEN_ERR), e);
+                    }
                 }
             }
         }

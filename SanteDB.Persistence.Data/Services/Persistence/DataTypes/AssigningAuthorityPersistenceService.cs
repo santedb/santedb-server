@@ -22,6 +22,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         {
         }
 
+        /// <inheritdoc/>
+        protected override void DoDeleteReferencesInternal(DataContext context, Guid key)
+        {
+            context.Delete<DbAuthorityScope>(o => o.SourceKey == key);
+            base.DoDeleteReferencesInternal(context, key);
+        }
+
         /// <summary>
         /// Convert the database representation of the assigning authority
         /// </summary>

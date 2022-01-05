@@ -337,6 +337,18 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             }
             else if (issues.Any()) // There are issues
             {
+                if(data.Extensions == null)
+                {
+                    if (data.Key.HasValue)
+                    {
+                        data.Extensions = this.GetRelatedPersistenceService<EntityExtension>().Query(context, o => o.SourceEntityKey == data.Key).ToList();
+                    }
+                    else
+                    {
+                        data.Extensions = new List<EntityExtension>();
+                    }
+                }
+
                 var extension = data.Extensions.FirstOrDefault(o => o.ExtensionTypeKey == ExtensionTypeKeys.DataQualityExtension);
                 if (extension == null)
                 {
@@ -376,6 +388,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                     retVal.SetLoaded(o => o.StatusConcept);
                     retVal.TypeConcept = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.TypeConceptKey.GetValueOrDefault());
                     retVal.SetLoaded(o => o.TypeConcept);
+                    retVal.Template = this.GetRelatedPersistenceService<TemplateDefinition>().Get(context, dbModel.TemplateKey.GetValueOrDefault());
+                    retVal.SetLoaded(o => o.Template);
                     goto case LoadMode.SyncLoad;
                 case LoadMode.SyncLoad:
                     retVal.Addresses = this.GetRelatedPersistenceService<EntityAddress>().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();

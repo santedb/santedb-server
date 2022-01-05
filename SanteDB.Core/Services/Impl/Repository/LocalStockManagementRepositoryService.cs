@@ -121,7 +121,7 @@ namespace SanteDB.Server.Core.Services.Impl
                     param = nameof(IDataPersistenceService<ActParticipation>)
                 }));
 
-            return persistenceService.Query(o => o.ParticipationRoleKey == ActParticipationKey.Consumable && o.PlayerEntityKey == manufacturedMaterialKey && o.Act.ActTime >= startPeriod  && o.Act.ActTime <= endPeriod && o.Act.Participations.Where(p => p.ParticipationRole.Mnemonic == "Location").Any(p => p.PlayerEntityKey == placeKey), AuthenticationContext.Current.Principal);
+            return persistenceService.Query(o => o.ParticipationRoleKey == ActParticipationKeys.Consumable && o.PlayerEntityKey == manufacturedMaterialKey && o.Act.ActTime >= startPeriod  && o.Act.ActTime <= endPeriod && o.Act.Participations.Where(p => p.ParticipationRole.Mnemonic == "Location").Any(p => p.PlayerEntityKey == placeKey), AuthenticationContext.Current.Principal);
         }
     }
 }

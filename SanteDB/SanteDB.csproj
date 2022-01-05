@@ -401,7 +401,7 @@
           <Project>{16ef1840-0361-439d-806c-92d0411122eb}</Project>
           <Name>RestSrvr</Name>
         </ProjectReference>
-		<ProjectReference Include="..\santedb-msmq\SanteDB.Queue.Msmq.csproj"/>
+        <ProjectReference Include="..\santedb-msmq\SanteDB.Queue.Msmq.csproj" />
         <ProjectReference Include="..\santedb-api\SanteDB.Core.Api\SanteDB.Core.Api.csproj">
           <Project>{3a45f695-47a2-464c-ace6-bdabbfa39fbc}</Project>
           <Name>SanteDB.Core.Api</Name>
@@ -466,7 +466,9 @@
           <Project>{ece9b280-9647-4092-babf-eb2e25084670}</Project>
           <Name>SanteDB.Core.Model.ViewModelSerializers</Name>
         </ProjectReference>
-		 <ProjectReference Include="..\santedb-msmq\SanteDB.Queue.Msmq\SanteDB.Queue.Msmq.csproj">
+        <ProjectReference Include="..\santedb-msmq\SanteDB.Queue.Msmq\SanteDB.Queue.Msmq.csproj">
+          <Project>{644E4E13-5F6D-45EF-9A82-DEDB01790A60}</Project>
+          <Name>SanteDB.Queue.Msmq</Name>
         </ProjectReference>
       </ItemGroup>
     </When>

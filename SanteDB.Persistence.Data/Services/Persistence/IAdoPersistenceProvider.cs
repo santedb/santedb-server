@@ -1,4 +1,5 @@
 ﻿using SanteDB.Core.Model.Acts;
+using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;

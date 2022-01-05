@@ -25,7 +25,8 @@ drop table ent_addr_cmp_val_tbl ;
 alter table ent_addr_cmp_tbl add seq_id bigint not null default nextval('ent_addr_cmp_seq');
 alter table ent_name_cmp_tbl add seq_id bigint not null default nextval('ent_name_cmp_seq')
 
-CREATE INDEX ENT_NAME_CMP_VAL_IDX USING GIST ON ENT_NAME_CMP_TBL(VAL); --#
-CREATE INDEX ENT_ADDR_CMP_VAL_IDX USING GIST ON ENT_ADDR_CMP_TBL(VAL); --#
+CREATE INDEX ENT_NAME_CMP_VAL_IDX ON ENT_NAME_CMP_TBL USING GIN (VAL gin_trgm_ops); --#
+CREATE INDEX ENT_ADDR_CMP_VAL_IDX ON ENT_ADDR_CMP_TBL USING GIN (VAL gin_trgm_ops); --#
+CREATE INDEX ENT_NAME_CMP_SDX_IDX ON ENT_NAME_CMP_TBL(SOUNDEX(VAL)); --#!
 
 SELECT REG_PATCH('20211110-01');

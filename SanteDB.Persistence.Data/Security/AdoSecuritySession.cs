@@ -65,6 +65,25 @@ namespace SanteDB.Persistence.Data.Security
         }
 
         /// <summary>
+        /// Copy an ADO session
+        /// </summary>
+        public AdoSecuritySession(AdoSecuritySession adoSession)
+        {
+            var addlClaims = new List<IClaim>()
+            {
+                new SanteDBClaim(SanteDBClaimTypes.AuthenticationInstant, adoSession.NotBefore.ToUniversalTime().ToString("o")),
+                new SanteDBClaim(SanteDBClaimTypes.Expiration, adoSession.NotAfter.ToUniversalTime().ToString("o")),
+                new SanteDBClaim(SanteDBClaimTypes.SanteDBSessionIdClaim, adoSession.Key.ToString())
+            };
+
+            this.Claims = addlClaims.Union(adoSession.Claims.Select(o => new SanteDBClaim(o.Type, o.Value))).ToArray();
+            this.Key = adoSession.Key;
+            this.Id = adoSession.Id;
+            this.NotBefore = adoSession.NotBefore;
+            this.NotAfter = adoSession.NotAfter;
+        }
+
+        /// <summary>
         /// Find first claim matching
         /// </summary>
         internal IClaim FindFirst(string claimType) => this.Claims.FirstOrDefault(o => o.Type == claimType);

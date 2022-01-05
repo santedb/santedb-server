@@ -35,6 +35,7 @@ namespace SanteDB.Persistence.Data.Security
             }
 
             this.m_device = device;
+            this.m_device.DeviceSecret = null;
             this.InitializeClaims();
         }
 

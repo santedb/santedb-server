@@ -105,7 +105,10 @@
       <Project>{0cec131c-dfa0-43c3-9612-3f7d36086633}</Project>
       <Name>SanteDB.Persistence.Data</Name>
     </ProjectReference>
-    <ProjectReference Include="..\santedb-i18n\SanteDB.Core.i18n\SanteDB.Core.i18n.csproj" />
+    <ProjectReference Include="..\santedb-i18n\SanteDB.Core.i18n\SanteDB.Core.i18n.csproj">
+      <Project>{41948F21-91D1-4D35-901F-362751EAECF5}</Project>
+      <Name>SanteDB.Core.i18n</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="TestConfig.xml" />

@@ -370,7 +370,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             var persistenceService = base.GetRelatedPersistenceService<TModelAssociation>();
             if (persistenceService == null)
             {
-                throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.RELATED_OBJECT_NOT_AVAILABLE, new { related = typeof(TModelAssociation), source = typeof(TModel) }));
+                throw new DataPersistenceException(String.Format(ErrorMessages.RELATED_OBJECT_NOT_AVAILABLE, typeof(TModelAssociation), typeof(TModel)));
             }
 
             // Next we want to perform a relationship query to establish what is being loaded and what is being persisted

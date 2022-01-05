@@ -110,7 +110,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 // Test name is added
                 afterInsert = base.TestUpdate(afterInsert, (o) =>
                 {
-                    o.Names.Add(new EntityName(NameUseKeys.License, "Bob", "Smith"));
+                    o.Names.Add(new EntityName(NameUseKeys.License, "Bobz", "Smith"));
                     return o;
                 });
                 Assert.AreEqual(3, afterInsert.Names.Count);
@@ -141,7 +141,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 // No more justin
                 fetched = base.TestQuery<Entity>(k => k.Names.Any(n => n.NameUseKey == NameUseKeys.Assigned && n.Component.Any(c => c.Value == "Justin")), 0).AsResultSet();
                 // But we have one Bob
-                fetched = base.TestQuery<Entity>(k => k.Names.Any(n => n.Component.Any(c => c.Value.Contains("Bob"))), 1).AsResultSet();
+                fetched = base.TestQuery<Entity>(k => k.Names.Any(n => n.Component.Any(c => c.Value.Contains("Bobz"))), 1).AsResultSet();
 
                 afterFetch = fetched.First();
                 Assert.AreEqual(afterInsert.Key, afterFetch.Key);

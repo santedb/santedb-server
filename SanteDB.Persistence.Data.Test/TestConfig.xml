@@ -92,22 +92,14 @@
            fuzzyTotal="false"
            readWriteConnectionString="TEST_CONNECTION"
            readOnlyConnectionString="TEST_CONNECTION"
-           traceSql="false"
+           traceSql="true"
            providerType="FirebirdSQL"
            versioning="default"
            staOnly="false"
            autoUpdateExisting="true"
            autoInsertChildren="true"
            prepareStatements="true">
-    <!-- Any corrective handlers should be added here
-    <corrections>
-      <add>value</add>
-    </corrections>
-    To limit the resources that can be persisted in ADO.NET add them here
-    <resources>
-      <add>value</add>
-    </resources>
-    -->
+    
   </section>
   <section xsi:type="ApplicationServiceContextConfigurationSection" threadPoolSize="4">
     <serviceProviders>

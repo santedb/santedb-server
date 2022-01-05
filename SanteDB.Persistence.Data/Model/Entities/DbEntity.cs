@@ -28,7 +28,7 @@ namespace SanteDB.Persistence.Data.Model.Entities
     /// <summary>
     /// Represents an entity in the database
     /// </summary>
-    [Table("ent_tbl"), SkipHint("template"), SkipHint("classConcept"), SkipHint("determinerConcept")]
+    [Table("ent_tbl")]
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     public class DbEntity : DbIdentified
     {

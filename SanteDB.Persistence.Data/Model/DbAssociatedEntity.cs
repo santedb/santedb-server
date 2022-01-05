@@ -142,7 +142,7 @@ namespace SanteDB.Persistence.Data.Model
         /// <summary>
         /// Gets or sets the source entity id
         /// </summary>
-        [Column("ent_id"), ForeignKey(typeof(DbEntityVersion), nameof(DbEntityVersion.Key))]
+        [Column("ent_id"), ForeignKey(typeof(DbEntity), nameof(DbEntity.Key))]
         public override Guid SourceKey { get; set; }
     }
 

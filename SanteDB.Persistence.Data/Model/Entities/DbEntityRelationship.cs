@@ -33,7 +33,7 @@ namespace SanteDB.Persistence.Data.Model.Entities
         /// <summary>
         /// Gets or sets the link type concept
         /// </summary>
-        [Column("rel_typ_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key)), AlwaysJoin]
+        [Column("rel_typ_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
         public Guid RelationshipTypeKey { get; set; }
 
         /// <summary>

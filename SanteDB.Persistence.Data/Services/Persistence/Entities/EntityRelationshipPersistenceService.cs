@@ -51,6 +51,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                     retVal.Classification = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.ClassificationKey.GetValueOrDefault());
                     retVal.SetLoaded(nameof(EntityRelationship.Classification));
                     retVal.RelationshipRole = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.RelationshipRoleKey.GetValueOrDefault());
+                    retVal.SetLoaded(o=>o.RelationshipRole);
+                    retVal.RelationshipType = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.RelationshipTypeKey);
+                    retVal.SetLoaded(o => o.RelationshipType);
+
                     break;
             }
 

@@ -126,7 +126,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                             break;
 
                         case DeleteMode.PermanentDelete:
-                            context.Delete(domainExpression);
+                            foreach (var obj in context.Query<TDbModel>(domainExpression))
+                            {
+                                this.DoDeleteReferencesInternal(context, obj.Key);
+                                context.Delete(obj);
+                            }
                             break;
                     }
                 }
@@ -137,7 +141,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
                     if (deletionMode == DeleteMode.PermanentDelete)
                     {
-                        context.Delete(domainQuery);
+                        foreach (var obj in context.Query<TDbModel>(domainQuery))
+                        {
+                            this.DoDeleteReferencesInternal(context, obj.Key);
+                            context.Delete(obj);
+                        }
                     }
                     else
                     {

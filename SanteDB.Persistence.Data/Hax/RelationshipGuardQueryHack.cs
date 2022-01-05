@@ -51,7 +51,7 @@ namespace SanteDB.Persistence.Data.Hax
                 if (predicate.Path == "participationRole"  && property.DeclaringType == typeof(ActParticipation))
                 {
                     columnName = "rol_cd_id";
-                    scanType = typeof(ActParticipationKey);
+                    scanType = typeof(ActParticipationKeys);
                     // We want to remove the inner join for cd_tbl
                     removeRegex = new Regex(@"INNER\sJOIN\scd_tbl\s.*\(.*?rol_cd_id.*");
                 }

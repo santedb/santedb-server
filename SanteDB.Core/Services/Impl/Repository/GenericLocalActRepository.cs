@@ -82,8 +82,8 @@ namespace SanteDB.Server.Core.Services.Impl
 
             var userService = ApplicationServiceContext.Current.GetService<ISecurityRepositoryService>();
             var currentUserEntity = userService.GetUserEntity(AuthenticationContext.Current.Principal.Identity);
-            if (data.Participations.All(o => o.ParticipationRoleKey != ActParticipationKey.Authororiginator))
-                data.Participations.Add(new ActParticipation(ActParticipationKey.Authororiginator, currentUserEntity));
+            if (data.Participations.All(o => o.ParticipationRoleKey != ActParticipationKeys.Authororiginator))
+                data.Participations.Add(new ActParticipation(ActParticipationKeys.Authororiginator, currentUserEntity));
 
             return data;
         }
