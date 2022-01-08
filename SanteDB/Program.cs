@@ -18,7 +18,9 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using MohawkCollege.Util.Console.Parameters;
+using Mono.Unix;
 using SanteDB.Core;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Model;
@@ -47,15 +49,13 @@ namespace SanteDB
     /// </summary>
     [ExcludeFromCodeCoverage]
     [Guid("21F35B18-E417-4F8E-B9C7-73E98B7C71B8")]
-    static class Program
+    internal static class Program
     {
-
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
-        static void Main(String[] args)
+        private static void Main(String[] args)
         {
-
             // Trace copyright information
             Assembly entryAsm = Assembly.GetEntryAssembly();
 
@@ -77,7 +77,6 @@ namespace SanteDB
                 Environment.Exit(999);
             };
 
-
             // Parser
             ParameterParser<ConsoleParameters> parser = new ParameterParser<ConsoleParameters>();
 
@@ -92,7 +91,7 @@ namespace SanteDB
                 // What to do?
                 if (parameters.ShowHelp)
                     parser.WriteHelp(Console.Out);
-                else if(parameters.InstallCerts)
+                else if (parameters.InstallCerts)
                 {
                     Console.WriteLine("Installing security certificates...");
                     SecurityExtensions.InstallCertsForChain();
@@ -126,7 +125,6 @@ namespace SanteDB
                 }
                 else if (parameters.GenConfig)
                 {
-
                     SanteDBConfiguration configuration = new SanteDBConfiguration();
                     ApplicationServiceContextConfigurationSection serverConfiguration = new ApplicationServiceContextConfigurationSection();
                     Console.WriteLine("Will generate full default configuration...");
@@ -147,24 +145,20 @@ namespace SanteDB
                     }
 
                     configuration.RemoveSection<ApplicationServiceContextConfigurationSection>();
-                    serverConfiguration.ThreadPoolSize = Environment.ProcessorCount;
+                    serverConfiguration.ThreadPoolSize = Environment.ProcessorCount * 16;
                     configuration.AddSection(serverConfiguration);
 
                     using (var fs = File.Create(Path.Combine(Path.GetDirectoryName(typeof(Program).Assembly.Location), "default.config.xml")))
                         configuration.Save(fs);
-
-
                 }
                 else if (parameters.ConsoleMode)
                 {
-
                     Console.WriteLine("SanteDB (SanteDB) {0} ({1})", entryAsm.GetName().Version, entryAsm.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion);
                     Console.WriteLine("{0}", entryAsm.GetCustomAttribute<AssemblyCopyrightAttribute>().Copyright);
                     Console.WriteLine("Complete Copyright information available at http://SanteDB.codeplex.com/wikipage?title=Contributions");
                     ServiceUtil.Start(typeof(Program).GUID, new FileConfigurationService(parameters.ConfigFile));
                     if (!parameters.StartupTest)
                     {
-
                         // Did the service start properly?
                         if (!ApplicationServiceContext.Current.IsRunning)
                         {
@@ -173,18 +167,41 @@ namespace SanteDB
                             Console.ResetColor();
                         }
 
-                        ManualResetEvent quitEvent = new ManualResetEvent(false);
-                        Console.CancelKeyPress += (o, e) =>
+                        if (Environment.OSVersion.Platform == PlatformID.Win32NT)
                         {
-                            Console.WriteLine("Service shutting down...");
+                            ManualResetEvent quitEvent = new ManualResetEvent(false);
+
+                            Console.CancelKeyPress += (o, e) =>
+                            {
+                                Console.WriteLine("Service shutting down...");
+                                ServiceUtil.Stop();
+                                quitEvent.Set();
+                            };
+
+                            Console.WriteLine("Service started (CTRL+C to stop)...");
+                            quitEvent.WaitOne();
+                        }
+                        else
+                        {
+                            // Now wait until the service is exiting va SIGTERM or SIGSTOP
+                            UnixSignal[] signals = new UnixSignal[]
+                            {
+                                new UnixSignal(Mono.Unix.Native.Signum.SIGINT),
+                                new UnixSignal(Mono.Unix.Native.Signum.SIGTERM),
+                                new UnixSignal(Mono.Unix.Native.Signum.SIGQUIT),
+                                new UnixSignal(Mono.Unix.Native.Signum.SIGHUP)
+                            };
+                            int signal = UnixSignal.WaitAny(signals);
+                            // Gracefully shutdown
                             ServiceUtil.Stop();
-                            quitEvent.Set();
-                        };
 
-                        Console.WriteLine("Service started (CTRL+C to stop)...");
-                        quitEvent.WaitOne();
+                            try // remove the lock file
+                            {
+                                File.Delete("/tmp/SanteDB.exe.lock");
+                            }
+                            catch { }
+                        }
                     }
-
                 }
                 else
                 {
@@ -197,14 +214,15 @@ namespace SanteDB
             {
 #if DEBUG
                 Trace.TraceError("011 899 981 199 911 9725 3!!! {0}", e.ToString());
-                if (hasConsole)
-                    Console.WriteLine("011 899 981 199 911 9725 3!!! {0}", e.ToString());
+               
 
                 EventLog.WriteEntry("SanteDB Host Process", $"011 899 981 199 911 9725 3!!! {e}", EventLogEntryType.Error, 911);
 
 #else
                 Trace.TraceError("Error encountered: {0}. Will terminate", e);
 #endif
+                if (hasConsole)
+                    Console.WriteLine("011 899 981 199 911 9725 3!!! {0}", e.ToString());
                 try
                 {
                     EventLog.WriteEntry("SanteDB Host Process", $"011 899 981 199 911 9725 3!!! {e}", EventLogEntryType.Error, 911);
@@ -214,9 +232,7 @@ namespace SanteDB
                     Trace.TraceWarning("Could not emit the error to the EventLog - {0}", e1);
                 }
                 Environment.Exit(911);
-
             }
-
         }
 
         /// <summary>
@@ -247,7 +263,6 @@ namespace SanteDB
                                 value.Add(defaultValue);
                             else
                                 value.Add(CreateFullXmlObject(xeType ?? prop.PropertyType.GetGenericArguments()[0]));
-
                         }
                         else
                         {
@@ -258,7 +273,6 @@ namespace SanteDB
                             else
                                 prop.SetValue(instance, CreateFullXmlObject(xeType ?? prop.PropertyType));
                         }
-
                     }
                 }
                 catch (Exception e)
@@ -288,10 +302,13 @@ namespace SanteDB
                     case "bool":
                     case "boolean":
                         return false;
+
                     case "string":
                         return "value";
+
                     case "guid":
                         return Guid.Empty;
+
                     case "int":
                     case "int32":
                     case "int64":
@@ -299,19 +316,26 @@ namespace SanteDB
                     case "short":
                     case "int16":
                         return 0;
+
                     case "double":
                     case "float":
                         return 0.0f;
+
                     case "datetime":
                         return DateTime.MinValue;
+
                     case "timespan":
                         return TimeSpan.MinValue;
+
                     case "storename":
                         return StoreName.My;
+
                     case "storelocation":
                         return StoreLocation.CurrentUser;
+
                     case "x509findtype":
                         return X509FindType.FindByThumbprint;
+
                     default:
                         if (propertyType.IsEnum)
                         {

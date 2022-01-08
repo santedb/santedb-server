@@ -25,20 +25,18 @@
   <class modelClass="SanteDB.Core.PubSub.PubSubSubscriptionDefinition, SanteDB.Core.Api"
   domainClass="SanteDB.Persistence.PubSub.ADO.Data.Model.DbSubscription, SanteDB.Persistence.PubSub.ADO">
     <property modelName="ModifiedOn" domainName="UpdatedTime" />
-    <property modelName="ResourceTypeXml" domainName="ResourceType"/>
+    <property modelName="ResourceTypeName" domainName="ResourceType" />
   </class>
 
   <!-- Subscription Definition -->
   <class modelClass="SanteDB.Core.PubSub.PubSubChannelDefinition, SanteDB.Core.Api"
   domainClass="SanteDB.Persistence.PubSub.ADO.Data.Model.DbChannel, SanteDB.Persistence.PubSub.ADO">
     <property modelName="ModifiedOn" domainName="UpdatedTime" />
-    <property modelName="DispatcherFactoryTypeXml" domainName="DispatchFactoryType"/>
+    <property modelName="DispatcherFactoryId" domainName="DispatchFactoryType" />
   </class>
 
   <!-- Subscription Definition -->
   <class modelClass="SanteDB.Core.PubSub.PubSubChannelSetting, SanteDB.Core.Api"
     domainClass="SanteDB.Persistence.PubSub.ADO.Data.Model.DbChannelSetting, SanteDB.Persistence.PubSub.ADO">
   </class>
-
-
 </modelMap>

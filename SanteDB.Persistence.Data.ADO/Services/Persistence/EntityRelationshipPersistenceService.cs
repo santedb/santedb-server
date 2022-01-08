@@ -87,7 +87,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             // Ensure we haven't already persisted this
             if (data.InversionIndicator)
                 return data; // don't persist inverted
-            if (data.TargetEntity != null) data.TargetEntity = data.TargetEntity.EnsureExists(context, this.m_settingsProvider.GetConfiguration().AutoInsertChildren) as Entity;
+            if (data.TargetEntity != null) data.TargetEntity = data.TargetEntity.EnsureExists(context, this.m_settingsProvider.GetConfiguration().AutoInsertChildren, typeof(Entity)) as Entity;
             data.TargetEntityKey = data.TargetEntity?.Key ?? data.TargetEntityKey;
             if (data.RelationshipType != null) data.RelationshipType = data.RelationshipType.EnsureExists(context, false) as Concept;
             data.RelationshipTypeKey = data.RelationshipType?.Key ?? data.RelationshipTypeKey;

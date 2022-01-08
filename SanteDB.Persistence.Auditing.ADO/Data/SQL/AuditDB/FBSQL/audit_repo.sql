@@ -48,10 +48,12 @@ CREATE SEQUENCE AUD_META_VAL_SEQ START WITH 1 INCREMENT BY 1;--#!
 	rol_cs INT, -- THE ROLE THE OBJECT PLAYS IN THE AUDIT
 	lcycl_cs INT, -- THE LIFECYCLE OF THE OBJECT
 	id_typ_cs INT, -- THE IDENTIFIER TYPE CODE
+	cst_id_typ uuid,
 	qry_dat BLOB SUB_TYPE TEXT, -- ADDITIONAL QUERY DATA ASSIGNED TO THE OBJECT
 	nam_dat BLOB SUB_TYPE TEXT, -- ADDITIONAL NAME DATA ASSIGNED TO THE OBJECT
 	CONSTRAINT pk_aud_obj_tbl PRIMARY KEY (id),
-	CONSTRAINT fk_aud_obj_aud_tbl FOREIGN KEY (aud_id) REFERENCES aud_tbl(id)
+	CONSTRAINT fk_aud_obj_aud_tbl FOREIGN KEY (aud_id) REFERENCES aud_tbl(id),
+	CONSTRAINT fk_aud_obj_cst_id foreign key (cst_id_typ) references aud_cd_tbl(id)
 );
 --#!
 CREATE TRIGGER aud_obj_tbl_seq FOR aud_obj_tbl ACTIVE BEFORE INSERT POSITION 0 AS BEGIN

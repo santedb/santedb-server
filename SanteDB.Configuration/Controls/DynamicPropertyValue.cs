@@ -86,6 +86,7 @@ namespace SanteDB.Configuration.Controls
     /// <summary>
     /// Custom property descriptor
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class DynamicPropertyValueDescriptor : PropertyDescriptor
     {
         private DynamicPropertyValue m_extensionValue;
@@ -179,6 +180,7 @@ namespace SanteDB.Configuration.Controls
     /// <summary>
     /// Property class
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class DynamicPropertyClass : CollectionBase, ICustomTypeDescriptor
     {
 

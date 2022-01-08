@@ -25,7 +25,7 @@
   </sections>
   <section xsi:type="FileMatchConfigurationSection">
     <basePath>
-      <add readonly="false">.\matching</add>
+      <add readonly="false">matching</add>
     </basePath>
   </section>
 </SanteDBConfiguration>

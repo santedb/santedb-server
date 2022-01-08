@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Configuration;
 using SanteDB.Configuration.Controls;
 using SanteDB.Configuration.Converters;
@@ -36,6 +37,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Tracing;
 using System.Drawing;
 using System.Drawing.Design;
@@ -51,15 +53,13 @@ using System.Xml.Serialization;
 
 namespace SanteDB.Configurator
 {
+    [ExcludeFromCodeCoverage]
     public partial class frmMain : Form
     {
-
-
         #region Trace Writer
 
         private class FormTraceWriter : TraceWriter
         {
-
             // Form for the error writer
             private readonly frmMain m_form;
 
@@ -97,7 +97,7 @@ namespace SanteDB.Configurator
             }
         }
 
-        #endregion
+        #endregion Trace Writer
 
         public IFeature CurrentFeature { get; private set; }
 
@@ -117,7 +117,6 @@ namespace SanteDB.Configurator
         /// <returns></returns>
         private bool HasChanged()
         {
-
             byte[] newHash = null;
 
             try
@@ -140,73 +139,109 @@ namespace SanteDB.Configurator
         /// </summary>
         private void PopulateConfiguration()
         {
-
-            this.Text = $"SanteDB Confgiuration Tool ({Path.GetFileName(ConfigurationContext.Current.ConfigurationFile)})";
-            using (var ms = new MemoryStream())
+            try
             {
-                ConfigurationContext.Current.Configuration.Save(ms);
-                this.m_configHash = MD5.Create().ComputeHash(ms.ToArray());
-            }
-
-            Tracer tracer = new Tracer("Configuration Tool");
-            // Load the license
-            using (var ms = typeof(frmMain).Assembly.GetManifestResourceStream("SanteDB.Configurator.License.rtf"))
-                rtbLicense.LoadFile(ms, RichTextBoxStreamType.RichText);
-
-            var asm = Assembly.LoadFile(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "santedb.exe"));
-            lblVersion.Text = $"{asm.GetName().Version} ({asm.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion}";
-            lblCopyright.Text = $"{asm.GetCustomAttribute<AssemblyCopyrightAttribute>()?.Copyright}";
-            lblInstanceName.Text = $"{ConfigurationContext.Current.GetAppSetting("w32instance.name") ?? "DEFAULT"}";
-
-            // Load advanced view
-            lsvConfigSections.Items.Clear();
-            btnRestartService.Enabled = ConfigurationContext.Current.Features.OfType<WindowsServiceFeature>().FirstOrDefault()?.QueryState(ConfigurationContext.Current.Configuration) == Core.Configuration.FeatureInstallState.Installed;
-
-            foreach (var sect in ConfigurationContext.Current.Configuration.Sections)
-            {
-                var lvi = lsvConfigSections.Items.Add(sect.GetType().FullName, sect.GetType().GetCustomAttribute<XmlTypeAttribute>()?.TypeName, 3);
-                lvi.Tag = sect;
-            }
-
-            // Now load all features from the application domain
-            trvFeatures.Nodes.Clear();
-            foreach (var ftr in ConfigurationContext.Current.Features)
-            {
-                try
+                using (frmWait.ShowWait())
                 {
-                    if (ftr.ConfigurationType == null) continue;
-                    // Add the features
-                    var trvParent = trvFeatures.Nodes.Find(ftr.Group, false).FirstOrDefault();
-                    if (trvParent == null)
+                    this.Text = $"SanteDB Confgiuration Tool ({Path.GetFileName(ConfigurationContext.Current.ConfigurationFile)})";
+                    using (var ms = new MemoryStream())
                     {
-                        trvParent = trvFeatures.Nodes.Add(ftr.Group, ftr.Group, 6);
-                        trvParent.SelectedImageIndex = 6;
+                        Application.DoEvents();
+
+                        ConfigurationContext.Current.Configuration.Save(ms);
+                        this.m_configHash = MD5.Create().ComputeHash(ms.ToArray());
                     }
 
-                    // Create node for the object
-                    var node = trvParent.Nodes.Add($"{ftr.Group}\\{ftr.Name}", ftr.Name, 0);
-                    switch (ftr.QueryState(ConfigurationContext.Current.Configuration))
+                    Tracer tracer = new Tracer("Configuration Tool");
+                    // Load the license
+                    try
                     {
-                        case Core.Configuration.FeatureInstallState.NotInstalled:
-                            node.ImageIndex = 8;
-                            break;
-                        case Core.Configuration.FeatureInstallState.Installed:
-                            node.ImageIndex = 9;
-                            break;
-                        case Core.Configuration.FeatureInstallState.PartiallyInstalled:
-                            node.ImageIndex = 10;
-                            break;
-                        case FeatureInstallState.CantInstall:
-                            node.ImageIndex = 12;
-                            break;
+                        Application.DoEvents();
+
+                        using (var ms = typeof(frmMain).Assembly.GetManifestResourceStream("SanteDB.Configurator.License.rtf"))
+                            rtbLicense.LoadFile(ms, RichTextBoxStreamType.RichText);
                     }
-                    node.SelectedImageIndex = node.ImageIndex;
-                    node.Tag = ftr;
+                    catch (Exception e) // common on Linux systems in Mono
+                    {
+                        tracer.TraceError("Could not load license file: {0}", e.Message);
+                    }
+
+                    var asm = Assembly.LoadFile(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "SanteDB.exe"));
+                    lblVersion.Text = $"{asm.GetName().Version} ({asm.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion}";
+                    lblCopyright.Text = $"{asm.GetCustomAttribute<AssemblyCopyrightAttribute>()?.Copyright}";
+                    lblInstanceName.Text = $"{ConfigurationContext.Current.GetAppSetting("w32instance.name") ?? "DEFAULT"}";
+
+                    // Load advanced view
+                    lsvConfigSections.Items.Clear();
+                    btnRestartService.Enabled = ConfigurationContext.Current.Features.OfType<WindowsServiceFeature>().FirstOrDefault()?.QueryState(ConfigurationContext.Current.Configuration) == Core.Configuration.FeatureInstallState.Installed;
+
+                    foreach (var sect in ConfigurationContext.Current.Configuration.Sections)
+                    {
+                        Application.DoEvents();
+                        var lvi = lsvConfigSections.Items.Add(sect.GetType().FullName, sect.GetType().GetCustomAttribute<XmlTypeAttribute>()?.TypeName, 3);
+                        lvi.Tag = sect;
+                    }
+
+                    // Now load all features from the application domain
+                    trvFeatures.Nodes.Clear();
+                    foreach (var ftr in ConfigurationContext.Current.Features)
+                    {
+                        try
+                        {
+                            if (ftr.ConfigurationType == null) continue;
+                            // Add the features
+                            var trvParent = trvFeatures.Nodes.Find(ftr.Group, false).FirstOrDefault();
+                            if (trvParent == null)
+                            {
+                                trvParent = trvFeatures.Nodes.Add(ftr.Group, ftr.Group, 6);
+                                trvParent.SelectedImageIndex = 6;
+                            }
+
+                            // Create node for the object
+                            var node = trvParent.Nodes.Add($"{ftr.Group}\\{ftr.Name}", ftr.Name, 0);
+
+                            var mre = new ManualResetEvent(false);
+                            Core.Configuration.FeatureInstallState state = FeatureInstallState.NotInstalled;
+                            ThreadPool.QueueUserWorkItem((o) =>
+                            {
+                                state = ftr.QueryState(ConfigurationContext.Current.Configuration);
+                                mre.Set();
+                            });
+
+                            while (!mre.WaitOne(100))
+                                Application.DoEvents();
+
+                            switch (state)
+                            {
+                                case Core.Configuration.FeatureInstallState.NotInstalled:
+                                    node.ImageIndex = 8;
+                                    break;
+
+                                case Core.Configuration.FeatureInstallState.Installed:
+                                    node.ImageIndex = 9;
+                                    break;
+
+                                case Core.Configuration.FeatureInstallState.PartiallyInstalled:
+                                    node.ImageIndex = 10;
+                                    break;
+
+                                case FeatureInstallState.CantInstall:
+                                    node.ImageIndex = 12;
+                                    break;
+                            }
+                            node.SelectedImageIndex = node.ImageIndex;
+                            node.Tag = ftr;
+                        }
+                        catch (Exception e)
+                        {
+                            tracer.TraceError("Could not load feature {0} - {1}", ftr.Name, e.Message);
+                        }
+                    }
                 }
-                catch (Exception e)
-                {
-                    tracer.TraceError("Could not load feature {0} - {1}", ftr.Name, e.Message);
-                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error on form initialization: {0}", e);
             }
         }
 
@@ -219,7 +254,6 @@ namespace SanteDB.Configurator
                 pbEditor.SelectedObject = null;
             else
                 pbEditor.SelectedObject = lsvConfigSections.SelectedItems[0].Tag;
-
         }
 
         /// <summary>
@@ -228,7 +262,6 @@ namespace SanteDB.Configurator
         private void trvFeatures_AfterSelect(object sender, TreeViewEventArgs e)
         {
             this.SelectFeature(e.Node.Tag as IFeature);
-
         }
 
         /// <summary>
@@ -254,7 +287,7 @@ namespace SanteDB.Configurator
 
                 var state = feature.QueryState(ConfigurationContext.Current.Configuration);
 
-                // Confiugration 
+                // Confiugration
                 if (feature.ConfigurationType == typeof(GenericFeatureConfiguration))
                 {
                     var descriptor = new DynamicPropertyClass(feature.Configuration as GenericFeatureConfiguration);
@@ -266,7 +299,7 @@ namespace SanteDB.Configurator
                     if (feature.Configuration == null)
                         feature.Configuration = ConfigurationContext.Current.Configuration.GetSection(feature.ConfigurationType) ?? Activator.CreateInstance(feature.ConfigurationType);
 
-                    // Now set the task 
+                    // Now set the task
                     pgConfiguration.SelectedObject = feature.Configuration;
                     pgConfiguration.Visible = true;
                 }
@@ -283,16 +316,17 @@ namespace SanteDB.Configurator
                         btnDisable.Visible = lblEnabled.Visible = !feature.Flags.HasFlag(FeatureFlags.NoRemove);
                         lblNoInstall.Visible = lblDisabled.Visible = btnEnable.Visible = false;
                         break;
+
                     case FeatureInstallState.CantInstall:
                         lblDisabled.Visible = lblEnabled.Visible = btnDisable.Visible = btnEnable.Visible = tcSettings.Enabled = false;
                         lblNoInstall.Visible = true;
                         break;
+
                     default:
                         lblNoInstall.Visible = tcSettings.Enabled = btnDisable.Visible = lblEnabled.Visible = false;
                         lblDisabled.Visible = btnEnable.Visible = true;
                         break;
                 }
-
             }
         }
 
@@ -309,8 +343,7 @@ namespace SanteDB.Configurator
         /// </summary>
         private void btnApply_Click(object sender, EventArgs e)
         {
-
-            if(this.HasChanged())
+            if (this.HasChanged())
             {
                 foreach (var itm in ConfigurationContext.Current.ConfigurationTasks.Where(o => o.Feature == this.CurrentFeature).ToArray())
                     ConfigurationContext.Current.ConfigurationTasks.Remove(itm);
@@ -347,7 +380,6 @@ namespace SanteDB.Configurator
             // Create install tasks
             foreach (var tsk in this.CurrentFeature.CreateInstallTasks())
                 ConfigurationContext.Current.ConfigurationTasks.Add(tsk);
-
         }
 
         /// <summary>

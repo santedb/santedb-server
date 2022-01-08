@@ -121,16 +121,19 @@ namespace SanteDB.Configurator
                     splash.Close();
                 }
 
-                var frmMain = new frmMain();
-                // Check for updates
-                foreach (var t in ConfigurationContext.Current.Features
-                    .Where(o => o.Flags.HasFlag(FeatureFlags.AlwaysConfigure) && !o.Flags.HasFlag(FeatureFlags.SystemFeature))
-                    .SelectMany(o => o.CreateInstallTasks())
-                    .Where(o => o.VerifyState(ConfigurationContext.Current.Configuration)))
-                    ConfigurationContext.Current.ConfigurationTasks.Add(t);
+                frmMain frmMain = new frmMain();
+                    // Check for updates
+                    foreach (var t in ConfigurationContext.Current.Features
+                        .Where(o => o.Flags.HasFlag(FeatureFlags.AlwaysConfigure) && !o.Flags.HasFlag(FeatureFlags.SystemFeature))
+                        .SelectMany(o => o.CreateInstallTasks())
+                        .Where(o => o.VerifyState(ConfigurationContext.Current.Configuration)))
+                        ConfigurationContext.Current.ConfigurationTasks.Add(t);
                 ConfigurationContext.Current.Apply();
-
                 Application.Run(frmMain);
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine("Configuration Tooling Fatal Error: {0}", e);
             }
             finally
             {

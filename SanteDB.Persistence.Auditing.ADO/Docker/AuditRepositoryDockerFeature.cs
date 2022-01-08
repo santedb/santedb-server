@@ -24,6 +24,7 @@ using SanteDB.Persistence.Auditing.ADO.Configuration;
 using SanteDB.Persistence.Auditing.ADO.Services;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -33,6 +34,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Docker
     /// <summary>
     /// Configures the ADO Audit repository
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class AuditRepositoryDockerFeature : IDockerFeature
     {
 
