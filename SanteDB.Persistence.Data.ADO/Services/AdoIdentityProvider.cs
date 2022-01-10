@@ -565,12 +565,17 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <returns>The authenticated principal</returns>
         public IPrincipal Authenticate(ISession session)
         {
+
             try
             {
+
+                var sessionId = new Guid(session.Id.Take(16).ToArray());
+
+                var adhocCache = ApplicationServiceContext.Current.GetService<IAdhocCacheService>();
+                var authCache = adhocCache?.Get<object[]>($"s{sessionId}");
                 using (var context = this.m_configuration.Provider.GetReadonlyConnection())
                 {
                     context.Open();
-                    var sessionId = new Guid(session.Id.Take(16).ToArray());
 
                     var sql = context.CreateSqlStatement<DbSession>().SelectFrom(typeof(DbSession), typeof(DbSecurityApplication), typeof(DbSecurityUser), typeof(DbSecurityDevice))
                         .InnerJoin<DbSecurityApplication>(o => o.ApplicationKey, o => o.Key)
@@ -579,6 +584,11 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         .Where<DbSession>(s => s.Key == sessionId);
 
                     var auth = context.FirstOrDefault<CompositeResult<DbSession, DbSecurityApplication, DbSecurityUser, DbSecurityDevice>>(sql);
+                    auth.Object2.Secret = null;
+                    auth.Object3.Password = null;
+                    auth.Object3.SecurityHash = null;
+                    auth.Object4.DeviceSecret = null;
+                    adhocCache.Add($"s{sessionId}", auth);
 
                     // Identities
                     List<IClaimsIdentity> identities = new List<IClaimsIdentity>(3);
@@ -597,8 +607,8 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     var principal = auth.Object1.UserKey.GetValueOrDefault() == Guid.Empty ?
                         new SanteDBClaimsPrincipal(identities) : AdoClaimsIdentity.Create(context, auth.Object3, true, "SESSION").CreateClaimsPrincipal(identities);
 
-                    identities.First().AddClaim(new SanteDBClaim(SanteDBClaimTypes.AuthenticationInstant, session.NotBefore.ToString("o")));
-                    identities.First().AddClaim(new SanteDBClaim(SanteDBClaimTypes.Expiration, session.NotAfter.ToString("o")));
+                    identities.First().AddClaim(new SanteDBClaim(SanteDBClaimTypes.AuthenticationInstant, auth.Object1.NotBefore.ToString("o")));
+                    identities.First().AddClaim(new SanteDBClaim(SanteDBClaimTypes.Expiration, auth.Object1.NotAfter.ToString("o")));
                     identities.First().AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBSessionIdClaim, auth.Object1.Key.ToString()));
 
                     // Add claims from session

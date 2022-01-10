@@ -31,8 +31,8 @@ install_mono() {
     if [[ "$install" =~ ^[nN]$ ]]; then 
         echo "Won't install mono - SanteDB may not work properly!"
     else
-        $SUDO apt install -y mono-complete
-        exit_on_error $? !!
+		$SUDO apt update
+        $SUDO apt install -y mono-complete || exit_on_error $? !!
         echo "Mono installed"
     fi
 }
@@ -41,8 +41,8 @@ install_psql() {
     local install=""
     read_yesno "You don't appear to have PostgreSQL installed, SanteDB iCDR Requires a PostgreSQL - do you want me to install it? (hint: answer no if you have another PostgreSQL server)" install
     if [[ "$install" =~ ^[yY]$ ]]; then 
-        $SUDO apt install -y postgresql
-        exit_on_error $? !!
+		$SUDO apt update
+        $SUDO apt install -y postgresql || exit_on_error $? !!
         echo "PostgreSQL installed"
     fi
 }
