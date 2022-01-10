@@ -352,7 +352,7 @@ namespace SanteDB.Configurator
                 .SelectMany(o => o.CreateInstallTasks()))
                 ConfigurationContext.Current.ConfigurationTasks.Add(tsk);
             ConfigurationContext.Current.ConfigurationTasks.Add(new SaveConfigurationTask());
-            ConfigurationContext.Current.Apply();
+            ConfigurationContext.Current.Apply(this);
             this.PopulateConfiguration();
         }
 

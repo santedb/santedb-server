@@ -140,7 +140,6 @@ namespace SanteDB.Configurator
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Configuring Service";
-            this.TopMost = true;
             this.ResumeLayout(false);
             this.PerformLayout();
 
