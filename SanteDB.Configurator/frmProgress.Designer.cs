@@ -91,6 +91,7 @@ namespace SanteDB.Configurator
             this.colTask,
             this.colProgress});
             this.lsvStatus.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
+            this.lsvStatus.HideSelection = false;
             this.lsvStatus.Location = new System.Drawing.Point(12, 12);
             this.lsvStatus.MultiSelect = false;
             this.lsvStatus.Name = "lsvStatus";
@@ -139,6 +140,7 @@ namespace SanteDB.Configurator
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Configuring Service";
+            this.TopMost = true;
             this.ResumeLayout(false);
             this.PerformLayout();
 
