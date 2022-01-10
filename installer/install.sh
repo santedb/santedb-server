@@ -118,8 +118,9 @@ Description=SanteDB iCDR Server
 [Service]
 Type=simple
 RemainAfterExit=yes
-ExecStart=/usr/bin/mono-service -d:$INSTALL_ROOT $INSTALL_ROOT/SanteDB.exe --console 
-ExecStop=kill \`cat /tmp/SanteDB.exe.lock\`
+PIDFile=/var/run/santedb.pid
+ExecStart=/usr/bin/mono-service -l:/var/run/santedb.pid -d:$INSTALL_ROOT $INSTALL_ROOT/SanteDB.exe --console 
+ExecStop=kill -HUP $MAINPID
 
 [Install]
 WantedBy=multi-user.target
