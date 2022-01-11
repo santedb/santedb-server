@@ -121,7 +121,7 @@ Type=simple
 RemainAfterExit=yes
 PIDFile=/run/santedb.pid
 ExecStart=/usr/bin/mono-service -l:/run/santedb.pid -d:$INSTALL_ROOT $INSTALL_ROOT/SanteDB.exe --console 
-ExecStop=kill -HUP $MAINPID
+ExecStop=kill -sHUP $MAINPID
 
 [Install]
 WantedBy=multi-user.target
