@@ -53,7 +53,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION reindex_fti(ent_id_in IN UUID) 
+CREATE OR REPLACE FUNCTION reindex_fti_ent(ent_id_in IN UUID) 
 RETURNS void
 AS 
 $$
