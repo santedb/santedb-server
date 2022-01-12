@@ -200,6 +200,8 @@ namespace SanteDB.Server.Core.Configuration.Features
             public bool Execute(SanteDBConfiguration configuration)
             {
                 SecurityExtensions.InstallCertsForChain();
+                this.ProgressChanged?.Invoke(this, new SanteDB.Core.Services.ProgressChangedEventArgs(1.0f, "Complete"));
+
                 return true;
             }
 
@@ -293,6 +295,8 @@ namespace SanteDB.Server.Core.Configuration.Features
                 secSection.SetPolicy(SecurityPolicyIdentification.MaxInvalidLogins, (Int32)config.Values["FailedLogins"]);
                 secSection.SetPolicy(SecurityPolicyIdentification.SessionLength, (PolicyValueTimeSpan)config.Values["SessionLength"]);
                 secSection.SetPolicy(SecurityPolicyIdentification.RefreshLength, (PolicyValueTimeSpan)config.Values["SessionRefresh"]);
+                this.ProgressChanged?.Invoke(this, new SanteDB.Core.Services.ProgressChangedEventArgs(1.0f, "Complete"));
+
                 return true;
             }
 

@@ -46,7 +46,9 @@ namespace SanteDB.Server.Core.Services.Impl
         {
         }
 
+        /// <inheritdoc/>
         protected override string WritePolicy => PermissionPolicyIdentifiers.CreateIdentity;
+        /// <inheritdoc/>
         protected override string DeletePolicy => PermissionPolicyIdentifiers.AlterIdentity;
 
         /// <summary>

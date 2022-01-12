@@ -38,7 +38,7 @@ namespace SanteDB.Server.AdminConsole.Security
         /// Gets the service name
         /// </summary>
         public String ServiceName => "HTTP Basic Identity Provider";
-
+#pragma warning disable CS0067
         /// <summary>
         /// Fired when the basic identity provider has authenticated successfully
         /// </summary>
@@ -48,7 +48,7 @@ namespace SanteDB.Server.AdminConsole.Security
         /// Fired when the basic identity provider is about to authenticate
         /// </summary>
         public event EventHandler<AuthenticatingEventArgs> Authenticating;
-
+#pragma warning restore CS0067
         /// <summary>
         /// Adds a claim to the current identity
         /// </summary>

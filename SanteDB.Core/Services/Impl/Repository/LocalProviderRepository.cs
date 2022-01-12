@@ -43,10 +43,15 @@ namespace SanteDB.Server.Core.Services.Impl
 
         }
 
+        /// <inheritdoc/>
         protected override string QueryPolicy => PermissionPolicyIdentifiers.ReadMetadata;
+        /// <inheritdoc/>
         protected override string ReadPolicy => PermissionPolicyIdentifiers.ReadMetadata;
+        /// <inheritdoc/>
         protected override string WritePolicy => PermissionPolicyIdentifiers.UnrestrictedMetadata;
+        /// <inheritdoc/>
         protected override string DeletePolicy => PermissionPolicyIdentifiers.UnrestrictedMetadata;
+        /// <inheritdoc/>
         protected override string AlterPolicy => PermissionPolicyIdentifiers.UnrestrictedMetadata;
 
     }

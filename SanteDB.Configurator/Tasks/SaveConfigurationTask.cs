@@ -75,6 +75,8 @@ namespace SanteDB.Configurator.Tasks
             configuration.Includes = null;
             using (var fs = File.Create(ConfigurationContext.Current.ConfigurationFile))
                 configuration.Save(fs);
+            this.ProgressChanged?.Invoke(this, new SanteDB.Core.Services.ProgressChangedEventArgs(1.0f, "Complete"));
+
             return true;
         }
 

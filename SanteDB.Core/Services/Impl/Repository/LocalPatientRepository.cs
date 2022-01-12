@@ -40,10 +40,15 @@ namespace SanteDB.Server.Core.Services.Impl
 
         }
 
+        /// <inheritdoc/>
         protected override string QueryPolicy => PermissionPolicyIdentifiers.QueryClinicalData;
+        /// <inheritdoc/>
         protected override string ReadPolicy => PermissionPolicyIdentifiers.ReadClinicalData;
+        /// <inheritdoc/>
         protected override string WritePolicy => PermissionPolicyIdentifiers.WriteClinicalData;
+        /// <inheritdoc/>
         protected override string DeletePolicy => PermissionPolicyIdentifiers.DeleteClinicalData;
+        /// <inheritdoc/>
         protected override string AlterPolicy => PermissionPolicyIdentifiers.WriteClinicalData;
     }
 

@@ -37,10 +37,15 @@ namespace SanteDB.Server.Core.Services.Impl
         {
         }
 
+        /// <inheritdoc/>
         protected override string QueryPolicy => PermissionPolicyIdentifiers.QueryMaterials;
+        /// <inheritdoc/>
         protected override string ReadPolicy => PermissionPolicyIdentifiers.ReadMaterials;
+        /// <inheritdoc/>
         protected override string WritePolicy => PermissionPolicyIdentifiers.WriteMaterials;
+        /// <inheritdoc/>
         protected override string DeletePolicy => PermissionPolicyIdentifiers.DeleteMaterials;
+        /// <inheritdoc/>
         protected override string AlterPolicy => PermissionPolicyIdentifiers.WriteMaterials;
     }
 

@@ -83,6 +83,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         // Trace source name
         private Tracer m_traceSource = Tracer.GetTracer(typeof(AdoAuditRepositoryService));
 
+#pragma warning disable CS0067
         /// <summary>
         /// Fired when data is being inserted
         /// </summary>
@@ -132,6 +133,8 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         /// Fired when data is has been queried
         /// </summary>
         public event EventHandler<QueryResultEventArgs<AuditData>> Queried;
+
+#pragma warning restore CS0067
 
         /// <summary>
         /// Create new audit repository service
