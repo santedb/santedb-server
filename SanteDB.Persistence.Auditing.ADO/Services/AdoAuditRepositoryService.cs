@@ -330,26 +330,18 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         {
             if (messageCode == null) return null;
 
-            var codeKey = $"{messageCode.CodeSystem}#{messageCode.Code}";
-
-            var existing = this.m_adhocCache?.Get<DbAuditCode>(codeKey);
-            if (existing != null)
-            {
-                return existing;
-            }
-
             // Try to get from database
             lock (this.m_lockBox)
             {
-                existing = context.FirstOrDefault<DbAuditCode>(o => o.Code == messageCode.Code && o.CodeSystem == messageCode.CodeSystem);
-                if (existing == null)
+                var retVal = context.FirstOrDefault<DbAuditCode>(o => o.Code == messageCode.Code && o.CodeSystem == messageCode.CodeSystem);
+                if (retVal == null)
                 {
                     Guid codeId = Guid.NewGuid();
-                    existing = context.Insert(new DbAuditCode() { Code = messageCode.Code, CodeSystem = messageCode.CodeSystem, Key = codeId });
+                    retVal = context.Insert(new DbAuditCode() { Code = messageCode.Code, CodeSystem = messageCode.CodeSystem, Key = codeId });
                 }
-                this.m_adhocCache?.Add(codeKey, existing);
+                return retVal;
+
             }
-            return existing;
         }
 
         /// <summary>

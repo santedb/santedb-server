@@ -19,10 +19,15 @@
  * Date: 2021-8-27
  */
 using SanteDB.Core;
+using SanteDB.Core.Jobs;
 using SanteDB.Core.Model;
+using SanteDB.Core.Model.Collection;
+using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Query;
+using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
+using SanteDB.Persistence.Data.ADO.Jobs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,27 +42,77 @@ namespace SanteDB.Persistence.Data.ADO.Services
     /// </summary>
     public class AdoFreetextSearchService : IFreetextSearchService
     {
+        private readonly ISqlDataPersistenceService m_sqlDataPersistence;
+        private readonly IThreadPoolService m_threadPool;
+
         /// <summary>
         /// Gets the name of the service
         /// </summary>
-        public string ServiceName => "Basic ADO.NET _any Search Service";
+        public string ServiceName => "ADO.NET Freetext Search Service";
 
+        /// <summary>
+        /// ADO freetext constructor
+        /// </summary>
+        public AdoFreetextSearchService(IJobManagerService jobManager, IServiceManager serviceManager, ISqlDataPersistenceService sqlDataPersistence, IThreadPoolService threadPoolService)
+        {
+            this.m_sqlDataPersistence = sqlDataPersistence;
+            this.m_threadPool = threadPoolService;
+
+            var job = serviceManager.CreateInjected<AdoRebuildFreetextIndexJob>();
+            jobManager.AddJob(job, JobStartType.TimerOnly);
+            if (jobManager.GetJobSchedules(job)?.Any() != true)
+            {
+                jobManager.SetJobSchedule(job, new DayOfWeek[] { DayOfWeek.Saturday }, new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0));
+            }
+
+            // Subscribe to common types and events
+            var appServiceProvider = ApplicationServiceContext.Current;
+            appServiceProvider.GetService<IDataPersistenceService<Bundle>>().Inserted += (o, e) => e.Data.Item.ForEach(i => this.ReIndex(i));
+            appServiceProvider.GetService<IDataPersistenceService<Patient>>().Inserted += (o, e) => this.ReIndex(e.Data);
+            appServiceProvider.GetService<IDataPersistenceService<Provider>>().Inserted += (o, e) => this.ReIndex(e.Data);
+            appServiceProvider.GetService<IDataPersistenceService<Material>>().Inserted += (o, e) => this.ReIndex(e.Data);
+            appServiceProvider.GetService<IDataPersistenceService<ManufacturedMaterial>>().Inserted += (o, e) => this.ReIndex(e.Data);
+            appServiceProvider.GetService<IDataPersistenceService<Entity>>().Inserted += (o, e) => this.ReIndex(e.Data);
+            appServiceProvider.GetService<IDataPersistenceService<Place>>().Inserted += (o, e) => this.ReIndex(e.Data);
+            appServiceProvider.GetService<IDataPersistenceService<Organization>>().Inserted += (o, e) => this.ReIndex(e.Data);
+            appServiceProvider.GetService<IDataPersistenceService<Person>>().Inserted += (o, e) => this.ReIndex(e.Data);
+            appServiceProvider.GetService<IDataPersistenceService<Patient>>().Updated += (o, e) => this.ReIndex(e.Data);
+            appServiceProvider.GetService<IDataPersistenceService<Provider>>().Updated += (o, e) => this.ReIndex(e.Data);
+            appServiceProvider.GetService<IDataPersistenceService<Material>>().Updated += (o, e) => this.ReIndex(e.Data);
+            appServiceProvider.GetService<IDataPersistenceService<ManufacturedMaterial>>().Updated += (o, e) => this.ReIndex(e.Data);
+            appServiceProvider.GetService<IDataPersistenceService<Entity>>().Updated += (o, e) => this.ReIndex(e.Data);
+            appServiceProvider.GetService<IDataPersistenceService<Place>>().Updated += (o, e) => this.ReIndex(e.Data);
+            appServiceProvider.GetService<IDataPersistenceService<Organization>>().Updated += (o, e) => this.ReIndex(e.Data);
+            appServiceProvider.GetService<IDataPersistenceService<Person>>().Updated += (o, e) => this.ReIndex(e.Data);
+        }
         /// <summary>
         /// Search for the specified object in the list of terms
         /// </summary>
         public IEnumerable<TEntity> Search<TEntity>(string[] term, Guid queryId, int offset, int? count, out int totalResults, ModelSort<TEntity>[] orderBy) where TEntity : IdentifiedData, new()
         {
-            var idps = ApplicationServiceContext.Current.GetService<IUnionQueryDataPersistenceService<TEntity>>();
+
+            // Does the provider support freetext search clauses?
+            var idps = ApplicationServiceContext.Current.GetService<IDataPersistenceService<TEntity>>();
             if (idps == null)
                 throw new InvalidOperationException("Cannot find a UNION query repository service");
 
-            // Perform the queries on the terms
-            var searchFilters = new List<Expression<Func<TEntity, bool>>>(term.Length);
-            searchFilters.Add(QueryExpressionParser.BuildLinqExpression<TEntity>(new NameValueCollection() { { "name.component.value", term } }));
-            searchFilters.Add(QueryExpressionParser.BuildLinqExpression<TEntity>(new NameValueCollection() { { "identifier.value", term } }));
+            var searchTerm = String.Join(" and ", term);
+            return idps.Query(o => o.FreetextSearch(searchTerm), offset, count, out totalResults, AuthenticationContext.Current.Principal, orderBy);
+        }
 
-            // Send query
-            return idps.Union(searchFilters.ToArray(), queryId, offset, count, out totalResults, AuthenticationContext.Current.Principal, orderBy);
+        /// <summary>
+        /// Reindex the entity 
+        /// </summary>
+        public void ReIndex<TEntity>(TEntity entity) where TEntity : IdentifiedData
+        {
+            // TODO: Detect type and reindex based on type
+            this.m_threadPool.QueueUserWorkItem(p =>
+            {
+                using (AuthenticationContext.EnterSystemContext())
+                {
+                    this.m_sqlDataPersistence.ExecuteNonQuery($"SELECT reindex_fti_ent('{p}')");
+                }
+            }, entity.Key);
         }
     }
 }
