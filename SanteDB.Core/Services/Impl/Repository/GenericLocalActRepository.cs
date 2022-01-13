@@ -19,6 +19,7 @@
  * Date: 2021-8-27
  */
 using SanteDB.Core;
+using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Query;
@@ -34,15 +35,14 @@ namespace SanteDB.Server.Core.Services.Impl
 {
 
     /// <summary>
-    /// Represents an act repository service.
+    /// Represents an <see cref="IRepositoryService"/> which stores <see cref="Act"/>s and their derivative classes
     /// </summary>
-    /// <seealso cref="IActRepositoryService" />
-    /// <seealso cref="Services.IRepositoryService{Act}" />
-    /// <seealso cref="Services.IRepositoryService{SubstanceAdministration}" />
-    /// <seealso cref="Services.IRepositoryService{QuantityObservation}" />
-    /// <seealso cref="Services.IRepositoryService{PatientEncounter}" />
-    /// <seealso cref="Services.IRepositoryService{CodedObservation}" />
-    /// <seealso cref="Services.IRepositoryService{TextObservation}" />
+    /// <seealso cref="IRepositoryService{Act}" />
+    /// <seealso cref="IRepositoryService{SubstanceAdministration}" />
+    /// <seealso cref="IRepositoryService{QuantityObservation}" />
+    /// <seealso cref="IRepositoryService{PatientEncounter}" />
+    /// <seealso cref="IRepositoryService{CodedObservation}" />
+    /// <seealso cref="IRepositoryService{TextObservation}" />
     public class GenericLocalActRepository<TAct> : GenericLocalClinicalDataRepository<TAct>, ICancelRepositoryService<TAct>
         where TAct : Act
     {
@@ -53,9 +53,7 @@ namespace SanteDB.Server.Core.Services.Impl
         {
         }
 
-        /// <summary>
-        /// Insert or update the specified act
-        /// </summary>
+        /// <inheritdoc/>
         public TAct Cancel(Guid id)
         {
             var act = base.Get(id);
@@ -63,94 +61,67 @@ namespace SanteDB.Server.Core.Services.Impl
             return base.Save(act);
         }
 
-        /// <summary>
-        /// Find the specified act
-        /// </summary>
+        /// <inheritdoc/>
         public override IEnumerable<TAct> Find(Expression<Func<TAct, bool>> query, int offset, int? count, out int totalResults, Guid queryId, params ModelSort<TAct>[] orderBy)
         {
             return base.Find(query, offset, count, out totalResults, queryId, orderBy);
         }
 
-        /// <summary>
-        /// Find the specified act
-        /// </summary>
+        /// <inheritdoc/>
         public override IEnumerable<TAct> Find(Expression<Func<TAct, bool>> query)
         {
             return base.Find(query);
         }
 
-        /// <summary>
-        /// Find the specified act
-        /// </summary>
+        /// <inheritdoc/>
         public override IEnumerable<TAct> Find(Expression<Func<TAct, bool>> query, int offset, int? count, out int totalResults, params ModelSort<TAct>[] orderBy)
         {
             return base.Find(query, offset, count, out totalResults, orderBy);
         }
 
-        /// <summary>
-        /// Find the specified act in a fast load manner
-        /// </summary>
+        /// <inheritdoc/>
         public override IEnumerable<TAct> FindFast(Expression<Func<TAct, bool>> query, int offset, int? count, out int totalResults, Guid queryId)
         {
             return base.FindFast(query, offset, count, out totalResults, queryId);
         }
 
-        /// <summary>
-        /// Get the specified act
-        /// </summary>
+        /// <inheritdoc/>
         public override TAct Get(Guid key)
         {
             return base.Get(key);
         }
 
-        /// <summary>
-        /// Get the specified act
-        /// </summary>
+        /// <inheritdoc/>
         public override TAct Get(Guid key, Guid versionKey)
         {
             return base.Get(key, versionKey);
         }
 
-        /// <summary>
-        /// Insert the specified act
-        /// </summary>
+        /// <inheritdoc/>
         public override TAct Insert(TAct entity)
         {
             return base.Insert(entity);
         }
 
-        /// <summary>
-        /// Nullify (invalidate or mark entered in error) the clinical act
-        /// </summary>
+        /// <inheritdoc/>
         public override TAct Nullify(Guid id)
         {
             return base.Nullify(id);
         }
 
-        /// <summary>
-        /// Obsolete (mark as no longer valid) the specified act
-        /// </summary> 
+        /// <inheritdoc/>
         public override TAct Obsolete(Guid key)
         {
             return base.Obsolete(key);
         }
 
-        /// <summary>
-        /// Update clinical act
-        /// </summary>
+        /// <inheritdoc/>
         public override TAct Save(TAct data)
         {
             return base.Save(data);
         }
 
-        /// <summary>
-        /// Validates an act.
-        /// </summary>
-        /// <typeparam name="TAct">The type of the act.</typeparam>
-        /// <param name="data">The data.</param>
-        /// <returns>TAct.</returns>
-        /// <exception cref="DetectedIssueException">If there are any validation errors detected.</exception>
-        /// <exception cref="System.InvalidOperationException">If the data is null.</exception>
+        /// <inheritdoc/>
         public override TAct Validate(TAct data)
         {
             if (data == null)

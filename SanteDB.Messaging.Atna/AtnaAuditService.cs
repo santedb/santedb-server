@@ -45,9 +45,27 @@ using SanteDB.Core.Diagnostics;
 namespace SanteDB.Messaging.Atna
 {
     /// <summary>
-    /// Represents an audit service that communicates Audits via
-    /// RFC3881 (ATNA style) audits
+    /// Represents an audit service that communicates Audits via an IHE ATNA transport
     /// </summary>
+    /// <remarks>
+    /// <para>This implementation of the <see cref="IAuditDispatchService"/> is responsible for 
+    /// creating and dispatching audits in one of the appropriate formats for <see href="https://profiles.ihe.net/ITI/TF/Volume1/ch-9.html">IHE Audit Trail and Node Authentication</see>
+    /// audits.</para>
+    /// <para>The specific formats of audits supported are:</para>
+    /// <list type="bullet">
+    ///     <item><see href="https://tools.ietf.org/html/rfc3881">IETF RFC-3881</see> messages</item>
+    ///     <item><see href="https://dicom.nema.org/medical/dicom/current/output/chtml/part15/sect_A.5.html">NEMA DICOM</see> messages</item>
+    /// </list>
+    /// <para>The audits can be sent via a variety of transports including:</para>
+    /// <list type="bullet">
+    ///     <item>UDP Syslog</item>
+    ///     <item>TCP Syslog</item>
+    ///     <item>Secure (TLS) TCP Syslog</item>
+    ///     <item>HTTP POST</item>
+    ///     <item>File System Settings</item>
+    /// </list>
+    /// <para>The configuration of this service is described in <see cref="AtnaConfigurationSection"/></para>
+    /// </remarks>
     [ServiceProvider("IHE ATNA Audit Dispatcher")]
     public class AtnaAuditService : IAuditDispatchService
     {

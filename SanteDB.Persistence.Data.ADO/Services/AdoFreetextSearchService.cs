@@ -27,6 +27,7 @@ using SanteDB.Core.Model.Query;
 using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
+using SanteDB.OrmLite.Providers;
 using SanteDB.Persistence.Data.ADO.Jobs;
 using System;
 using System.Collections.Generic;
@@ -38,8 +39,14 @@ using System.Threading.Tasks;
 namespace SanteDB.Persistence.Data.ADO.Services
 {
     /// <summary>
-    /// Represents a basic ADO FreeText search service which really just filters on database tables
+    /// An implementation of the <see cref="IFreetextSearchService"/> which uses the underlying built-in database functionality
     /// </summary>
+    /// <remarks>
+    /// <para>This implementation of the free-text search service relies on a <see cref="IDbProvider"/> implementation 
+    /// providing a <see cref="IDbFilterFunction"/> with the identifier <c>freetext</c>. The call is equivalent to using the 
+    /// HDSI query expression: <c>id=:(freetext|$term)</c> and uses SanteDB's extended filter function (see an example
+    /// of <see href="https://help.santesuite.org/developers/server-plugins/custom-algorithms#implementing-custom-idbfilterfunction">implementing a custom IDbFilterFunction</see></para>
+    /// </remarks>
     public class AdoFreetextSearchService : IFreetextSearchService
     {
         private readonly ISqlDataPersistenceService m_sqlDataPersistence;

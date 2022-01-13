@@ -30,6 +30,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>..\bin\Debug\SanteDB.Persistence.Data.ADO.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -95,6 +96,7 @@
     <Compile Include="Data\Model\Security\DbSession.cs" />
     <Compile Include="Data\Model\Security\DbSessionClaim.cs" />
     <Compile Include="Docker\AdoDataDockerFeature.cs" />
+    <Compile Include="Docker\AdoFreetextDockerFeature.cs" />
     <Compile Include="Exceptions\AdoFormalConstraintException.cs" />
     <Compile Include="Configuration\Features\AdoPersistenceFeature.cs" />
     <Compile Include="Jobs\AdoRebuildFreetextIndexJob.cs" />

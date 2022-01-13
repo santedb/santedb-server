@@ -32,6 +32,7 @@ using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Audit;
+using SanteDB.Core.Security.Principal;
 using SanteDB.Core.Security.Privacy;
 using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
@@ -48,8 +49,13 @@ using System.Security.Principal;
 namespace SanteDB.Server.Core.Security.Privacy
 {
     /// <summary>
-    /// Local policy enforcement point service
+    /// A data privacy filter service which supports exemption based on configuration
     /// </summary>
+    /// <remarks>
+    /// <para>This class is an extension of the <see cref="DataPolicyFilterService"/> which adds support for exempting certain types
+    /// of principals from the enforcement action. This is useful for scenarios where, for example, a <see cref="IDeviceIdentity"/>
+    /// may be a node that is synchronizing data.</para>
+    /// </remarks>
     public class ExemptablePolicyFilterService : DataPolicyFilterService
     {
         // Security configuration
