@@ -298,7 +298,6 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     e.Data.SecurityHash = Guid.NewGuid().ToString();
                 };
 
-                ApplicationServiceContext.Current.GetService<IServiceManager>().AddServiceProvider(typeof(AdoFreetextSearchService));
                 // Unload configuration when app domain unloads
                 ApplicationServiceContext.Current.Stopped += (o, e) => this.m_configuration = null;
 
