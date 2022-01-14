@@ -40,6 +40,14 @@ namespace SanteDB.Server.Core.Persistence
     /// <summary>
     /// Data initialization service
     /// </summary>
+    /// <remarks>
+    /// <para>This service reads data from the configured directory (usually the <c>data/</c> directory) with extension <c>.dataset</c>
+    /// and imports the data into the SanteDB iCDR instance. Each <see cref="Dataset"/> file is then renamed to <c>.completed</c> to 
+    /// indicate that the import of the provided data was successful. This service allows SanteDB instances to share information between
+    /// deployments easily.</para>
+    /// <para>For more information consult the <see href="https://help.santesuite.org/developers/applets/distributing-data">Distributing Data</see> files</para>
+    /// </remarks>
+    /// <seealso cref="Dataset"/>
     [ServiceProvider("Dataset Installation Service")]
     #pragma warning disable CS0067
     public class DataInitializationService : IDaemonService, IReportProgressChanged

@@ -60,8 +60,17 @@ using System.Xml.Serialization;
 namespace SanteDB.Persistence.Data.ADO.Services
 {
     /// <summary>
-    /// Represents a dummy service which just adds the persistence services to the context
+    /// Registers and configures the necessary sub-services and <see cref="IDataPersistenceService"/> implementations
+    /// to allow SanteDB iCDR to persist, query, and read messages from available ADO.NET data providers
     /// </summary>
+    /// <remarks>
+    /// <para>This service is responsible for registering the necessary <see cref="IDataPersistenceService"/> providers
+    /// which are responsible for interfacing the SanteDB <see href="https://help.santesuite.org/santedb/data-and-information-architecture/physical-model">Physical Model</see> 
+    /// with the SanteDB <see href="https://help.santesuite.org/santedb/data-and-information-architecture/conceptual-data-model">Business / Object Model</see>. Each 
+    /// persistence implementation is derived from the <see cref="ModelMap"/> configuration, and is uses the ADO.NET classes to via the <see cref="IDbProvider"/> configured.</para>
+    /// <para>Additionally, on start of the SanteDB iCDR or dCDR, this service is responsible for applying any <see href="https://help.santesuite.org/developers/server-plugins/database-patching">Data Patches</see>
+    /// which have been provided (compiled via an embedded resource) by any of the validated SanteDB plugins.</para>
+    /// </remarks>
     [ServiceProvider("ADO.NET Data Persistence Service", Configuration = typeof(AdoPersistenceConfigurationSection))]
     public class AdoPersistenceService : IDaemonService, ISqlDataPersistenceService, IAdoPersistenceSettingsProvider
     {
