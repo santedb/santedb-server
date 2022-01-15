@@ -522,6 +522,7 @@ namespace SanteDB.Server.Core.Configuration.Features
         {
             configuration.Sections.RemoveAll(o => o is IConfigurationSection && o.GetType() == this.m_serviceConfigurationObject.GetType());
             configuration.AddSection(this.m_serviceConfigurationObject);
+            this.ProgressChanged?.Invoke(this, new SanteDB.Core.Services.ProgressChangedEventArgs(1.0f, "Complete"));
             return true;
         }
 

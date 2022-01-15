@@ -107,8 +107,15 @@ namespace SanteDB.Configurator
                     ConfigurationContext.Current.InitialStart();
 
                     var init = new frmInitialConfig();
-                    if (init.ShowDialog() == DialogResult.Cancel)
-                        return;
+                    try
+                    {
+                        if (init.ShowDialog() == DialogResult.Cancel)
+                            return;
+                    }
+                    finally
+                    {
+                        init.Dispose();
+                    }
                 }
                 else if (!ConfigurationContext.Current.LoadConfiguration(ConfigurationContext.Current.ConfigurationFile))
                 {
@@ -128,7 +135,7 @@ namespace SanteDB.Configurator
                         .SelectMany(o => o.CreateInstallTasks())
                         .Where(o => o.VerifyState(ConfigurationContext.Current.Configuration)))
                         ConfigurationContext.Current.ConfigurationTasks.Add(t);
-                ConfigurationContext.Current.Apply();
+                ConfigurationContext.Current.Apply(frmMain);
                 Application.Run(frmMain);
             }
             catch(Exception e)

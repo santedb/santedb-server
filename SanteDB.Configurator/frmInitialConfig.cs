@@ -86,7 +86,9 @@ namespace SanteDB.Configurator
         /// </summary>
         private void btnContinue_Click(object sender, EventArgs e)
         {
+
             ConfigurationContext.Current.ConfigurationTasks.Clear();
+            this.Hide();
             // Create a default configuration with minimal sections
             if (cbxTemplate.SelectedItem != null)
             {
@@ -167,11 +169,13 @@ namespace SanteDB.Configurator
                         ConfigurationContext.Current.ConfigurationTasks.Add(tsk);
                 }
 
-                ConfigurationContext.Current.Apply();
+                ConfigurationContext.Current.Apply(this);
             }
+
 
             this.DialogResult = DialogResult.OK;
             this.Close();
+
         }
 
         /// <summary>

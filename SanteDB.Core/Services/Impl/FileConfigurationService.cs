@@ -32,9 +32,14 @@ using SanteDB.Core.Services;
 namespace SanteDB.Server.Core.Services.Impl
 {
     /// <summary>
-    /// Provides a redirected configuration service which reads configuration from a different file
+    /// Provides a redirected configuration service which reads configuration information from a file
     /// </summary>
-    [ServiceProvider("Local Configuration Manager")]
+    /// <remarks>
+    /// This configuration manager implementation  reads from the configuration file <c>santedb.config.xml</c> in the same directory
+    /// as the installed iCDR instance. This file is create either manually (<see href="https://help.santesuite.org/operations/server-administration/host-configuration-file">as documented here</see>), or
+    /// using the <see href="https://help.santesuite.org/operations/server-administration/configuration-tool">Configuration Tool</see>.
+    /// </remarks>
+    [ServiceProvider("Local File Configuration Manager")]
     public class FileConfigurationService : IConfigurationManager
     {
         /// <summary>

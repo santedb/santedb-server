@@ -129,6 +129,8 @@ namespace SanteDB.Messaging.Atna.Configuration
         {
             var dispatcherConfiguration = configuration.GetSection<AtnaConfigurationSection>();
             configuration.GetSection<ApplicationServiceContextConfigurationSection>().ServiceProviders.RemoveAll(r => r.Type == typeof(AtnaAuditService));
+            this.ProgressChanged?.Invoke(this, new SanteDB.Core.Services.ProgressChangedEventArgs(1.0f, "Complete"));
+
             return true;
         }
 

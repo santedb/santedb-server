@@ -40,4 +40,11 @@
       <canOverride>false</canOverride>
     </SecurityPolicy>
   </insert>
+  <exec>
+    <service type="SanteDB.Core.Security.Services.IPolicyDecisionService, SanteDB.Core.Api" method="ClearCache">
+      <args>
+        <string>SYSTEM</string>
+      </args>
+    </service>
+  </exec>
 </dataset>

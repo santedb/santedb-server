@@ -63,10 +63,11 @@ namespace SanteDB.Persistence.Data.ADO.Services
         private AdoPersistenceConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AdoPersistenceConfigurationSection>();
 
         // Ad-hoc cache
-        private IAdhocCacheService m_adhocCache;
+        private readonly IAdhocCacheService m_adhocCache;
 
         // PEP
-        private IPolicyEnforcementService m_policyEnforcement;
+        private readonly IPolicyEnforcementService m_policyEnforcement;
+        private readonly IPolicyDecisionService m_policyDecisionService;
 
         // TRace source
         private Tracer m_traceSource = new Tracer(AdoDataConstants.IdentityTraceSourceName);
@@ -74,10 +75,11 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// Create new service with adhoc cache
         /// </summary>
-        public AdoPolicyInformationService(IPolicyEnforcementService pepService, IAdhocCacheService adhocCache = null)
+        public AdoPolicyInformationService(IPolicyEnforcementService pepService, IPolicyDecisionService pdpService, IAdhocCacheService adhocCache = null)
         {
             this.m_adhocCache = adhocCache;
             this.m_policyEnforcement = pepService;
+            this.m_policyDecisionService = pdpService;
         }
 
 
@@ -114,6 +116,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                 GrantType = (int)rule,
                                 PolicyKey = policy.Key
                             });
+                            
                         }
                         else if (securable is SecurityApplication sa)
                         {

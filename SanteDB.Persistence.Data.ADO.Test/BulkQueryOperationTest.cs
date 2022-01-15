@@ -32,6 +32,7 @@ using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using SanteDB.Core.TestFramework;
+using SanteDB.Core.Model.Query;
 
 namespace SanteDB.Persistence.Data.ADO.Test
 {

@@ -37,8 +37,7 @@ using System.Text.RegularExpressions;
 namespace SanteDB.Server.Core.Services.Impl
 {
     /// <summary>
-    /// Represents a service which is responsible for the
-    /// maintenance of concepts.
+    /// Represents a service which is responsible for the maintenance of concepts using local persistence.
     /// </summary>
     public class LocalConceptRepository : GenericLocalRepositoryEx<Concept>, IConceptRepositoryService
     {

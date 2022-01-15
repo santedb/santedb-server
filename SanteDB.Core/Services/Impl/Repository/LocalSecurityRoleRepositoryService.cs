@@ -38,8 +38,11 @@ namespace SanteDB.Server.Core.Services.Impl
         {
         }
 
+        /// <inheritdoc/>
         protected override string WritePolicy => PermissionPolicyIdentifiers.CreateRoles;
+        /// <inheritdoc/>
         protected override string DeletePolicy => PermissionPolicyIdentifiers.AlterRoles;
+        /// <inheritdoc/>
         protected override string AlterPolicy => PermissionPolicyIdentifiers.AlterRoles;
     }
 }

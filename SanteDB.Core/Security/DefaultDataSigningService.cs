@@ -38,6 +38,16 @@ namespace SanteDB.Server.Core.Security
     /// <summary>
     /// Default data signature service
     /// </summary>
+    /// <remarks>
+    /// <para>This digital signature service uses the keys configured in the <see cref="SecurityConfigurationSection"/>
+    /// to sign data based on the type of signature algorithm in the <see cref="SecurityConfigurationSection"/>. Supported signature 
+    /// algorithms are:</para>
+    /// <list type="bullet">
+    ///     <item>HMAC256 (HMAC + SHA256) using shared secrets</item>
+    ///     <item>RS256 (RSA+SHA256) using X.509 certificates (generation of a signature requires private key)</item>
+    ///     <item>RS512 (RSA+SHA512)</item>
+    /// </list>
+    /// </remarks>
     [Obsolete("Use SanteDB.Core.Security.DefaultDataSigningService", true)]
     public class DefaultDataSigningService : SanteDB.Core.Security.DefaultDataSigningService
     {

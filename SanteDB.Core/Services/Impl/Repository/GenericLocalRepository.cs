@@ -142,10 +142,14 @@ namespace SanteDB.Server.Core.Services.Impl
         // Privacy service
         private IPrivacyEnforcementService m_privacyService;
 
-        // Localization service
+        /// <summary>
+        /// Reference to the localization service
+        /// </summary>
         protected readonly ILocalizationService m_localizationService;
 
-        // Policy enforcement
+        /// <summary>
+        /// Reference to the policy enforcement service
+        /// </summary>
         protected IPolicyEnforcementService m_policyService;
 
         // Data persistence service

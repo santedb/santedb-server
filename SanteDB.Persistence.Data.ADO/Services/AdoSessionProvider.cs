@@ -37,6 +37,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.Dynamic;
 using System.IdentityModel.Tokens;
 using System.IO;
 using System.Linq;
@@ -93,7 +94,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
         private SecurityConfigurationSection m_securityConfiguration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SecurityConfigurationSection>();
 
         // Session cache
-        private Dictionary<Guid, KeyValuePair<DbSession, DbSessionClaim[]>> m_sessionCache = new Dictionary<Guid, KeyValuePair<DbSession, DbSessionClaim[]>>();
+        private IAdhocCacheService m_adhocCache = ApplicationServiceContext.Current.GetService<IAdhocCacheService>();
 
         // Session lookups
         private Int32 m_sessionLookups = 0;
@@ -161,7 +162,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         var userKey = cprincipal.FindFirst(SanteDBClaimTypes.Sid).Value;
                         var expiration = DateTimeOffset.Now.Add(this.m_securityConfiguration.GetSecurityPolicy<TimeSpan>(SecurityPolicyIdentification.SessionLength, new TimeSpan(0, 5, 0)));
                         if ((purpose == PurposeOfUseKeys.SecurityAdmin.ToString() ||
-                            cprincipal.Claims.Any(o=>o.Type == SanteDBClaimTypes.PurposeOfUse && o.Value == PurposeOfUseKeys.SecurityAdmin.ToString()))
+                            cprincipal.Claims.Any(o => o.Type == SanteDBClaimTypes.PurposeOfUse && o.Value == PurposeOfUseKeys.SecurityAdmin.ToString()))
                             && policyDemands?.Contains(PermissionPolicyIdentifiers.LoginPasswordOnly) == true) // TODO: Make purpose of use menmonic check instead
                             expiration = DateTime.Now.Add(new TimeSpan(0, 2, 0));
 
@@ -202,7 +203,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             {
                                 // Get grant
                                 var grant = pdp.GetPolicyOutcome(cprincipal, pol);
-                                if (isOverride && grant == PolicyGrantType.Elevate && 
+                                if (isOverride && grant == PolicyGrantType.Elevate &&
                                     (pol.StartsWith(PermissionPolicyIdentifiers.SecurityElevations) || // Special security elevations don't require override permission
                                     pdp.GetPolicyOutcome(cprincipal, PermissionPolicyIdentifiers.OverridePolicyPermission) == PolicyGrantType.Grant
                                     )) // We are attempting to override
@@ -226,7 +227,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             claims.Add(new SanteDBClaim(SanteDBClaimTypes.Language, lang));
 
                         // Claims?
-                        foreach (var clm in claims.Where(o=>!m_nonSessionClaims.Contains(o.Type)))
+                        foreach (var clm in claims.Where(o => !m_nonSessionClaims.Contains(o.Type)))
                             context.Insert(new DbSessionClaim()
                             {
                                 SessionKey = dbSession.Key,
@@ -237,12 +238,14 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         tx.Commit();
 
                         var signingService = ApplicationServiceContext.Current.GetService<IDataSigningService>();
-                        
+
                         if (signingService == null)
                         {
                             this.m_traceSource.TraceWarning("No IDataSigningService provided. Session data will be unsigned!");
                             var session = new AdoSecuritySession(dbSession.Key, dbSession.Key.ToByteArray(), refreshToken, dbSession.NotBefore, dbSession.NotAfter, claims.ToArray());
                             this.Established?.Invoke(this, new SessionEstablishedEventArgs(principal, session, true, isOverride, purpose, policyDemands));
+
+                            this.m_adhocCache?.Add($"ses.{session.Key}", session);
                             return session;
                         }
                         else
@@ -252,6 +255,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                             var session = new AdoSecuritySession(dbSession.Key, signedToken, signedRefresh, dbSession.NotBefore, dbSession.NotAfter, claims.ToArray());
                             this.Established?.Invoke(this, new SessionEstablishedEventArgs(principal, session, true, isOverride, purpose, policyDemands));
+                            this.m_adhocCache?.Add($"ses.{session.Key}", session);
                             return session;
                         }
                     }
@@ -264,7 +268,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 throw new SecurityException("Error establishing session", e);
             }
         }
-        
+
         /// <summary>
         /// Extend the session 
         /// </summary>
@@ -332,13 +336,17 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     if (signingService == null)
                     {
                         this.m_traceSource.TraceWarning("No IDataSigningService provided. Session data will be unsigned!");
-                        return new AdoSecuritySession(dbSession.Key, dbSession.Key.ToByteArray(), refreshToken, dbSession.NotBefore, dbSession.NotAfter, claims.Select(o=>new SanteDBClaim(o.ClaimType, o.ClaimValue)).ToArray());
+                        var session = new AdoSecuritySession(dbSession.Key, dbSession.Key.ToByteArray(), refreshToken, dbSession.NotBefore, dbSession.NotAfter, claims.Select(o => new SanteDBClaim(o.ClaimType, o.ClaimValue)).ToArray());
+                        this.m_adhocCache?.Add($"ses.{session.Key}", session);
+                        return session;
                     }
                     else
                     {
                         var signedToken = dbSession.Key.ToByteArray().Concat(signingService.SignData(dbSession.Key.ToByteArray())).ToArray();
                         var signedRefresh = refreshToken.Concat(signingService.SignData(refreshToken)).ToArray();
-                        return new AdoSecuritySession(dbSession.Key, signedToken, signedRefresh, dbSession.NotBefore, dbSession.NotAfter, claims.Select(o => new SanteDBClaim(o.ClaimType, o.ClaimValue)).ToArray());
+                        var session = new AdoSecuritySession(dbSession.Key, signedToken, signedRefresh, dbSession.NotBefore, dbSession.NotAfter, claims.Select(o => new SanteDBClaim(o.ClaimType, o.ClaimValue)).ToArray());
+                        this.m_adhocCache?.Add($"ses.{session.Key}", session);
+                        return session;
                     }
 
                 }
@@ -366,61 +374,55 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
             try
             {
-                using (var context = this.m_configuration.Provider.GetReadonlyConnection())
+
+                var signingService = ApplicationServiceContext.Current.GetService<IDataSigningService>();
+                var sessionId = new Guid(sessionToken.Take(16).ToArray());
+                if (signingService == null)
+                    this.m_traceSource.TraceWarning("No IDataSigingService registered. Session data will not be verified");
+                else if (sessionToken.Length == 16)
+                    this.m_traceSource.TraceWarning("Will not verify signature for session {0}", sessionId);
+                else if (!signingService.Verify(sessionToken.Take(16).ToArray(), sessionToken.Skip(16).ToArray()))
+                    throw new SecurityException("Session token appears to have been tampered with");
+
+                var session = this.m_adhocCache?.Get<AdoSecuritySession>($"ses.{sessionId}");
+                if (session != null)
                 {
-                    context.Open();
-
-                    var signingService = ApplicationServiceContext.Current.GetService<IDataSigningService>();
-                    var sessionId = new Guid(sessionToken.Take(16).ToArray());
-                    if (signingService == null)
-                        this.m_traceSource.TraceWarning("No IDataSigingService registered. Session data will not be verified");
-                    else if (sessionToken.Length == 16)
-                        this.m_traceSource.TraceWarning("Will not verify signature for session {0}", sessionId);
-                    else if (!signingService.Verify(sessionToken.Take(16).ToArray(), sessionToken.Skip(16).ToArray()))
-                        throw new SecurityException("Session token appears to have been tampered with");
-
-
-                    // Check the cache
-                    if (!this.m_sessionCache.TryGetValue(sessionId, out KeyValuePair<DbSession, DbSessionClaim[]> sessionInfo))
+                    if (session.Key == Guid.Empty)
                     {
+                        var exp = this.m_adhocCache.Get<dynamic>($"ses.{sessionId}");
+                        return new GenericSession(Convert.FromBase64String(exp.Id), null, DateTime.Parse(exp.NotBefore), DateTime.Parse(exp.NotAfter), (exp.Claims as dynamic[]).Select(o => new SanteDBClaim(o.Type, o.Value)).ToArray());
+                    }
+                    else
+                    {
+                        return session;
+                    }
+                }
+                else
+                {
+                    using (var context = this.m_configuration.Provider.GetReadonlyConnection())
+                    {
+                        context.Open();
+
+                        // Check the cache
 
                         var dbSession = context.SingleOrDefault<DbSession>(o => o.Key == sessionId);
 
                         if (dbSession == null)
                             throw new SecuritySessionException(SessionExceptionType.NotEstablished, $"Session {BitConverter.ToString(sessionToken)} not found", null);
                         else if (dbSession.NotAfter < DateTime.Now)
-                            throw new SecuritySessionException(SessionExceptionType.Expired, new AdoSecuritySession(dbSession),  $"Session {BitConverter.ToString(sessionToken)} is expired", null);
+                            throw new SecuritySessionException(SessionExceptionType.Expired, new AdoSecuritySession(dbSession), $"Session {BitConverter.ToString(sessionToken)} is expired", null);
                         else if (dbSession.NotBefore > DateTime.Now)
                             throw new SecuritySessionException(SessionExceptionType.NotYetValid, new AdoSecuritySession(dbSession), $"Session {BitConverter.ToString(sessionToken)} is expired", null);
                         else
                         {
-                            sessionInfo = new KeyValuePair<DbSession, DbSessionClaim[]>(dbSession, context.Query<DbSessionClaim>(o => o.SessionKey == dbSession.Key).ToArray());
-                            lock (this.m_syncLock)
-                            {
-                                if (!this.m_sessionCache.ContainsKey(sessionId))
-                                    this.m_sessionCache.Add(sessionId, sessionInfo);
-                                else
-                                    this.m_sessionCache[sessionId] = sessionInfo;
-                            }
+                            var sessionInfo = new KeyValuePair<DbSession, DbSessionClaim[]>(dbSession, context.Query<DbSessionClaim>(o => o.SessionKey == dbSession.Key).ToArray());
+                            session = new AdoSecuritySession(sessionInfo.Key.Key, sessionToken, null, sessionInfo.Key.NotBefore, sessionInfo.Key.NotAfter, sessionInfo.Value.Select(o => new SanteDBClaim(o.ClaimType, o.ClaimValue)).ToArray());
+                            this.m_adhocCache?.Add($"ses.{sessionId}", session);
                         }
-                    }
 
-                    // TODO: Write a timer job for this
-                    lock (this.m_syncLock)
-                    {
-                        this.m_sessionLookups++;
-                        if (this.m_sessionLookups > 10000) // Clean up  {
-                        {
-                            this.m_sessionLookups = 0;
-                            this.m_traceSource.TraceInfo("Cleaning expired sessions from cache");
-                            var keyIds = this.m_sessionCache.Where(s => s.Value.Key.NotAfter <= DateTimeOffset.Now).Select(s => s.Key).ToList();
-                            foreach (var kid in keyIds)
-                                this.m_sessionCache.Remove(kid);
-                        }
                     }
-
-                    return new AdoSecuritySession(sessionInfo.Key.Key, sessionToken, null, sessionInfo.Key.NotBefore, sessionInfo.Key.NotAfter, sessionInfo.Value.Select(o=>new SanteDBClaim(o.ClaimType, o.ClaimValue)).ToArray());
                 }
+                return session;
             }
             catch (Exception e)
             {

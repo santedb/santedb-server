@@ -41,6 +41,9 @@ namespace SanteDB.Server.Core.Services.Impl
     [Obsolete("Use SanteDB.Core.Security.DefaultPolicyEnforcementService", true)]
     public class DefaultPolicyEnforcementService : SanteDB.Core.Security.DefaultPolicyEnforcementService
     {
+        /// <summary>
+        /// DI constructor
+        /// </summary>
         public DefaultPolicyEnforcementService(IPolicyDecisionService pdpService) : base(pdpService)
         {
         }

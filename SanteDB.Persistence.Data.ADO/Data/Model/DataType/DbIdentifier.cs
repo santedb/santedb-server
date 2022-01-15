@@ -69,13 +69,13 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.DataType
         /// Gets or sets the time of issue
         /// </summary>
         [Column("iss_dt")]
-        public DateTime? IssueDate { get; set; }
+        public DateTimeOffset? IssueDate { get; set; }
 
         /// <summary>
         /// Gets or sets the expiration time
         /// </summary>
         [Column("exp_dt")]
-        public DateTime? ExpiryDate { get; set; }
+        public DateTimeOffset? ExpiryDate { get; set; }
 
         /// <summary>
         /// Gets or sets the check digit
