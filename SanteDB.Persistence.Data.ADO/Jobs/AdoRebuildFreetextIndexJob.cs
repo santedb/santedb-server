@@ -2,6 +2,7 @@
 using SanteDB.Core.Jobs;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
+using SanteDB.Persistence.Data.ADO.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,14 +21,14 @@ namespace SanteDB.Persistence.Data.ADO.Jobs
         private readonly Tracer m_tracer = Tracer.GetTracer(typeof(AdoRebuildFreetextIndexJob));
 
         // Service on which SQL can be run
-        private readonly ISqlDataPersistenceService m_sqlService;
+        private readonly AdoPersistenceConfigurationSection m_configuration;
 
         /// <summary>
         /// DI constructor
         /// </summary>
-        public AdoRebuildFreetextIndexJob(ISqlDataPersistenceService sqlDataPersistenceService)
+        public AdoRebuildFreetextIndexJob(IConfigurationManager configurationManager)
         {
-            this.m_sqlService = sqlDataPersistenceService;
+            this.m_configuration = configurationManager.GetSection<AdoPersistenceConfigurationSection>();
         }
 
         /// <summary>
@@ -80,16 +81,18 @@ namespace SanteDB.Persistence.Data.ADO.Jobs
         {
             try
             {
-                using (AuthenticationContext.EnterSystemContext())
+                using(var ctx = this.m_configuration.Provider.GetWriteConnection())
                 {
+                    ctx.Open();
                     this.LastStarted = DateTime.Now;
                     this.CurrentState = JobStateType.Running;
 
-                    this.m_sqlService.ExecuteNonQuery("SELECT rfrsh_fti()");
+                    ctx.ExecuteProcedure<object>("rfrsh_fti");
 
                     this.CurrentState = JobStateType.Completed;
                     this.LastFinished = DateTime.Now;
                 }
+
             }
             catch(Exception ex)
             {
