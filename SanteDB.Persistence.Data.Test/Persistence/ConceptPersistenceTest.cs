@@ -161,7 +161,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                     {
                         new ConceptName("This is yet another test concept")
                     },
-                    ConceptSetKeys = new List<Guid>()
+                    ConceptSetsXml = new List<Guid>()
                     {
                         ConceptSetKeys.AdministrativeGenderCode
                     },
@@ -194,7 +194,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                 Assert.AreEqual(1, afterInsert.Relationship.Count);
                 Assert.AreEqual(1, afterInsert.ConceptNames.Count);
                 Assert.AreEqual(1, afterInsert.ReferenceTerms.Count);
-                Assert.AreEqual(1, afterInsert.ConceptSetKeys.Count);
+                Assert.AreEqual(1, afterInsert.ConceptSetsXml.Count);
 
                 var afterQuery = base.TestQuery<Concept>(o => o.Mnemonic == "TEST-04", 1).First();
                 Assert.AreEqual("TEST-04", afterQuery.Mnemonic);
@@ -217,7 +217,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.ReferenceTerms).Count);
 
                 // Concept sets are not a delay loadable property
-                Assert.AreEqual(1, afterQuery.ConceptSetKeys.Count);
+                Assert.AreEqual(1, afterQuery.ConceptSetsXml.Count);
             }
         }
 
@@ -288,7 +288,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                         new ConceptName("fr", "Un concept nouveau"),
                         new ConceptName("es", "Un concepto nuevo")
                     },
-                    ConceptSetKeys = new List<Guid>()
+                    ConceptSetsXml = new List<Guid>()
                     {
                         ConceptSetKeys.AdministrativeGenderCode
                     },
@@ -305,7 +305,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                 var afterInsert = base.TestInsert(concept);
                 Assert.AreEqual("TEST-06", afterInsert.Mnemonic);
                 Assert.AreEqual(3, afterInsert.ConceptNames.Count);
-                Assert.AreEqual(1, afterInsert.ConceptSetKeys.Count);
+                Assert.AreEqual(1, afterInsert.ConceptSetsXml.Count);
                 Assert.AreEqual(1, afterInsert.ReferenceTerms.Count);
 
                 // First we will remove a name
@@ -347,7 +347,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                 afterUpdate = base.TestUpdate(afterQuery, (o) =>
                 {
                     o.ConceptNames.RemoveAt(1);
-                    o.ConceptSetKeys.Clear();
+                    o.ConceptSetsXml.Clear();
                     o.ReferenceTerms.Add(new ConceptReferenceTerm()
                     {
                         RelationshipTypeKey = ConceptRelationshipTypeKeys.SameAs,
@@ -359,7 +359,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                 // Ensure the update reflects
                 Assert.AreEqual(1, afterUpdate.ConceptNames.Count);
                 Assert.AreEqual(2, afterUpdate.ReferenceTerms.Count);
-                Assert.AreEqual(0, afterUpdate.ConceptSetKeys.Count);
+                Assert.AreEqual(0, afterUpdate.ConceptSetsXml.Count);
                 Assert.AreEqual(1, afterUpdate.Relationship.Count);
 
                 // Now re-query
@@ -370,7 +370,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Relationship).Count);
                 Assert.AreEqual("en", afterQuery.ConceptNames[0].Language);
                 Assert.AreEqual(2, afterQuery.LoadProperty(o => o.ReferenceTerms).Count);
-                Assert.AreEqual(0, afterQuery.ConceptSetKeys.Count);
+                Assert.AreEqual(0, afterQuery.ConceptSetsXml.Count);
             }
         }
 

@@ -27,7 +27,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
             using (AuthenticationContext.EnterSystemContext())
             {
                 var conceptSet = base.TestQuery<ConceptSet>(o => o.Mnemonic == "NullReason", 1).AsResultSet();
-                Assert.AreEqual(15, conceptSet.First().ConceptKeys.Count);
+                Assert.AreEqual(15, conceptSet.First().ConceptsXml.Count);
             }
         }
 
@@ -40,7 +40,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
             using (AuthenticationContext.EnterSystemContext())
             {
                 var conceptSet = base.TestQuery<ConceptSet>(o => o.Mnemonic == "NullReason", 1).AsResultSet();
-                Assert.AreEqual(15, conceptSet.First().ConceptKeys.Count);
+                Assert.AreEqual(15, conceptSet.First().ConceptsXml.Count);
                 Assert.IsTrue(conceptSet.First().Concepts.Any(r => r.Key == NullReasonKeys.NoInformation));
             }
         }

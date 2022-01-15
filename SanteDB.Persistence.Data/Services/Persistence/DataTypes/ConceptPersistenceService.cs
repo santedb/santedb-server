@@ -68,10 +68,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             }
 
             // Concept sets
-            if (data.ConceptSetKeys != null)
+            if (data.ConceptSetsXml != null)
             {
-                retVal.ConceptSetKeys = base.UpdateInternalAssociations<DbConceptSetConceptAssociation>(context, retVal.Key.Value,
-                    data.ConceptSetKeys.Select(o => new DbConceptSetConceptAssociation()
+                retVal.ConceptSetsXml = base.UpdateInternalAssociations<DbConceptSetConceptAssociation>(context, retVal.Key.Value,
+                    data.ConceptSetsXml.Select(o => new DbConceptSetConceptAssociation()
                     {
                         ConceptKey = retVal.Key.Value,
                         SourceKey = o
@@ -112,10 +112,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             }
 
             // Update concept sets
-            if (data.ConceptSetKeys != null)
+            if (data.ConceptSetsXml != null)
             {
-                retVal.ConceptSetKeys = base.UpdateInternalAssociations<DbConceptSetConceptAssociation>(context, retVal.Key.Value,
-                    data.ConceptSetKeys.Select(o => new DbConceptSetConceptAssociation()
+                retVal.ConceptSetsXml = base.UpdateInternalAssociations<DbConceptSetConceptAssociation>(context, retVal.Key.Value,
+                    data.ConceptSetsXml.Select(o => new DbConceptSetConceptAssociation()
                     {
                         ConceptKey = retVal.Key.Value,
                         SourceKey = o
@@ -163,7 +163,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
                     retVal.SetLoaded(nameof(Concept.ReferenceTerms));
                     goto case LoadMode.QuickLoad;
                 case LoadMode.QuickLoad:
-                    retVal.ConceptSetKeys = context.Query<DbConceptSetConceptAssociation>(o => o.ConceptKey == dbModel.Key).Select(o => o.SourceKey).ToList();
+                    retVal.ConceptSetsXml = context.Query<DbConceptSetConceptAssociation>(o => o.ConceptKey == dbModel.Key).Select(o => o.SourceKey).ToList();
                     retVal.SetLoaded(nameof(Concept.ConceptSets));
                     break;
             }

@@ -246,7 +246,7 @@ namespace SanteDB.Server.Core.Services.Impl
         [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
         public bool IsMember(ConceptSet set, Concept concept)
         {
-            return this.m_conceptSetService.Query(o => o.Key == set.Key && o.ConceptKeys.Any(c => c == concept.Key), AuthenticationContext.Current.Principal).Any();
+            return this.m_conceptSetService.Query(o => o.Key == set.Key && o.ConceptsXml.Any(c => c == concept.Key), AuthenticationContext.Current.Principal).Any();
         }
 
         /// <summary>
@@ -259,7 +259,7 @@ namespace SanteDB.Server.Core.Services.Impl
 		[PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
         public bool IsMember(Guid set, Guid concept)
         {
-            return this.m_conceptSetService.Query(o => o.Key == set && o.ConceptKeys.Any(c => c == concept), AuthenticationContext.Current.Principal).Any();
+            return this.m_conceptSetService.Query(o => o.Key == set && o.ConceptsXml.Any(c => c == concept), AuthenticationContext.Current.Principal).Any();
         }
 
         /// <summary>
