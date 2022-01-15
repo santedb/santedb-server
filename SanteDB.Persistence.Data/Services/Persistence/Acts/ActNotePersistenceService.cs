@@ -41,7 +41,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             switch (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
                 case LoadMode.FullLoad:
-                    retVal.Author = base.GetRelatedPersistenceService<Entity>().Get(context, dbModel.AuthorKey);
+                    retVal.Author = retVal.Author.GetRelatedPersistenceService().Get(context, dbModel.AuthorKey);
                     retVal.SetLoaded(nameof(ActNote.Author));
                     break;
             }

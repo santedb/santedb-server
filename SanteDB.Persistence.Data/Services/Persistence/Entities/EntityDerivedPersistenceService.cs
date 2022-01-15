@@ -243,7 +243,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         {
             if (this.m_classKeyMap.TryGetValue(classKey, out Type modelType))
             {
-                persistenceService = this.GetRelatedPersistenceService(modelType);
+                persistenceService = modelType.GetRelatedPersistenceService();
                 return true;
             }
             else
@@ -341,7 +341,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                 {
                     if (data.Key.HasValue)
                     {
-                        data.Extensions = this.GetRelatedPersistenceService<EntityExtension>().Query(context, o => o.SourceEntityKey == data.Key).ToList();
+                        data.Extensions = data.Extensions.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == data.Key).ToList();
                     }
                     else
                     {
@@ -374,39 +374,39 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         protected virtual TEntity DoConvertToInformationModelEx(DataContext context, DbEntityVersion dbModel, params object[] referenceObjects)
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
-
+            var conceptPersistence = typeof(Concept).GetRelatedPersistenceService() as IAdoPersistenceProvider<Concept>;
             switch (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
                 case LoadMode.FullLoad:
-                    retVal.ClassConcept = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.ClassConceptKey);
+                    retVal.ClassConcept = conceptPersistence.Get(context, dbModel.ClassConceptKey);
                     retVal.SetLoaded(o => o.ClassConcept);
-                    retVal.CreationAct = this.GetRelatedPersistenceService<Act>()?.Get(context, dbModel.CreationActKey.GetValueOrDefault());
+                    retVal.CreationAct = retVal.CreationAct.GetRelatedPersistenceService()?.Get(context, dbModel.CreationActKey.GetValueOrDefault());
                     retVal.SetLoaded(o => o.CreationAct);
-                    retVal.DeterminerConcept = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.DeterminerConceptKey);
+                    retVal.DeterminerConcept = conceptPersistence.Get(context, dbModel.DeterminerConceptKey);
                     retVal.SetLoaded(o => o.DeterminerConcept);
-                    retVal.StatusConcept = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.StatusConceptKey);
+                    retVal.StatusConcept = conceptPersistence.Get(context, dbModel.StatusConceptKey);
                     retVal.SetLoaded(o => o.StatusConcept);
-                    retVal.TypeConcept = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.TypeConceptKey.GetValueOrDefault());
+                    retVal.TypeConcept = conceptPersistence.Get(context, dbModel.TypeConceptKey.GetValueOrDefault());
                     retVal.SetLoaded(o => o.TypeConcept);
-                    retVal.Template = this.GetRelatedPersistenceService<TemplateDefinition>().Get(context, dbModel.TemplateKey.GetValueOrDefault());
+                    retVal.Template = retVal.Template.GetRelatedPersistenceService().Get(context, dbModel.TemplateKey.GetValueOrDefault());
                     retVal.SetLoaded(o => o.Template);
                     goto case LoadMode.SyncLoad;
                 case LoadMode.SyncLoad:
-                    retVal.Addresses = this.GetRelatedPersistenceService<EntityAddress>().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
+                    retVal.Addresses = retVal.Addresses.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
                     retVal.SetLoaded(o => o.Addresses);
-                    retVal.Extensions = this.GetRelatedPersistenceService<EntityExtension>().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
+                    retVal.Extensions = retVal.Extensions.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
                     retVal.SetLoaded(o => o.Extensions);
-                    retVal.Identifiers = this.GetRelatedPersistenceService<EntityIdentifier>().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
+                    retVal.Identifiers = retVal.Identifiers.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
                     retVal.SetLoaded(o => o.Identifiers);
-                    retVal.Names = this.GetRelatedPersistenceService<EntityName>().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
+                    retVal.Names = retVal.Names.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
                     retVal.SetLoaded(o => o.Names);
-                    retVal.Notes = this.GetRelatedPersistenceService<EntityNote>().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
+                    retVal.Notes = retVal.Notes.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
                     retVal.SetLoaded(o => o.Notes);
-                    retVal.Relationships = this.GetRelatedPersistenceService<EntityRelationship>().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
+                    retVal.Relationships = retVal.Relationships.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
                     retVal.SetLoaded(o => o.Relationships);
-                    retVal.Tags = this.GetRelatedPersistenceService<EntityTag>().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
+                    retVal.Tags = retVal.Tags.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
                     retVal.SetLoaded(o => o.Tags);
-                    retVal.Telecoms = this.GetRelatedPersistenceService<EntityTelecomAddress>().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
+                    retVal.Telecoms = retVal.Telecoms.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
                     retVal.SetLoaded(o => o.Telecoms);
 
                     if (dbModel.GeoTagKey.HasValue)
@@ -417,7 +417,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                             this.m_tracer.TraceWarning("Using slow geo-tag reference of device");
                             dbGeoTag = context.FirstOrDefault<DbGeoTag>(o => o.Key == dbModel.GeoTagKey);
                         }
-                        retVal.GeoTag = this.GetRelatedMappingProvider<GeoTag>().ToModelInstance(context, dbGeoTag);
+                        retVal.GeoTag = retVal.GeoTag.GetRelatedMappingProvider().ToModelInstance(context, dbGeoTag);
                         retVal.SetLoaded(o => o.GeoTag);
                     }
 

@@ -45,11 +45,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             switch (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
                 case LoadMode.FullLoad:
-                    retVal.TargetAct = this.GetRelatedPersistenceService<Act>().Get(context, dbModel.TargetKey);
+                    retVal.TargetAct = retVal.TargetAct.GetRelatedPersistenceService().Get(context, dbModel.TargetKey);
                     retVal.SetLoaded(o=>o.TargetAct);
-                    retVal.Classification = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.ClassificationKey.GetValueOrDefault());
+                    retVal.Classification = retVal.Classification.GetRelatedPersistenceService().Get(context, dbModel.ClassificationKey.GetValueOrDefault());
                     retVal.SetLoaded(o=>o.Classification);
-                    retVal.RelationshipType = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.RelationshipTypeKey);
+                    retVal.RelationshipType = retVal.RelationshipType.GetRelatedPersistenceService().Get(context, dbModel.RelationshipTypeKey);
                     retVal.SetLoaded(o => o.RelationshipType);
                     break;
             }

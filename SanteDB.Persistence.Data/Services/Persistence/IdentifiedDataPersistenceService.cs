@@ -367,7 +367,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }).ToArray();
 
             // We now want to fetch the perssitence serivce of this
-            var persistenceService = base.GetRelatedPersistenceService<TModelAssociation>();
+            var persistenceService = typeof(TModelAssociation).GetRelatedPersistenceService() as IAdoPersistenceProvider<TModelAssociation>;
             if (persistenceService == null)
             {
                 throw new DataPersistenceException(String.Format(ErrorMessages.RELATED_OBJECT_NOT_AVAILABLE, typeof(TModelAssociation), typeof(TModel)));

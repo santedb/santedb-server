@@ -77,16 +77,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         protected readonly ILocalizationService m_localizationService;
 
         /// <summary>
-        /// Providers
-        /// </summary>
-        private static ConcurrentDictionary<Type, IAdoPersistenceProvider> s_providers = new ConcurrentDictionary<Type, IAdoPersistenceProvider>();
-
-        /// <summary>
-        /// Providers for mapping
-        /// </summary>
-        private static ConcurrentDictionary<Type, object> s_mapProviders = new ConcurrentDictionary<Type, object>();
-
-        /// <summary>
         /// Base persistence service
         /// </summary>
         public BasePersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCaching = null, IQueryPersistenceService queryPersistence = null)
@@ -264,52 +254,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// Called after the object is persisted - this allows implementations to change the object before it is returned
         /// </summary>
         protected abstract TModel AfterPersisted(DataContext context, TModel data);
-
-        /// <summary>
-        /// Get related mapping provider
-        /// </summary>
-        /// <typeparam name="TRelated">The model type for which the provider should be returned</typeparam>
-        protected IMappedQueryProvider<TRelated> GetRelatedMappingProvider<TRelated>()
-        {
-            if (!s_mapProviders.TryGetValue(typeof(TRelated), out object provider))
-            {
-                provider = ApplicationServiceContext.Current.GetService<IMappedQueryProvider<TRelated>>();
-                if (provider != null)
-                {
-                    s_mapProviders.TryAdd(typeof(TRelated), provider);
-                }
-                else
-                {
-                    throw new InvalidOperationException(this.m_localizationService.GetString(ErrorMessageStrings.MISSING_SERVICE, new { service = typeof(IMappedQueryProvider<TRelated>) }));
-                }
-            }
-            return provider as IMappedQueryProvider<TRelated>;
-        }
-
-        /// <summary>
-        /// Get related persistence service
-        /// </summary>
-        protected IAdoPersistenceProvider<TRelated> GetRelatedPersistenceService<TRelated>() => this.GetRelatedPersistenceService(typeof(TRelated)) as IAdoPersistenceProvider<TRelated>;
-
-        /// <summary>
-        /// Get related persistence service that can store model objects of <paramref name="trelated"/>
-        /// </summary>
-        /// <param name="trelated">The related type of object</param>
-        /// <returns>The persistence provider</returns>
-        protected IAdoPersistenceProvider GetRelatedPersistenceService(Type trelated)
-        {
-            if (!s_providers.TryGetValue(trelated, out IAdoPersistenceProvider provider))
-            {
-                var relType = typeof(IAdoPersistenceProvider<>).MakeGenericType(trelated);
-                provider = ApplicationServiceContext.Current.GetService(relType) as IAdoPersistenceProvider;
-                if (provider != null)
-                {
-                    s_providers.TryAdd(trelated, provider);
-                }
-            }
-            return provider;
-        }
-
 
         /// <summary>
         /// Perform the actual insert of a model object
@@ -1182,7 +1126,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 return default(TData);
             }
 
-            var persistenceService = this.GetRelatedPersistenceService<TData>();
+            var persistenceService = typeof(TData).GetRelatedPersistenceService() as IAdoPersistenceProvider<TData>;
             if (!data.Key.HasValue || !persistenceService.Query(context, o => o.Key == data.Key).Any())
             {
                 if (this.m_configuration.AutoInsertChildren)

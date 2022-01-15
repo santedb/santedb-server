@@ -37,11 +37,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             switch (data)
             {
                 case Patient pat:
-                    return this.GetRelatedPersistenceService<Patient>().Insert(context, pat);
+                    return pat.GetRelatedPersistenceService().Insert(context, pat);
                 case Provider prov:
-                    return this.GetRelatedPersistenceService<Provider>().Insert(context, prov);
+                    return prov.GetRelatedPersistenceService().Insert(context, prov);
                 case UserEntity ue:
-                    return this.GetRelatedPersistenceService<UserEntity>().Insert(context, ue);
+                    return ue.GetRelatedPersistenceService().Insert(context, ue);
                 default:
                     var retVal = base.DoInsertModel(context, data);
 
@@ -61,11 +61,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             switch (data)
             {
                 case Patient pat:
-                    return this.GetRelatedPersistenceService<Patient>().Update(context, pat);
+                    return pat.GetRelatedPersistenceService().Update(context, pat);
                 case Provider prov:
-                    return this.GetRelatedPersistenceService<Provider>().Update(context, prov);
+                    return prov.GetRelatedPersistenceService().Update(context, prov);
                 case UserEntity ue:
-                    return this.GetRelatedPersistenceService<UserEntity>().Update(context, ue);
+                    return ue.GetRelatedPersistenceService().Update(context, ue);
                 default:
                     var retVal = base.DoUpdateModel(context, data);
 
@@ -94,13 +94,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             switch (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
                 case LoadMode.FullLoad:
-                    modelData.GenderConcept = this.GetRelatedPersistenceService<Concept>().Get(context, personData.GenderConceptKey.GetValueOrDefault());
+                    modelData.GenderConcept = modelData.GenderConcept.GetRelatedPersistenceService().Get(context, personData.GenderConceptKey.GetValueOrDefault());
                     modelData.SetLoaded(o => o.GenderConcept);
-                    modelData.Occupation = this.GetRelatedPersistenceService<Concept>().Get(context, personData.OccupationKey.GetValueOrDefault());
+                    modelData.Occupation = modelData.Occupation.GetRelatedPersistenceService().Get(context, personData.OccupationKey.GetValueOrDefault());
                     modelData.SetLoaded(o => o.Occupation);
                     goto case LoadMode.SyncLoad;
                 case LoadMode.SyncLoad:
-                    modelData.LanguageCommunication = this.GetRelatedPersistenceService<PersonLanguageCommunication>().Query(context, r => r.SourceEntityKey == dbModel.Key)?.ToList();
+                    modelData.LanguageCommunication = modelData.LanguageCommunication.GetRelatedPersistenceService().Query(context, r => r.SourceEntityKey == dbModel.Key)?.ToList();
                     modelData.SetLoaded(o => o.LanguageCommunication);
                     break;
             }

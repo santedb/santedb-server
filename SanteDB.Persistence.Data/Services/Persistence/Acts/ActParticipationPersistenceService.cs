@@ -42,11 +42,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             switch (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
                 case LoadMode.FullLoad:
-                    retVal.PlayerEntity = this.GetRelatedPersistenceService<Entity>().Get(context, dbModel.TargetKey);
+                    retVal.PlayerEntity = retVal.PlayerEntity.GetRelatedPersistenceService().Get(context, dbModel.TargetKey);
                     retVal.SetLoaded(o=>o.PlayerEntity);
-                    retVal.Classification = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.ClassificationKey.GetValueOrDefault());
+                    retVal.Classification = retVal.Classification.GetRelatedPersistenceService().Get(context, dbModel.ClassificationKey.GetValueOrDefault());
                     retVal.SetLoaded(o=>o.Classification);
-                    retVal.ParticipationRole = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.ParticipationRoleKey);
+                    retVal.ParticipationRole = retVal.ParticipationRole.GetRelatedPersistenceService().Get(context, dbModel.ParticipationRoleKey);
                     retVal.SetLoaded(o => o.ParticipationRole);
                     break;
             }

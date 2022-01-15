@@ -57,20 +57,20 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         protected override EntityIdentifier DoConvertToInformationModel(DataContext context, DbEntityIdentifier dbModel, params Object[] referenceObjects)
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
-            var aaPersistence = this.GetRelatedPersistenceService<AssigningAuthority>();
             switch (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
                 case LoadMode.FullLoad:
-                    retVal.IdentifierType = this.GetRelatedPersistenceService<IdentifierType>().Get(context, dbModel.TypeKey.GetValueOrDefault());
+                    retVal.IdentifierType = retVal.IdentifierType.GetRelatedPersistenceService().Get(context, dbModel.TypeKey.GetValueOrDefault());
                     retVal.SetLoaded(nameof(EntityIdentifier.IdentifierType));
                     goto case LoadMode.SyncLoad;
                 case LoadMode.SyncLoad:
-                    retVal.Authority = this.GetRelatedMappingProvider<AssigningAuthority>().ToModelInstance(context, referenceObjects.OfType<DbAssigningAuthority>().FirstOrDefault()) ?? aaPersistence.Get(context, dbModel.AuthorityKey);
+                    retVal.Authority = retVal.Authority.GetRelatedMappingProvider().ToModelInstance(context, referenceObjects.OfType<DbAssigningAuthority>().FirstOrDefault()) ?? 
+                        retVal.Authority.GetRelatedPersistenceService().Get(context, dbModel.AuthorityKey);
                     retVal.SetLoaded(nameof(EntityIdentifier.Authority));
                     break;
 
                 case LoadMode.QuickLoad:
-                    retVal.Authority = this.GetRelatedMappingProvider<AssigningAuthority>().ToModelInstance(context, referenceObjects.OfType<DbAssigningAuthority>().FirstOrDefault());
+                    retVal.Authority = retVal.Authority.GetRelatedMappingProvider().ToModelInstance(context, referenceObjects.OfType<DbAssigningAuthority>().FirstOrDefault());
                     if (retVal.Authority != null)
                     {
                         retVal.SetLoaded(o => o.Authority);

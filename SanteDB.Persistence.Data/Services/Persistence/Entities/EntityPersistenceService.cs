@@ -49,27 +49,27 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             switch (data)
             {
                 case NonPersonLivingSubject npls:
-                    return this.GetRelatedPersistenceService<NonPersonLivingSubject>().Insert(context, npls);
+                    return npls.GetRelatedPersistenceService().Insert(context, npls);
                 case Place place:
-                    return this.GetRelatedPersistenceService<Place>().Insert(context, place);
+                    return place.GetRelatedPersistenceService().Insert(context, place);
                 case Organization organization:
-                    return this.GetRelatedPersistenceService<Organization>().Insert(context, organization);
+                    return organization.GetRelatedPersistenceService().Insert(context, organization);
                 case Patient patient:
-                    return this.GetRelatedPersistenceService<Patient>().Insert(context, patient);
+                    return patient.GetRelatedPersistenceService().Insert(context, patient);
                 case Provider provider:
-                    return this.GetRelatedPersistenceService<Provider>().Insert(context, provider);
+                    return provider.GetRelatedPersistenceService().Insert(context, provider);
                 case UserEntity userEntity:
-                    return this.GetRelatedPersistenceService<UserEntity>().Insert(context, userEntity);
+                    return userEntity.GetRelatedPersistenceService().Insert(context, userEntity);
                 case DeviceEntity deviceEntity:
-                    return this.GetRelatedPersistenceService<DeviceEntity>().Insert(context, deviceEntity);
+                    return deviceEntity.GetRelatedPersistenceService().Insert(context, deviceEntity);
                 case ApplicationEntity applicationEntity:
-                    return this.GetRelatedPersistenceService<ApplicationEntity>().Insert(context, applicationEntity);
+                    return applicationEntity.GetRelatedPersistenceService().Insert(context, applicationEntity);
                 case Person person:
-                    return this.GetRelatedPersistenceService<Person>().Insert(context, person);
+                    return person.GetRelatedPersistenceService().Insert(context, person);
                 case ManufacturedMaterial manufacturedMaterial:
-                    return this.GetRelatedPersistenceService<ManufacturedMaterial>().Insert(context, manufacturedMaterial);
+                    return manufacturedMaterial.GetRelatedPersistenceService().Insert(context, manufacturedMaterial);
                 case Material material:
-                    return this.GetRelatedPersistenceService<Material>().Insert(context, material);
+                    return material.GetRelatedPersistenceService().Insert(context, material);
                 default:
                     if (this.TryGetSubclassPersister(data.ClassConceptKey.GetValueOrDefault(), out var service))
                     {
@@ -92,36 +92,28 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         {
             switch (data)
             {
+                case NonPersonLivingSubject npls:
+                    return npls.GetRelatedPersistenceService().Update(context, npls);
                 case Place place:
-                    return this.GetRelatedPersistenceService<Place>().Update(context, place);
-
+                    return place.GetRelatedPersistenceService().Update(context, place);
                 case Organization organization:
-                    return this.GetRelatedPersistenceService<Organization>().Update(context, organization);
-
+                    return organization.GetRelatedPersistenceService().Update(context, organization);
                 case Patient patient:
-                    return this.GetRelatedPersistenceService<Patient>().Update(context, patient);
-
+                    return patient.GetRelatedPersistenceService().Update(context, patient);
                 case Provider provider:
-                    return this.GetRelatedPersistenceService<Provider>().Update(context, provider);
-
+                    return provider.GetRelatedPersistenceService().Update(context, provider);
                 case UserEntity userEntity:
-                    return this.GetRelatedPersistenceService<UserEntity>().Update(context, userEntity);
-
+                    return userEntity.GetRelatedPersistenceService().Update(context, userEntity);
                 case DeviceEntity deviceEntity:
-                    return this.GetRelatedPersistenceService<DeviceEntity>().Update(context, deviceEntity);
-
+                    return deviceEntity.GetRelatedPersistenceService().Update(context, deviceEntity);
                 case ApplicationEntity applicationEntity:
-                    return this.GetRelatedPersistenceService<ApplicationEntity>().Update(context, applicationEntity);
-
+                    return applicationEntity.GetRelatedPersistenceService().Update(context, applicationEntity);
                 case Person person:
-                    return this.GetRelatedPersistenceService<Person>().Update(context, person);
-
+                    return person.GetRelatedPersistenceService().Update(context, person);
                 case ManufacturedMaterial manufacturedMaterial:
-                    return this.GetRelatedPersistenceService<ManufacturedMaterial>().Update(context, manufacturedMaterial);
-
+                    return manufacturedMaterial.GetRelatedPersistenceService().Update(context, manufacturedMaterial);
                 case Material material:
-                    return this.GetRelatedPersistenceService<Material>().Update(context, material);
-
+                    return material.GetRelatedPersistenceService().Update(context, material);
                 default:
                     if (this.TryGetSubclassPersister(data.ClassConceptKey.GetValueOrDefault(), out var service))
                     {

@@ -46,7 +46,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             switch(DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
                 case LoadMode.FullLoad:
-                    modelData.Specialty = this.GetRelatedPersistenceService<Concept>().Get(context, dbProvider.SpecialtyKey);
+                    modelData.Specialty = modelData.Specialty.GetRelatedPersistenceService().Get(context, dbProvider.SpecialtyKey);
                     modelData.SetLoaded(o => o.Specialty);
                     break;
             }

@@ -44,9 +44,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             switch (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
                 case LoadMode.FullLoad:
-                    retVal.AddressUse = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.TelecomUseKey);
+                    retVal.AddressUse = retVal.AddressUse.GetRelatedPersistenceService().Get(context, dbModel.TelecomUseKey);
                     retVal.SetLoaded(nameof(EntityTelecomAddress.AddressUse));
-                    retVal.TypeConcept = this.GetRelatedPersistenceService<Concept>().Get(context, dbModel.TypeConceptKey.GetValueOrDefault());
+                    retVal.TypeConcept = retVal.TypeConcept.GetRelatedPersistenceService().Get(context, dbModel.TypeConceptKey.GetValueOrDefault());
                     retVal.SetLoaded(nameof(EntityTelecomAddress.TypeConcept));
                     break;
             }

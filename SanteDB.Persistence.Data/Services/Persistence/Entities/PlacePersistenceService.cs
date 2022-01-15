@@ -65,7 +65,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             {
                 case LoadMode.FullLoad:
                 case LoadMode.SyncLoad:
-                    modelData.Services = this.GetRelatedPersistenceService<PlaceService>().Query(context, r => r.SourceEntityKey == dbModel.Key)?.ToList();
+                    modelData.Services = modelData.Services.GetRelatedPersistenceService().Query(context, r => r.SourceEntityKey == dbModel.Key)?.ToList();
                     modelData.SetLoaded(o => o.Services);
                     break;
             }

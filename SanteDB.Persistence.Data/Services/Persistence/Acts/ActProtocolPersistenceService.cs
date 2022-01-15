@@ -40,7 +40,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             switch(DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
                 case LoadMode.FullLoad:
-                    retVal.Protocol = this.GetRelatedPersistenceService<Protocol>().Get(context, dbModel.ProtocolKey);
+                    retVal.Protocol = retVal.Protocol.GetRelatedPersistenceService().Get(context, dbModel.ProtocolKey);
                     retVal.SetLoaded(o => o.Protocol);
                     break;
             }

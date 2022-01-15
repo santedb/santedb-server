@@ -43,31 +43,31 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             switch (data)
             {
                 case Account acct:
-                    return this.GetRelatedPersistenceService<Account>().Insert(context, acct);
+                    return acct.GetRelatedPersistenceService().Insert(context, acct);
                 case CarePlan cp:
-                    return this.GetRelatedPersistenceService<CarePlan>().Insert(context, cp);
+                    return cp.GetRelatedPersistenceService().Insert(context, cp);
                 case ControlAct ca:
-                    return this.GetRelatedPersistenceService<ControlAct>().Insert(context, ca);
+                    return ca.GetRelatedPersistenceService().Insert(context, ca);
                 case FinancialContract fc:
-                    return this.GetRelatedPersistenceService<FinancialContract>().Insert(context, fc);
+                    return fc.GetRelatedPersistenceService().Insert(context, fc);
                 case FinancialTransaction ft:
-                    return this.GetRelatedPersistenceService<FinancialTransaction>().Insert(context, ft);
+                    return ft.GetRelatedPersistenceService().Insert(context, ft);
                 case InvoiceElement ie:
-                    return this.GetRelatedPersistenceService<InvoiceElement>().Insert(context, ie);
+                    return ie.GetRelatedPersistenceService().Insert(context, ie);
                 case Narrative nv:
-                    return this.GetRelatedPersistenceService<Narrative>().Insert(context, nv);
+                    return nv.GetRelatedPersistenceService().Insert(context, nv);
                 case QuantityObservation qo:
-                    return this.GetRelatedPersistenceService<QuantityObservation>().Insert(context, qo);
+                    return qo.GetRelatedPersistenceService().Insert(context, qo);
                 case CodedObservation co:
-                    return this.GetRelatedPersistenceService<CodedObservation>().Insert(context, co);
+                    return co.GetRelatedPersistenceService().Insert(context, co);
                 case TextObservation to:
-                    return this.GetRelatedPersistenceService<TextObservation>().Insert(context, to);
+                    return to.GetRelatedPersistenceService().Insert(context, to);
                 case PatientEncounter pe:
-                    return this.GetRelatedPersistenceService<PatientEncounter>().Insert(context, pe);
+                    return pe.GetRelatedPersistenceService().Insert(context, pe);
                 case Procedure pr:
-                    return this.GetRelatedPersistenceService<Procedure>().Insert(context, pr);
+                    return pr.GetRelatedPersistenceService().Insert(context, pr);
                 case SubstanceAdministration sa:
-                    return this.GetRelatedPersistenceService<SubstanceAdministration>().Insert(context, sa);
+                    return sa.GetRelatedPersistenceService().Insert(context, sa);
                 default:
                     if (this.TryGetSubclassPersister(data.ClassConceptKey.GetValueOrDefault(), out var service))
                     {
@@ -91,31 +91,31 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             switch (data)
             {
                 case Account acct:
-                    return this.GetRelatedPersistenceService<Account>().Update(context, acct);
+                    return acct.GetRelatedPersistenceService().Update(context, acct);
                 case CarePlan cp:
-                    return this.GetRelatedPersistenceService<CarePlan>().Update(context, cp);
+                    return cp.GetRelatedPersistenceService().Update(context, cp);
                 case ControlAct ca:
-                    return this.GetRelatedPersistenceService<ControlAct>().Update(context, ca);
+                    return ca.GetRelatedPersistenceService().Update(context, ca);
                 case FinancialContract fc:
-                    return this.GetRelatedPersistenceService<FinancialContract>().Update(context, fc);
+                    return fc.GetRelatedPersistenceService().Update(context, fc);
                 case FinancialTransaction ft:
-                    return this.GetRelatedPersistenceService<FinancialTransaction>().Update(context, ft);
+                    return ft.GetRelatedPersistenceService().Update(context, ft);
                 case InvoiceElement ie:
-                    return this.GetRelatedPersistenceService<InvoiceElement>().Update(context, ie);
+                    return ie.GetRelatedPersistenceService().Update(context, ie);
                 case Narrative nv:
-                    return this.GetRelatedPersistenceService<Narrative>().Update(context, nv);
+                    return nv.GetRelatedPersistenceService().Update(context, nv);
                 case QuantityObservation qo:
-                    return this.GetRelatedPersistenceService<QuantityObservation>().Update(context, qo);
+                    return qo.GetRelatedPersistenceService().Update(context, qo);
                 case CodedObservation co:
-                    return this.GetRelatedPersistenceService<CodedObservation>().Update(context, co);
+                    return co.GetRelatedPersistenceService().Update(context, co);
                 case TextObservation to:
-                    return this.GetRelatedPersistenceService<TextObservation>().Update(context, to);
+                    return to.GetRelatedPersistenceService().Update(context, to);
                 case PatientEncounter pe:
-                    return this.GetRelatedPersistenceService<PatientEncounter>().Update(context, pe);
+                    return pe.GetRelatedPersistenceService().Update(context, pe);
                 case Procedure pr:
-                    return this.GetRelatedPersistenceService<Procedure>().Update(context, pr);
+                    return pr.GetRelatedPersistenceService().Update(context, pr);
                 case SubstanceAdministration sa:
-                    return this.GetRelatedPersistenceService<SubstanceAdministration>().Update(context, sa);
+                    return sa.GetRelatedPersistenceService().Update(context, sa);
                 default:
                     if (this.TryGetSubclassPersister(data.ClassConceptKey.GetValueOrDefault(), out var service))
                     {

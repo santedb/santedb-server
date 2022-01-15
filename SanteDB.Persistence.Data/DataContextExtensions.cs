@@ -8,12 +8,14 @@ using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Principal;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
+using SanteDB.OrmLite.MappedResultSets;
 using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Model.Security;
 using SanteDB.Persistence.Data.Security;
 using SanteDB.Persistence.Data.Services.Persistence;
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security;
@@ -51,6 +53,69 @@ namespace SanteDB.Persistence.Data
 
         // Adhoc cache
         private static readonly IAdhocCacheService s_adhocCache = ApplicationServiceContext.Current.GetService<IAdhocCacheService>();
+
+        /// <summary>
+        /// Providers
+        /// </summary>
+        private readonly static ConcurrentDictionary<Type, IAdoPersistenceProvider> s_providers = new ConcurrentDictionary<Type, IAdoPersistenceProvider>();
+
+        /// <summary>
+        /// Providers for mapping
+        /// </summary>
+        private readonly static ConcurrentDictionary<Type, object> s_mapProviders = new ConcurrentDictionary<Type, object>();
+
+
+        /// <summary>
+        /// Get related mapping provider
+        /// </summary>
+        /// <typeparam name="TRelated">The model type for which the provider should be returned</typeparam>
+        public static IMappedQueryProvider<TRelated> GetRelatedMappingProvider<TRelated>(this TRelated me)
+        {
+            if (!s_mapProviders.TryGetValue(typeof(TRelated), out object provider))
+            {
+                provider = ApplicationServiceContext.Current.GetService<IMappedQueryProvider<TRelated>>();
+                if (provider != null)
+                {
+                    s_mapProviders.TryAdd(typeof(TRelated), provider);
+                }
+                else
+                {
+                    throw new InvalidOperationException(s_localizationService.GetString(ErrorMessageStrings.MISSING_SERVICE, new { service = typeof(IMappedQueryProvider<TRelated>) }));
+                }
+            }
+            return provider as IMappedQueryProvider<TRelated>;
+        }
+
+        /// <summary>
+        /// Get related persistence service from an enumerable
+        /// </summary>
+        public static IAdoPersistenceProvider<TRelated> GetRelatedPersistenceService<TRelated>(this IEnumerable<TRelated> me) where TRelated : IdentifiedData 
+            => GetRelatedPersistenceService(typeof(TRelated)) as IAdoPersistenceProvider<TRelated>;
+        
+        /// <summary>
+        /// Get related persistence service
+        /// </summary>
+        public static IAdoPersistenceProvider<TRelated> GetRelatedPersistenceService<TRelated>(this TRelated me) where TRelated : IdentifiedData 
+            => GetRelatedPersistenceService(typeof(TRelated)) as IAdoPersistenceProvider<TRelated>;
+
+        /// <summary>
+        /// Get related persistence service that can store model objects of <paramref name="trelated"/>
+        /// </summary>
+        /// <param name="trelated">The related type of object</param>
+        /// <returns>The persistence provider</returns>
+        public static IAdoPersistenceProvider GetRelatedPersistenceService(this Type trelated)
+        {
+            if (!s_providers.TryGetValue(trelated, out IAdoPersistenceProvider provider))
+            {
+                var relType = typeof(IAdoPersistenceProvider<>).MakeGenericType(trelated);
+                provider = ApplicationServiceContext.Current.GetService(relType) as IAdoPersistenceProvider;
+                if (provider != null)
+                {
+                    s_providers.TryAdd(trelated, provider);
+                }
+            }
+            return provider;
+        }
 
         /// <summary>
         /// Convert to security policy instance

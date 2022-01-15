@@ -49,7 +49,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             switch (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
                 case LoadMode.FullLoad:
-                    modelData.SecurityDevice = this.GetRelatedPersistenceService<SecurityDevice>().Get(context, dbDevice.SecurityDeviceKey);
+                    modelData.SecurityDevice = modelData.SecurityDevice.GetRelatedPersistenceService().Get(context, dbDevice.SecurityDeviceKey);
                     modelData.SetLoaded(o => o.SecurityDevice);
                     break;   
             }

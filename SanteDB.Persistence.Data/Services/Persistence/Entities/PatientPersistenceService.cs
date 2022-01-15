@@ -52,7 +52,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             switch (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
                 case LoadMode.FullLoad:
-                    var conceptPersister = this.GetRelatedPersistenceService<Concept>();
+                    var conceptPersister = typeof(Concept).GetRelatedPersistenceService() as IAdoPersistenceProvider<Concept>;
                     modelData.EducationLevel = conceptPersister.Get(context, dbPatient.EducationLevelKey.GetValueOrDefault());
                     modelData.SetLoaded(o => o.EducationLevel);
                     modelData.EthnicGroup = conceptPersister.Get(context, dbPatient.EthnicGroupKey.GetValueOrDefault());

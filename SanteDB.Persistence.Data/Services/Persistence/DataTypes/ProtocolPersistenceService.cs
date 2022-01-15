@@ -36,7 +36,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             switch(DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
                 case LoadMode.FullLoad:
-                    retVal.Narrative = this.GetRelatedPersistenceService<Narrative>().Get(context, dbModel.NarrativeKey.GetValueOrDefault());
+                    retVal.Narrative = retVal.Narrative.GetRelatedPersistenceService().Get(context, dbModel.NarrativeKey.GetValueOrDefault());
                     retVal.SetLoaded(o => o.Narrative);
                     break;
             }

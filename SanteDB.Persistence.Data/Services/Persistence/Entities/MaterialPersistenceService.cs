@@ -31,9 +31,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             switch(data)
             {
                 case Container ct:
-                    return this.GetRelatedPersistenceService<Container>().Insert(context, ct);
+                    return ct.GetRelatedPersistenceService().Insert(context, ct);
                 case ManufacturedMaterial mm:
-                    return this.GetRelatedPersistenceService<ManufacturedMaterial>().Insert(context, mm);
+                    return mm.GetRelatedPersistenceService().Insert(context, mm);
                 default:
                     return base.DoInsertModel(context, data);
             }
@@ -47,9 +47,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             switch (data)
             {
                 case Container ct:
-                    return this.GetRelatedPersistenceService<Container>().Update(context, ct);
+                    return ct.GetRelatedPersistenceService().Update(context, ct);
                 case ManufacturedMaterial mm:
-                    return this.GetRelatedPersistenceService<ManufacturedMaterial>().Update(context, mm);
+                    return mm.GetRelatedPersistenceService().Update(context, mm);
                 default:
                     return base.DoUpdateModel(context, data);
             }
@@ -78,9 +78,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             switch (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
                 case LoadMode.FullLoad:
-                    modelData.FormConcept = this.GetRelatedPersistenceService<Concept>().Get(context, materialData.FormConceptKey);
+                    modelData.FormConcept = modelData.FormConcept.GetRelatedPersistenceService().Get(context, materialData.FormConceptKey);
                     modelData.SetLoaded(o => o.FormConcept);
-                    modelData.QuantityConcept = this.GetRelatedPersistenceService<Concept>().Get(context, materialData.QuantityConceptKey);
+                    modelData.QuantityConcept = modelData.QuantityConcept.GetRelatedPersistenceService().Get(context, materialData.QuantityConceptKey);
                     modelData.SetLoaded(o => o.QuantityConcept);
                     break;
             }
