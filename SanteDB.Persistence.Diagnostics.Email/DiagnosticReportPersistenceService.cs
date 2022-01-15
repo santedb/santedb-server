@@ -195,8 +195,8 @@ namespace SanteDB.Persistence.Diagnostics.Email
             }
             catch (Exception ex)
             {
-                this.m_traceSource.TraceEvent(EventLevel.Error, "Error sending to JIRA: {0}", ex);
-                throw;
+                this.m_traceSource.TraceEvent(EventLevel.Error,  "Error sending to E-Mail: {0}", ex);
+                throw new InvalidOperationException("Error sending diagnostic reports to administrative contacts", ex);
             }
         }
 

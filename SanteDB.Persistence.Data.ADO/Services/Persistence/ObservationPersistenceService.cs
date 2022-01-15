@@ -22,7 +22,6 @@
 using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Query;
-using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.ADO.Data;
 using SanteDB.Persistence.Data.ADO.Data.Model.Acts;
@@ -96,6 +95,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         private Observation InsertData(DataContext context, Observation data)
         {
+            var retVal = base.InsertInternal(context, data);
+
             switch (data)
             {
                 case QuantityObservation qobs: // insert the qty obs
@@ -106,10 +107,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
                 case CodedObservation cobs:
                     return new CodedObservationPersistenceService(this.m_settingsProvider).Insert(context, cobs);
-
-                default:
-                    return base.Insert(context, data);
             }
+
+            return retVal;
         }
 
         /// <summary>
@@ -127,6 +127,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         private Observation UpdateData(DataContext context, Observation data)
         {
+            var retVal = base.UpdateInternal(context, data);
+
             switch (data)
             {
                 case QuantityObservation qobs: // insert the qty obs
@@ -137,10 +139,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
                 case CodedObservation cobs:
                     return new CodedObservationPersistenceService(this.m_settingsProvider).Update(context, cobs);
-
-                default:
-                    return base.Insert(context, data);
             }
+
+            return retVal;
         }
 
         /// <summary>
@@ -151,7 +152,26 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             if (data.InterpretationConcept != null) data.InterpretationConcept = data.InterpretationConcept?.EnsureExists(context) as Concept;
             data.InterpretationConceptKey = data.InterpretationConcept?.Key ?? data.InterpretationConceptKey;
 
-            return base.ObsoleteInternal(context, data);
+            return this.ObsoleteData(context, data);
+        }
+
+        private Observation ObsoleteData(DataContext context, Observation data)
+        {
+            var retVal = base.ObsoleteInternal(context, data);
+
+            switch (data)
+            {
+                case QuantityObservation qobs: // insert the qty obs
+                    return new QuantityObservationPersistenceService(this.m_settingsProvider).Obsolete(context, qobs);
+
+                case TextObservation tobs:
+                    return new TextObservationPersistenceService(this.m_settingsProvider).Obsolete(context, tobs);
+
+                case CodedObservation cobs:
+                    return new CodedObservationPersistenceService(this.m_settingsProvider).Obsolete(context, cobs);
+            }
+
+            return retVal;
         }
     }
 
@@ -160,12 +180,12 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     /// </summary>
     public class TextObservationPersistenceService : ActDerivedPersistenceService<Core.Model.Acts.TextObservation, DbTextObservation, CompositeResult<DbTextObservation, DbObservation, DbActVersion, DbAct>>
     {
+        private readonly ObservationPersistenceService m_observationPersistence;
+
         public TextObservationPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
         {
             this.m_observationPersistence = new ObservationPersistenceService(settingsProvider);
         }
-
-        private ObservationPersistenceService m_observationPersistence;
 
         /// <summary>
         /// Query internal
@@ -193,12 +213,12 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         public override TextObservation InsertInternal(DataContext context, TextObservation data)
         {
-            var obsData = this.m_observationPersistence.InsertInternal(context, data);
             context.Insert(new DbTextObservation()
             {
-                ParentKey = obsData.VersionKey.Value,
+                ParentKey = data.VersionKey.Value,
                 Value = data.Value
             });
+
             return data;
         }
 
@@ -207,12 +227,12 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         public override TextObservation UpdateInternal(DataContext context, TextObservation data)
         {
-            var obsData = this.m_observationPersistence.UpdateInternal(context, data);
             context.Insert(new DbTextObservation()
             {
-                ParentKey = obsData.VersionKey.Value,
+                ParentKey = data.VersionKey.Value,
                 Value = data.Value
             });
+
             return data;
         }
 
@@ -221,12 +241,12 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         public override TextObservation ObsoleteInternal(DataContext context, TextObservation data)
         {
-            var obsData = this.m_observationPersistence.ObsoleteInternal(context, data);
             context.Insert(new DbTextObservation()
             {
-                ParentKey = obsData.VersionKey.Value,
+                ParentKey = data.VersionKey.Value,
                 Value = data.Value
             });
+
             return data;
         }
     }
@@ -272,12 +292,13 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         {
             if (data.Value != null) data.Value = data.Value?.EnsureExists(context) as Concept;
             data.ValueKey = data.Value?.Key ?? data.ValueKey;
-            var obsData = this.m_observationPersistence.InsertInternal(context, data);
+
             context.Insert(new DbCodedObservation()
             {
-                ParentKey = obsData.VersionKey.Value,
+                ParentKey = data.VersionKey.Value,
                 Value = data.ValueKey
             });
+
             return data;
         }
 
@@ -288,12 +309,13 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         {
             if (data.Value != null) data.Value = data.Value?.EnsureExists(context) as Concept;
             data.ValueKey = data.Value?.Key ?? data.ValueKey;
-            var obsData = this.m_observationPersistence.UpdateInternal(context, data);
+
             context.Insert(new DbCodedObservation()
             {
-                ParentKey = obsData.VersionKey.Value,
+                ParentKey = data.VersionKey.Value,
                 Value = data.ValueKey
             });
+
             return data;
         }
 
@@ -304,12 +326,13 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         {
             if (data.Value != null) data.Value = data.Value?.EnsureExists(context) as Concept;
             data.ValueKey = data.Value?.Key ?? data.ValueKey;
-            var obsData = this.m_observationPersistence.ObsoleteInternal(context, data);
+
             context.Insert(new DbCodedObservation()
             {
-                ParentKey = obsData.VersionKey.Value,
+                ParentKey = data.VersionKey.Value,
                 Value = data.ValueKey
             });
+
             return data;
         }
     }
@@ -356,13 +379,14 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         {
             if (data.UnitOfMeasure != null) data.UnitOfMeasure = data.UnitOfMeasure?.EnsureExists(context) as Concept;
             data.UnitOfMeasureKey = data.UnitOfMeasure?.Key ?? data.UnitOfMeasureKey;
-            var retVal = this.m_observationPersistence.InsertInternal(context, data);
+
             context.Insert(new DbQuantityObservation()
             {
                 ParentKey = data.VersionKey.Value,
                 UnitOfMeasureKey = data.UnitOfMeasureKey.Value,
                 Value = data.Value
             });
+
             return data;
         }
 
@@ -373,13 +397,14 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         {
             if (data.UnitOfMeasure != null) data.UnitOfMeasure = data.UnitOfMeasure?.EnsureExists(context) as Concept;
             data.UnitOfMeasureKey = data.UnitOfMeasure?.Key ?? data.UnitOfMeasureKey;
-            this.m_observationPersistence.UpdateInternal(context, data);
+
             context.Insert(new DbQuantityObservation()
             {
                 ParentKey = data.VersionKey.Value,
                 UnitOfMeasureKey = data.UnitOfMeasureKey.Value,
                 Value = data.Value
             });
+
             return data;
         }
 
@@ -390,13 +415,14 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         {
             if (data.UnitOfMeasure != null) data.UnitOfMeasure = data.UnitOfMeasure?.EnsureExists(context) as Concept;
             data.UnitOfMeasureKey = data.UnitOfMeasure?.Key ?? data.UnitOfMeasureKey;
-            this.m_observationPersistence.ObsoleteInternal(context, data);
+
             context.Insert(new DbQuantityObservation()
             {
                 ParentKey = data.VersionKey.Value,
                 UnitOfMeasureKey = data.UnitOfMeasureKey.Value,
                 Value = data.Value
             });
+
             return data;
         }
     }

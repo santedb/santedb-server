@@ -23,6 +23,7 @@ using SanteDB.Core.Configuration.Data;
 using SanteDB.Core.Services;
 using System;
 using System.Configuration;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 
@@ -31,6 +32,7 @@ namespace SanteDB.Core.TestFramework
     /// <summary>
     /// Configuration service that loads from the test file
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class TestConfigurationService  : IConfigurationManager
     {
         /// <summary>

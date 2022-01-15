@@ -23,6 +23,7 @@ using SanteDB.Docker.Core;
 using SanteDB.Messaging.Atna.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -32,6 +33,7 @@ namespace SanteDB.Messaging.Atna.Docker
     /// <summary>
     /// Feature for atna audit shipping
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class AtnaAuditDockerFeature : IDockerFeature
     {
 

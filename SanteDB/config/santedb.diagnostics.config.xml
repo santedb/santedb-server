@@ -25,9 +25,8 @@
   </sections>
   <!-- Diagnostic e-mail (bug) report configuration -->
   <section xsi:type="DiagnosticEmailServiceConfigurationSection">
-    <smtp from="value" password="value" server="value" ssl="false" username="value" />
     <recipients>
-      <add>value</add>
+      <add>nobody@fyfesoftware.ca</add>
     </recipients>
   </section>
   <!-- Logging Configuration -->

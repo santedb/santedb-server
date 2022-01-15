@@ -93,6 +93,7 @@ namespace SanteDB.Configuration.Editors
     /// <summary>
     /// Represents a display wrapper for a connection string
     /// </summary>
+    [ExcludeFromCodeCoverage]
     internal class ConnectionStringWrapper
     {
         // The connection string

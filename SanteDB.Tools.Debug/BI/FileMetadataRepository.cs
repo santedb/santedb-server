@@ -255,12 +255,21 @@ namespace SanteDB.Tools.Debug.BI
 
             this.m_scanTimer = new Timer(_ =>
             {
-                foreach (var path in this.m_configuration.BiMetadataRepository)
-                    this.LoadDefinitions(path.Path);
+                this.Rescan();
             }, null, 0, this.m_configuration.BiMetadataRepository.First().RescanTime);
+            this.Rescan();
 
             this.Started?.Invoke(this, EventArgs.Empty);
             return true;
+        }
+
+        /// <summary>
+        /// Rescan
+        /// </summary>
+        private void Rescan()
+        {
+            foreach (var path in this.m_configuration.BiMetadataRepository)
+                this.LoadDefinitions(path.Path);
         }
 
         /// <summary>

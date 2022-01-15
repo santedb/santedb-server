@@ -211,8 +211,8 @@ namespace SanteDB.Server.Core.Services.Impl
             throw new DetectedIssueException(
                 new DetectedIssue(DetectedIssuePriorityType.Error, "privacy", this.m_localizationService.GetString("error.server.core.validationFail", new
                 {
-                    param = "Privacy"
-                }), DetectedIssueKeys.AlreadyDoneIssue)
+                    param = "QueryExecutionFail"
+                }), DetectedIssueKeys.PrivacyIssue)
             );
         }
 

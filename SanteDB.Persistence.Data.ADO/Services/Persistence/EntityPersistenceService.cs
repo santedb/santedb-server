@@ -547,7 +547,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 else
                 {
                     var existingValues = extension.GetValue<List<DetectedIssue>>();
-                    existingValues.AddRange(issues);
+                    existingValues?.AddRange(issues);
                     extension.ExtensionValue = existingValues;
                 }
             }

@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Configuration;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Configuration.Data;
@@ -28,6 +29,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Data.Common;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -40,6 +42,7 @@ using System.Reflection;
 
 namespace SanteDB.Configurator
 {
+    [ExcludeFromCodeCoverage]
     public partial class frmInitialConfig : Form
     {
         public frmInitialConfig()
@@ -49,7 +52,7 @@ namespace SanteDB.Configurator
         }
 
         /// <summary>
-        /// Initialize templates 
+        /// Initialize templates
         /// </summary>
         private void InitializeTemplates()
         {
@@ -76,7 +79,6 @@ namespace SanteDB.Configurator
         private void dbSelector_Configured(object sender, EventArgs e)
         {
             btnContinue.Enabled = dbSelector.IsConfigured;
-
         }
 
         /// <summary>
@@ -84,7 +86,6 @@ namespace SanteDB.Configurator
         /// </summary>
         private void btnContinue_Click(object sender, EventArgs e)
         {
-
             ConfigurationContext.Current.ConfigurationTasks.Clear();
             // Create a default configuration with minimal sections
             if (cbxTemplate.SelectedItem != null)
@@ -96,7 +97,6 @@ namespace SanteDB.Configurator
                     {
                         ConfigurationContext.Current.Configuration = SanteDBConfiguration.Load(s);
                     }
-
                 }
                 catch (Exception ex)
                 {
@@ -113,9 +113,8 @@ namespace SanteDB.Configurator
                         new DiagnosticsConfigurationSection(),
                         new ApplicationServiceContextConfigurationSection()
                         {
-                            ThreadPoolSize = Environment.ProcessorCount
+                            ThreadPoolSize = Environment.ProcessorCount * 16
                         }
-                        
                     }
                 };
             }
@@ -133,7 +132,7 @@ namespace SanteDB.Configurator
                 // Create feature
                 dbSelector.ConnectionString.Name = "main";
                 var dataSection = ConfigurationContext.Current.Configuration.GetSection<DataConfigurationSection>();
-                if(dataSection == null)
+                if (dataSection == null)
                 {
                     dataSection = new DataConfigurationSection();
                     ConfigurationContext.Current.Configuration.AddSection(dataSection);
@@ -163,7 +162,7 @@ namespace SanteDB.Configurator
                         ormConfig.ProviderType = dbSelector.Provider.Invariant;
                         ormConfig.TraceSql = false;
                     }
-                    // Add configuration 
+                    // Add configuration
                     foreach (var tsk in ftr.CreateInstallTasks().Where(o => o.VerifyState(ConfigurationContext.Current.Configuration)))
                         ConfigurationContext.Current.ConfigurationTasks.Add(tsk);
                 }

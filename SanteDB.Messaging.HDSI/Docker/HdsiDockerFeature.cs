@@ -27,6 +27,7 @@ using SanteDB.Rest.Common.Configuration;
 using SanteDB.Rest.Common.Security;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 
@@ -35,6 +36,7 @@ namespace SanteDB.Rest.HDSI.Docker
     /// <summary>
     /// HDSI docker feature
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class HdsiFeature : IDockerFeature
     {
 

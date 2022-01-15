@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Query;
@@ -40,10 +41,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         where TModel : IdentifiedData, new()
         where TDomain : class, IDbIdentified, new()
     {
-
         public IdentifiedPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
         {
-
         }
     }
 
@@ -54,7 +53,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         where TModel : IdentifiedData, new()
         where TDomain : class, IDbIdentified, new()
     {
-
         /// <summary>
         /// Constructor for settings provider
         /// </summary>
@@ -103,7 +101,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         {
             try
             {
-                // Sanity 
+                // Sanity
                 if (data.Key == Guid.Empty)
                     throw new AdoFormalConstraintException(AdoFormalConstraintType.NonIdentityUpdate);
 
@@ -113,6 +111,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 if (oldDomainObject == null)
                     throw new KeyNotFoundException(data.Key.ToString());
 
+                oldDomainObject.CopyObjectData(newDomainObject);
+
                 // Is this an un-delete?
                 if (oldDomainObject is IDbVersionedAssociation dba && dba.ObsoleteVersionSequenceId.HasValue &&
                     newDomainObject is IDbVersionedAssociation dbb && !dbb.ObsoleteVersionSequenceId.HasValue)
@@ -121,7 +121,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     dba.ObsoleteVersionSequenceIdSpecified = true;
                 }
 
-                oldDomainObject.CopyObjectData(newDomainObject);
                 context.Update<TDomain>(oldDomainObject);
                 return data;
             }
@@ -129,7 +128,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             {
                 throw new DataPersistenceException($"Error updating {data}", this.TranslateDbException(ex));
             }
-
         }
 
         /// <summary>
@@ -155,10 +153,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             }
             catch (DbException ex)
             {
-                this.m_tracer.TraceEvent(EventLevel.Error,  "Error obsoleting {0} - {1}", data, ex.Message);
+                this.m_tracer.TraceEvent(EventLevel.Error, "Error obsoleting {0} - {1}", data, ex.Message);
                 throw;
             }
-
         }
 
         /// <summary>
@@ -183,7 +180,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         }
 
         /// <summary>
-        /// Obsolete the specified objects 
+        /// Obsolete the specified objects
         /// </summary>
         protected override void BulkObsoleteInternal(DataContext context, Guid[] keysToObsolete)
         {
@@ -206,12 +203,12 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         }
 
         /// <summary>
-        /// Purge the specified object 
+        /// Purge the specified object
         /// </summary>
         protected override void BulkPurgeInternal(DataContext connection, Guid[] keysToPurge)
         {
-            // TODO: CASCADE DELETE - SCAN THE CONTEXT DOMAIN FOR TABLES WHICH POINT AT TDOMAIN 
-            // AND CASCADE THE DELETION TO THEM WHERE THE FK THAT POINTS AT MY TABLE 
+            // TODO: CASCADE DELETE - SCAN THE CONTEXT DOMAIN FOR TABLES WHICH POINT AT TDOMAIN
+            // AND CASCADE THE DELETION TO THEM WHERE THE FK THAT POINTS AT MY TABLE
             // IS IN THE KEYS PROVIDED
             var ofs = 0;
             while (ofs < keysToPurge.Length)
@@ -262,7 +259,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 toContext.InsertOrUpdate(fromContext.Query<TDomain>(o => keys.Contains(o.Key)));
             }
         }
-        #endregion
+
+        #endregion implemented abstract members of LocalDataPersistenceService
     }
 }
-

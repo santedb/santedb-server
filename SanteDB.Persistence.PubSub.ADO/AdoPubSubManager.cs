@@ -19,10 +19,8 @@
  * Date: 2021-8-27
  */
 
-using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Event;
-using SanteDB.Core.Interfaces;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Map;
 using SanteDB.Core.Model.Query;
@@ -67,9 +65,6 @@ namespace SanteDB.Persistence.PubSub.ADO
 
         // Load mapper
         private ModelMapper m_mapper = new ModelMapper(typeof(AdoPubSubManager).Assembly.GetManifestResourceStream("SanteDB.Persistence.PubSub.ADO.Data.Map.ModelMap.xml"), "PubSubModelMap");
-
-        // Cached factories
-        private IDictionary<String, IPubSubDispatcherFactory> m_factories;
 
         // Configuration section
         private AdoPubSubConfigurationSection m_configuration;
@@ -237,6 +232,7 @@ namespace SanteDB.Persistence.PubSub.ADO
 
                     dbExisting.ObsoletedByKey = se.Key.Value;
                     dbExisting.ObsoletionTime = DateTimeOffset.Now;
+                    dbExisting.IsActive = false;
                     conn.Update(dbExisting);
                     this.m_cache?.Remove(key);
                     return this.MapInstance(conn, dbExisting);
@@ -456,6 +452,7 @@ namespace SanteDB.Persistence.PubSub.ADO
                         }
                         dbExisting.UpdatedByKey = se.Key.Value;
                         dbExisting.UpdatedTime = DateTimeOffset.Now;
+
                         dbExisting.ObsoletedByKey = null;
                         dbExisting.ObsoletionTime = null;
                         dbExisting.ObsoletedBySpecified = dbExisting.ObsoletionTimeSpecified = true;
@@ -484,6 +481,7 @@ namespace SanteDB.Persistence.PubSub.ADO
                         this.m_cache?.Add(retVal);
 
                         tx.Commit();
+
                         return retVal;
                     }
                 }

@@ -23,6 +23,7 @@ using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace SanteDB.Core.TestFramework
@@ -30,6 +31,7 @@ namespace SanteDB.Core.TestFramework
     /// <summary>
     /// Test contexts don't really have applet configurations
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class TestLocalizationService : ILocalizationService
     {
         /// <summary>

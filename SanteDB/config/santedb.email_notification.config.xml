@@ -31,7 +31,7 @@
       <from>no-reply@fyfesoftware.ca</from>
     </smtp>
     <adminContacts>
-      <add>justin@fyfesoftware.ca</add>
+      <add>nobody@fyfesoftware.ca</add>
     </adminContacts>
   </section>
 </SanteDBConfiguration>

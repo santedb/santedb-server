@@ -72,6 +72,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             retVal.OccupationKey = personInstance.OccupationKey;
             retVal.LivingArrangementKey = patientInstance.LivingArrangementKey;
             retVal.VipStatusKey = patientInstance.VipStatusKey;
+            retVal.ReligiousAffiliationKey = patientInstance.ReligiousAffiliationKey;
             retVal.EducationLevelKey = patientInstance.EducationLevelKey;
             retVal.EthnicGroupCodeKey = patientInstance.EthnicGroupCodeKey;
             retVal.MaritalStatusKey = patientInstance.MaritalStatusKey;

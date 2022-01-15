@@ -1,6 +1,18 @@
 <?xml version="1.0"?>
 <dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Vital Signs Observation Types">
   <update insertIfNotExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>0FFAD58D-21B5-4C17-B3F4-9CAA0C570EF3</id>
+      <mnemonic>EQUIV</mnemonic>
+      <codeSystem>ff12d77b-625d-497a-8794-c3726942b113</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Equivalent</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </update>
+  <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>395F4EDF-5D5D-4950-9F5E-F827F72E4B32</id>
       <isReadonly>false</isReadonly>
@@ -12,28 +24,193 @@
         <language>en</language>
         <value>Equivalent Entity</value>
       </name>
+      <referenceTerm>
+        <term>0FFAD58D-21B5-4C17-B3F4-9CAA0C570EF3</term>
+        <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+      </referenceTerm>
     </Concept>
   </update>
+
+  <update insertIfNotExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>0FFAD58D-21B5-4C17-B3F4-9CAA0C570EF3</id>
+      <mnemonic>EQUIV</mnemonic>
+      <codeSystem>ff12d77b-625d-497a-8794-c3726942b113</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Equivalent</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>395F4EDF-5D5D-4950-9F5E-F827F72E4B32</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>EquivalentEntity</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <conceptSet>EE16A667-2085-440A-B1E7-4032D10B9F40</conceptSet>
+      <name>
+        <language>en</language>
+        <value>Equivalent Entity</value>
+      </name>
+      <referenceTerm>
+        <term>0FFAD58D-21B5-4C17-B3F4-9CAA0C570EF3</term>
+        <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+      </referenceTerm>
+    </Concept>
+  </update>
+
+  <update insertIfNotExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>3760B686-5A03-426F-BE88-0011242DFD33</id>
+      <mnemonic>GEN</mnemonic>
+      <codeSystem>ff12d77b-625d-497a-8794-c3726942b113</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Has Generalization</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>BF9F929A-E7EB-4E5B-B82E-CF44384F0A3B</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>HasGeneralization</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <conceptSet>EE16A667-2085-440A-B1E7-4032D10B9F40</conceptSet>
+      <name>
+        <language>en</language>
+        <value>Has Generalization</value>
+      </name>
+      <referenceTerm>
+        <term>3760B686-5A03-426F-BE88-0011242DFD33</term>
+        <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+      </referenceTerm>
+    </Concept>
+  </update>
+
+  <update insertIfNotExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>EEF84F30-8579-49DC-80D4-C33A8489DCAD</id>
+      <mnemonic>CONT</mnemonic>
+      <codeSystem>ff12d77b-625d-497a-8794-c3726942b113</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Has Content</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>9B127E8C-3703-42A9-8A7A-BBAFC6AB2C00</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>HasContent</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <conceptSet>EE16A667-2085-440A-B1E7-4032D10B9F40</conceptSet>
+      <name>
+        <language>en</language>
+        <value>Has Content</value>
+      </name>
+
+      <referenceTerm>
+        <term>EEF84F30-8579-49DC-80D4-C33A8489DCAD</term>
+        <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+      </referenceTerm>
+
+    </Concept>
+  </update>
+
+  <update insertIfNotExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>DF4B6C22-7A0F-40D4-A2E2-65D0E20DB861</id>
+      <mnemonic>INGR</mnemonic>
+      <codeSystem>ff12d77b-625d-497a-8794-c3726942b113</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Has Ingredient</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>1F7163DF-BD86-436D-A14C-B225CDC630C5</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>HasIngredient</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <conceptSet>EE16A667-2085-440A-B1E7-4032D10B9F40</conceptSet>
+      <name>
+        <language>en</language>
+        <value>Has Ingredient</value>
+      </name>
+
+
+      <referenceTerm>
+        <term>DF4B6C22-7A0F-40D4-A2E2-65D0E20DB861</term>
+        <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+      </referenceTerm>
+    </Concept>
+  </update>
+
+  <update insertIfNotExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>ca290ed0-330c-49e7-a644-3e52728cfc0f</id>
+      <mnemonic>PART</mnemonic>
+      <codeSystem>ff12d77b-625d-497a-8794-c3726942b113</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Has Part</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>2220EF3F-B8D9-43A4-9BAE-A2906E3C0803</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>HasPart</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <conceptSet>EE16A667-2085-440A-B1E7-4032D10B9F40</conceptSet>
+      <name>
+        <language>en</language>
+        <value>Has Part</value>
+      </name>
+
+      <referenceTerm>
+        <term>ca290ed0-330c-49e7-a644-3e52728cfc0f</term>
+        <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+      </referenceTerm>
+    </Concept>
+  </update>
+
   <sql>
     <exec invariant="npgsql">
       <![CDATA[
-INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) 
-	SELECT 
+INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc)
+	SELECT
 		'395F4EDF-5D5D-4950-9F5E-F827F72E4B32', CD_ID, CD_ID, 'EQUIVALENT'
 	FROM CD_SET_MEM_ASSOC_TBL WHERE SET_ID = '4E6DA567-0094-4F23-8555-11DA499593AF'
   ON CONFLICT DO NOTHING;
-  
- -- PERSON SUBCLASSES 
+
+ -- PERSON SUBCLASSES
 INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES ('395F4EDF-5D5D-4950-9F5E-F827F72E4B32','9de2a846-ddf2-4ebc-902e-84508c5089ea','bacd9c6f-3fa9-481e-9636-37457962804d','PERSON-[EQUIVALENT]->PATIENT') ON CONFLICT DO NOTHING;
-INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES ('395F4EDF-5D5D-4950-9F5E-F827F72E4B32','bacd9c6f-3fa9-481e-9636-37457962804d','9de2a846-ddf2-4ebc-902e-84508c5089ea','PATIENT-[EQUIVALENT]->PERSON') ON CONFLICT DO NOTHING; 
+INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES ('395F4EDF-5D5D-4950-9F5E-F827F72E4B32','bacd9c6f-3fa9-481e-9636-37457962804d','9de2a846-ddf2-4ebc-902e-84508c5089ea','PATIENT-[EQUIVALENT]->PERSON') ON CONFLICT DO NOTHING;
 INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES ('395F4EDF-5D5D-4950-9F5E-F827F72E4B32','9de2a846-ddf2-4ebc-902e-84508c5089ea','6b04fed8-c164-469c-910b-f824c2bda4f0','PERSON-[EQUIVALENT]->PROVIDER') ON CONFLICT DO NOTHING;
-INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES ('395F4EDF-5D5D-4950-9F5E-F827F72E4B32','6b04fed8-c164-469c-910b-f824c2bda4f0','9de2a846-ddf2-4ebc-902e-84508c5089ea','PROVIDER-[EQUIVALENT]->PERSON') ON CONFLICT DO NOTHING; 
+INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES ('395F4EDF-5D5D-4950-9F5E-F827F72E4B32','6b04fed8-c164-469c-910b-f824c2bda4f0','9de2a846-ddf2-4ebc-902e-84508c5089ea','PROVIDER-[EQUIVALENT]->PERSON') ON CONFLICT DO NOTHING;
 ]]>
     </exec>
     <exec invariant="FirebirdSQL">
       <![CDATA[
-INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) 
-	SELECT 
+INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc)
+	SELECT
 		char_to_uuid('395F4EDF-5D5D-4950-9F5E-F827F72E4B32'), CD_ID, CD_ID, 'EQUIVALENT'
 	FROM CD_SET_MEM_ASSOC_TBL WHERE SET_ID = char_to_uuid('4e6da567-0094-4f23-8555-11da499593af')
  ;

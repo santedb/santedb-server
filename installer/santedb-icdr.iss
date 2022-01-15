@@ -139,6 +139,7 @@ Source: ..\bin\release\applets\*.pak; DestDir: {app}\applets; Components: server
 Source: ..\bin\release\sdbac.exe; DestDir: {app}; Components: tools
 Source: ..\bin\Release\SanteDB.exe.config; DestDir: {app}; DestName: sdbac.exe.config; Components: tools
 Source: ..\bin\release\SanteDB.Server.AdminConsole.Api.dll; DestDir: {app}; Components: tools
+Source: ..\bin\Release\Mono.Posix.dll; DestDir: {app}; Components: core
 
 Source: ..\bin\release\SanteDB.Messaging.AMI.Client.dll; DestDir: {app}; Components: tools
 Source: ..\bin\release\SanteDB.Tools.Debug.dll; DestDir: {app}; Components: tools
@@ -190,7 +191,7 @@ Source: ..\bin\Release\RazorTemplates.Core.dll; DestDir: {app}; Components: serv
 
 ; Common BRE
 Source: ..\bin\Release\Antlr3.Runtime.dll; DestDir: {app}; Components: core\bre core\protocol core
-Source: ..\bin\Release\ExpressionEvaluator.dll; DestDir: {app}; Components: core\bre core\protocol                              
+Source: ..\bin\Release\DynamicExpresso.Core.dll; DestDir: {app}; Components: core\bre core\protocol                              
 Source: ..\bin\Release\Jint.dll; DestDir: {app}; Components: core\bre
 Source: ..\bin\Release\Esprima.dll; DestDir: {app}; Components: core\bre
 Source: ..\bin\Release\SanteDB.BusinessRules.JavaScript.dll; DestDir: {app}; Components: core\bre
@@ -203,6 +204,8 @@ Source: ..\bin\Release\AtnaApi.dll; DestDir: {app}; Components: interop\atna
 Source: ..\bin\Release\Hl7.Fhir.ElementModel.dll; DestDir: {app}; Components: interop\fhir
 Source: ..\bin\Release\Hl7.Fhir.R4.Core.dll; DestDir: {app}; Components: interop\fhir
 Source: ..\bin\Release\Hl7.Fhir.Serialization.dll; DestDir: {app}; Components: interop\fhir
+Source: ..\bin\Release\Microsoft.IdentityModel.Tokens.dll; DestDir: {app}; Components: interop\fhir
+Source: ..\bin\Release\Microsoft.IdentityModel.Logging.dll; DestDir: {app}; Components: interop\fhir
 Source: ..\bin\Release\Hl7.Fhir.Support.dll; DestDir: {app}; Components: interop\fhir
 Source: ..\bin\Release\Hl7.Fhir.Support.Poco.dll; DestDir: {app}; Components: interop\fhir
 Source: ..\bin\Release\Hl7.FhirPath.dll; DestDir: {app}; Components: interop\fhir
