@@ -62,10 +62,14 @@ namespace SanteDB.Messaging.AMI
     }
 
     /// <summary>
-    /// AMI Message handler
+    /// An implementation of the <see cref="IApiEndpointProvider"/> which hosts and manages the 
+    /// <see href="https://help.santesuite.org/developers/service-apis/administration-management-interface-ami">Administrative Management Interface</see> REST services.
     /// </summary>
+    /// <remarks>
+    /// <para>This service is responsible for starting up and shutting down the REST services for the AMI, as well as </para>
+    /// </remarks>
     [Description("The AMI provides administrative operations for SanteDB over HTTP")]
-    [ApiServiceProvider("Administrative Messaging Interface", typeof(AmiServiceBehavior), configurationType: typeof(AmiConfigurationSection), required: true)]
+    [ApiServiceProvider("Administrative Management Interface", typeof(AmiServiceBehavior), configurationType: typeof(AmiConfigurationSection), required: true)]
     public class AmiMessageHandler : IDaemonService, IApiEndpointProvider
     {
         /// <summary>

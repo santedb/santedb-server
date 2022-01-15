@@ -19,6 +19,7 @@
  * Date: 2021-8-27
  */
 using SanteDB.Core;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Jobs;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Collection;
@@ -28,6 +29,7 @@ using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite.Providers;
+using SanteDB.Persistence.Data.ADO.Configuration;
 using SanteDB.Persistence.Data.ADO.Jobs;
 using System;
 using System.Collections.Generic;
@@ -49,8 +51,9 @@ namespace SanteDB.Persistence.Data.ADO.Services
     /// </remarks>
     public class AdoFreetextSearchService : IFreetextSearchService
     {
-        private readonly ISqlDataPersistenceService m_sqlDataPersistence;
+        private readonly AdoPersistenceConfigurationSection m_configuration;
         private readonly IThreadPoolService m_threadPool;
+        private readonly Tracer m_tracer = Tracer.GetTracer(typeof(AdoFreetextSearchService));
 
         /// <summary>
         /// Gets the name of the service
@@ -60,10 +63,12 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <summary>
         /// ADO freetext constructor
         /// </summary>
-        public AdoFreetextSearchService(IJobManagerService jobManager, IServiceManager serviceManager, ISqlDataPersistenceService sqlDataPersistence, IThreadPoolService threadPoolService)
+        public AdoFreetextSearchService(IJobManagerService jobManager, IServiceManager serviceManager, IConfigurationManager configurationManager, IThreadPoolService threadPoolService)
         {
-            this.m_sqlDataPersistence = sqlDataPersistence;
+            this.m_configuration = configurationManager.GetSection<AdoPersistenceConfigurationSection>();
             this.m_threadPool = threadPoolService;
+
+            if (this.m_configuration.Provider.GetFilterFunction("freetext") == null) return; // Freetext not supported
 
             var job = serviceManager.CreateInjected<AdoRebuildFreetextIndexJob>();
             jobManager.AddJob(job, JobStartType.TimerOnly);
@@ -112,14 +117,24 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// </summary>
         public void ReIndex<TEntity>(TEntity entity) where TEntity : IdentifiedData
         {
-            // TODO: Detect type and reindex based on type
-            this.m_threadPool.QueueUserWorkItem(p =>
-            {
-                using (AuthenticationContext.EnterSystemContext())
+            if (this.m_configuration.Provider.GetFilterFunction("freetext") != null) {
+                // TODO: Detect type and reindex based on type
+                this.m_threadPool.QueueUserWorkItem(p =>
                 {
-                    this.m_sqlDataPersistence.ExecuteNonQuery($"SELECT reindex_fti_ent('{p}')");
-                }
-            }, entity.Key);
+                    using (var ctx  = this.m_configuration.Provider.GetWriteConnection())
+                    {
+                        try
+                        {
+                            ctx.Open();
+                            ctx.ExecuteProcedure<object>("reindex_fti_ent", p);
+                        }
+                        catch(Exception e)
+                        {
+                            this.m_tracer.TraceWarning("Could not refresh fulltext index - {0}", e.Message);
+                        }
+                    }
+                }, entity.Key);
+            }
         }
     }
 }
