@@ -11,6 +11,7 @@ using SanteDB.Core.TestFramework;
 using SanteDB.Persistence.Data.Services.Persistence.Collections;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,6 +22,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Collections
     /// Ensures that the bundle service can reorganize itself
     /// </summary>
     [TestFixture]
+    [ExcludeFromCodeCoverage]
     public class BundleReorganizeTest
     {
 

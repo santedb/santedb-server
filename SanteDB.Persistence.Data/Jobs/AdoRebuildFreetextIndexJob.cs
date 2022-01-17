@@ -5,6 +5,7 @@ using SanteDB.Core.Services;
 using SanteDB.Persistence.Data.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,6 +15,7 @@ namespace SanteDB.Persistence.Data.ADO.Jobs
     /// <summary>
     /// Rebuild ADO.NET Freetext index
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class AdoRebuildFreetextIndexJob : IJob
     {
 
