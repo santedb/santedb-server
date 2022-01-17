@@ -42,7 +42,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
 
-            switch (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
                 case LoadMode.FullLoad:
                     retVal.TargetAct = retVal.TargetAct.GetRelatedPersistenceService().Get(context, dbModel.TargetKey);

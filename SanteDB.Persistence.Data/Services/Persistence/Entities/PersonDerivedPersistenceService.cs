@@ -76,7 +76,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             }
 
             // Deep loading?
-            switch (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
                 case LoadMode.FullLoad:
                     modelData.GenderConcept = modelData.GenderConcept.GetRelatedPersistenceService().Get(context, personData.GenderConceptKey.GetValueOrDefault());

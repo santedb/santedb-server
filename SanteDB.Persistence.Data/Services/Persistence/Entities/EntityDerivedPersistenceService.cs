@@ -53,7 +53,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
     /// <typeparam name="TDbEntitySubTable">The sub-table which points to <see cref="DbEntityVersion"/></typeparam>
     /// <typeparam name="TDbTopLevelTable">The top level table which <typeparamref name="TEntity"/> stores its data</typeparam>
     public abstract class EntityDerivedPersistenceService<TEntity, TDbTopLevelTable, TDbEntitySubTable> : EntityDerivedPersistenceService<TEntity, TDbEntitySubTable>
-        where TEntity : Entity, IVersionedEntity, new()
+        where TEntity : Entity, IVersionedData, new()
         where TDbEntitySubTable : DbEntitySubTable, new()
         where TDbTopLevelTable : DbEntitySubTable, new()
     {
@@ -142,7 +142,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
     /// <typeparam name="TEntity">The model type of entity</typeparam>
     /// <typeparam name="TDbEntitySubTable">The sub table instance</typeparam>
     public abstract class EntityDerivedPersistenceService<TEntity, TDbEntitySubTable> : EntityDerivedPersistenceService<TEntity>
-        where TEntity : Entity, IVersionedEntity, new()
+        where TEntity : Entity, IVersionedData, new()
         where TDbEntitySubTable : DbEntitySubTable, new()
     {
 
@@ -224,7 +224,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
     /// Persistence service that is responsible for storing and retrieving entities
     /// </summary>
     public abstract class EntityDerivedPersistenceService<TEntity> : VersionedDataPersistenceService<TEntity, DbEntityVersion, DbEntity>, IAdoClassMapper, IEntityDerivedPersistenceService
-        where TEntity : Entity, IVersionedEntity, new()
+        where TEntity : Entity, IVersionedData, new()
     {
 
         // Class key map
@@ -375,7 +375,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
             var conceptPersistence = typeof(Concept).GetRelatedPersistenceService() as IAdoPersistenceProvider<Concept>;
-            switch (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
                 case LoadMode.FullLoad:
                     retVal.ClassConcept = conceptPersistence.Get(context, dbModel.ClassConceptKey);

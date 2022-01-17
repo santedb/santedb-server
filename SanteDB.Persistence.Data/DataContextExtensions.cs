@@ -1,5 +1,7 @@
 ﻿using SanteDB.Core;
 using SanteDB.Core.BusinessRules;
+using SanteDB.Core.Diagnostics;
+using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Security;
@@ -17,6 +19,7 @@ using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Security;
 using System.Security.Principal;
@@ -51,6 +54,9 @@ namespace SanteDB.Persistence.Data
         // Localization service
         private static readonly ILocalizationService s_localizationService = ApplicationServiceContext.Current.GetService<ILocalizationService>();
 
+        // Tracer
+        private static readonly Tracer s_tracer = Tracer.GetTracer(typeof(DataContextExtensions));
+
         // Adhoc cache
         private static readonly IAdhocCacheService s_adhocCache = ApplicationServiceContext.Current.GetService<IAdhocCacheService>();
 
@@ -64,6 +70,57 @@ namespace SanteDB.Persistence.Data
         /// </summary>
         private readonly static ConcurrentDictionary<Type, object> s_mapProviders = new ConcurrentDictionary<Type, object>();
 
+        /// <summary>
+        /// Translates a DB exception to an appropriate SanteDB exception
+        /// </summary>
+        public static Exception TranslateDbException(this DbException e)
+        {
+            s_tracer.TraceError("Will Translate DBException: {0} - {1}", e.Data["SqlState"] ?? e.ErrorCode, e.Message);
+            if (e.Data["SqlState"] != null)
+            {
+                switch (e.Data["SqlState"].ToString())
+                {
+                    case "O9001": // SanteDB => Data Validation Error
+                        return new DetectedIssueException(
+                            new DetectedIssue(DetectedIssuePriorityType.Error, e.Data["SqlState"].ToString(), e.Message, DetectedIssueKeys.InvalidDataIssue));
+
+                    case "O9002": // SanteDB => Codification error
+                        return new DetectedIssueException(new List<DetectedIssue>() {
+                                        new DetectedIssue(DetectedIssuePriorityType.Error, e.Data["SqlState"].ToString(),  e.Message, DetectedIssueKeys.CodificationIssue),
+                                        new DetectedIssue(DetectedIssuePriorityType.Information, e.Data["SqlState"].ToString(), "HINT: Select a code that is from the correct concept set or add the selected code to the concept set", DetectedIssueKeys.CodificationIssue)
+                                    });
+
+                    case "23502": // PGSQL - NOT NULL
+                        return new DetectedIssueException(
+                                        new DetectedIssue(DetectedIssuePriorityType.Error, e.Data["SqlState"].ToString(), e.Message, DetectedIssueKeys.InvalidDataIssue)
+                                    );
+
+                    case "23503": // PGSQL - FK VIOLATION
+                        return new DetectedIssueException(
+                                        new DetectedIssue(DetectedIssuePriorityType.Error, e.Data["SqlState"].ToString(), e.Message, DetectedIssueKeys.FormalConstraintIssue)
+                                    );
+
+                    case "23505": // PGSQL - UQ VIOLATION
+                        return new DetectedIssueException(
+                                        new DetectedIssue(DetectedIssuePriorityType.Error, e.Data["SqlState"].ToString(), e.Message, DetectedIssueKeys.AlreadyDoneIssue)
+                                    );
+
+                    case "23514": // PGSQL - CK VIOLATION
+                        return new DetectedIssueException(new List<DetectedIssue>()
+                        {
+                            new DetectedIssue(DetectedIssuePriorityType.Error, e.Data["SqlState"].ToString(), e.Message, DetectedIssueKeys.FormalConstraintIssue),
+                            new DetectedIssue(DetectedIssuePriorityType.Information, e.Data["SqlState"].ToString(), "HINT: The code you're using may be incorrect for the given context", DetectedIssueKeys.CodificationIssue)
+                        });
+
+                    default:
+                        return new DataPersistenceException(e.Message, e);
+                }
+            }
+            else
+            {
+                return new DetectedIssueException(new DetectedIssue(DetectedIssuePriorityType.Error, "dbexception", e.Message, DetectedIssueKeys.OtherIssue));
+            }
+        }
 
         /// <summary>
         /// Get related mapping provider

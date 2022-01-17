@@ -206,7 +206,7 @@ namespace SanteDB.Server.Core.Persistence
                                 ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Remove(ivr.SourceEntityKey.Value);
                                 var idt = typeof(IDataPersistenceService<>).MakeGenericType(stype.GetGenericArguments()[0]);
                                 var idp = ApplicationServiceContext.Current.GetService(idt) as IDataPersistenceService;
-                                ivr.EffectiveVersionSequenceId = (idp.Get(ivr.SourceEntityKey.Value) as IVersionedEntity)?.VersionSequence;
+                                ivr.EffectiveVersionSequenceId = (idp.Get(ivr.SourceEntityKey.Value) as IVersionedData)?.VersionSequence;
                                 if (ivr.EffectiveVersionSequenceId == null)
                                     throw new KeyNotFoundException($"Dataset contains a reference to an unkown source entity : {ivr.SourceEntityKey}");
                                 target = ivr;

@@ -1,4 +1,5 @@
-﻿using SanteDB.Core.Model.Acts;
+﻿using SanteDB.Core.Model;
+using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Services;
@@ -23,12 +24,25 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Insert the specified object into the database
         /// </summary>
-        object Insert(DataContext context, object data);
+        IdentifiedData Insert(DataContext context, IdentifiedData data);
 
         /// <summary>
         /// Update the specified object in the database context
         /// </summary>
-        object Update(DataContext context, object data);
+        IdentifiedData Update(DataContext context, IdentifiedData data);
+
+        /// <summary>
+        /// Do an obsolete of the model
+        /// </summary>
+        IdentifiedData Delete(DataContext context, Guid key, DeleteMode deletionMode);
+
+        /// <summary>
+        /// True if the object exists in the database
+        /// </summary>
+        /// <param name="context">The context to check</param>
+        /// <param name="key">The primary key of the model data</param>
+        /// <returns></returns>
+        bool Exists(DataContext context, Guid key);
 
     }
 
@@ -55,7 +69,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Do an obsolete of the model
         /// </summary>
-        TModel Delete(DataContext context, Guid key, DeleteMode deletionMode);
+        new TModel Delete(DataContext context, Guid key, DeleteMode deletionMode);
 
         /// <summary>
         /// Perform a get on the context

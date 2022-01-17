@@ -167,7 +167,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 Assert.IsNull(afterQuery.Telecoms);
 
                 // Enter a custom query context
-                using (DataPersistenceQueryContext.Create(LoadMode.SyncLoad))
+                using (DataPersistenceControlContext.Create(LoadMode.SyncLoad))
                 {
                     afterQuery = base.TestQuery<Patient>(o => o.Key == afterInsert.Key, 1).AsResultSet().First();
                     Assert.AreEqual(afterInsert.Key, afterQuery.Key);
@@ -188,7 +188,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 }
 
                 // Enter a custom query context
-                using (DataPersistenceQueryContext.Create(LoadMode.FullLoad))
+                using (DataPersistenceControlContext.Create(LoadMode.FullLoad))
                 {
                     afterQuery = base.TestQuery<Patient>(o => o.Key == afterInsert.Key, 1).AsResultSet().First();
                     Assert.AreEqual(afterInsert.Key, afterQuery.Key);

@@ -45,7 +45,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
     /// <typeparam name="TAct">The type of act being persisted</typeparam>
     /// <typeparam name="TDbActSubTable">The database table which stores additional information for the type of data</typeparam>
     public abstract class ActDerivedPersistenceService<TAct, TDbActSubTable> : ActDerivedPersistenceService<TAct>
-        where TAct : Act, IVersionedEntity, new()
+        where TAct : Act, IVersionedData, new()
         where TDbActSubTable : DbActSubTable, new()
     {
         /// <summary>
@@ -127,7 +127,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
     /// </summary>
     /// <typeparam name="TAct">The model type of act</typeparam>
     public abstract class ActDerivedPersistenceService<TAct> : VersionedDataPersistenceService<TAct, DbActVersion, DbAct>, IAdoClassMapper, IActDerivedPersistenceService
-        where TAct : Act, IVersionedEntity, new()
+        where TAct : Act, IVersionedData, new()
     {
 
         // Class key map
@@ -271,7 +271,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
             var conceptPersistence = typeof(Concept).GetRelatedPersistenceService() as IAdoPersistenceProvider<Concept>;
 
-            switch (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
                 case LoadMode.FullLoad:
                     retVal.ClassConcept = conceptPersistence.Get(context, dbModel.ClassConceptKey);

@@ -87,10 +87,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             }
 
             // Relationships
-            if (data.Relationship != null)
+            if (data.Relationships != null)
             {
-                retVal.Relationship = base.UpdateModelVersionedAssociations<ConceptRelationship>(context, retVal, data.Relationship).ToList(); 
-                retVal.SetLoaded(o => o.Relationship);
+                retVal.Relationships = base.UpdateModelVersionedAssociations<ConceptRelationship>(context, retVal, data.Relationships).ToList(); 
+                retVal.SetLoaded(o => o.Relationships);
 
             }
             return retVal;
@@ -131,10 +131,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
             }
 
             // Relationships
-            if (data.Relationship != null)
+            if (data.Relationships != null)
             {
-                retVal.Relationship = base.UpdateModelVersionedAssociations<ConceptRelationship>(context, retVal, data.Relationship).ToList();
-                retVal.SetLoaded(o => o.Relationship);
+                retVal.Relationships = base.UpdateModelVersionedAssociations<ConceptRelationship>(context, retVal, data.Relationships).ToList();
+                retVal.SetLoaded(o => o.Relationships);
 
             }
 
@@ -148,7 +148,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
 
-            switch (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
                 case LoadMode.FullLoad:
                     retVal.Class = retVal.Class.GetRelatedPersistenceService().Get(context, dbModel.ClassKey);
@@ -157,8 +157,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
                 case LoadMode.SyncLoad:
                     retVal.ConceptNames = retVal.ConceptNames.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
                     retVal.SetLoaded(nameof(Concept.ConceptNames));
-                    retVal.Relationship = retVal.Relationship.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
-                    retVal.SetLoaded(nameof(Concept.Relationship));
+                    retVal.Relationships = retVal.Relationships.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
+                    retVal.SetLoaded(nameof(Concept.Relationships));
                     retVal.ReferenceTerms = retVal.ReferenceTerms.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key && o.ObsoleteVersionSequenceId == null).ToList();
                     retVal.SetLoaded(nameof(Concept.ReferenceTerms));
                     goto case LoadMode.QuickLoad;

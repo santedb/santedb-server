@@ -49,7 +49,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                 dbPatient = context.FirstOrDefault<DbPatient>(o => o.ParentKey == dbModel.VersionKey);
             }
 
-            switch (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
                 case LoadMode.FullLoad:
                     var conceptPersister = typeof(Concept).GetRelatedPersistenceService() as IAdoPersistenceProvider<Concept>;

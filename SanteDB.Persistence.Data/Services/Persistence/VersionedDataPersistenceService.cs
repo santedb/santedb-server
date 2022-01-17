@@ -26,7 +26,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
     /// Persistence service which handles versioned objects
     /// </summary>
     public abstract class VersionedDataPersistenceService<TModel, TDbModel, TDbKeyModel> : BaseEntityDataPersistenceService<TModel, TDbModel>
-        where TModel : BaseEntityData, IVersionedEntity, IHasState, new()
+        where TModel : BaseEntityData, IVersionedData, IHasState, new()
         where TDbModel : DbVersionedData, IDbHasStatus, new()
         where TDbKeyModel : DbIdentified, new()
     {
@@ -397,8 +397,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 }
 
                 // next - we create a new version of dbmodel
-                var newVersion = existing.First().CopyObjectData(model, true);
-                newVersion.ReplacesVersionKey = newVersion.VersionKey;
+                var oldVersion = existing.First();
+                var newVersion = new TDbModel();
+                newVersion.CopyObjectData(model, true);
+                newVersion.ReplacesVersionKey = oldVersion.VersionKey;
                 newVersion.CreationTime = DateTimeOffset.Now;
                 newVersion.CreatedByKey = context.ContextId;
                 newVersion.ObsoletedByKey = null;
@@ -719,15 +721,15 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             var existing = persistenceService.Query(context, o => o.SourceEntityKey == data.Key && !o.ObsoleteVersionSequenceId.HasValue).Select(o => o.Key).ToArray();
 
             // Which are new and which are not?
-            var removedRelationships = existing.Where(o => !associations.Any(a => a.Key == o)).Select(a => persistenceService.Delete(context, a.Value, DeleteMode.LogicalDelete));
-            var addedRelationships = associations.Where(o => !o.Key.HasValue || !existing.Any(a => a == o.Key)).Select(a =>
+            var removedRelationships = existing.Where(o => associations.Any(a=>a.Key == o && a.BatchOperation == BatchOperationType.Delete) || !associations.Any(a => a.Key == o)).Select(a => persistenceService.Delete(context, a.Value, DeleteMode.LogicalDelete));
+            var addedRelationships = associations.Where(o => o.BatchOperation != BatchOperationType.Delete && ( !o.Key.HasValue || !existing.Any(a => a == o.Key))).Select(a =>
             {
                 a.EffectiveVersionSequenceId = data.VersionSequence;
                 a = persistenceService.Insert(context, a);
                 a.BatchOperation = Core.Model.DataTypes.BatchOperationType.Insert;
                 return a;
             });
-            var updatedRelationships = associations.Where(o => o.Key.HasValue && existing.Any(a => a == o.Key)).Select(a =>
+            var updatedRelationships = associations.Where(o => o.BatchOperation != BatchOperationType.Delete && o.Key.HasValue && existing.Any(a => a == o.Key)).Select(a =>
             {
                 a = persistenceService.Update(context, a);
                 a.BatchOperation = Core.Model.DataTypes.BatchOperationType.Update;

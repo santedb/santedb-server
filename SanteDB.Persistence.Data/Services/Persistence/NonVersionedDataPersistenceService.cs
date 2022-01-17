@@ -94,7 +94,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
 
             // Load strategy
-            switch (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
                 case LoadMode.FullLoad:
                     retVal.UpdatedBy = retVal.UpdatedBy.GetRelatedPersistenceService().Get(context, dbModel.UpdatedByKey.GetValueOrDefault());

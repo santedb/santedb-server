@@ -38,7 +38,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         protected override ActNote DoConvertToInformationModel(DataContext context, DbActNote dbModel, params Object[] referenceObjects)
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
-            switch (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
                 case LoadMode.FullLoad:
                     retVal.Author = retVal.Author.GetRelatedPersistenceService().Get(context, dbModel.AuthorKey);

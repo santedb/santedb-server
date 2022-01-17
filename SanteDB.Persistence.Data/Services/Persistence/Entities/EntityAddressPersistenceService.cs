@@ -73,7 +73,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         protected override EntityAddress DoConvertToInformationModel(DataContext context, DbEntityAddress dbModel, params Object[] referenceObjects)
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
-            switch (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
                 case LoadMode.FullLoad:
                     retVal.AddressUse = retVal.AddressUse.GetRelatedPersistenceService().Get(context, dbModel.UseConceptKey);

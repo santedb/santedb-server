@@ -41,7 +41,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                 nplsData = context.FirstOrDefault<DbNonPersonLivingSubject>(o => o.ParentKey == modelData.VersionKey);
             }
 
-            switch (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
                 case LoadMode.FullLoad:
                     modelData.Strain = modelData.Strain.GetRelatedPersistenceService().Get(context, nplsData.StrainKey.GetValueOrDefault());

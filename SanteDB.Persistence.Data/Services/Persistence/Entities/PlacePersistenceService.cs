@@ -61,7 +61,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             }
 
             // Deep loading?
-            switch (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
                 case LoadMode.FullLoad:
                 case LoadMode.SyncLoad:
