@@ -41,6 +41,9 @@ namespace SanteDB.Persistence.Data.ADO.Jobs
         /// </summary>
         public string Name => "Full Rebuild of Freetext Index";
 
+        /// <inheritdoc/>
+        public string Description => "Rebuilds the entire freetext index (usually the _any query parameter)";
+
         /// <summary>
         /// Can cancel
         /// </summary>

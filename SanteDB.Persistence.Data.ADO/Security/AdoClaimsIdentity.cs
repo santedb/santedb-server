@@ -287,7 +287,7 @@ namespace SanteDB.Persistence.Data.ADO.Security
                 var retVal = new SanteDBClaimsPrincipal(
                         identities
                     );
-                s_traceSource.TraceInfo("Created security principal from identity {0} > {1}", this, AdoClaimsIdentity.PrincipalToString(retVal));
+                //s_traceSource.TraceInfo("Created security principal from identity {0} > {1}", this, AdoClaimsIdentity.PrincipalToString(retVal));
                 return retVal;
             }
             catch (Exception e)
