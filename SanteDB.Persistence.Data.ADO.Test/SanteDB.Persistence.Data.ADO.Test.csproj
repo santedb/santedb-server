@@ -54,7 +54,7 @@
     <PackageReference Include="Newtonsoft.Json">
       <Version>13.0.1</Version>
     </PackageReference>
-    <PackageReference Include="Npgsql" Version="5.0.11" />
+    <PackageReference Include="Npgsql" Version="6.0.2" />
     <Reference Include="System" />
     <PackageReference Include="NUnit">
       <Version>3.13.2</Version>
@@ -77,6 +77,7 @@
     <Compile Include="PatientPersistenceServiceTest.cs" />
     <Compile Include="PersistenceTest.cs" />
     <Compile Include="PersonPersistenceServiceTest.cs" />
+    <Compile Include="PreparedFilterManagerTests.cs" />
     <Compile Include="QueryExpressionWriterTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="AdoPolicyProviderTest.cs" />

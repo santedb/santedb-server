@@ -45,7 +45,7 @@
       <Version>8.5.4</Version>
     </PackageReference>
     <PackageReference Include="Npgsql">
-      <Version>5.0.11</Version>
+      <Version>6.0.2</Version>
     </PackageReference>
     <PackageReference Include="System.IdentityModel.Tokens.Jwt">
       <Version>4.0.4.403061554</Version>
@@ -53,6 +53,7 @@
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data.Linq" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.IdentityModel" />
     <Reference Include="System.Windows.Forms" />
@@ -75,6 +76,7 @@
     <Compile Include="Data\Hax\EntityAddressNameQueryHack.cs" />
     <Compile Include="Data\Hax\RelationshipGuardQueryHack.cs" />
     <Compile Include="Data\Hax\SecurityUserEntityQueryHack.cs" />
+    <Compile Include="Data\Index\DbPreparedFilterDefinition.cs" />
     <Compile Include="Data\Model\Acts\DbActProtocol.cs" />
     <Compile Include="Data\Model\Acts\DbActVersion.cs" />
     <Compile Include="Data\Model\Acts\DbAct.cs" />
@@ -99,6 +101,9 @@
     <Compile Include="Docker\AdoFreetextDockerFeature.cs" />
     <Compile Include="Exceptions\AdoFormalConstraintException.cs" />
     <Compile Include="Configuration\Features\AdoPersistenceFeature.cs" />
+    <Compile Include="Index\AdoPreparedFilter.cs" />
+    <Compile Include="Index\AdoPreparedFilterManager.cs" />
+    <Compile Include="Index\AdoPreparedFilterQueryHack.cs" />
     <Compile Include="Jobs\AdoRebuildFreetextIndexJob.cs" />
     <Compile Include="Resources\Locale.Designer.cs">
       <AutoGen>True</AutoGen>

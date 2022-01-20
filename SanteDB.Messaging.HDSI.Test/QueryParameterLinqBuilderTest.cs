@@ -55,6 +55,41 @@ namespace SanteDB.Messaging.HDSI.Test
 		}
 
 		/// <summary>
+		/// Tests that the expression selector
+		/// </summary>
+		[Test]
+		public void TestBuildPropertySelector()
+        {
+			Expression<Func<Patient, dynamic>> expected = (o => o.DateOfBirth);
+			var expr = QueryExpressionParser.BuildPropertySelector(typeof(Patient), "dateOfBirth", false);
+			Assert.AreEqual(expected.ToString(), expr);
+        }
+
+		/// <summary>
+		/// Tests that the expression selector can build complex properties
+		/// </summary>
+		[Test]
+		public void TestBuildComplexPropertySelector()
+		{
+			var expr = QueryExpressionParser.BuildPropertySelector<Patient>("name[Legal].component[Given].value", false);
+			var exprString = QueryExpressionBuilder.BuildPropertySelector(expr);
+			Assert.AreEqual("name[Legal].component[Given].value", exprString);
+
+			expr = QueryExpressionParser.BuildPropertySelector<Patient>("address.component[City|County].value", false);
+			exprString = QueryExpressionBuilder.BuildPropertySelector(expr);
+			Assert.AreEqual("address.component[City|County].value", exprString);
+
+			expr = QueryExpressionParser.BuildPropertySelector<Patient>("name.component.value", false);
+			exprString = QueryExpressionBuilder.BuildPropertySelector(expr);
+			Assert.AreEqual("name.component.value", exprString);
+
+			expr = QueryExpressionParser.BuildPropertySelector<Patient>("genderConcept.mnemonic", false);
+			exprString = QueryExpressionBuilder.BuildPropertySelector(expr);
+			Assert.AreEqual("genderConcept.mnemonic", exprString);
+
+		}
+
+		/// <summary>
 		/// Test that using UUID as guard works
 		/// </summary>
 		[Test]

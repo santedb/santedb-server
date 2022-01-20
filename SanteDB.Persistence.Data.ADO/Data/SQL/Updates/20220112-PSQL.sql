@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS ft_ent_systbl
 	CONSTRAINT fk_ft_cls_cd_id FOREIGN KEY (cls_cd_id) REFERENCES cd_tbl(cd_id)
 );
 
-CREATE INDEX ft_ent_ftidx ON ft_ent_systbl USING GIN (terms);
+CREATE INDEX IF NOT EXISTS ft_ent_ftidx ON ft_ent_systbl USING GIN (terms);
 
 CREATE OR REPLACE FUNCTION rfrsh_fti() 
 RETURNS void
@@ -86,6 +86,14 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION fti_tsquery (term_in IN TEXT) 
+RETURNS tsquery 
+IMMUTABLE AS
+$$
+BEGIN
+	RETURN WEBSEARCH_TO_TSQUERY(term_in);
+END;
+$$ LANGUAGE plpgsql;
 
 SELECT rfrsh_fti();
 
