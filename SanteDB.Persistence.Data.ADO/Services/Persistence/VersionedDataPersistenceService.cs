@@ -438,8 +438,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     this.FireRetrieved(postData);
 
                     // Add to cache
-                    foreach (var d in connection.CacheOnCommit)
-                        ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Add(d);
+                    ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Add(retVal);
                     return retVal;
                 }
                 catch (NotSupportedException e)

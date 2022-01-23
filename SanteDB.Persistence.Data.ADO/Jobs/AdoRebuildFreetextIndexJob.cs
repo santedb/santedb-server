@@ -89,7 +89,7 @@ namespace SanteDB.Persistence.Data.ADO.Jobs
                     ctx.Open();
                     this.LastStarted = DateTime.Now;
                     this.CurrentState = JobStateType.Running;
-
+                    ctx.CommandTimeout = 360000;
                     ctx.ExecuteProcedure<object>("rfrsh_fti");
 
                     this.CurrentState = JobStateType.Completed;

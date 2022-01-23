@@ -48,6 +48,7 @@ using System.Security.Principal;
 using SanteDB.Server.Core.Configuration;
 using SanteDB.Server.Core.Security;
 using SanteDB.Server.Core.Services;
+using Newtonsoft.Json.Linq;
 
 namespace SanteDB.Persistence.Data.ADO.Services
 {
@@ -604,10 +605,14 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     }
                     else
                     {
-                        securitySession = authCache[0] as DbSession;
-                        securityApplication = authCache[1] as DbSecurityApplication;
-                        securityUser = authCache[2] as DbSecurityUser;
-                        securityDevice = authCache[3] as DbSecurityDevice;
+                        securitySession = authCache[0] as DbSession ??
+                            (authCache[0] as JObject).ToObject<DbSession>();
+                        securityApplication = authCache[1] as DbSecurityApplication ??
+                            (authCache[1] as JObject).ToObject<DbSecurityApplication>();
+                        securityUser = authCache[2] as DbSecurityUser ??
+                            (authCache[2] as JObject).ToObject<DbSecurityUser>();
+                        securityDevice = authCache[3] as DbSecurityDevice ??
+                            (authCache[3] as JObject).ToObject<DbSecurityDevice>();
                     }
 
                     // Identities

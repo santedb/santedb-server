@@ -22,7 +22,7 @@ AS
 $$
 BEGIN
 	TRUNCATE TABLE ft_ent_systbl;
-	INSERT INTO ft_ent_systbl
+	CREATE TABLE ft_ent_systbl tmp AS INSERT INTO ft_ent_systbl
 	SELECT ent_id, cls_cd_id, vector FROM
 		ent_tbl 
 		INNER JOIN

@@ -277,6 +277,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             if (provenance.Distinct().Count() > 1)
                 this.m_tracer.TraceError("PROVENANCE OF OBJECTS DO NOT MATCH. WHEN A BUNDLE IS PERSISTED PROVENANCE DATA MUST BE NULL OR MUST MATCH. {0}", String.Join(",", provenance.Distinct().Select(o => o.ToString())));
 
+            var cacheService = ApplicationServiceContext.Current.GetService<IDataCachingService>();
+
             for (int i = 0; i < reorganized.Item.Count; i++)
             {
                 var itm = reorganized.Item[i];
@@ -293,16 +295,19 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         case BatchOperationType.Update:
                             this.m_tracer.TraceVerbose("Will update {0} object from bundle...", itm);
                             reorganized.Item[i] = svc.Update(context, itm) as IdentifiedData;
+                            reorganized.Item[i].BatchOperation = BatchOperationType.Update;
                             break;
 
                         case BatchOperationType.Insert:
                             this.m_tracer.TraceVerbose("Will insert {0} object from bundle...", itm);
                             reorganized.Item[i] = svc.Insert(context, itm) as IdentifiedData;
+                            reorganized.Item[i].BatchOperation = BatchOperationType.Insert;
                             break;
 
                         case BatchOperationType.Delete:
                             this.m_tracer.TraceVerbose("Will obsolete {0} object from bundle...", itm);
                             reorganized.Item[i] = svc.Obsolete(context, itm) as IdentifiedData;
+                            reorganized.Item[i].BatchOperation = BatchOperationType.Delete;
                             break;
 
                         default:
@@ -343,12 +348,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 }
             }
 
-            // Cache items
-            foreach (var itm in data.Item)
-            {
-                itm.LoadState = LoadState.FullLoad;
-                context.AddCacheCommit(itm);
-            }
             return data;
         }
 

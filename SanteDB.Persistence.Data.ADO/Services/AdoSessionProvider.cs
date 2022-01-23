@@ -158,7 +158,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         if ((purpose == PurposeOfUseKeys.SecurityAdmin.ToString() ||
                             cprincipal.Claims.Any(o => o.Type == SanteDBClaimTypes.PurposeOfUse && o.Value == PurposeOfUseKeys.SecurityAdmin.ToString()))
                             && policyDemands?.Contains(PermissionPolicyIdentifiers.LoginPasswordOnly) == true) // TODO: Make purpose of use menmonic check instead
-                            expiration = DateTime.Now.Add(new TimeSpan(0, 2, 0));
+                            expiration = DateTimeOffset.Now.Add(new TimeSpan(0, 2, 0));
 
                         var dbSession = new DbSession()
                         {
@@ -384,7 +384,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     if (session.Key == Guid.Empty)
                     {
                         var exp = this.m_adhocCache.Get<dynamic>($"ses.{sessionId}");
-                        return new GenericSession(Convert.FromBase64String(exp.Id), null, DateTime.Parse(exp.NotBefore), DateTime.Parse(exp.NotAfter), (exp.Claims as dynamic[]).Select(o => new SanteDBClaim(o.Type, o.Value)).ToArray());
+                        return new GenericSession(Convert.FromBase64String((String)exp.Id), null, DateTime.Parse((String)exp.NotBefore), DateTime.Parse((String)exp.NotAfter), (exp.Claims as IEnumerable<dynamic>).Select(o => new SanteDBClaim((String)o.Type, (String)o.Value)).ToArray());
                     }
                     else
                     {

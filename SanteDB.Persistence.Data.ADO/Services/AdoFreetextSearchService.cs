@@ -22,7 +22,9 @@ using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Jobs;
 using SanteDB.Core.Model;
+using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Collection;
+using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Model.Roles;
@@ -32,10 +34,12 @@ using SanteDB.OrmLite.Providers;
 using SanteDB.Persistence.Data.ADO.Configuration;
 using SanteDB.Persistence.Data.ADO.Jobs;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SanteDB.Persistence.Data.ADO.Services
@@ -52,8 +56,11 @@ namespace SanteDB.Persistence.Data.ADO.Services
     public class AdoFreetextSearchService : IFreetextSearchService
     {
         private readonly AdoPersistenceConfigurationSection m_configuration;
-        private readonly IThreadPoolService m_threadPool;
         private readonly Tracer m_tracer = Tracer.GetTracer(typeof(AdoFreetextSearchService));
+        private readonly ConcurrentQueue<Guid> m_ftiRefreshList = new ConcurrentQueue<Guid>();
+        private readonly ManualResetEventSlim m_ftiRefreshEvent = new ManualResetEventSlim(false);
+        private readonly Thread m_ftiRefreshThread;
+        private bool m_shutdown = false;
 
         /// <summary>
         /// Gets the name of the service
@@ -66,7 +73,14 @@ namespace SanteDB.Persistence.Data.ADO.Services
         public AdoFreetextSearchService(IJobManagerService jobManager, IServiceManager serviceManager, IConfigurationManager configurationManager, IThreadPoolService threadPoolService)
         {
             this.m_configuration = configurationManager.GetSection<AdoPersistenceConfigurationSection>();
-            this.m_threadPool = threadPoolService;
+
+            this.m_ftiRefreshThread = new Thread(this.MonitorFreetextJob)
+            {
+                Name = "ADO.NET FullText Realtime Refresh",
+                IsBackground = true,
+                Priority = ThreadPriority.Lowest
+            };
+            this.m_ftiRefreshThread.Start();
 
             if (this.m_configuration.Provider.GetFilterFunction("freetext") == null) return; // Freetext not supported
 
@@ -96,7 +110,36 @@ namespace SanteDB.Persistence.Data.ADO.Services
             appServiceProvider.GetService<IDataPersistenceService<Place>>().Updated += (o, e) => this.ReIndex(e.Data);
             appServiceProvider.GetService<IDataPersistenceService<Organization>>().Updated += (o, e) => this.ReIndex(e.Data);
             appServiceProvider.GetService<IDataPersistenceService<Person>>().Updated += (o, e) => this.ReIndex(e.Data);
+            appServiceProvider.Stopping += (o,e) => this.m_shutdown = true;
         }
+
+        /// <summary>
+        /// Monitor the freetext job
+        /// </summary>
+        private void MonitorFreetextJob()
+        {
+            while (!this.m_shutdown)
+            {
+                this.m_ftiRefreshEvent.Wait();
+                using (var ctx = this.m_configuration.Provider.GetWriteConnection())
+                {
+                    try
+                    {
+                        ctx.Open();
+                        while (this.m_ftiRefreshList.TryDequeue(out var p))
+                        {
+                            ctx.ExecuteProcedure<object>("reindex_fti_ent", p);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        this.m_tracer.TraceWarning("Could not refresh fulltext index - {0}", e.Message);
+                    }
+                }
+                this.m_ftiRefreshEvent.Reset();
+            }
+        }
+
         /// <summary>
         /// Search for the specified object in the list of terms
         /// </summary>
@@ -117,24 +160,12 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// </summary>
         public void ReIndex<TEntity>(TEntity entity) where TEntity : IdentifiedData
         {
-            if (this.m_configuration.Provider.GetFilterFunction("freetext") != null) {
-                // TODO: Detect type and reindex based on type
-                this.m_threadPool.QueueUserWorkItem(p =>
-                {
-                    using (var ctx  = this.m_configuration.Provider.GetWriteConnection())
-                    {
-                        try
-                        {
-                            ctx.Open();
-                            ctx.ExecuteProcedure<object>("reindex_fti_ent", p);
-                        }
-                        catch(Exception e)
-                        {
-                            this.m_tracer.TraceWarning("Could not refresh fulltext index - {0}", e.Message);
-                        }
-                    }
-                }, entity.Key);
+            if (entity is Entity || entity is Act || entity is Concept)
+            {
+                this.m_ftiRefreshList.Enqueue(entity.Key.Value);
+                this.m_ftiRefreshEvent.Set();
             }
         }
+
     }
 }

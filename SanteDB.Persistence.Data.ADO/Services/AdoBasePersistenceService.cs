@@ -235,10 +235,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             {
                                 tx.Commit();
                                 var cacheService = ApplicationServiceContext.Current.GetService<IDataCachingService>();
-                                foreach (var itm in connection.CacheOnCommit)
-                                {
-                                    cacheService?.Remove(itm);
-                                }
+                                cacheService?.Remove(data);
                             }
                             else
                                 tx.Rollback();
@@ -324,10 +321,8 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             {
                                 tx.Commit();
                                 var cacheService = ApplicationServiceContext.Current.GetService<IDataCachingService>();
-                                foreach (var itm in connection.CacheOnCommit)
-                                {
-                                    cacheService?.Remove(itm);
-                                }
+                                cacheService?.Remove(data);
+
                             }
                             else
                                 tx.Rollback();
@@ -489,10 +484,8 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             {
                                 tx.Commit();
                                 var cacheService = ApplicationServiceContext.Current.GetService<IDataCachingService>();
-                                foreach (var itm in connection.CacheOnCommit)
-                                {
-                                    cacheService?.Remove(itm);
-                                }
+                                cacheService?.Remove(data);
+
                             }
                             else
                                 tx.Rollback();
@@ -566,8 +559,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         var postData = new DataRetrievedEventArgs<TData>(result, overrideAuthContext);
                         this.Retrieved?.Invoke(this, postData);
 
-                        foreach (var itm in connection.CacheOnCommit)
-                            ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Add(itm);
+                            ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Add(result);
 
                         return result;
                     }
@@ -672,10 +664,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                     // Add to cache
                     foreach (var i in retVal.Where(i => i != null))
-                        connection.AddCacheCommit(i);
-
-                    foreach (var itm in connection.CacheOnCommit)
-                        ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Add(itm);
+                        ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Add(i);
 
                     this.m_tracer.TraceEvent(EventLevel.Verbose, "Returning {0}..{1} or {2} results", offset, offset + (count ?? 1000), totalCount);
 

@@ -370,9 +370,9 @@ namespace SanteDB.Authentication.OAuth2.Rest
 
             // Add JTI
             claims.Add(new SanteDBClaim("jti", BitConverter.ToString(session.Id).Replace("-", "")));
-            claims.Add(new SanteDBClaim("iat", (session.NotBefore - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds.ToString()));
+            claims.Add(new SanteDBClaim("iat", (session.NotBefore.ToUniversalTime() - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds.ToString()));
             claims.RemoveAll(o => String.IsNullOrEmpty(o.Value));
-            claims.Add(new SanteDBClaim("exp", (session.NotAfter - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds.ToString()));
+            claims.Add(new SanteDBClaim("exp", (session.NotAfter.ToUniversalTime() - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds.ToString()));
             claims.RemoveAll(o => String.IsNullOrEmpty(o.Value));
             claims.Add(new SanteDBClaim("sub", session.Claims.First(o => o.Type == SanteDBClaimTypes.Sid).Value)); // Subject is the first security identifier
             claims.RemoveAll(o => o.Type == SanteDBClaimTypes.Sid);
@@ -409,8 +409,8 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 signingCredentials: signingCredentials,
                 claims: claims.Select(o => new System.Security.Claims.Claim(o.Type, o.Value)),
                 issuer: this.m_configuration.IssuerName,
-                notBefore: session.NotBefore.DateTime,
-                expires: session.NotAfter.DateTime
+                notBefore: session.NotBefore.LocalDateTime,
+                expires: session.NotAfter.LocalDateTime
            );
 
             return jwt;

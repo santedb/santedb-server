@@ -150,9 +150,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             var results = this.DoQueryInternal(context, query, queryId, offset, count, out resultCount, orderBy, countResults).ToList();
             totalResults = resultCount;
 
-            if (!this.m_settingsProvider.GetConfiguration().SingleThreadFetch)
+            if (!this.m_settingsProvider.GetConfiguration().SingleThreadFetch && results.Count > 20)
             {
-                return results.AsParallel().AsOrdered().WithDegreeOfParallelism(2).Select(o =>
+                return results.AsParallel().AsOrdered().Select(o =>
                 {
                     var subContext = context;
                     var newSubContext = results.Count() > 1;
@@ -201,6 +201,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             Stopwatch sw = new Stopwatch();
             sw.Start();
 #endif
+            // Query has been registered?
+            if (queryId != Guid.Empty && this.m_queryPersistence?.IsRegistered(queryId) == true)
+                return this.GetStoredQueryResults(queryId, offset, count, out totalResults);
 
             OrmResultSet<TQueryReturn> retVal = null;
             Expression<Func<TModel, bool>>[] queries = new Expression<Func<TModel, bool>>[] { primaryQuery };
@@ -219,9 +222,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 {
                     var query = q;
                     SqlStatement domainQuery = null;
-                    // Query has been registered?
-                    if (queryId != Guid.Empty && this.m_queryPersistence?.IsRegistered(queryId) == true)
-                        return this.GetStoredQueryResults(queryId, offset, count, out totalResults);
+                    
 
                     // Is obsoletion time already specified? If so and the entity is an iversioned entity we don't want obsolete data coming back
                     var queryString = query.ToString();
