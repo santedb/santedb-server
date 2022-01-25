@@ -21,8 +21,7 @@ RETURNS void
 AS
 $$
 BEGIN
-	TRUNCATE TABLE ft_ent_systbl;
-	CREATE TABLE ft_ent_systbl tmp AS INSERT INTO ft_ent_systbl
+	CREATE TEMPORARY TABLE ft_ent_tmptbl AS 
 	SELECT ent_id, cls_cd_id, vector FROM
 		ent_tbl 
 		INNER JOIN
@@ -48,7 +47,8 @@ BEGIN
 				ent_addr_cmp_val_tbl.VAL  IS NOT NULL AND ent_addr_tbl.OBSLT_VRSN_SEQ_ID IS NULL 
 			GROUP BY ent_id
 		) vectors USING (ent_id);
-	
+	TRUNCATE TABLE ft_ent_systbl;
+	INSERT INTO ft_ent_systbl SELECT * FROM ft_ent_tmptbl ;
 	
 END;
 $$ LANGUAGE plpgsql;
@@ -86,6 +86,16 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+
+CREATE OR REPLACE FUNCTION fti_tsquery(search_term_in in text)
+RETURNS tsquery 
+IMMUTABLE
+AS 
+$$
+BEGIN
+	RETURN websearch_to_tsquery(search_term_in);
+END;
+$$ LANGUAGE plpgsql;
 
 SELECT rfrsh_fti();
 

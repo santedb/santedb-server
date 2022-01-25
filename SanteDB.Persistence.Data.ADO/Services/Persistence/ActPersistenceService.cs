@@ -76,7 +76,15 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
             if (dataInstance == null) return null;
 
-            var parentKey = (dataInstance as DbActSubTable).ParentKey;
+            Guid parentKey = Guid.Empty;
+            if (dataInstance is CompositeResult cr)
+            {
+                parentKey = cr.Values.OfType<DbActSubTable>().First().ParentKey;
+            }
+            else
+            {
+                parentKey = (dataInstance as DbActSubTable).ParentKey;
+            }
             DbActVersion dbActVersion = (dataInstance as CompositeResult)?.Values.OfType<DbActVersion>().FirstOrDefault() ?? dataInstance as DbActVersion ?? context.FirstOrDefault<DbActVersion>(o => o.VersionKey == parentKey);
             DbAct dbAct = (dataInstance as CompositeResult)?.Values.OfType<DbAct>().FirstOrDefault() ?? context.FirstOrDefault<DbAct>(o => o.Key == dbActVersion.Key);
             Act retVal = null;

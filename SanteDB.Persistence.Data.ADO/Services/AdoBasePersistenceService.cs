@@ -235,7 +235,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             {
                                 tx.Commit();
                                 var cacheService = ApplicationServiceContext.Current.GetService<IDataCachingService>();
-                                cacheService?.Remove(data);
+                                cacheService?.Add(data);
                             }
                             else
                                 tx.Rollback();

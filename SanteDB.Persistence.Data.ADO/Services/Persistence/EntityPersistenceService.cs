@@ -348,7 +348,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             // Identifiers
             if (data.Identifiers != null)
             {
-                this.VerifyIdentities(context, data, assertedCreator);
+                    data.Identifiers.RemoveAll(o => o.IsEmpty());
+
+                    this.VerifyIdentities(context, data, assertedCreator);
                 // Assert
                 base.UpdateVersionedAssociatedItems<Core.Model.DataTypes.EntityIdentifier, DbEntityIdentifier>(
                     data.Identifiers.Where(o => o != null && !o.IsEmpty()),
@@ -358,52 +360,75 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
             // Relationships
             if (data.Relationships != null)
+            {
+                data.Relationships.RemoveAll(o => o.IsEmpty());
                 base.UpdateVersionedAssociatedItems<Core.Model.Entities.EntityRelationship, DbEntityRelationship>(
-                   data.Relationships.Distinct(new EntityRelationshipPersistenceService.Comparer()).Where(o => o != null && !o.InversionIndicator && !o.IsEmpty()).ToList(),
-                    retVal,
-                    context);
+                       data.Relationships.Distinct(new EntityRelationshipPersistenceService.Comparer()).Where(o => o != null && !o.InversionIndicator && !o.IsEmpty()).ToList(),
+                        retVal,
+                        context);
+            }
 
             // Telecoms
             if (data.Telecoms != null)
+            {
+                data.Telecoms.RemoveAll(o => o.IsEmpty());
+
                 base.UpdateVersionedAssociatedItems<Core.Model.Entities.EntityTelecomAddress, DbTelecomAddress>(
                    data.Telecoms.Where(o => o != null && !o.IsEmpty()),
                     retVal,
                     context);
+            }
 
             // Extensions
             if (data.Extensions != null)
+            {
+                data.Extensions.RemoveAll(o => o.IsEmpty());
                 base.UpdateVersionedAssociatedItems<Core.Model.DataTypes.EntityExtension, DbEntityExtension>(
                    data.Extensions.Where(o => o != null && !o.IsEmpty()),
                     retVal,
                     context);
+            }
 
             // Names
             if (data.Names != null)
+            {
+                data.Names.RemoveAll(o => o.IsEmpty());
                 base.UpdateVersionedAssociatedItems<Core.Model.Entities.EntityName, DbEntityName>(
                    data.Names.Where(o => o != null && !o.IsEmpty()),
                     retVal,
                     context);
+            }
 
             // Addresses
             if (data.Addresses != null)
+            {
+                data.Addresses.RemoveAll(o => o.IsEmpty());
+
                 base.UpdateVersionedAssociatedItems<Core.Model.Entities.EntityAddress, DbEntityAddress>(
                    data.Addresses.Where(o => o != null && !o.IsEmpty()),
                     retVal,
                     context);
+            }
 
             // Notes
             if (data.Notes != null)
+            {
+                data.Notes.RemoveAll(o => o.IsEmpty());
                 base.UpdateVersionedAssociatedItems<Core.Model.DataTypes.EntityNote, DbEntityNote>(
                    data.Notes.Where(o => o != null && !o.IsEmpty()),
                     retVal,
                     context);
+            }
 
             // Tags
             if (data.Tags != null)
+            {
+                data.Tags.RemoveAll(o => o.IsEmpty());
                 base.UpdateAssociatedItems<Core.Model.DataTypes.EntityTag, DbEntityTag>(
                    data.Tags.Where(o => o != null && !o.IsEmpty() && !o.TagKey.StartsWith("$")),
                     retVal,
                     context);
+            }
 
             // Persist policies
             if (data.Policies != null && data.Policies.Any())
@@ -578,6 +603,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             // Identifiers
             if (data.Identifiers != null)
             {
+                data.Identifiers.RemoveAll(o => o.IsEmpty());
+
                 this.VerifyIdentities(context, data, assertedCreator);
 
                 // Validate unique values for IDs
@@ -589,52 +616,79 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
             // Relationships
             if (data.Relationships != null)
+            {
+                data.Relationships.RemoveAll(o => o.IsEmpty());
+
                 base.UpdateVersionedAssociatedItems<Core.Model.Entities.EntityRelationship, DbEntityRelationship>(
                    data.Relationships,
                     retVal,
                     context);
+            }
 
             // Telecoms
             if (data.Telecoms != null)
+            {
+                data.Telecoms.RemoveAll(o => o.IsEmpty());
+
                 base.UpdateVersionedAssociatedItems<Core.Model.Entities.EntityTelecomAddress, DbTelecomAddress>(
                    data.Telecoms.Where(o => o != null && !o.IsEmpty()),
                     retVal,
                     context);
+            }
 
             // Extensions
             if (data.Extensions != null)
+            {
+                data.Extensions.RemoveAll(o => o.IsEmpty());
                 base.UpdateVersionedAssociatedItems<Core.Model.DataTypes.EntityExtension, DbEntityExtension>(
                    data.Extensions.Where(o => o != null && !o.IsEmpty()),
                     retVal,
                     context);
+            }
 
             // Names
             if (data.Names != null)
+            {
+                data.Names.RemoveAll(o => o.IsEmpty());
+
                 base.UpdateVersionedAssociatedItems<Core.Model.Entities.EntityName, DbEntityName>(
                    data.Names.Where(o => o != null && !o.IsEmpty()),
                     retVal,
                     context);
+            }
 
             // Addresses
             if (data.Addresses != null)
+            {
+                data.Addresses.RemoveAll(o => o.IsEmpty());
+
                 base.UpdateVersionedAssociatedItems<Core.Model.Entities.EntityAddress, DbEntityAddress>(
                    data.Addresses.Where(o => o != null && !o.IsEmpty()),
                     retVal,
                     context);
+            }
 
             // Notes
             if (data.Notes != null)
+            {
+                data.Notes.RemoveAll(o => o.IsEmpty());
+
                 base.UpdateVersionedAssociatedItems<Core.Model.DataTypes.EntityNote, DbEntityNote>(
                    data.Notes.Where(o => o != null && !o.IsEmpty()),
                     retVal,
                     context);
+            }
 
             // Tags
             if (data.Tags != null)
+            {
+                data.Tags.RemoveAll(o => o.IsEmpty());
+
                 base.UpdateAssociatedItems<Core.Model.DataTypes.EntityTag, DbEntityTag>(
                    data.Tags.Where(o => o != null && !o.IsEmpty() && !o.TagKey.StartsWith("$")),
                     retVal,
                     context);
+            }
 
             // Persist policies
             if (data.Policies != null && data.Policies.Any())
@@ -750,6 +804,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         public override Entity UpdateInternal(DataContext context, Entity data)
         {
+            // HACK: If we're 
             switch (data.ClassConceptKey.ToString().ToLowerInvariant())
             {
                 case EntityClassKeyStrings.Device:

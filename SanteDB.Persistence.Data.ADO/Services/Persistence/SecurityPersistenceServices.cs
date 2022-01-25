@@ -305,9 +305,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// </summary>
         public override Core.Model.Security.SecurityPolicy UpdateInternal(DataContext context, Core.Model.Security.SecurityPolicy data)
 		{
-            // Only public objects (created by the user) can be deleted
-            if(!data.IsPublic)
-			    throw new AdoFormalConstraintException(AdoFormalConstraintType.UpdatedReadonlyObject);
+           
             return base.UpdateInternal(context, data);
 		}
 	}

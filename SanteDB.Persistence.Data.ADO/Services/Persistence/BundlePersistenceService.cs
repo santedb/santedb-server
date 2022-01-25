@@ -348,7 +348,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 }
             }
 
-            return data;
+            return reorganized;
         }
 
         /// <summary>
