@@ -99,4 +99,11 @@ $$ LANGUAGE plpgsql;
 
 SELECT rfrsh_fti();
 
+CREATE INDEX psn_dob_idx ON psn_tbl (dob);
+CREATE INDEX psn_gndr_idx ON psn_tbl (gndr_cd_id);
+DROP INDEX phon_val_phon_val_idx;
+DROP INDEX phon_val_val_btr_idx;
+CREATE INDEX phon_val_val_soundex_idx ON phon_val_tbl (SOUNDEX(val));
+DROP INDEX en_addr_cmp_val_val_idx;
+CREATE INDEX ent_addr_cmp_val_gin_idx ON ent_addr_cmp_val_tbl USING GIN (val gin_trgm_ops);
 SELECT REG_PATCH('20220112-01');
