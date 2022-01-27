@@ -128,7 +128,7 @@ namespace SanteDB.Server.Core.Rest
 
                 foreach (var ep in config.Endpoints)
                 {
-                    var se = retVal.AddServiceEndpoint(new Uri(ep.Address), ep.Contract, new RestHttpBinding());
+                    var se = retVal.AddServiceEndpoint(new Uri(ep.Address), ep.Contract, new RestHttpBinding(this.m_configuration.UseSeparateHttpPool));
                     foreach (var bhvr in ep.Behaviors)
                     {
                         if (bhvr.Type == null)
