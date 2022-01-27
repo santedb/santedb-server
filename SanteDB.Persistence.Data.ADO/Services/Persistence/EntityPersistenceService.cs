@@ -863,6 +863,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             {
                 var k = this.QueryKeysInternal(connection, expression, offset, 1000, out totalResults).ToArray();
                 this.BulkPurgeInternal(connection, k);
+
                 offset += k.Length;
             }
         }
@@ -951,6 +952,8 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             }
 
             context.ResetSequence("ENT_VRSN_SEQ", context.Query<DbEntityVersion>(o => true).Max(o => o.VersionSequenceId));
+            this.PurgeCache(keysToPurge);
+
         }
 
         /// <summary>

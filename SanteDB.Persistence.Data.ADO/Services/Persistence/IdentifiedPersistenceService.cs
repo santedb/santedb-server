@@ -19,6 +19,7 @@
  * Date: 2021-8-27
  */
 
+using SanteDB.Core;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Query;
@@ -222,7 +223,19 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 var keys = keysToPurge.Skip(ofs).Take(100).ToArray();
                 ofs += 100;
                 connection.Delete<TDomain>(o => keys.Contains(o.Key));
-                
+            }
+            this.PurgeCache(keysToPurge);
+        }
+
+        /// <summary>
+        /// Purge cache of all keys
+        /// </summary>
+        protected void PurgeCache(Guid[] keysToPurge)
+        {
+            var cache = ApplicationServiceContext.Current.GetService<IDataCachingService>();
+            foreach(var k in keysToPurge)
+            {
+                cache.Remove(cache.GetCacheItem(k));
             }
         }
 

@@ -249,6 +249,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
             context.ResetSequence("CD_VRSN_SEQ",
                 context.Query<DbConceptVersion>(o => true).Max(o => o.VersionSequenceId));
+
+            this.PurgeCache(keysToPurge);
+
         }
 
         /// <summary>
