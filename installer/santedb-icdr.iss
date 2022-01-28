@@ -238,7 +238,6 @@ Source: ..\bin\Release\Data\SQL\AuditDB\FBSQL\*.sql; DestDir: {app}\data\sql\fbs
 ; Matching Infrastructure
 Source: ..\bin\Release\Phonix.dll; DestDir: {app}; Components: match
 Source: ..\bin\Release\SanteDB.Matcher.dll; DestDir: {app}; Components: match
-Source: ..\santedb-match\SanteDB.Matcher.Test\Matching\example.xml; DestDir: {app}\matching; Components: match
 
 ; OAUTH
 Source: ..\bin\Release\SanteDB.Authentication.OAuth2.dll; DestDir: {app}; Components: msg\auth
