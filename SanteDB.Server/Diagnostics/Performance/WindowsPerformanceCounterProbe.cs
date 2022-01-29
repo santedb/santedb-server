@@ -79,5 +79,11 @@ namespace SanteDB.Server.Diagnostics.Performance
         {
             this.m_windowsCounter.Dispose();
         }
+
+        /// <summary>
+        /// Gets the unit
+        /// </summary>
+        public override string Unit => "%";
+
     }
 }

@@ -71,5 +71,10 @@ namespace SanteDB.Server.Diagnostics.Performance
         /// Gets the value
         /// </summary>
         object IDiagnosticsProbe.Value => this.Value;
+
+        /// <summary>
+        /// Gets the units 
+        /// </summary>
+        string IDiagnosticsProbe.Unit => null;
     }
 }
