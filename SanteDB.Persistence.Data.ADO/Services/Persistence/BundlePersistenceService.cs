@@ -269,8 +269,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             var reorganized = this.ReorganizeForInsert(data);
             this.m_tracer.TraceVerbose("After reorganization has {0} objects...", reorganized.Item.Count);
 
-            context.PrepareStatements = this.m_settingsProvider.GetConfiguration().PrepareStatements;
-
             // Ensure that provenance objects match
             var operationalItems = reorganized.Item.Where(o => reorganized.FocalObjects.Any(k => o.Key == k)).ToArray();
             var provenance = operationalItems.OfType<NonVersionedEntityData>().Select(o => o.UpdatedByKey.GetValueOrDefault()).Union(operationalItems.OfType<BaseEntityData>().Select(o => o.CreatedByKey.GetValueOrDefault())).Where(o => o != Guid.Empty);

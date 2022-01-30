@@ -150,7 +150,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             var results = this.DoQueryInternal(context, query, queryId, offset, count, out resultCount, orderBy, countResults).ToList();
             totalResults = resultCount;
 
-            if (!this.m_settingsProvider.GetConfiguration().SingleThreadFetch && results.Count > 20)
+            if (!this.m_settingsProvider.GetConfiguration().SingleThreadFetch && (results.Count >= 10 || queryId != Guid.Empty))
             {
                 return results.AsParallel().AsOrdered().Select(o =>
                 {

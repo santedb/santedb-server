@@ -641,8 +641,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     this.m_tracer.TraceEvent(EventLevel.Verbose, "QUERY {0}", query);
 
                     // Is there an obsoletion item already specified?
-                    if ((count ?? 1000) > 25 && this.m_settingsProvider.GetConfiguration().PrepareStatements)
-                        connection.PrepareStatements = true;
+                    
                     if (fastQuery)
                     {
                         connection.AddData("loadFast", true);
