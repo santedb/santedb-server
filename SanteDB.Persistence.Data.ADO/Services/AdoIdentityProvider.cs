@@ -440,7 +440,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                     // Obsolete
                     if (lockout)
-                        user.Lockout = DateTime.MaxValue.AddDays(-10);
+                        user.Lockout = DateTimeOffset.MaxValue.AddDays(-10);
                     else
                         user.Lockout = null;
 
@@ -463,7 +463,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             catch (Exception e)
             {
                 this.m_traceSource.TraceEvent(EventLevel.Error, e.ToString());
-                throw new DataPersistenceException($"Error setting lockout for {userName}");
+                throw new DataPersistenceException($"Error setting lockout for {userName}", e);
             }
         }
 

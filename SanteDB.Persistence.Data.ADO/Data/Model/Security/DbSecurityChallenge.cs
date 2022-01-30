@@ -77,7 +77,7 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Security
         /// The time that the challenge will expire
         /// </summary>
         [Column("exp_utc")]
-        public DateTime ExpiryTime { get; set; }
+        public DateTimeOffset ExpiryTime { get; set; }
 
     }
 }
