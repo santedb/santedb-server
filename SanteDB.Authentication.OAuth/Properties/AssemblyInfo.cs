@@ -54,7 +54,7 @@ using System.Runtime.InteropServices;
 //
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
-// [assembly: AssemblyVersion("2.1.3.*")][assembly: AssemblyInformationalVersion("Queenston")]
-[assembly: AssemblyInformationalVersion("Queenston")]
+// [assembly: AssemblyVersion("2.1.3.*")][assembly: AssemblyInformationalVersion("Regina")]
+[assembly: AssemblyInformationalVersion("Regina")]
 [assembly: Plugin(EnableByDefault = true, Environment = PluginEnvironment.Server, Group = FeatureGroup.Security)]
 [assembly: PluginTraceSource(OAuthConstants.TraceSourceName)]
