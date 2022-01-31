@@ -370,9 +370,9 @@ namespace SanteDB.Authentication.OAuth2.Rest
 
             // Add JTI
             claims.Add(new SanteDBClaim("jti", BitConverter.ToString(session.Id).Replace("-", "")));
-            claims.Add(new SanteDBClaim("iat", (session.NotBefore.ToUniversalTime() - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds.ToString()));
+            claims.Add(new SanteDBClaim("iat", session.NotBefore.ToUnixTimeSeconds().ToString()));
             claims.RemoveAll(o => String.IsNullOrEmpty(o.Value));
-            claims.Add(new SanteDBClaim("exp", (session.NotAfter.ToUniversalTime() - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds.ToString()));
+            claims.Add(new SanteDBClaim("exp", session.NotAfter.ToUnixTimeSeconds().ToString()));
             claims.RemoveAll(o => String.IsNullOrEmpty(o.Value));
             claims.Add(new SanteDBClaim("sub", session.Claims.First(o => o.Type == SanteDBClaimTypes.Sid).Value)); // Subject is the first security identifier
             claims.RemoveAll(o => o.Type == SanteDBClaimTypes.Sid);
@@ -463,7 +463,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                     TokenType = OAuthConstants.BearerTokenType,
                     AccessToken = sessionId,
                     IdentityToken = handler.WriteToken(jwt),
-                    ExpiresIn = (int)(session.NotAfter.Subtract(DateTime.Now)).TotalMilliseconds,
+                    ExpiresIn = (int)(session.NotAfter.Subtract(DateTimeOffset.Now)).TotalMilliseconds,
                     RefreshToken = refreshToken // TODO: Need to write a SessionProvider for this so we can keep track of refresh tokens 
                 };
             else
@@ -471,7 +471,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 {
                     TokenType = OAuthConstants.JwtTokenType,
                     AccessToken = handler.WriteToken(jwt),
-                    ExpiresIn = (int)(session.NotAfter.Subtract(DateTime.Now)).TotalMilliseconds,
+                    ExpiresIn = (int)(session.NotAfter.Subtract(DateTimeOffset.Now)).TotalMilliseconds,
                     RefreshToken = refreshToken // TODO: Need to write a SessionProvider for this so we can keep track of refresh tokens 
                 };
 
@@ -511,7 +511,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                     };
                 else
                 {
-                    DateTime notBefore = DateTime.Parse(principal.FindFirst(SanteDBClaimTypes.AuthenticationInstant).Value), notAfter = DateTime.Parse(principal.FindFirst(SanteDBClaimTypes.Expiration).Value);
+                    DateTime notBefore = principal.FindFirst(SanteDBClaimTypes.AuthenticationInstant).AsDateTime(), notAfter = principal.FindFirst(SanteDBClaimTypes.Expiration).AsDateTime();
 
                     var jwt = this.HydrateToken(RestOperationContext.Current.Data[SanteDB.Rest.Common.Security.TokenAuthorizationAccessBehavior.RestPropertyNameSession] as ISession);
                     return new OAuthTokenResponse()
@@ -550,7 +550,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
             var responseMode = RestOperationContext.Current.IncomingRequest.QueryString["response_mode"] ?? authorization["response_mode"] ?? "query";
             var nonce = RestOperationContext.Current.IncomingRequest.QueryString["nonce"] ?? authorization["nonce"];
 
-            AuditData audit = new AuditData(DateTime.Now, ActionType.Execute, OutcomeIndicator.Success, EventIdentifierType.SecurityAlert, AuditUtil.CreateAuditActionCode(EventTypeCodes.UserAuthentication));
+            AuditData audit = new AuditData(DateTimeOffset.Now, ActionType.Execute, OutcomeIndicator.Success, EventIdentifierType.SecurityAlert, AuditUtil.CreateAuditActionCode(EventTypeCodes.UserAuthentication));
             AuditUtil.AddLocalDeviceActor(audit);
 
             try

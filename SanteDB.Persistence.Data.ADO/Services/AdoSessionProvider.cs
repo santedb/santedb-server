@@ -403,9 +403,9 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                         if (dbSession == null)
                             throw new SecuritySessionException(SessionExceptionType.NotEstablished, $"Session {BitConverter.ToString(sessionToken)} not found", null);
-                        else if (dbSession.NotAfter < DateTime.Now)
+                        else if (dbSession.NotAfter < DateTimeOffset.Now)
                             throw new SecuritySessionException(SessionExceptionType.Expired, new AdoSecuritySession(dbSession), $"Session {BitConverter.ToString(sessionToken)} is expired", null);
-                        else if (dbSession.NotBefore > DateTime.Now)
+                        else if (dbSession.NotBefore > DateTimeOffset.Now)
                             throw new SecuritySessionException(SessionExceptionType.NotYetValid, new AdoSecuritySession(dbSession), $"Session {BitConverter.ToString(sessionToken)} is expired", null);
                         else
                         {

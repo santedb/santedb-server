@@ -72,7 +72,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
         [Test]
         public void TestConstructLocalParameters()
         {
-            SqlStatement sql = new SqlStatement<DbActVersion>(new PostgreSQLProvider()).SelectFrom().Where("act_id = ?", Guid.NewGuid()).And("act_utc < ?", DateTime.Now).Build();
+            SqlStatement sql = new SqlStatement<DbActVersion>(new PostgreSQLProvider()).SelectFrom().Where("act_id = ?", Guid.NewGuid()).And("act_utc < ?", DateTimeOffset.Now).Build();
             Assert.IsTrue(sql.SQL.Contains("AND"));
             Assert.IsTrue(sql.SQL.Contains("act_id"));
             Assert.IsTrue(sql.SQL.Contains("act_utc"));
@@ -107,7 +107,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
             Guid mg = Guid.NewGuid();
             Stopwatch sw = new Stopwatch();
             sw.Start();
-            SqlStatement sql = new SqlStatement<DbActVersion>(new PostgreSQLProvider()).SelectFrom().Where(o => o.Key == mg || o.Key == Guid.NewGuid() && o.CreationTime <= DateTime.Now).Build();
+            SqlStatement sql = new SqlStatement<DbActVersion>(new PostgreSQLProvider()).SelectFrom().Where(o => o.Key == mg || o.Key == Guid.NewGuid() && o.CreationTime <= DateTimeOffset.Now).Build();
             sw.Stop();
 
             Assert.IsTrue(sql.SQL.Contains("AND"));

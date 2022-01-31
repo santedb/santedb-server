@@ -190,7 +190,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             if (user == null)
                                 throw new KeyNotFoundException(userName);
 
-                            var claims = dataContext.Query<DbUserClaim>(o => o.SourceKey == user.Key && (o.ClaimType == SanteDBClaimTypes.SanteDBOTAuthCode || o.ClaimType == SanteDBClaimTypes.SanteDBCodeAuth) && (!o.ClaimExpiry.HasValue || o.ClaimExpiry > DateTime.Now));
+                            var claims = dataContext.Query<DbUserClaim>(o => o.SourceKey == user.Key && (o.ClaimType == SanteDBClaimTypes.SanteDBOTAuthCode || o.ClaimType == SanteDBClaimTypes.SanteDBCodeAuth) && (!o.ClaimExpiry.HasValue || o.ClaimExpiry > DateTimeOffset.Now));
                             DbUserClaim tfaClaim = claims.FirstOrDefault(o => o.ClaimType == SanteDBClaimTypes.SanteDBOTAuthCode),
                                 noPassword = claims.FirstOrDefault(o => o.ClaimType == SanteDBClaimTypes.SanteDBCodeAuth);
 
@@ -210,7 +210,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                     ici.AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, PermissionPolicyIdentifiers.LoginPasswordOnly));
                                     ici.AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, PermissionPolicyIdentifiers.ReadMetadata));
                                     ici.RemoveClaim(retVal.FindFirst(SanteDBClaimTypes.Expiration));
-                                    ici.AddClaim(new SanteDBClaim(SanteDBClaimTypes.Expiration, DateTime.Now.AddMinutes(5).ToString("o"))); // Special case, password
+                                    ici.AddClaim(new SanteDBClaim(SanteDBClaimTypes.Expiration, DateTimeOffset.Now.AddMinutes(5).ToString("o"))); // Special case, password
                                 }
                             }
                             else if (!String.IsNullOrEmpty(password))
@@ -300,7 +300,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             // Set expiration
                             var passwordAge = this.m_securityConfiguration?.GetSecurityPolicy<Int32>(SecurityPolicyIdentification.MaxPasswordAge, 3650);
                             if (passwordAge.HasValue)
-                                user.PasswordExpiration = DateTime.Now.AddDays(passwordAge.Value);
+                                user.PasswordExpiration = DateTimeOffset.Now.AddDays(passwordAge.Value);
                             dataContext.Update(user);
                             tx.Commit();
                         }
@@ -507,14 +507,14 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                 SourceKey = user.Key
                             };
                             if (expire.HasValue)
-                                existingClaim.ClaimExpiry = DateTime.Now.Add(expire.Value);
+                                existingClaim.ClaimExpiry = DateTimeOffset.Now.Add(expire.Value);
                             dataContext.Insert(existingClaim);
                         }
                         else
                         {
                             existingClaim.ClaimValue = claimValue;
                             if (expire.HasValue)
-                                existingClaim.ClaimExpiry = DateTime.Now.Add(expire.Value);
+                                existingClaim.ClaimExpiry = DateTimeOffset.Now.Add(expire.Value);
                             dataContext.Update(existingClaim);
                         }
                     }
@@ -619,9 +619,9 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     List<IClaimsIdentity> identities = new List<IClaimsIdentity>(3);
                     if (securitySession == null)
                         throw new SecuritySessionException(SessionExceptionType.NotEstablished, "Session not found", null);
-                    if (securitySession.NotAfter < DateTime.Now)
+                    if (securitySession.NotAfter < DateTimeOffset.Now)
                         throw new SecuritySessionException(SessionExceptionType.Expired, "Session expired", null);
-                    else if (securitySession.NotBefore > DateTime.Now)
+                    else if (securitySession.NotBefore > DateTimeOffset.Now)
                         throw new SecuritySessionException(SessionExceptionType.NotYetValid, "Session not yet valid", null);
 
                     if (securitySession.ApplicationKey != null)

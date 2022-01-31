@@ -229,7 +229,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                     ActionCode = (ActionType)res.Object1.ActionCode,
                     EventIdentifier = (EventIdentifierType)res.Object1.EventIdentifier,
                     Outcome = (OutcomeIndicator)res.Object1.Outcome,
-                    Timestamp = res.Object1.Timestamp.DateTime,
+                    Timestamp = res.Object1.Timestamp,
                     Key = res.Object1.Key
                 };
 
@@ -377,7 +377,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                     if (eventId != null)
                         dbAudit.EventTypeCode = this.GetOrCreateAuditCode(context, eventId).Key;
 
-                    dbAudit.CreationTime = DateTime.Now;
+                    dbAudit.CreationTime = DateTimeOffset.Now;
                     storageData.Key = Guid.NewGuid();
                     dbAudit.Key = storageData.Key.Value;
                     context.Insert(dbAudit);
