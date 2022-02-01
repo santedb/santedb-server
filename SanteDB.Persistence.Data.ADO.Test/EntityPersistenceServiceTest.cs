@@ -202,7 +202,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
 
             var afterTest = base.DoTestInsert(toBeKilled, s_authorization);
             var id = afterTest.Key;
-            Assert.AreEqual(StatusKeys.Active, afterTest.StatusConcept.Key);
+            Assert.AreEqual(StatusKeys.Active, afterTest.LoadProperty(o=>o.StatusConcept).Key);
 
             // Obsolete
             var idp = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Entity>>();

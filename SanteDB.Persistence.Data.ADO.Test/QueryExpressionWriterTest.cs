@@ -79,7 +79,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
             Assert.IsTrue(sql.SQL.Contains("SELECT act_vrsn_tbl.neg_ind,act_vrsn_tbl.act_utc,act_vrsn_tbl.act_start_utc,act_vrsn_tbl.act_stop_utc,act_vrsn_tbl.rsn_cd_id,act_vrsn_tbl.sts_cd_id,act_vrsn_tbl.typ_cd_id,act_vrsn_tbl.act_vrsn_id,act_vrsn_tbl.act_id,act_vrsn_tbl.vrsn_seq_id,act_vrsn_tbl.rplc_vrsn_id,act_vrsn_tbl.crt_prov_id,act_vrsn_tbl.obslt_prov_id,act_vrsn_tbl.crt_utc,act_vrsn_tbl.obslt_utc FROM act_vrsn_tbl"));
             Assert.AreEqual(2, sql.Arguments.Count());
             Assert.IsAssignableFrom<Guid>(sql.Arguments.First());
-            Assert.IsAssignableFrom<DateTime>(sql.Arguments.Last());
+            Assert.IsAssignableFrom<DateTimeOffset>(sql.Arguments.Last());
         }
 
         /// <summary>

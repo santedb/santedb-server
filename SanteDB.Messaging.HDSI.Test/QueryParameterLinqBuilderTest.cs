@@ -88,7 +88,7 @@ namespace SanteDB.Messaging.HDSI.Test
 		[Test]
 		public void TestBuildFuzzyDate()
 		{
-            String expected = $"o => ((o.DateOfBirth != null) AndAlso (((o.DateOfBirth.Value >= Convert({new DateTime(2015,01,01)})) AndAlso (o.DateOfBirth.Value <= Convert({new DateTime(2015, 12, 31, 23, 59, 59)}))) == True))";
+            String expected = $"o => ((o.DateOfBirth != null) AndAlso (((o.DateOfBirth.Value >= {new DateTime(2015,01,01)}) AndAlso (o.DateOfBirth.Value <= {new DateTime(2015, 12, 31, 23, 59, 59)})) == True))";
 
             NameValueCollection httpQueryParameters = new NameValueCollection();
 			httpQueryParameters.Add("dateOfBirth", "~2015");
@@ -381,10 +381,10 @@ namespace SanteDB.Messaging.HDSI.Test
             QueryFilterExtensions.AddExtendedFilter(new SimpleQueryExtensionEx());
             NameValueCollection httpQueryParameters = new NameValueCollection();
             httpQueryParameters.Add("dateOfBirth", ":(testEx|$input.relationship[Mother].target@Patient.dateOfBirth)>2y");
-            var expr = QueryExpressionParser.BuildLinqExpression<Patient>(httpQueryParameters, new System.Collections.Generic.Dictionary<string, Func<Object>>()
+            var expr = QueryExpressionParser.BuildLinqExpression<Patient>(httpQueryParameters, "o",  variables: new System.Collections.Generic.Dictionary<string, Func<Object>>()
             {
                 { "input" , () => new Patient() { DateOfBirth = DateTime.Parse("2018-01-01") } }
-            });
+            }, forceLoad: true);
             Assert.AreEqual(expected, expr.ToString());
         }
 
@@ -398,7 +398,7 @@ namespace SanteDB.Messaging.HDSI.Test
             QueryFilterExtensions.AddExtendedFilter(new SimpleQueryExtensionEx());
             NameValueCollection httpQueryParameters = new NameValueCollection();
             httpQueryParameters.Add("dateOfBirth", ":(testEx|$_.relationship[Mother].target@Patient.dateOfBirth)>P20Y");
-            var expr = QueryExpressionParser.BuildLinqExpression<Patient>(httpQueryParameters);
+            var expr = QueryExpressionParser.BuildLinqExpression<Patient>(httpQueryParameters, "o", safeNullable: true, forceLoad: true);
             Assert.AreEqual(expected, expr.ToString());
         }
     }

@@ -138,9 +138,15 @@ namespace SanteDB.Configurator
                 ConfigurationContext.Current.Apply(frmMain);
                 Application.Run(frmMain);
             }
-            catch(Exception e)
+            catch(TargetInvocationException e)
+            {
+                MessageBox.Show(e.InnerException.Message, "Error Starting Config Tool");
+
+            }
+            catch (Exception e)
             {
                 Console.WriteLine("Configuration Tooling Fatal Error: {0}", e);
+                MessageBox.Show(e.Message, "Error Starting Config Tool");
             }
             finally
             {

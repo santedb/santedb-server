@@ -67,7 +67,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
             };
             var afterTest = base.DoTestInsert(simpleConcept, s_authorization);
             Assert.AreEqual("TESTCODE1", afterTest.Mnemonic);
-            Assert.AreEqual("Other", afterTest.Class.Mnemonic);
+            Assert.AreEqual("Other", afterTest.LoadProperty(o=>o.Class).Mnemonic);
             Assert.IsTrue(afterTest.IsReadonly);
         }
 
@@ -95,7 +95,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
             // Insert
             var afterTest = base.DoTestInsert(namedConcept, s_authorization);
             Assert.AreEqual("TESTCODE2", afterTest.Mnemonic);
-            Assert.AreEqual("Other", afterTest.Class.Mnemonic);
+            Assert.AreEqual("Other", afterTest.LoadProperty(o=>o.Class).Mnemonic);
             Assert.IsFalse(afterTest.IsReadonly);
             Assert.AreEqual(1, afterTest.LoadCollection<ConceptName>("ConceptNames").Count());
             Assert.AreEqual("en", afterTest.ConceptNames[0].Language);
@@ -204,7 +204,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
             // Insert
             var afterTest = base.DoTestInsert(refTermConcept, s_authorization);
             Assert.AreEqual("TESTCODE5", afterTest.Mnemonic);
-            Assert.AreEqual("Other", afterTest.Class.Mnemonic);
+            Assert.AreEqual("Other", afterTest.LoadProperty(o=>o.Class).Mnemonic);
             Assert.IsFalse(afterTest.IsReadonly);
             Assert.AreEqual(1, afterTest.LoadCollection<ConceptName>("ConceptNames").Count());
             Assert.AreEqual(1, afterTest.ReferenceTerms.Count);
