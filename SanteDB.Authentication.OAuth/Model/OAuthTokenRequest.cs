@@ -19,12 +19,14 @@
  * Date: 2021-8-27
  */
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SanteDB.Authentication.OAuth2.Model
 {
     /// <summary>
     /// A token request
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class OAuthTokenRequest
     {
         ///<summary>Grant type</summary> 

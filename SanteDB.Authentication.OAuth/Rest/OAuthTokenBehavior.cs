@@ -39,6 +39,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IdentityModel.Tokens;
 using System.IO;
 using System.Linq;
@@ -75,6 +76,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
     /// </summary>
     /// <remarks>An Access Control Service and Token Service implemented using OAUTH 2.0</remarks>
     [ServiceBehavior(Name = "OAuth2", InstanceMode = ServiceInstanceMode.Singleton)]
+    [ExcludeFromCodeCoverage]
     public class OAuthTokenBehavior : IOAuthTokenContract
     {
 

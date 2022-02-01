@@ -51,6 +51,7 @@ namespace SanteDB.Messaging.HDSI
     /// </remarks>
     [Description("The primary iCDR Health Data Messaging Service (HDSI) allows sharing of RIM objects in XML or JSON over HTTP")]
     [ApiServiceProvider("Health Data Services Interface", typeof(HdsiServiceBehavior), configurationType: typeof(HdsiConfigurationSection), required: true)]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage] // Model classes - ignored
     public class HdsiMessageHandler : IDaemonService, IApiEndpointProvider
     {
         /// <summary>

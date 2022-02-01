@@ -20,6 +20,7 @@
  */
 using Newtonsoft.Json;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SanteDB.Authentication.OAuth2.Model
 {
@@ -27,6 +28,7 @@ namespace SanteDB.Authentication.OAuth2.Model
     /// OAuth token response
     /// </summary>
     [JsonObject]
+    [ExcludeFromCodeCoverage]
     public class OAuthTokenResponse
     {
 
