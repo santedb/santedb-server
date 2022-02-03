@@ -341,8 +341,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             {
                 if (retVal != null)
                     this.m_tracer.TraceEvent(EventLevel.Error, context.GetQueryLiteral(retVal.ToSqlStatement()));
-                context.Dispose(); // No longer important
-
                 throw new DataPersistenceException("Error executing query", ex);
             }
             finally
