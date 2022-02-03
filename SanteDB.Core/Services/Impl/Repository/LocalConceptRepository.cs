@@ -127,7 +127,7 @@ namespace SanteDB.Server.Core.Services.Impl
             else
                 retVal = refTermService.Query(o => o.ReferenceTerm.CodeSystem.Authority == codeSystemDomain && o.ReferenceTerm.Mnemonic == code && o.ObsoleteVersionSequenceId == null, AuthenticationContext.Current.Principal);
 
-            adhocCache?.Add($"{code}.{codeSystemDomain}", retVal, new TimeSpan(0, 0, 30));
+            adhocCache?.Add($"{code}.{codeSystemDomain}", retVal);
             return retVal;
         }
 
@@ -159,7 +159,7 @@ namespace SanteDB.Server.Core.Services.Impl
             {
                 var obj = base.Find(o => o.Mnemonic == mnemonic).FirstOrDefault();
                 if (obj != null)
-                    adhocCache?.Add($"concept.{mnemonic}", obj.Key.Value, new TimeSpan(1, 0, 0));
+                    adhocCache?.Add($"concept.{mnemonic}", obj.Key.Value);
                 return obj;
             }
         }
@@ -202,7 +202,7 @@ namespace SanteDB.Server.Core.Services.Impl
             var refTermEnt = refTermService.Query(filterExpression, 0, 1, out int _, AuthenticationContext.Current.Principal).FirstOrDefault();
             retVal = refTermEnt?.LoadProperty<ReferenceTerm>("ReferenceTerm");
 
-            adhocCache?.Add($"refTerm.{conceptId}.{codeSystem}", retVal, new TimeSpan(0, 0, 30));
+            adhocCache?.Add($"refTerm.{conceptId}.{codeSystem}", retVal);
 
             return retVal;
         }
@@ -326,7 +326,7 @@ namespace SanteDB.Server.Core.Services.Impl
                 refTermEnt = refTermService.Query(o => (o.ReferenceTerm.CodeSystem.Authority == codeSystem) && o.SourceEntity.Mnemonic == conceptMnemonic && o.ObsoleteVersionSequenceId == null && o.RelationshipTypeKey == ConceptRelationshipTypeKeys.SameAs, 0, 1, out tr, AuthenticationContext.Current.Principal).FirstOrDefault();
             retVal = refTermEnt.LoadProperty<ReferenceTerm>("ReferenceTerm");
 
-            adhocCache?.Add($"refTerm.{conceptMnemonic}.{codeSystem}", retVal, new TimeSpan(0, 0, 30));
+            adhocCache?.Add($"refTerm.{conceptMnemonic}.{codeSystem}", retVal);
 
             return retVal;
         }

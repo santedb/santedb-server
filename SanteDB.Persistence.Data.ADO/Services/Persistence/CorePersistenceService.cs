@@ -150,46 +150,14 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             var results = this.DoQueryInternal(context, query, queryId, offset, count, out resultCount, orderBy, countResults).ToList();
             totalResults = resultCount;
 
-            if (!this.m_settingsProvider.GetConfiguration().SingleThreadFetch && (results.Count >= 10 || queryId != Guid.Empty))
-            {
-                return results.AsParallel().WithDegreeOfParallelism(2).AsOrdered().Select(o =>
-                {
-                    var subContext = context;
-                    var newSubContext = results.Count() > 1;
-                    var idx = results.IndexOf(o);
-                    try
-                    {
-                        if (newSubContext) subContext = subContext.OpenClonedContext();
 
-                        if (o is Guid)
-                            return this.Get(subContext, (Guid)o);
-                        else
-                            return this.CacheConvert(o, subContext);
-                    }
-                    catch (Exception e)
-                    {
-                        this.m_tracer.TraceEvent(EventLevel.Error, "Error performing sub-query: {0}", e);
-                        throw new DataPersistenceException($"Error performing sub-query {query}", e);
-                    }
-                    finally
-                    {
-                        if (newSubContext)
-                        {
-                            foreach (var i in subContext.CacheOnCommit)
-                                context.AddCacheCommit(i);
-                            subContext.Dispose();
-                        }
-                    }
-                });
-            }
-            else
-                return results.Select(o =>
-                {
-                    if (o is Guid)
-                        return this.Get(context, (Guid)o);
-                    else
-                        return this.CacheConvert(o, context);
-                });
+            return results.Select(o =>
+            {
+                if (o is Guid)
+                    return this.Get(context, (Guid)o);
+                else
+                    return this.CacheConvert(o, context);
+            });
         }
 
         /// <summary>
@@ -222,7 +190,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 {
                     var query = q;
                     SqlStatement domainQuery = null;
-                    
+
 
                     // Is obsoletion time already specified? If so and the entity is an iversioned entity we don't want obsolete data coming back
                     var queryString = query.ToString();
@@ -332,7 +300,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 if (retVal != null)
                     this.m_tracer.TraceEvent(EventLevel.Error, context.GetQueryLiteral(retVal.ToSqlStatement()));
                 context.Dispose(); // No longer important
-                throw new DataPersistenceException($"Error executing query {String.Join("UNION", queries.Select(o=>o.ToString()))}", ex);
+                throw new DataPersistenceException($"Error executing query {String.Join("UNION", queries.Select(o => o.ToString()))}", ex);
             }
 #if DEBUG
             finally
@@ -626,7 +594,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     this.Copy(keysToCopy, connection, toContext);
                 }
             }
-            catch(DbException e)
+            catch (DbException e)
             {
                 throw new DataPersistenceException("Could copy keys to data context", this.TranslateDbException(e));
             }

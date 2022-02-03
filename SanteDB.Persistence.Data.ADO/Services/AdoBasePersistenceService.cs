@@ -655,7 +655,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     if (unionWith != null)
                         connection.AddData("UNION", unionWith);
 
-                    var results = this.Query(connection, preArgs.Query, queryId, preArgs.Offset, preArgs.Count ?? 1000, out totalCount, orderBy, true).ToList();
+                    var results = this.Query(connection, preArgs.Query, queryId, preArgs.Offset, preArgs.Count ?? 25, out totalCount, orderBy, true).ToList();
                     var postData = new QueryResultEventArgs<TData>(query, results.AsQueryable(), offset, count, totalCount, queryId, overrideAuthContext);
                     this.Queried?.Invoke(this, postData);
 
