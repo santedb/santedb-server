@@ -304,14 +304,20 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                                 var statement = dynParm.Statement as SqlStatement;
                                 var type = dynParm.Type as Type;
                                 var qid = (Guid)dynParm.QueryId;
-
-                                // Get the rest of the keys
-                                Guid[] sk = null;
-                                if (type == typeof(OrmResultSet<Guid>))
-                                    sk = subContext.Query<Guid>(statement).ToArray();
-                                else
-                                    sk = subContext.Query<CompositeResult<TDomain, TDomainKey>>(statement).Keys<Guid>(false).ToArray();
-                                this.m_queryPersistence?.RegisterQuerySet(queryId, sk, statement, sk.Length);
+                                try
+                                {
+                                    // Get the rest of the keys
+                                    Guid[] sk = null;
+                                    if (type == typeof(OrmResultSet<Guid>))
+                                        sk = subContext.Query<Guid>(statement).ToArray();
+                                    else
+                                        sk = subContext.Query<CompositeResult<TDomain, TDomainKey>>(statement).Keys<Guid>(false).ToArray();
+                                    this.m_queryPersistence?.RegisterQuerySet(queryId, sk, statement, sk.Length);
+                                }
+                                finally
+                                {
+                                    subContext.Dispose();
+                                }
                             }, new { Context = context.OpenClonedContext(), Statement = retVal.Statement.Build(), QueryId = queryId, Type = retVal.GetType() });
                         }
                         return keys.Skip(offset).Take(count.Value).OfType<Object>();
