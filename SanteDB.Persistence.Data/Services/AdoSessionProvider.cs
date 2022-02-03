@@ -228,6 +228,10 @@ namespace SanteDB.Persistence.Data.Services
             {
                 throw new InvalidOperationException(this.m_localizationService.GetString(ErrorMessageStrings.SESSION_OVERRIDE_WITH_INSUFFICIENT_DATA));
             }
+            else if (scope == null || scope.Length == 0)
+            {
+                scope = new string[]{ "*" };
+            }
 
             // Must be claims principal
             if (!(principal is IClaimsPrincipal claimsPrincipal))
@@ -283,55 +287,53 @@ namespace SanteDB.Persistence.Data.Services
                             deviceId = claimsPrincipal.Identities.OfType<IDeviceIdentity>().FirstOrDefault(),
                             userId = claimsPrincipal.Identities.FirstOrDefault(o => !(o is IApplicationIdentity || o is IDeviceIdentity));
 
-                        if (applicationId == null)
-                        {
-                            throw new InvalidOperationException(this.m_localizationService.GetString(ErrorMessageStrings.SESSION_NO_APPLICATION_ID));
-                        }
-
+                        
                         // Fetch the keys for the identities
                         Guid? applicationKey = null, deviceKey = null, userKey = null;
 
                         // Application
-                        if (applicationId is AdoIdentity adoApplication)
+                        switch(applicationId)
                         {
-                            applicationKey = adoApplication.Sid;
-                        }
-                        else if (applicationId is IClaimsIdentity claimApplication)
-                        {
-                            applicationKey = Guid.Parse(claimApplication.FindFirst(SanteDBClaimTypes.Sid)?.Value ?? claimApplication.FindFirst(SanteDBClaimTypes.SanteDBApplicationIdentifierClaim)?.Value);
-                        }
-                        else
-                        {
-                            applicationKey = context.FirstOrDefault<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == applicationId.Name.ToLowerInvariant())?.Key;
+                            case AdoIdentity adoApplication:
+                                applicationKey = adoApplication.Sid;
+                                break;
+                            case IClaimsIdentity claimApplication:
+                                applicationKey = Guid.Parse(claimApplication.FindFirst(SanteDBClaimTypes.Sid)?.Value ?? claimApplication.FindFirst(SanteDBClaimTypes.SanteDBApplicationIdentifierClaim)?.Value);
+                                break;
+                            case IIdentity idApplication:
+                                applicationKey = context.FirstOrDefault<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == applicationId.Name.ToLowerInvariant())?.Key;
+                                break;
+                            default:
+                                throw new InvalidOperationException(this.m_localizationService.GetString(ErrorMessageStrings.SESSION_NO_APPLICATION_ID));
                         }
 
                         // Device
-                        if (deviceId is AdoIdentity adoDevice)
+                        switch(deviceId)
                         {
-                            deviceKey = adoDevice.Sid;
+                            case AdoIdentity adoDevice:
+                                deviceKey = adoDevice.Sid;
+                                break;
+                            case IClaimsIdentity claimDevice:
+                                deviceKey = Guid.Parse(claimDevice.FindFirst(SanteDBClaimTypes.Sid)?.Value ?? claimDevice.FindFirst(SanteDBClaimTypes.SanteDBDeviceIdentifierClaim)?.Value);
+                                break;
+                            case IIdentity idDevice:
+                                deviceKey = context.FirstOrDefault<DbSecurityDevice>(o => o.PublicId.ToLowerInvariant() == deviceId.Name.ToLowerInvariant())?.Key;
+                                break;
                         }
-                        else if (deviceId is IClaimsIdentity claimDevice)
-                        {
-                            deviceKey = Guid.Parse(claimDevice.FindFirst(SanteDBClaimTypes.Sid)?.Value ?? claimDevice.FindFirst(SanteDBClaimTypes.SanteDBDeviceIdentifierClaim)?.Value);
-                        }
-                        else
-                        {
-                            deviceKey = context.FirstOrDefault<DbSecurityDevice>(o => o.PublicId.ToLowerInvariant() == deviceId.Name.ToLowerInvariant())?.Key;
-                        }
-
+                        
                         // User
-                        if (userId is AdoIdentity adoUser)
-                        {
-                            userKey = adoUser.Sid;
+                        switch(userId) {
+                            case AdoIdentity adoUser:
+                                userKey = adoUser.Sid;
+                                break;
+                            case IClaimsIdentity claimUser:
+                                userKey = Guid.Parse(claimUser.FindFirst(SanteDBClaimTypes.Sid)?.Value);
+                                break;
+                            case IIdentity idUser:
+                                userKey = context.FirstOrDefault<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userId.Name)?.Key;
+                                break;
                         }
-                        else if (userId is IClaimsIdentity claimUser)
-                        {
-                            userKey = Guid.Parse(claimUser.FindFirst(SanteDBClaimTypes.Sid)?.Value);
-                        }
-                        else
-                        {
-                            userKey = context.FirstOrDefault<DbSecurityUser>(o => o.UserName.ToLowerInvariant() == userId.Name)?.Key;
-                        }
+                       
 
                         // Establish time limit
                         var expiration = DateTimeOffset.Now.Add(this.m_securityConfiguration.GetSecurityPolicy<TimeSpan>(SecurityPolicyIdentification.SessionLength, new TimeSpan(1, 0, 0)));
@@ -606,7 +608,7 @@ namespace SanteDB.Persistence.Data.Services
 
                         // Precendence of identiites in the principal : User , App, Device
                         identities = new IClaimsIdentity[3];
-                        if (dbSession.Object3?.Key != null)
+                        if (dbSession.Object3.Key != Guid.Empty)
                         {
                             if (authenticated)
                             {
@@ -617,7 +619,7 @@ namespace SanteDB.Persistence.Data.Services
                                 identities[0] = new AdoUserIdentity(dbSession.Object3);
                             }
                         }
-                        if (dbSession.Object2?.Key != null)
+                        if (dbSession.Object2.Key != Guid.Empty)
                         {
                             if (authenticated)
                             {
@@ -628,7 +630,7 @@ namespace SanteDB.Persistence.Data.Services
                                 identities[1] = new AdoApplicationIdentity(dbSession.Object2);
                             }
                         }
-                        if (dbSession.Object4?.Key != null)
+                        if (dbSession.Object4.Key != Guid.Empty)
                         {
                             if (authenticated)
                             {

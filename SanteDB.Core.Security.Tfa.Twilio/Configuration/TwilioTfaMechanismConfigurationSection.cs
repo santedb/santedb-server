@@ -28,6 +28,7 @@ namespace SanteDB.Core.Security.Tfa.Twilio.Configuration
     /// Represents the configuration for the TFA mecahnism
     /// </summary>
     [XmlType(nameof(TwilioTfaMechanismConfigurationSection), Namespace = "http://santedb.org/configuration")]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage] // Serialization class
     public class TwilioTfaMechanismConfigurationSection : IConfigurationSection
 	{
 		/// <summary>

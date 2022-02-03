@@ -193,6 +193,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         protected abstract OrmResultSet<TDbModel> DoQueryInternal(DataContext context, Expression<Func<TModel, bool>> query, bool allowCache = false);
 
         /// <summary>
+        /// Perform a query by model object
+        /// </summary>
+        protected abstract IQueryResultSet<TModel> DoQueryModel(Expression<Func<TModel, bool>> query);
+
+        /// <summary>
         /// Perform an internal get operation
         /// </summary>
         protected abstract TDbModel DoGetInternal(DataContext context, Guid key, Guid? versionKey, bool allowCache = false);
@@ -237,14 +242,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// Perform an obsoletion for all objects matching <paramref name="expression"/>
         /// </summary>
         protected abstract void DoDeleteAllInternal(DataContext context, Expression<Func<TModel, bool>> expression, DeleteMode deletionMode);
-
-        /// <summary>
-        /// Perform a query on the model
-        /// </summary>
-        protected virtual IQueryResultSet<TModel> DoQueryModel(DataContext context, Expression<Func<TModel, bool>> query)
-        {
-            return new MappedQueryResultSet<TModel>(this).Where(query);
-        }
 
         /// <summary>
         /// Called before the object is persisted - this allows implementations to change the object before being persisted
@@ -428,12 +425,15 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 // Attempt fetch from master cache
                 TModel retVal = null;
                 var useCache = allowCached &&
-                    (this.m_configuration.CachingPolicy?.Targets.HasFlag(AdoDataCachingPolicyTarget.ModelObjects) == true ||
-                    (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy) <= this.m_configuration.LoadStrategy);
+                    this.m_configuration.CachingPolicy?.Targets.HasFlag(AdoDataCachingPolicyTarget.ModelObjects) == true;
 
                 if (useCache)
                 {
                     retVal = this.m_dataCacheService?.GetCacheItem<TModel>(key);
+                    if(!this.ValidateCacheItemLoadMode(retVal))
+                    {
+                        retVal = null;
+                    }
                 }
 
                 // Fetch from database
@@ -558,7 +558,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
             // Fetch from cache?
             TModel retVal = this.m_dataCacheService?.GetCacheItem<TModel>(key);
-            if (retVal == null || versionKey.HasValue)
+           
+            if (retVal == null || versionKey.GetValueOrDefault() != Guid.Empty || !this.ValidateCacheItemLoadMode(retVal))
             {
                 // Try-fetch
                 using (var context = this.Provider.GetReadonlyConnection())
@@ -569,7 +570,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
                         // Is there an ad-hoc version from the database?
                         retVal = this.DoGetModel(context, key, versionKey, true);
-                        retVal.HarmonizeKeys(KeyHarmonizationMode.PropertyOverridesKey);
+                        retVal?.HarmonizeKeys(KeyHarmonizationMode.PropertyOverridesKey);
                     }
                     catch (DbException e)
                     {
@@ -752,7 +753,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// Executes the specified query returning the query set
         /// </summary>
         public IQueryResultSet<TModel> Query(Expression<Func<TModel, bool>> query, IPrincipal principal)
-        {
+        { 
             if (query == null)
             {
                 throw new ArgumentNullException(nameof(query), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
@@ -770,27 +771,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 return preEvt.Results;
             }
 
-            using (var context = this.Provider.GetReadonlyConnection())
-            {
-                try
-                {
-                    var results = this.DoQueryModel(context, query);
-
-                    var postEvt = new QueryResultEventArgs<TModel>(query, results, principal);
-                    this.Queried?.Invoke(this, postEvt);
-                    return postEvt.Results;
-                }
-                catch (DbException e)
-                {
-                    this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "Data error executing query operation", query, e);
-                    throw e.TranslateDbException();
-                }
-                catch (Exception e)
-                {
-                    this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "General error executing query operation", query, e);
-                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.DATA_GENERAL), e);
-                }
-            }
+            var results = this.DoQueryModel(query);
+            var postEvt = new QueryResultEventArgs<TModel>(query, results, principal);
+            this.Queried?.Invoke(this, postEvt);
+            return postEvt.Results;
         }
 
         /// <summary>
@@ -945,7 +929,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }
         }
 
-        
+
 
         /// <summary>
         /// Get the ad-hoc cache key
@@ -965,8 +949,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         public virtual TModel ToModelInstance(DataContext context, object result)
         {
-            var useCache = this.m_configuration.CachingPolicy?.Targets.HasFlag(AdoDataCachingPolicyTarget.ModelObjects) == true // Configuration allows caching
-                && (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy) <= this.m_configuration.LoadStrategy;
+            var useCache = this.m_configuration.CachingPolicy?.Targets.HasFlag(AdoDataCachingPolicyTarget.ModelObjects) == true;
             // TODO: Add caching here
             if (context == null)
             {
@@ -980,7 +963,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 // Retrieve cache version - check updated time
                 var existing = this.m_dataCacheService?.GetCacheItem<TModel>(dbModel.Key);
-                if (!useCache || existing == null || !this.ValidateCacheItem(existing, dbModel))
+
+                if (!useCache || existing == null || !this.ValidateCacheItem(existing, dbModel) || !this.ValidateCacheItemLoadMode(existing))
                 {
                     var retVal = this.DoConvertToInformationModel(context, dbModel);
 
@@ -1000,7 +984,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 var dbObject = composite.Values.OfType<TDbModel>().First();
                 var existing = this.m_dataCacheService?.GetCacheItem<TModel>(dbObject.Key);
-                if (!useCache || existing == null || !this.ValidateCacheItem(existing, dbObject))
+                if (!useCache || existing == null || !this.ValidateCacheItem(existing, dbObject) || !this.ValidateCacheItemLoadMode(existing))
                 {
                     var retVal = this.DoConvertToInformationModel(context, dbObject, composite.Values.ToArray());
 
@@ -1020,6 +1004,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 throw new ArgumentException(nameof(result), String.Format(ErrorMessages.ARGUMENT_INVALID_TYPE, typeof(TDbModel), result.GetType()));
             }
+        }
+
+        /// <summary>
+        /// Validate the cache state of an object from cache
+        /// </summary>
+        private bool ValidateCacheItemLoadMode(TModel existing)
+        {
+            return existing?.GetAnnotations<LoadMode>().Max() >= (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy) == true;
         }
 
         /// <summary>
@@ -1045,7 +1037,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// ADO Persistence provider for query
         /// </summary>
-        IQueryResultSet<TModel> IAdoPersistenceProvider<TModel>.Query(DataContext context, Expression<Func<TModel, bool>> filter) => this.DoQueryModel(context, filter);
+        IQueryResultSet<TModel> IAdoPersistenceProvider<TModel>.Query(DataContext context, Expression<Func<TModel, bool>> filter)
+             => new MappedQueryResultSet<TModel>(this, context).Where(filter);
 
         /// <summary>
         /// ADO Persistence provider for insert
@@ -1061,7 +1054,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// ADO persistence delete
         /// </summary>
         TModel IAdoPersistenceProvider<TModel>.Delete(DataContext context, Guid key, DeleteMode deletionMode) => this.DoDeleteModel(context, key, deletionMode);
-        
+
         /// <summary>
         /// ADO non-generic delete
         /// </summary>
@@ -1084,7 +1077,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }
 
             var persistenceService = typeof(TData).GetRelatedPersistenceService() as IAdoPersistenceProvider<TData>;
-            if (!data.Key.HasValue || !persistenceService.Query(context, o => o.Key == data.Key).Any())
+            if (!data.Key.HasValue || !persistenceService.Exists(context, data.Key.Value))
             {
                 if (this.m_configuration.AutoInsertChildren)
                 {
@@ -1278,6 +1271,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         public TModel Touch(DataContext context, Guid id) => this.DoTouchModel(context, id);
 
         /// <inheritdoc/>
-        public bool Exists(DataContext context, Guid key) => this.DoQueryModel(context, o => o.Key == key).Any();
+        public bool Exists(DataContext context, Guid key) => context.Any<TDbModel>(o => o.Key == key);
     }
 }

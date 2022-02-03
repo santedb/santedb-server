@@ -31,6 +31,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
@@ -68,6 +69,7 @@ namespace SanteDB.Messaging.Atna
     /// <para>The configuration of this service is described in <see cref="AtnaConfigurationSection"/></para>
     /// </remarks>
     [ServiceProvider("IHE ATNA Audit Dispatcher")]
+    [ExcludeFromCodeCoverage] // This class relies on sending outbound messages which needs a trading partner
     public class AtnaAuditService : IAuditDispatchService
     {
         // Tracer

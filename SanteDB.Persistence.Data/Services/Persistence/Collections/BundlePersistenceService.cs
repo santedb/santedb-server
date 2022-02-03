@@ -41,16 +41,19 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
         private readonly AdoPersistenceConfigurationSection m_configuration;
         // Model mapping utility
         private readonly ModelMapper m_modelMapper;
+        // Data cache service
+        private readonly IDataCachingService m_dataCachingService;
 
         /// <summary>
         /// DI constructor
         /// </summary>
-        public BundlePersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService)
+        public BundlePersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IDataCachingService dataCachingService)
         {
             this.m_localizationService = localizationService;
             this.m_configuration = configurationManager.GetSection<AdoPersistenceConfigurationSection>();
             this.Provider = this.m_configuration.Provider;
             this.m_modelMapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(DataConstants.MapResourceName), "AdoModelMap");
+            this.m_dataCachingService = dataCachingService;
 
         }
 
@@ -119,6 +122,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
                         case Concept concept:
                             dependencies = dependencies.Concat(concept.Relationships?.Select(r => Array.FindIndex(resolved, i => i.Key == r.TargetConceptKey)) ?? new int[0]);
                             break;
+                        case ITargetedAssociation ta:
+                            dependencies = new int[] { Array.FindIndex(resolved, i => i.Key == ta.TargetEntityKey), Array.FindIndex(resolved, i => i.Key == ta.SourceEntityKey) };
+                            break;
+                        
                     }
 
                     // Scan dependencies and swap
@@ -212,6 +219,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
                         {
                             tx.Commit();
                         }
+
+                        data.Item.ForEach(i => this.m_dataCachingService.Remove(i));
                     }
                 }
 
@@ -304,6 +313,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
                         }
                         break;
                 }
+
             }
 
             // Give the bundle a UUID indicating it was persisted (use the prov id)
@@ -390,6 +400,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
         /// <inheritdoc/>
         /// <exception cref="NotSupportedException">This method is not supported on bundles</exception>
         public bool Exists(OrmLite.DataContext context, Guid key)
+        {
+            throw new NotSupportedException();
+        }
+
+        /// <inheritdoc/>
+        public IQueryResultSet<Bundle> Query<TExpression>(Expression<Func<TExpression, bool>> query, IPrincipal principal) where TExpression : Bundle
         {
             throw new NotSupportedException();
         }

@@ -142,7 +142,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 // Get ID
                 DbAssigningAuthority dbAuth = null;
 
-                if (id.Authority.Key.HasValue) // Attempt lookup in adhoc cache then by db
+                if (id.AuthorityKey.HasValue)
+                {
+                    dbAuth = this.m_adhocCache?.Get<DbAssigningAuthority>($"{DataConstants.AdhocAuthorityKey}{id.AuthorityKey}");
+                    if (dbAuth == null)
+                        dbAuth = context.FirstOrDefault<DbAssigningAuthority>(o => o.Key == id.AuthorityKey);
+                }
+                else if (id.Authority.Key.HasValue) // Attempt lookup in adhoc cache then by db
                 {
                     dbAuth = this.m_adhocCache?.Get<DbAssigningAuthority>($"{DataConstants.AdhocAuthorityKey}{id.Authority.Key}");
                     if (dbAuth == null)
@@ -266,7 +272,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
 #endif
 
-                if (!versionKey.HasValue) // fetching the current version
+                if (versionKey.GetValueOrDefault() == Guid.Empty) // fetching the current version
                 {
                     var cacheKey = this.GetAdHocCacheKey(key);
                     if (allowCache && (this.m_configuration?.CachingPolicy?.Targets & Data.Configuration.AdoDataCachingPolicyTarget.DatabaseObjects) == Data.Configuration.AdoDataCachingPolicyTarget.DatabaseObjects)
@@ -595,6 +601,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                             existing.StatusConceptKey = StatusKeys.Inactive;
                             retVal = this.DoUpdateInternal(context, existing);
                             break;
+                        case DeleteMode.VersionedDelete:
+                            existing.StatusConceptKey = StatusKeys.Purged;
+                            retVal = this.DoUpdateInternal(context, existing);
+                            break;
                         case DeleteMode.PermanentDelete:
                             existing.StatusConceptKey = StatusKeys.Purged;
                             this.DoDeleteReferencesInternal(context, existing.Key);
@@ -644,14 +654,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         }
 
         /// <summary>
-        /// Perform a query on the model
-        /// </summary>
-        protected override IQueryResultSet<TModel> DoQueryModel(DataContext context, Expression<Func<TModel, bool>> query)
-        {
-            return new MappedQueryResultSet<TModel>(this, nameof(IDbVersionedData.Key)).Where(query);
-        }
-
-        /// <summary>
         /// Perform a query internal as another
         /// </summary>
         protected override OrmResultSet<TReturn> DoQueryInternalAs<TReturn>(DataContext context, Expression<Func<TModel, bool>> query, Func<SqlStatement, SqlStatement> queryModifier = null)
@@ -680,6 +682,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
             return base.DoQueryInternalAs<TReturn>(context, query, queryModifier);
         }
+
+        /// <inheritdoc/>
+        protected override IQueryResultSet<TModel> DoQueryModel(Expression<Func<TModel, bool>> query) => new MappedQueryResultSet<TModel>(this, nameof(IDbVersionedData.Key)).Where(query);
 
         /// <summary>
         /// Update associated entities

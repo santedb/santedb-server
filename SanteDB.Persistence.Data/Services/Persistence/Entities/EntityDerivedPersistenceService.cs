@@ -27,6 +27,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Text.RegularExpressions;
+using SanteDB.Persistence.Data.Model.Acts;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Entities
 {
@@ -281,7 +282,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// </summary>
         protected override void DoDeleteReferencesInternal(DataContext context, Guid key)
         {
-            context.Delete<DbEntityRelationship>(o => o.SourceKey == key);
+            if (this.m_configuration.VersioningPolicy.HasFlag(Configuration.AdoVersioningPolicyFlags.KeepPurged))
+            {
+                context.Delete<DbEntityRelationship>(o => o.SourceKey == key);
+            }
+            else
+            {
+                context.Delete<DbEntityRelationship>(o => o.SourceKey == key || o.TargetKey == key);
+            }
             var addressIds = context.Query<DbEntityAddress>(o => o.SourceKey == key).Select(o => o.Key).ToArray();
             context.Delete<DbEntityAddressComponent>(o => addressIds.Contains(o.SourceKey));
             context.Delete<DbEntityAddress>(o => addressIds.Contains(o.Key));

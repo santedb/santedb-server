@@ -169,6 +169,15 @@ namespace SanteDB.Persistence.Data.Configuration
         public bool AutoUpdateExisting { get; set; }
 
         /// <summary>
+        /// Gets or sets strict key enforcement behavior
+        /// </summary>
+        [XmlAttribute("keyValidation")]
+        [Category("strictKeyAgreement")]
+        [DisplayName("Key / Data Agreement")]
+        [Description("When a key property and a data property disagree (i.e. identifier.AuthorityKey <> identifier.Authority.Key) - the persistence layer should refuse to persist (when false, the key is taken over the property value)")]
+        public bool StrictKeyAgreement { get; set; }
+
+        /// <summary>
         /// When true, indicates that inserts can allow auto inserts of child properties
         /// </summary>
         [XmlAttribute("autoInsertChildren")]

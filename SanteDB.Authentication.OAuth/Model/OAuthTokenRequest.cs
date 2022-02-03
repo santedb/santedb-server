@@ -25,6 +25,7 @@ namespace SanteDB.Authentication.OAuth2.Model
     /// <summary>
     /// A token request
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage] // Serialization class
     public class OAuthTokenRequest
     {
         ///<summary>Grant type</summary> 

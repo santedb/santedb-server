@@ -27,6 +27,7 @@ namespace SanteDB.Persistence.Data.Model.Concepts
     /// </summary>
     [Table("cd_tbl")]
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [AssociativeTable(typeof(DbConceptSet), typeof(DbConceptSetConceptAssociation))]
     public class DbConcept : DbIdentified
     {
         /// <summary>

@@ -27,6 +27,7 @@ namespace SanteDB.Authentication.OAuth2.Model
     /// OAuth token response
     /// </summary>
     [JsonObject]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage] // Serialization class
     public class OAuthTokenResponse
     {
 

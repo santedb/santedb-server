@@ -126,6 +126,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     case DeleteMode.LogicalDelete:
                     case DeleteMode.NullifyDelete:
                     case DeleteMode.ObsoleteDelete:
+                    case DeleteMode.VersionedDelete:
                         existing.ObsoleteVersionSequenceId = this.GetCurrentVersionSequenceForSource(context, existing.SourceKey);
                         return this.DoUpdateInternal(context, existing);
 
@@ -161,6 +162,33 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }
 
             return base.DoInsertInternal(context, dbModel);
+        }
+
+        /// <summary>
+        /// Perform an updation of the object
+        /// </summary>
+        protected override TDbModel DoUpdateInternal(DataContext context, TDbModel dbModel)
+        {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
+            }
+            else if (dbModel == null)
+            {
+                throw new ArgumentNullException(nameof(dbModel), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
+            }
+
+            // Effective seq set?
+            if (dbModel.EffectiveVersionSequenceId == default(int))
+            {
+                dbModel.EffectiveVersionSequenceId = this.GetCurrentVersionSequenceForSource(context, dbModel.SourceKey);
+            }
+            if(dbModel.ObsoleteVersionSequenceId.GetValueOrDefault() == Int32.MaxValue)
+            {
+                dbModel.ObsoleteVersionSequenceId = this.GetCurrentVersionSequenceForSource(context, dbModel.SourceKey);
+            }
+
+            return base.DoUpdateInternal(context, dbModel);
         }
 
         /// <summary>

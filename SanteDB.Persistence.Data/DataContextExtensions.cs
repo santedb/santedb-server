@@ -65,6 +65,9 @@ namespace SanteDB.Persistence.Data
         /// </summary>
         private readonly static ConcurrentDictionary<Type, IAdoPersistenceProvider> s_providers = new ConcurrentDictionary<Type, IAdoPersistenceProvider>();
 
+        // Configuration
+        private readonly static AdoPersistenceConfigurationSection s_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AdoPersistenceConfigurationSection>();
+
         /// <summary>
         /// Providers for mapping
         /// </summary>
@@ -170,6 +173,11 @@ namespace SanteDB.Persistence.Data
                 {
                     s_providers.TryAdd(trelated, provider);
                 }
+                else
+                {
+                    // Try TRelated's parent
+                    return trelated.BaseType.GetRelatedPersistenceService();
+                }
             }
             return provider;
         }
@@ -223,7 +231,7 @@ namespace SanteDB.Persistence.Data
         {
             me = me.Clone() as TData;
 
-            foreach (var pi in typeof(TData).GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
+            foreach (var pi in me.GetType().GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
             {
                 if (!pi.CanWrite)
                 {
@@ -241,9 +249,16 @@ namespace SanteDB.Persistence.Data
                     switch (harmonizationMode)
                     {
                         case KeyHarmonizationMode.KeyOverridesProperty:
-                            if (keyValue != null) // There is a key for this which is populated, we want to use the key and clear the property
+                            if (keyValue != null && !keyValue.Equals(iddata.Key)) // There is a key for this which is populated, we want to use the key and clear the property
                             {
-                                pi.SetValue(me, null);
+                                if (s_configuration.StrictKeyAgreement)
+                                {
+                                    throw new DataPersistenceException(s_localizationService.GetString(ErrorMessageStrings.DATA_KEY_PROPERTY_DISAGREEMENT, new { keyProperty = keyProperty.ToString(), dataProperty = pi.ToString() }));
+                                }
+                                else
+                                {
+                                    pi.SetValue(me, null);
+                                }
                             }
                             else
                             {
@@ -252,7 +267,7 @@ namespace SanteDB.Persistence.Data
                             break;
 
                         case KeyHarmonizationMode.PropertyOverridesKey:
-                            if (iddata.Key.HasValue)
+                            if (iddata.Key.HasValue) // Data has value
                             {
                                 keyProperty.SetValue(me, iddata.Key);
                             }
@@ -265,9 +280,9 @@ namespace SanteDB.Persistence.Data
                 }
                 else if (piValue is IList list)
                 {
-                    foreach (var itm in list.OfType<IdentifiedData>())
+                    for(var i = 0; i < list.Count; i++)
                     {
-                        itm.HarmonizeKeys(harmonizationMode);
+                        list[i] = (list[i] as IdentifiedData)?.HarmonizeKeys(harmonizationMode) ?? list[i];
                     }
                 }
             }

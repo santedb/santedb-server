@@ -31,6 +31,7 @@ namespace SanteDB.Authentication.OAuth2.Model
     /// Serialized open id configuration
     /// </summary>
     [JsonObject(nameof(OpenIdConfiguration))]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage] // Serialization class
     public class OpenIdConfiguration
     {
         /// <summary>

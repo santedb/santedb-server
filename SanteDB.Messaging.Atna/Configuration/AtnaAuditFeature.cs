@@ -2,6 +2,7 @@
 using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,6 +12,7 @@ namespace SanteDB.Messaging.Atna.Configuration
     /// <summary>
     /// FHIR audit dispatcher feature
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class AtnaAuditFeature : IFeature
     {
 
@@ -89,6 +91,7 @@ namespace SanteDB.Messaging.Atna.Configuration
     /// <summary>
     /// Uninstall the FHIR audit 
     /// </summary>
+    [ExcludeFromCodeCoverage]
     internal class UninstallFhirAuditDispatcher : IConfigurationTask
     {
         private AtnaConfigurationSection m_configuration;
@@ -151,6 +154,7 @@ namespace SanteDB.Messaging.Atna.Configuration
     /// <summary>
     /// Install the FHIR dispatcher configured in this service
     /// </summary>
+    [ExcludeFromCodeCoverage]
     internal class InstallFhirAuditDispatcher : IConfigurationTask
     {
         private AtnaConfigurationSection m_configuration;

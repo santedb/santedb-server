@@ -58,6 +58,7 @@ namespace SanteDB.Authentication.OAuth2.Model
     /// OAuth error response message
     /// </summary>
     [JsonObject]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage] // Serialization class
     public class OAuthError
     {
 

@@ -23,6 +23,7 @@ using SanteDB.Core.Configuration;
 using SanteDB.Core.Security.Configuration;
 using System;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Xml.Serialization;
 
@@ -48,6 +49,7 @@ namespace SanteDB.Messaging.Atna.Configuration
     /// Audit configuration
     /// </summary>
     [XmlType(nameof(AtnaConfigurationSection), Namespace = "http://santedb.org/configuration")]
+    [ExcludeFromCodeCoverage]
     public class AtnaConfigurationSection : IConfigurationSection
     {
 

@@ -6,6 +6,7 @@ using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.OrmLite.Providers;
 using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 
 namespace SanteDB.Persistence.Data.Services.Persistence

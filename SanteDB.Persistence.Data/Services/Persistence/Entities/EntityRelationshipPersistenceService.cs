@@ -33,6 +33,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             data.RelationshipTypeKey = this.EnsureExists(context, data.RelationshipType)?.Key ?? data.RelationshipTypeKey;
             data.TargetEntityKey = this.EnsureExists(context, data.TargetEntity)?.Key ?? data.TargetEntityKey;
             data.HolderKey = this.EnsureExists(context, data.Holder)?.Key ?? data.HolderKey;
+
             return base.BeforePersisting(context, data);
         }
 
