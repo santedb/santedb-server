@@ -40,6 +40,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IdentityModel.Tokens;
 using System.IO;
 using System.Linq;
@@ -77,6 +78,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
     /// </summary>
     /// <remarks>An Access Control Service and Token Service implemented using OAUTH 2.0</remarks>
     [ServiceBehavior(Name = "OAuth2", InstanceMode = ServiceInstanceMode.Singleton)]
+    [ExcludeFromCodeCoverage]
     public class OAuthTokenBehavior : IOAuthTokenContract
     {
         // Trace source name
@@ -370,9 +372,9 @@ namespace SanteDB.Authentication.OAuth2.Rest
 
             // Add JTI
             claims.Add(new SanteDBClaim("jti", BitConverter.ToString(session.Id).Replace("-", "")));
-            claims.Add(new SanteDBClaim("iat", (session.NotBefore - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds.ToString()));
+            claims.Add(new SanteDBClaim("iat", session.NotBefore.ToUnixTimeSeconds().ToString()));
             claims.RemoveAll(o => String.IsNullOrEmpty(o.Value));
-            claims.Add(new SanteDBClaim("exp", (session.NotAfter - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds.ToString()));
+            claims.Add(new SanteDBClaim("exp", session.NotAfter.ToUnixTimeSeconds().ToString()));
             claims.RemoveAll(o => String.IsNullOrEmpty(o.Value));
             claims.Add(new SanteDBClaim("sub", session.Claims.First(o => o.Type == SanteDBClaimTypes.Sid).Value)); // Subject is the first security identifier
             claims.RemoveAll(o => o.Type == SanteDBClaimTypes.Sid);
@@ -408,8 +410,8 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 signingCredentials: signingCredentials,
                 claims: claims.Select(o => new System.Security.Claims.Claim(o.Type, o.Value)),
                 issuer: this.m_configuration.IssuerName,
-                notBefore: session.NotBefore.DateTime,
-                expires: session.NotAfter.DateTime
+                notBefore: session.NotBefore.LocalDateTime,
+                expires: session.NotAfter.LocalDateTime
            );
 
             return jwt;
@@ -459,16 +461,16 @@ namespace SanteDB.Authentication.OAuth2.Rest
                     TokenType = OAuthConstants.BearerTokenType,
                     AccessToken = sessionId,
                     IdentityToken = handler.WriteToken(jwt),
-                    ExpiresIn = (int)(session.NotAfter.Subtract(DateTime.Now)).TotalMilliseconds,
-                    RefreshToken = refreshToken // TODO: Need to write a SessionProvider for this so we can keep track of refresh tokens
+                    ExpiresIn = (int)(session.NotAfter.Subtract(DateTimeOffset.Now)).TotalMilliseconds,
+                    RefreshToken = refreshToken // TODO: Need to write a SessionProvider for this so we can keep track of refresh tokens 
                 };
             else
                 response = new OAuthTokenResponse()
                 {
                     TokenType = OAuthConstants.JwtTokenType,
                     AccessToken = handler.WriteToken(jwt),
-                    ExpiresIn = (int)(session.NotAfter.Subtract(DateTime.Now)).TotalMilliseconds,
-                    RefreshToken = refreshToken // TODO: Need to write a SessionProvider for this so we can keep track of refresh tokens
+                    ExpiresIn = (int)(session.NotAfter.Subtract(DateTimeOffset.Now)).TotalMilliseconds,
+                    RefreshToken = refreshToken // TODO: Need to write a SessionProvider for this so we can keep track of refresh tokens 
                 };
 
             return response;
@@ -506,7 +508,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                     };
                 else
                 {
-                    DateTime notBefore = DateTime.Parse(principal.FindFirst(SanteDBClaimTypes.AuthenticationInstant).Value), notAfter = DateTime.Parse(principal.FindFirst(SanteDBClaimTypes.Expiration).Value);
+                    DateTime notBefore = principal.FindFirst(SanteDBClaimTypes.AuthenticationInstant).AsDateTime(), notAfter = principal.FindFirst(SanteDBClaimTypes.Expiration).AsDateTime();
 
                     var jwt = this.HydrateToken(RestOperationContext.Current.Data[SanteDB.Rest.Common.Security.TokenAuthorizationAccessBehavior.RestPropertyNameSession] as ISession);
                     return new OAuthTokenResponse()

@@ -31,6 +31,7 @@ using SanteDB.Core.Services;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Tracing;
 using System.Security;
 using System.Security.Authentication;
@@ -43,6 +44,7 @@ namespace SanteDB.Authentication.OAuth2.Wcf
     /// Basic authorization policy
     /// </summary>
     [DisplayName("OAUTH: HTTP BASIC Client-Credentials")]
+    [ExcludeFromCodeCoverage]
     public class ClientAuthorizationAccessBehavior : IServicePolicy, IServiceBehavior
     {
         // Configuration from main SanteDB

@@ -80,6 +80,7 @@ namespace SanteDB.Server.Core.Services.Impl
                 typeof(GenericLocalMetadataRepository<DeviceEntity>),
                 typeof(GenericLocalMetadataRepository<ApplicationEntity>),
                 typeof(LocalSecurityRepositoryService),
+                typeof(LocalProviderRepository),
                 typeof(LocalTemplateDefinitionRepositoryService),
                 typeof(LocalAuditRepository)
             };

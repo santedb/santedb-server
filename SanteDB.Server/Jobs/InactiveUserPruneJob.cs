@@ -61,6 +61,9 @@ namespace SanteDB.Server.Jobs
         /// </summary>
         public string Name => "Prune Inactive Users";
 
+        /// <inheritdoc/>
+        public string Description => "When configured or enabled on a schedule - this job regularly prunes inactive users.";
+
         /// <summary>
         /// Can cancel the job?
         /// </summary>

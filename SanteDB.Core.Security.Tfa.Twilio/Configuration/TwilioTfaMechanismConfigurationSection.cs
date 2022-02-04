@@ -20,6 +20,7 @@
  */
 using SanteDB.Core.Configuration;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Xml.Serialization;
 
 namespace SanteDB.Core.Security.Tfa.Twilio.Configuration

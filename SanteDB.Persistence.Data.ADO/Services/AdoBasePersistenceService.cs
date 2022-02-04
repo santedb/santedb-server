@@ -234,10 +234,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             {
                                 tx.Commit();
                                 var cacheService = ApplicationServiceContext.Current.GetService<IDataCachingService>();
-                                foreach (var itm in connection.CacheOnCommit)
-                                {
-                                    cacheService?.Remove(itm);
-                                }
+                                cacheService?.Add(data);
                             }
                             else
                                 tx.Rollback();
@@ -323,10 +320,8 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             {
                                 tx.Commit();
                                 var cacheService = ApplicationServiceContext.Current.GetService<IDataCachingService>();
-                                foreach (var itm in connection.CacheOnCommit)
-                                {
-                                    cacheService?.Remove(itm);
-                                }
+                                cacheService?.Remove(data);
+
                             }
                             else
                                 tx.Rollback();
@@ -488,10 +483,8 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             {
                                 tx.Commit();
                                 var cacheService = ApplicationServiceContext.Current.GetService<IDataCachingService>();
-                                foreach (var itm in connection.CacheOnCommit)
-                                {
-                                    cacheService?.Remove(itm);
-                                }
+                                cacheService?.Remove(data);
+
                             }
                             else
                                 tx.Rollback();
@@ -565,8 +558,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         var postData = new DataRetrievedEventArgs<TData>(result, overrideAuthContext);
                         this.Retrieved?.Invoke(this, postData);
 
-                        foreach (var itm in connection.CacheOnCommit)
-                            ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Add(itm);
+                            ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Add(result);
 
                         return result;
                     }
@@ -648,8 +640,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     this.m_tracer.TraceEvent(EventLevel.Verbose, "QUERY {0}", query);
 
                     // Is there an obsoletion item already specified?
-                    if ((count ?? 1000) > 25 && this.m_settingsProvider.GetConfiguration().PrepareStatements)
-                        connection.PrepareStatements = true;
+                    
                     if (fastQuery)
                     {
                         connection.AddData("loadFast", true);
@@ -663,11 +654,15 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     if (unionWith != null)
                         connection.AddData("UNION", unionWith);
 
-                    var results = this.Query(connection, preArgs.Query, queryId, preArgs.Offset, preArgs.Count ?? 1000, out totalCount, orderBy, true).ToList();
+                    var results = this.Query(connection, preArgs.Query, queryId, preArgs.Offset, preArgs.Count ?? 25, out totalCount, orderBy, true).ToList();
                     var postData = new QueryResultEventArgs<TData>(query, results.AsQueryable(), offset, count, totalCount, queryId, overrideAuthContext);
                     this.Queried?.Invoke(this, postData);
 
                     var retVal = postData.Results;
+
+                    // Add to cache
+                    foreach (var i in retVal.Where(i => i != null))
+                        ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Add(i);
 
                     this.m_tracer.TraceEvent(EventLevel.Verbose, "Returning {0}..{1} or {2} results", offset, offset + (count ?? 1000), totalCount);
 

@@ -171,7 +171,7 @@ namespace SanteDB.Messaging.Atna
 
                     // Create the audit basic
                     AuditMessage am = new AuditMessage(
-                        ad.Timestamp, (AtnaApi.Model.ActionType)Enum.Parse(typeof(AtnaApi.Model.ActionType), ad.ActionCode.ToString()),
+                        ad.Timestamp.DateTime, (AtnaApi.Model.ActionType)Enum.Parse(typeof(AtnaApi.Model.ActionType), ad.ActionCode.ToString()),
                         (AtnaApi.Model.OutcomeIndicator)Enum.Parse(typeof(AtnaApi.Model.OutcomeIndicator), ad.Outcome.ToString()),
                         (AtnaApi.Model.EventIdentifierType)Enum.Parse(typeof(AtnaApi.Model.EventIdentifierType), ad.EventIdentifier.ToString()),
                         null

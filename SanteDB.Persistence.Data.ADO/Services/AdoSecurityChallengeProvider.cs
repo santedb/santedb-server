@@ -113,7 +113,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     var query = context.CreateSqlStatement<DbSecurityUser>().SelectFrom(typeof(DbSecurityUser), typeof(DbSecurityUserChallengeAssoc))
                         .InnerJoin<DbSecurityUserChallengeAssoc>(o => o.Key, o => o.UserKey)
                         .Where(o => o.UserName.ToLower() == userName.ToLower() && o.ObsoletionTime == null)
-                        .And<DbSecurityUserChallengeAssoc>(o => o.ExpiryTime > DateTime.Now);
+                        .And<DbSecurityUserChallengeAssoc>(o => o.ExpiryTime > DateTimeOffset.Now);
                     var dbUser = context.FirstOrDefault<CompositeResult<DbSecurityUser, DbSecurityUserChallengeAssoc>>(query);
 
                     // User found?
@@ -125,25 +125,25 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     {
                         var tfaSecret = ApplicationServiceContext.Current.GetService<IPasswordHashingService>().ComputeHash(tfa);
 
-                        var claims = context.Query<DbUserClaim>(o => o.SourceKey == dbUser.Object1.Key && (!o.ClaimExpiry.HasValue || o.ClaimExpiry > DateTime.Now)).ToList();
+                        var claims = context.Query<DbUserClaim>(o => o.SourceKey == dbUser.Object1.Key && (!o.ClaimExpiry.HasValue || o.ClaimExpiry > DateTimeOffset.Now)).ToList();
                         DbUserClaim tfaClaim = claims.FirstOrDefault(o => o.ClaimType == SanteDBClaimTypes.SanteDBOTAuthCode);
                         if (tfaClaim == null || !tfaSecret.Equals(tfaClaim.ClaimValue, StringComparison.OrdinalIgnoreCase))
                             throw new SecurityException("TFA_MISMATCH");
 
                     }
 
-                    if (dbUser.Object1.Lockout > DateTime.Now)
+                    if (dbUser.Object1.Lockout > DateTimeOffset.Now)
                         throw new SecurityException("AUTH_LCK");
-                    else if (dbUser.Object2.ChallengeResponse != responseHash || dbUser.Object1.Lockout.GetValueOrDefault() > DateTime.Now) // Increment invalid
+                    else if (dbUser.Object2.ChallengeResponse != responseHash || dbUser.Object1.Lockout.GetValueOrDefault() > DateTimeOffset.Now) // Increment invalid
                     {
                         dbUser.Object1.InvalidLoginAttempts++;
                         if (dbUser.Object1.InvalidLoginAttempts > this.m_securityConfiguration.GetSecurityPolicy<Int32>(SecurityPolicyIdentification.MaxInvalidLogins, 5))
-                            dbUser.Object1.Lockout = DateTime.Now.Add(new TimeSpan(0, 0, dbUser.Object1.InvalidLoginAttempts.Value * 30));
+                            dbUser.Object1.Lockout = DateTimeOffset.Now.Add(new TimeSpan(0, 0, dbUser.Object1.InvalidLoginAttempts.Value * 30));
                         dbUser.Object1.UpdatedByKey = Guid.Parse(AuthenticationContext.SystemUserSid);
                         dbUser.Object1.UpdatedTime = DateTimeOffset.Now;
 
                         context.Update(dbUser.Object1);
-                        if (dbUser.Object1.Lockout > DateTime.Now)
+                        if (dbUser.Object1.Lockout > DateTimeOffset.Now)
                             throw new AuthenticationException("AUTH_LCK");
                         else
                             throw new AuthenticationException("AUTH_INV");
@@ -318,13 +318,13 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             ChallengeKey = challengeKey,
                             UserKey = dbUser.Key,
                             ChallengeResponse = challengeResponse,
-                            ExpiryTime = DateTime.Now.Add(this.m_securityConfiguration.GetSecurityPolicy<TimeSpan>(SecurityPolicyIdentification.MaxChallengeAge, new TimeSpan(3650, 0, 0, 0)))
+                            ExpiryTime = DateTimeOffset.Now.Add(this.m_securityConfiguration.GetSecurityPolicy<TimeSpan>(SecurityPolicyIdentification.MaxChallengeAge, new TimeSpan(3650, 0, 0, 0)))
                         });
                     }
                     else if (!this.m_securityConfiguration.GetSecurityPolicy<Boolean>(SecurityPolicyIdentification.ChallengeHistory, false) ||
                         !context.Any<DbSecurityUserChallengeAssoc>(o => o.ChallengeKey == challengeRec.ChallengeKey && o.UserKey == challengeRec.UserKey && o.ChallengeResponse == challengeResponse))
                     {
-                        challengeRec.ExpiryTime = DateTime.Now.Add(this.m_securityConfiguration.GetSecurityPolicy<TimeSpan>(SecurityPolicyIdentification.MaxChallengeAge, new TimeSpan(3650, 0, 0, 0)));
+                        challengeRec.ExpiryTime = DateTimeOffset.Now.Add(this.m_securityConfiguration.GetSecurityPolicy<TimeSpan>(SecurityPolicyIdentification.MaxChallengeAge, new TimeSpan(3650, 0, 0, 0)));
                         challengeRec.ChallengeResponse = challengeResponse;
                         context.Update(challengeRec);
                     }

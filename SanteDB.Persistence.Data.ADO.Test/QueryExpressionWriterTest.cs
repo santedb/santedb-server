@@ -72,14 +72,14 @@ namespace SanteDB.Persistence.Data.ADO.Test
         [Test]
         public void TestConstructLocalParameters()
         {
-            SqlStatement sql = new SqlStatement<DbActVersion>(new PostgreSQLProvider()).SelectFrom().Where("act_id = ?", Guid.NewGuid()).And("act_utc < ?", DateTime.Now).Build();
+            SqlStatement sql = new SqlStatement<DbActVersion>(new PostgreSQLProvider()).SelectFrom().Where("act_id = ?", Guid.NewGuid()).And("act_utc < ?", DateTimeOffset.Now).Build();
             Assert.IsTrue(sql.SQL.Contains("AND"));
             Assert.IsTrue(sql.SQL.Contains("act_id"));
             Assert.IsTrue(sql.SQL.Contains("act_utc"));
             Assert.IsTrue(sql.SQL.Contains("SELECT act_vrsn_tbl.neg_ind,act_vrsn_tbl.act_utc,act_vrsn_tbl.act_start_utc,act_vrsn_tbl.act_stop_utc,act_vrsn_tbl.rsn_cd_id,act_vrsn_tbl.sts_cd_id,act_vrsn_tbl.typ_cd_id,act_vrsn_tbl.act_vrsn_id,act_vrsn_tbl.act_id,act_vrsn_tbl.vrsn_seq_id,act_vrsn_tbl.rplc_vrsn_id,act_vrsn_tbl.crt_prov_id,act_vrsn_tbl.obslt_prov_id,act_vrsn_tbl.crt_utc,act_vrsn_tbl.obslt_utc FROM act_vrsn_tbl"));
             Assert.AreEqual(2, sql.Arguments.Count());
             Assert.IsAssignableFrom<Guid>(sql.Arguments.First());
-            Assert.IsAssignableFrom<DateTime>(sql.Arguments.Last());
+            Assert.IsAssignableFrom<DateTimeOffset>(sql.Arguments.Last());
         }
 
         /// <summary>
@@ -107,7 +107,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
             Guid mg = Guid.NewGuid();
             Stopwatch sw = new Stopwatch();
             sw.Start();
-            SqlStatement sql = new SqlStatement<DbActVersion>(new PostgreSQLProvider()).SelectFrom().Where(o => o.Key == mg || o.Key == Guid.NewGuid() && o.CreationTime <= DateTime.Now).Build();
+            SqlStatement sql = new SqlStatement<DbActVersion>(new PostgreSQLProvider()).SelectFrom().Where(o => o.Key == mg || o.Key == Guid.NewGuid() && o.CreationTime <= DateTimeOffset.Now).Build();
             sw.Stop();
 
             Assert.IsTrue(sql.SQL.Contains("AND"));

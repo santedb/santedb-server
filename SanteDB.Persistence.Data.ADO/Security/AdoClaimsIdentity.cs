@@ -266,7 +266,7 @@ namespace SanteDB.Persistence.Data.ADO.Security
                     claims.Add(new SanteDBClaim(SanteDBClaimTypes.Name, this.m_securityUser.UserName));
                 if (!this.Claims.Any(o => o.Type == SanteDBClaimTypes.DefaultRoleClaimType))
                     claims.AddRange(this.m_roles.Select(r => new SanteDBClaim(SanteDBClaimTypes.DefaultRoleClaimType, r.Name)));
-                if (this.m_securityUser.PasswordExpiration.HasValue && this.m_securityUser.PasswordExpiration < DateTime.Now)
+                if (this.m_securityUser.PasswordExpiration.HasValue && this.m_securityUser.PasswordExpiration < DateTimeOffset.Now)
                 {
                     s_traceSource.TraceWarning("User {0} password expired on {1}", this.m_securityUser.UserName, this.m_securityUser.PasswordExpiration);
                     claims.Add(new SanteDBClaim(SanteDBClaimTypes.PurposeOfUse, PurposeOfUseKeys.SecurityAdmin.ToString()));
@@ -288,7 +288,7 @@ namespace SanteDB.Persistence.Data.ADO.Security
                 var retVal = new SanteDBClaimsPrincipal(
                         identities
                     );
-                s_traceSource.TraceInfo("Created security principal from identity {0} > {1}", this, AdoClaimsIdentity.PrincipalToString(retVal));
+                //s_traceSource.TraceInfo("Created security principal from identity {0} > {1}", this, AdoClaimsIdentity.PrincipalToString(retVal));
                 return retVal;
             }
             catch (Exception e)

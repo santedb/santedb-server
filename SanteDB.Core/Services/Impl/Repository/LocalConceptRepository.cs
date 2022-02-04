@@ -128,7 +128,7 @@ namespace SanteDB.Server.Core.Services.Impl
             else
                 retVal = this.m_referenceTermService.Query(o => o.ReferenceTerm.CodeSystem.Authority == codeSystemDomain && o.ReferenceTerm.Mnemonic == code && o.ObsoleteVersionSequenceId == null, AuthenticationContext.Current.Principal);
 
-            this.m_adhocCache?.Add($"{code}.{codeSystemDomain}", retVal, new TimeSpan(0, 0, 30));
+            adhocCache?.Add($"{code}.{codeSystemDomain}", retVal);
             return retVal;
         }
 
@@ -159,7 +159,7 @@ namespace SanteDB.Server.Core.Services.Impl
             {
                 var obj = base.Find(o => o.Mnemonic == mnemonic).FirstOrDefault();
                 if (obj != null)
-                    this.m_adhocCache?.Add($"concept.{mnemonic}", obj.Key.Value, new TimeSpan(1, 0, 0));
+                    adhocCache?.Add($"concept.{mnemonic}", obj.Key.Value);
                 return obj;
             }
         }
@@ -194,7 +194,7 @@ namespace SanteDB.Server.Core.Services.Impl
             var refTermEnt = this.m_referenceTermService.Query(filterExpression, AuthenticationContext.Current.Principal).FirstOrDefault();
             retVal = refTermEnt?.LoadProperty<ReferenceTerm>("ReferenceTerm");
 
-            this.m_adhocCache?.Add($"refTerm.{conceptId}.{codeSystem}", retVal, new TimeSpan(0, 0, 30));
+            adhocCache?.Add($"refTerm.{conceptId}.{codeSystem}", retVal);
 
             return retVal;
         }
@@ -288,7 +288,7 @@ namespace SanteDB.Server.Core.Services.Impl
 
             var refTermEnt = this.m_referenceTermService.Query(filterExpression, AuthenticationContext.Current.Principal).FirstOrDefault();
 
-            this.m_adhocCache?.Add($"refTerm.{conceptMnemonic}.{codeSystem}", retVal, new TimeSpan(0, 0, 30));
+            adhocCache?.Add($"refTerm.{conceptMnemonic}.{codeSystem}", retVal);
 
             return retVal;
         }
