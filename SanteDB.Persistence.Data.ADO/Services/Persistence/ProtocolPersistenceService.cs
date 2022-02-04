@@ -73,7 +73,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 {
                     Key = Guid.NewGuid(),
                     CreatedByKey = context.ContextId,
-                    CreationTime = DateTime.Now,
+                    CreationTime = DateTimeOffset.Now,
                     IsActive = true,
                     Name = modelInstance.HandlerClass.Name,
                     TypeName = modelInstance.HandlerClassName

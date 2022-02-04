@@ -41,6 +41,9 @@ namespace SanteDB.Persistence.Data.ADO.Jobs
         /// </summary>
         public string Name => "Full Rebuild of Freetext Index";
 
+        /// <inheritdoc/>
+        public string Description => "Rebuilds the entire freetext index (usually the _any query parameter)";
+
         /// <summary>
         /// Can cancel
         /// </summary>
@@ -86,7 +89,7 @@ namespace SanteDB.Persistence.Data.ADO.Jobs
                     ctx.Open();
                     this.LastStarted = DateTime.Now;
                     this.CurrentState = JobStateType.Running;
-
+                    ctx.CommandTimeout = 360000;
                     ctx.ExecuteProcedure<object>("rfrsh_fti");
 
                     this.CurrentState = JobStateType.Completed;

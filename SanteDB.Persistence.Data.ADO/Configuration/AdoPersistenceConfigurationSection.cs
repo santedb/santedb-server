@@ -123,15 +123,7 @@ namespace SanteDB.Persistence.Data.ADO.Configuration
         [TypeConverter("SanteDB.Configuration.Converters.StringCollectionRenderConverter, SanteDB.Configuration")]
         public List<ResourceTypeReferenceConfiguration> AllowedResources { get; set; }
 
-        /// <summary>
-        /// True if statements should be prepared
-        /// </summary>
-        [XmlAttribute("prepareStatements")]
-        [Category("Performance")]
-        [DisplayName("Prepare SQL Queries")]
-        [Description("When true, instructs the provider to prepare statements and reuse them during a transaction")]
-        public bool PrepareStatements { get; set; }
-
+        
         /// <summary>
         /// Validation flags
         /// </summary>

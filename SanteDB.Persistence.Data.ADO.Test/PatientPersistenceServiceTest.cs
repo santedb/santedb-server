@@ -18,7 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
-
+using SanteDB.Core.Model;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -122,7 +122,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
             Assert.AreEqual(DatePrecision.Day, afterInsert.DeceasedDatePrecision);
             Assert.AreEqual(new DateTime(1984, 03, 22), afterInsert.DateOfBirth);
             Assert.AreEqual(new DateTime(2016, 05, 02), afterInsert.DeceasedDate);
-            Assert.AreEqual("Male", afterInsert.GenderConcept.Mnemonic);
+            Assert.AreEqual("Male", afterInsert.LoadProperty(o=>o.GenderConcept).Mnemonic);
             Assert.AreEqual(2, afterInsert.MultipleBirthOrder);
             Assert.AreEqual(1, p.Names.Count);
             Assert.AreEqual(1, p.Addresses.Count);
@@ -211,7 +211,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
             };
 
             var afterInsert = base.DoTestInsert(p, s_authorization);
-            Assert.AreEqual("Male", afterInsert.GenderConcept.Mnemonic);
+            Assert.AreEqual("Male", afterInsert.LoadProperty(o=>o.GenderConcept).Mnemonic);
             Assert.AreEqual(EntityClassKeys.Patient, p.ClassConceptKey);
             Assert.AreEqual(DeterminerKeys.Specific, p.DeterminerConceptKey);
             Assert.AreEqual(StatusKeys.Active, p.StatusConceptKey);

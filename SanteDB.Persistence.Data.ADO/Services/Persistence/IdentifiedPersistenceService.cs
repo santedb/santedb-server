@@ -19,9 +19,11 @@
  * Date: 2021-8-27
  */
 
+using SanteDB.Core;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Query;
+using SanteDB.Core.Services;
 using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.ADO.Data.Model;
 using SanteDB.Persistence.Data.ADO.Exceptions;
@@ -49,7 +51,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
     /// <summary>
     /// Generic persistence service which can persist between two simple types.
     /// </summary>
-    public abstract class IdentifiedPersistenceService<TModel, TDomain, TQueryResult> : CorePersistenceService<TModel, TDomain, TQueryResult>
+    public abstract class IdentifiedPersistenceService<TModel, TDomain, TQueryResult> : CorePersistenceService<TModel, TDomain, TQueryResult>, IReportProgressChanged
         where TModel : IdentifiedData, new()
         where TDomain : class, IDbIdentified, new()
     {
@@ -59,6 +61,11 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         public IdentifiedPersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
         {
         }
+
+        /// <summary>
+        /// Progress has changed
+        /// </summary>
+        public event EventHandler<ProgressChangedEventArgs> ProgressChanged;
 
         #region implemented abstract members of LocalDataPersistenceService
 
@@ -193,12 +200,12 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
         /// <remarks>Since there are so many dependent tables this really calls QueryKeys and then BulkPurge</remarks>
         protected override void BulkPurgeInternal(DataContext connection, Expression<Func<TModel, bool>> expression)
         {
-            int offset = 0, totalResults = 1;
-            while (offset < totalResults)
+            int totalResults = 1;
+            while (totalResults > 0)
             {
-                var k = this.QueryKeysInternal(connection, expression, offset, 1000, out totalResults).ToArray();
+                var k = this.QueryKeysInternal(connection, expression, 0, 1000, out totalResults).ToArray();
                 this.BulkPurgeInternal(connection, k);
-                offset += k.Length;
+                this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs((float)k.Length / (float)totalResults, $"Purging matching {typeof(TModel).Name} - {totalResults} remain"));
             }
         }
 
@@ -216,6 +223,19 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 var keys = keysToPurge.Skip(ofs).Take(100).ToArray();
                 ofs += 100;
                 connection.Delete<TDomain>(o => keys.Contains(o.Key));
+            }
+            this.PurgeCache(keysToPurge);
+        }
+
+        /// <summary>
+        /// Purge cache of all keys
+        /// </summary>
+        protected void PurgeCache(Guid[] keysToPurge)
+        {
+            var cache = ApplicationServiceContext.Current.GetService<IDataCachingService>();
+            foreach(var k in keysToPurge)
+            {
+                cache.Remove(cache.GetCacheItem(k));
             }
         }
 

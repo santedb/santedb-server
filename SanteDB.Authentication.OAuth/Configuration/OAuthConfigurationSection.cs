@@ -22,6 +22,7 @@ using SanteDB.Core.Configuration;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing.Design;
 using System.Windows.Forms.Design;
 using System.Xml.Serialization;
@@ -32,6 +33,7 @@ namespace SanteDB.Authentication.OAuth2.Configuration
     /// OAuth2 configuration
     /// </summary>
     [XmlType(nameof(OAuthConfigurationSection), Namespace = "http://santedb.org/configuration")]
+    [ExcludeFromCodeCoverage]
     public class OAuthConfigurationSection : IConfigurationSection
     {
 

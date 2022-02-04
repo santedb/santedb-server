@@ -304,14 +304,20 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                                 var statement = dynParm.Statement as SqlStatement;
                                 var type = dynParm.Type as Type;
                                 var qid = (Guid)dynParm.QueryId;
-
-                                // Get the rest of the keys
-                                Guid[] sk = null;
-                                if (type == typeof(OrmResultSet<Guid>))
-                                    sk = subContext.Query<Guid>(statement).ToArray();
-                                else
-                                    sk = subContext.Query<CompositeResult<TDomain, TDomainKey>>(statement).Keys<Guid>(false).ToArray();
-                                this.m_queryPersistence?.RegisterQuerySet(queryId, sk, statement, sk.Length);
+                                try
+                                {
+                                    // Get the rest of the keys
+                                    Guid[] sk = null;
+                                    if (type == typeof(OrmResultSet<Guid>))
+                                        sk = subContext.Query<Guid>(statement).ToArray();
+                                    else
+                                        sk = subContext.Query<CompositeResult<TDomain, TDomainKey>>(statement).Keys<Guid>(false).ToArray();
+                                    this.m_queryPersistence?.RegisterQuerySet(queryId, sk, statement, sk.Length);
+                                }
+                                finally
+                                {
+                                    subContext.Dispose();
+                                }
                             }, new { Context = context.OpenClonedContext(), Statement = retVal.Statement.Build(), QueryId = queryId, Type = retVal.GetType() });
                         }
                         return keys.Skip(offset).Take(count.Value).OfType<Object>();
@@ -341,8 +347,6 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             {
                 if (retVal != null)
                     this.m_tracer.TraceEvent(EventLevel.Error, context.GetQueryLiteral(retVal.ToSqlStatement()));
-                context.Dispose(); // No longer important
-
                 throw new DataPersistenceException("Error executing query", ex);
             }
             finally
@@ -438,8 +442,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     this.FireRetrieved(postData);
 
                     // Add to cache
-                    foreach (var d in connection.CacheOnCommit)
-                        ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Add(d);
+                    ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Add(retVal);
                     return retVal;
                 }
                 catch (NotSupportedException e)

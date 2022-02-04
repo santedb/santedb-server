@@ -62,7 +62,6 @@ namespace SanteDB.Persistence.Data.ADO.Configuration.Features
         {
             AutoInsertChildren = true,
             AutoUpdateExisting = true,
-            PrepareStatements = true
         };
 
 

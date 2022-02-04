@@ -40,6 +40,7 @@ namespace SanteDB.Messaging.HDSI.Wcf
     /// Health Data Service Interface (HDSI)
     /// </summary>
     /// <remarks>Represents SanteDB Server implementation of the the Health Data Service Interface (HDSI) contract</remarks>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage] // Model classes - ignored
     public class HdsiServiceBehavior : HdsiServiceBehaviorBase
     {
         /// <summary>

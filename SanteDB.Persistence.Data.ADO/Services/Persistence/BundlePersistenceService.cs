@@ -269,13 +269,13 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             var reorganized = this.ReorganizeForInsert(data);
             this.m_tracer.TraceVerbose("After reorganization has {0} objects...", reorganized.Item.Count);
 
-            context.PrepareStatements = this.m_settingsProvider.GetConfiguration().PrepareStatements;
-
             // Ensure that provenance objects match
             var operationalItems = reorganized.Item.Where(o => reorganized.FocalObjects.Any(k => o.Key == k)).ToArray();
             var provenance = operationalItems.OfType<NonVersionedEntityData>().Select(o => o.UpdatedByKey.GetValueOrDefault()).Union(operationalItems.OfType<BaseEntityData>().Select(o => o.CreatedByKey.GetValueOrDefault())).Where(o => o != Guid.Empty);
             if (provenance.Distinct().Count() > 1)
                 this.m_tracer.TraceError("PROVENANCE OF OBJECTS DO NOT MATCH. WHEN A BUNDLE IS PERSISTED PROVENANCE DATA MUST BE NULL OR MUST MATCH. {0}", String.Join(",", provenance.Distinct().Select(o => o.ToString())));
+
+            var cacheService = ApplicationServiceContext.Current.GetService<IDataCachingService>();
 
             for (int i = 0; i < reorganized.Item.Count; i++)
             {
@@ -293,16 +293,19 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                         case BatchOperationType.Update:
                             this.m_tracer.TraceVerbose("Will update {0} object from bundle...", itm);
                             reorganized.Item[i] = svc.Update(context, itm) as IdentifiedData;
+                            reorganized.Item[i].BatchOperation = BatchOperationType.Update;
                             break;
 
                         case BatchOperationType.Insert:
                             this.m_tracer.TraceVerbose("Will insert {0} object from bundle...", itm);
                             reorganized.Item[i] = svc.Insert(context, itm) as IdentifiedData;
+                            reorganized.Item[i].BatchOperation = BatchOperationType.Insert;
                             break;
 
                         case BatchOperationType.Delete:
                             this.m_tracer.TraceVerbose("Will obsolete {0} object from bundle...", itm);
                             reorganized.Item[i] = svc.Obsolete(context, itm) as IdentifiedData;
+                            reorganized.Item[i].BatchOperation = BatchOperationType.Delete;
                             break;
 
                         default:
@@ -343,13 +346,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 }
             }
 
-            // Cache items
-            foreach (var itm in data.Item)
-            {
-                itm.LoadState = LoadState.FullLoad;
-                context.AddCacheCommit(itm);
-            }
-            return data;
+            return reorganized;
         }
 
         /// <summary>

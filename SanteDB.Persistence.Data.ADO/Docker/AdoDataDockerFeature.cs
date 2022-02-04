@@ -74,7 +74,6 @@ namespace SanteDB.Persistence.Data.ADO.Docker
                 {
                     AutoInsertChildren = true,
                     AutoUpdateExisting = true,
-                    PrepareStatements = true,
                     ProviderType = "Npgsql",
                     ReadonlyConnectionString = "MAIN",
                     ReadWriteConnectionString = "MAIN",

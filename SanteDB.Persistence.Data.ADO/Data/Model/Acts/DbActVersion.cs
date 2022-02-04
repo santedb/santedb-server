@@ -40,19 +40,19 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Acts
         /// Identifies the time that the act occurred
         /// </summary>
         [Column("act_utc")]
-        public DateTime? ActTime { get; set; }
+        public DateTimeOffset? ActTime { get; set; }
 
         /// <summary>
         /// Identifies the start time of the act
         /// </summary>
         [Column("act_start_utc")]
-        public DateTime? StartTime { get; set; }
+        public DateTimeOffset? StartTime { get; set; }
 
         /// <summary>
         /// Identifies the stop time of the act
         /// </summary>
         [Column("act_stop_utc")]
-        public DateTime? StopTime { get; set; }
+        public DateTimeOffset? StopTime { get; set; }
 
         /// <summary>
         /// Gets or sets the reason concept

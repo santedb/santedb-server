@@ -31,7 +31,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("SanteSuite Contributors")]
 [assembly: AssemblyProduct("SanteDB iCDR Server")]
-[assembly: AssemblyCopyright("Copyright (C) 2021 SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md)")]
+[assembly: AssemblyCopyright("Copyright (C) 2022 SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md)")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
