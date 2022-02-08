@@ -151,7 +151,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             totalResults = resultCount;
 
 
-            if (!this.m_settingsProvider.GetConfiguration().SingleThreadFetch && results.Count >= Environment.ProcessorCount * 2 && queryId != Guid.Empty)
+            if (!this.m_settingsProvider.GetConfiguration().SingleThreadFetch && results.Count >= Environment.ProcessorCount * 2 && queryId != Guid.Empty && Environment.ProcessorCount > 4)
             {
                 return results.AsParallel().AsOrdered().Select(o =>
                 {
