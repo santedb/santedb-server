@@ -597,7 +597,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         auth.Object3.Password = null;
                         auth.Object3.SecurityHash = null;
                         auth.Object4.DeviceSecret = null;
-                        adhocCache.Add($"s{sessionId}", auth.Values, new TimeSpan(0, 5, 0));
+                        adhocCache?.Add($"s{sessionId}", auth.Values, new TimeSpan(0, 5, 0));
                         securityApplication = auth.Object2;
                         securityDevice = auth.Object4;
                         securityUser = auth.Object3;
