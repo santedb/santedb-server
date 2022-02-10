@@ -637,7 +637,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     identities.First().AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBSessionIdClaim, securitySession.Key.ToString()));
 
                     // Add claims from session
-                    foreach (var clm in session.Claims)
+                    foreach (var clm in session.Claims.Where(o=> o.Type != SanteDBClaimTypes.Sid && o.Type != SanteDBClaimTypes.SanteDBApplicationIdentifierClaim && o.Type != SanteDBClaimTypes.SanteDBDeviceIdentifierClaim))
                         identities.First().AddClaim(clm);
 
                     // TODO: Load additional claims made about the user on the session
