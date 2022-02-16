@@ -158,6 +158,10 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="config\config.skel" />
+    <None Include="data\000-DetectedIssue.dataset">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="data\000-DuplicateRelationshipType.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

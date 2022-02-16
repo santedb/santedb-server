@@ -1,0 +1,138 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" id="HL7v3 AdministrableDrugForm Concept Set" xmlns="http://santedb.org/data">
+  <update insertIfNotExists="true">
+    <ConceptSet xmlns="http://santedb.org/model">
+      <id>9167DDAF-D29A-4448-9F72-887DF3A5BD3E</id>
+      <name>Detected Issue Type</name>
+      <mnemonic>Detected Issue Type</mnemonic>
+      <oid>1.3.6.1.4.1.33349.3.1.5.9.3.86</oid>
+      <url>http://santedb.org/valuset/DetectedIssueType</url>
+    </ConceptSet>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>1a4ff454-f54f-11e8-8eb2-f2801f1b9fd1</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>DetectedIssue-SecurityIssue</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Security</value>
+      </name>
+      <conceptSet>9167DDAF-D29A-4448-9F72-887DF3A5BD3E</conceptSet>
+    </Concept>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>1a4ff6f2-f54f-11e8-8eb2-f2801f1b9fd1</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>DetectedIssue-Constraint</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Formal Constraint</value>
+      </name>
+      <conceptSet>9167DDAF-D29A-4448-9F72-887DF3A5BD3E</conceptSet>
+    </Concept>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>1a4ff850-f54f-11e8-8eb2-f2801f1b9fd1</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>DetectedIssue-Codification</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Improper Code Use</value>
+      </name>
+      <conceptSet>9167DDAF-D29A-4448-9F72-887DF3A5BD3E</conceptSet>
+    </Concept>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>1a4ff986-f54f-11e8-8eb2-f2801f1b9fd1</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>DetectedIssue-Other</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Other/Unclassified</value>
+      </name>
+      <conceptSet>9167DDAF-D29A-4448-9F72-887DF3A5BD3E</conceptSet>
+    </Concept>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>1a4ffab2-f54f-11e8-8eb2-f2801f1b9fd1</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>DetectedIssue-AlreadyDone</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Already Done</value>
+      </name>
+      <conceptSet>9167DDAF-D29A-4448-9F72-887DF3A5BD3E</conceptSet>
+    </Concept>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>1a4ffcec-f54f-11e8-8eb2-f2801f1b9fd1</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>DetectedIssue-InvalidData</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Improper Data/Validation</value>
+      </name>
+      <conceptSet>9167DDAF-D29A-4448-9F72-887DF3A5BD3E</conceptSet>
+    </Concept>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>1a4ffe40-f54f-11e8-8eb2-f2801f1b9fd1</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>DetectedIssue-BusinessRule</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Business Rule Violation</value>
+      </name>
+      <conceptSet>9167DDAF-D29A-4448-9F72-887DF3A5BD3E</conceptSet>
+    </Concept>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>1a4fff6c-f54f-11e8-8eb2-f2801f1b9fd1</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>DetectedIssue-SafetyConcern</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Patient Safety Concern</value>
+      </name>
+      <conceptSet>9167DDAF-D29A-4448-9F72-887DF3A5BD3E</conceptSet>
+    </Concept>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>a799d33d-2326-4beb-aa27-6ff82bd0e217</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>DetectedIssue-PrivacyConcern</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Patient Privacy Concern</value>
+      </name>
+      <conceptSet>9167DDAF-D29A-4448-9F72-887DF3A5BD3E</conceptSet>
+    </Concept>
+  </update>
+</dataset>

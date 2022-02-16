@@ -113,6 +113,14 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(userName, principal, true));
                 return principal;
             }
+            catch(AuthenticationException e) when (e.Message.Contains("AUTH_LCK"))
+            {
+                throw new AuthenticationException($"Account is locked please contact an administrator");
+            }
+            catch (AuthenticationException e) when (e.Message.Contains("AUTH_INV"))
+            {
+                throw new AuthenticationException($"Invalid username or password");
+            }
             catch (Exception e)
             {
                 this.m_traceSource.TraceEvent(EventLevel.Verbose, "Invalid credentials : {0}/{1}", userName, password);
