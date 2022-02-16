@@ -40,8 +40,9 @@ namespace SanteDB.Server.Jobs
     /// <summary>
     /// A job which prunes old users from the system 
     /// </summary>
-    public class InactiveUserPruneJob : IReportProgressJob
+    public class InactiveUserPruneJob : IJob
     {
+        private readonly IJobStateManagerService m_stateManager;
 
         /// <summary>
         /// Tracer for inactivity
@@ -49,7 +50,15 @@ namespace SanteDB.Server.Jobs
         private Tracer m_tracer = Tracer.GetTracer(typeof(InactiveUserPruneJob));
 
         // Cancel flag
-        private bool m_cancelFlag = false;
+        private volatile bool m_cancelFlag = false;
+
+        /// <summary>
+        /// DI constructor
+        /// </summary>
+        public InactiveUserPruneJob(IJobStateManagerService stateManagerService)
+        {
+            this.m_stateManager = stateManagerService;
+        }
 
         /// <summary>
         /// Get the id of this job
@@ -70,11 +79,6 @@ namespace SanteDB.Server.Jobs
         public bool CanCancel => true;
 
         /// <summary>
-        /// Gets the current state
-        /// </summary>
-        public JobStateType CurrentState { get; private set; }
-
-        /// <summary>
         /// Parameters to the job
         /// </summary>
         public IDictionary<string, Type> Parameters => new Dictionary<String, Type>()
@@ -83,32 +87,12 @@ namespace SanteDB.Server.Jobs
         };
 
         /// <summary>
-        /// Gets last time the job was started
-        /// </summary>
-        public DateTime? LastStarted { get; private set; }
-
-        /// <summary>
-        /// Gets the time that the job was finished
-        /// </summary>
-        public DateTime? LastFinished { get; private set; }
-
-        /// <summary>
-        /// Gets the progress
-        /// </summary>
-        public float Progress { get; private set; }
-
-        /// <summary>
-        /// Gets the status text
-        /// </summary>
-        public string StatusText { get; private set; }
-
-        /// <summary>
         /// Cancel the operation
         /// </summary>
         public void Cancel()
         {
             this.m_cancelFlag = true;
-            this.CurrentState = JobStateType.Cancelled;
+            this.m_stateManager.SetProgress(this, "Cancel Requested", 0.0f);
         }
 
         /// <summary>
@@ -118,8 +102,7 @@ namespace SanteDB.Server.Jobs
         {
             try
             {
-                this.CurrentState = JobStateType.Running;
-                this.LastStarted = DateTime.Now;
+                this.m_stateManager.SetState(this, JobStateType.Running);
 
                 using (AuthenticationContext.EnterSystemContext())
                 {
@@ -132,12 +115,10 @@ namespace SanteDB.Server.Jobs
 
                     DateTimeOffset cutoff = DateTimeOffset.Now.AddDays(-days);
 
-                    this.StatusText = "Pruning Users";
-
                     int offset = 0, totalResults = 1;
                     while (offset < totalResults)
                     {
-                        this.Progress = (float)offset / (float)totalResults;
+                        this.m_stateManager.SetProgress(this, "Pruning Users", (float)offset / (float)totalResults);
                         List<SecurityUser> actionedUser = new List<SecurityUser>(10);
 
                         // Users who haven't logged in 
@@ -192,19 +173,19 @@ namespace SanteDB.Server.Jobs
                         if (actionedUser.Count > 0)
                             AuditUtil.AuditSecurityDeletionAction(actionedUser, true, new String[] { "obsoletionTime" });
                     }
-                    this.LastFinished = DateTime.Now;
+
+                    this.m_stateManager.SetState(this, JobStateType.Completed);
                 }
             }
             catch (Exception ex)
             {
                 this.m_tracer.TraceError("Error pruning inactive users : {0}", ex);
-                this.CurrentState = JobStateType.Aborted;
+                this.m_stateManager.SetProgress(this, ex.Message, 0.0f);
+                this.m_stateManager.SetState(this, JobStateType.Aborted);
             }
             finally
             {
                 this.m_cancelFlag = false;
-                this.StatusText = String.Empty;
-                this.Progress = 1.0f;
             }
         }
     }
