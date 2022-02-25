@@ -77,16 +77,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         protected readonly ILocalizationService m_localizationService;
 
         /// <summary>
-        /// Providers
-        /// </summary>
-        private static ConcurrentDictionary<Type, IAdoPersistenceProvider> s_providers = new ConcurrentDictionary<Type, IAdoPersistenceProvider>();
-
-        /// <summary>
-        /// Providers for mapping
-        /// </summary>
-        private static ConcurrentDictionary<Type, object> s_mapProviders = new ConcurrentDictionary<Type, object>();
-
-        /// <summary>
         /// Base persistence service
         /// </summary>
         public BasePersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCaching = null, IQueryPersistenceService queryPersistence = null)
@@ -96,6 +86,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             this.m_adhocCache = adhocCacheService;
             this.m_configuration = configurationManager.GetSection<AdoPersistenceConfigurationSection>();
             this.m_localizationService = localizationService;
+            this.Provider = this.m_configuration.Provider;
             this.m_modelMapper = new ModelMapper(typeof(AdoPersistenceService).Assembly.GetManifestResourceStream(DataConstants.MapResourceName), "AdoModelMap");
         }
 
@@ -202,6 +193,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         protected abstract OrmResultSet<TDbModel> DoQueryInternal(DataContext context, Expression<Func<TModel, bool>> query, bool allowCache = false);
 
         /// <summary>
+        /// Perform a query by model object
+        /// </summary>
+        protected abstract IQueryResultSet<TModel> DoQueryModel(Expression<Func<TModel, bool>> query);
+
+        /// <summary>
         /// Perform an internal get operation
         /// </summary>
         protected abstract TDbModel DoGetInternal(DataContext context, Guid key, Guid? versionKey, bool allowCache = false);
@@ -248,14 +244,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         protected abstract void DoDeleteAllInternal(DataContext context, Expression<Func<TModel, bool>> expression, DeleteMode deletionMode);
 
         /// <summary>
-        /// Perform a query on the model
-        /// </summary>
-        protected virtual IQueryResultSet<TModel> DoQueryModel(DataContext context, Expression<Func<TModel, bool>> query)
-        {
-            return new MappedQueryResultSet<TModel>(this).Where(query);
-        }
-
-        /// <summary>
         /// Called before the object is persisted - this allows implementations to change the object before being persisted
         /// </summary>
         protected abstract TModel BeforePersisting(DataContext context, TModel data);
@@ -264,52 +252,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// Called after the object is persisted - this allows implementations to change the object before it is returned
         /// </summary>
         protected abstract TModel AfterPersisted(DataContext context, TModel data);
-
-        /// <summary>
-        /// Get related mapping provider
-        /// </summary>
-        /// <typeparam name="TRelated">The model type for which the provider should be returned</typeparam>
-        protected IMappedQueryProvider<TRelated> GetRelatedMappingProvider<TRelated>()
-        {
-            if (!s_mapProviders.TryGetValue(typeof(TRelated), out object provider))
-            {
-                provider = ApplicationServiceContext.Current.GetService<IMappedQueryProvider<TRelated>>();
-                if (provider != null)
-                {
-                    s_mapProviders.TryAdd(typeof(TRelated), provider);
-                }
-                else
-                {
-                    throw new InvalidOperationException(this.m_localizationService.GetString(ErrorMessageStrings.MISSING_SERVICE, new { service = typeof(IMappedQueryProvider<TRelated>) }));
-                }
-            }
-            return provider as IMappedQueryProvider<TRelated>;
-        }
-
-        /// <summary>
-        /// Get related persistence service
-        /// </summary>
-        protected IAdoPersistenceProvider<TRelated> GetRelatedPersistenceService<TRelated>() => this.GetRelatedPersistenceService(typeof(TRelated)) as IAdoPersistenceProvider<TRelated>;
-
-        /// <summary>
-        /// Get related persistence service that can store model objects of <paramref name="trelated"/>
-        /// </summary>
-        /// <param name="trelated">The related type of object</param>
-        /// <returns>The persistence provider</returns>
-        protected IAdoPersistenceProvider GetRelatedPersistenceService(Type trelated)
-        {
-            if (!s_providers.TryGetValue(trelated, out IAdoPersistenceProvider provider))
-            {
-                var relType = typeof(IAdoPersistenceProvider<>).MakeGenericType(trelated);
-                provider = ApplicationServiceContext.Current.GetService(relType) as IAdoPersistenceProvider;
-                if (provider != null)
-                {
-                    s_providers.TryAdd(trelated, provider);
-                }
-            }
-            return provider;
-        }
-
 
         /// <summary>
         /// Perform the actual insert of a model object
@@ -483,12 +425,15 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 // Attempt fetch from master cache
                 TModel retVal = null;
                 var useCache = allowCached &&
-                    (this.m_configuration.CachingPolicy?.Targets.HasFlag(AdoDataCachingPolicyTarget.ModelObjects) == true ||
-                    (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy) <= this.m_configuration.LoadStrategy);
+                    this.m_configuration.CachingPolicy?.Targets.HasFlag(AdoDataCachingPolicyTarget.ModelObjects) == true;
 
                 if (useCache)
                 {
                     retVal = this.m_dataCacheService?.GetCacheItem<TModel>(key);
+                    if(!this.ValidateCacheItemLoadMode(retVal))
+                    {
+                        retVal = null;
+                    }
                 }
 
                 // Fetch from database
@@ -511,7 +456,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                         this.m_dataCacheService?.Add(retVal);
                     }
                 }
-                
+
                 return retVal;
 #if DEBUG
             }
@@ -546,7 +491,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 catch (DbException e)
                 {
                     this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "Data error executing count operation", query, e);
-                    throw this.TranslateDbException(e);
+                    throw e.TranslateDbException();
                 }
                 catch (Exception e)
                 {
@@ -613,7 +558,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
             // Fetch from cache?
             TModel retVal = this.m_dataCacheService?.GetCacheItem<TModel>(key);
-            if (retVal == null || versionKey.HasValue)
+           
+            if (retVal == null || versionKey.GetValueOrDefault() != Guid.Empty || !this.ValidateCacheItemLoadMode(retVal))
             {
                 // Try-fetch
                 using (var context = this.Provider.GetReadonlyConnection())
@@ -624,12 +570,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
                         // Is there an ad-hoc version from the database?
                         retVal = this.DoGetModel(context, key, versionKey, true);
-                        retVal.HarmonizeKeys(KeyHarmonizationMode.PropertyOverridesKey);
+                        retVal?.HarmonizeKeys(KeyHarmonizationMode.PropertyOverridesKey);
                     }
                     catch (DbException e)
                     {
                         this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "Data error executing get operation", key, e);
-                        throw this.TranslateDbException(e);
+                        throw e.TranslateDbException();
                     }
                     catch (Exception e)
                     {
@@ -685,9 +631,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 return preEvent.Data;
             }
 
-            using (var context = this.Provider.GetWriteConnection())
+
+            try
             {
-                try
+                using (var context = this.Provider.GetWriteConnection())
                 {
                     context.Open();
 
@@ -719,26 +666,26 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                         if (mode == TransactionMode.Commit)
                         {
                             tx.Commit();
-                           
+
                         }
                     }
+                }
 
-                    // Post event
-                    var postEvt = new DataPersistedEventArgs<TModel>(data, mode, principal);
-                    this.Inserted?.Invoke(this, postEvt);
+                // Post event
+                var postEvt = new DataPersistedEventArgs<TModel>(data, mode, principal);
+                this.Inserted?.Invoke(this, postEvt);
 
-                    return postEvt.Data;
-                }
-                catch (DbException e)
-                {
-                    this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "Data error executing insert operation", data, e);
-                    throw this.TranslateDbException(e);
-                }
-                catch (Exception e)
-                {
-                    this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "General error executing insert operation", data, e);
-                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.DATA_GENERAL), e);
-                }
+                return postEvt.Data;
+            }
+            catch (DbException e)
+            {
+                this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "Data error executing insert operation", data, e);
+                throw e.TranslateDbException();
+            }
+            catch (Exception e)
+            {
+                this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "General error executing insert operation", data, e);
+                throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.DATA_GENERAL), e);
             }
         }
 
@@ -790,7 +737,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Perform the specified query
         /// </summary>
-        public IEnumerable Query(Expression query)
+        public IQueryResultSet Query(Expression query)
         {
             if (query is Expression<Func<TModel, bool>> expr)
             {
@@ -806,7 +753,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// Executes the specified query returning the query set
         /// </summary>
         public IQueryResultSet<TModel> Query(Expression<Func<TModel, bool>> query, IPrincipal principal)
-        {
+        { 
             if (query == null)
             {
                 throw new ArgumentNullException(nameof(query), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
@@ -824,27 +771,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 return preEvt.Results;
             }
 
-            using (var context = this.Provider.GetReadonlyConnection())
-            {
-                try
-                {
-                    var results = this.DoQueryModel(context, query);
-
-                    var postEvt = new QueryResultEventArgs<TModel>(query, results, principal);
-                    this.Queried?.Invoke(this, postEvt);
-                    return postEvt.Results;
-                }
-                catch (DbException e)
-                {
-                    this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "Data error executing query operation", query, e);
-                    throw this.TranslateDbException(e);
-                }
-                catch (Exception e)
-                {
-                    this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "General error executing query operation", query, e);
-                    throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.DATA_GENERAL), e);
-                }
-            }
+            var results = this.DoQueryModel(query);
+            var postEvt = new QueryResultEventArgs<TModel>(query, results, principal);
+            this.Queried?.Invoke(this, postEvt);
+            return postEvt.Results;
         }
 
         /// <summary>
@@ -989,7 +919,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 catch (DbException e)
                 {
                     this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "Data error executing update operation", data, e);
-                    throw this.TranslateDbException(e);
+                    throw e.TranslateDbException();
                 }
                 catch (Exception e)
                 {
@@ -999,57 +929,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }
         }
 
-        /// <summary>
-        /// Translates a DB exception to an appropriate SanteDB exception
-        /// </summary>
-        protected Exception TranslateDbException(DbException e)
-        {
-            this.m_tracer.TraceError("Will Translate DBException: {0} - {1}", e.Data["SqlState"] ?? e.ErrorCode, e.Message);
-            if (e.Data["SqlState"] != null)
-            {
-                switch (e.Data["SqlState"].ToString())
-                {
-                    case "O9001": // SanteDB => Data Validation Error
-                        return new DetectedIssueException(
-                            new DetectedIssue(DetectedIssuePriorityType.Error, e.Data["SqlState"].ToString(), e.Message, DetectedIssueKeys.InvalidDataIssue));
 
-                    case "O9002": // SanteDB => Codification error
-                        return new DetectedIssueException(new List<DetectedIssue>() {
-                                        new DetectedIssue(DetectedIssuePriorityType.Error, e.Data["SqlState"].ToString(),  e.Message, DetectedIssueKeys.CodificationIssue),
-                                        new DetectedIssue(DetectedIssuePriorityType.Information, e.Data["SqlState"].ToString(), "HINT: Select a code that is from the correct concept set or add the selected code to the concept set", DetectedIssueKeys.CodificationIssue)
-                                    });
-
-                    case "23502": // PGSQL - NOT NULL
-                        return new DetectedIssueException(
-                                        new DetectedIssue(DetectedIssuePriorityType.Error, e.Data["SqlState"].ToString(), e.Message, DetectedIssueKeys.InvalidDataIssue)
-                                    );
-
-                    case "23503": // PGSQL - FK VIOLATION
-                        return new DetectedIssueException(
-                                        new DetectedIssue(DetectedIssuePriorityType.Error, e.Data["SqlState"].ToString(), e.Message, DetectedIssueKeys.FormalConstraintIssue)
-                                    );
-
-                    case "23505": // PGSQL - UQ VIOLATION
-                        return new DetectedIssueException(
-                                        new DetectedIssue(DetectedIssuePriorityType.Error, e.Data["SqlState"].ToString(), e.Message, DetectedIssueKeys.AlreadyDoneIssue)
-                                    );
-
-                    case "23514": // PGSQL - CK VIOLATION
-                        return new DetectedIssueException(new List<DetectedIssue>()
-                        {
-                            new DetectedIssue(DetectedIssuePriorityType.Error, e.Data["SqlState"].ToString(), e.Message, DetectedIssueKeys.FormalConstraintIssue),
-                            new DetectedIssue(DetectedIssuePriorityType.Information, e.Data["SqlState"].ToString(), "HINT: The code you're using may be incorrect for the given context", DetectedIssueKeys.CodificationIssue)
-                        });
-
-                    default:
-                        return new DataPersistenceException(e.Message, e);
-                }
-            }
-            else
-            {
-                return new DetectedIssueException(new DetectedIssue(DetectedIssuePriorityType.Error, "dbexception", e.Message, DetectedIssueKeys.OtherIssue));
-            }
-        }
 
         /// <summary>
         /// Get the ad-hoc cache key
@@ -1069,8 +949,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         public virtual TModel ToModelInstance(DataContext context, object result)
         {
-            var useCache = this.m_configuration.CachingPolicy?.Targets.HasFlag(AdoDataCachingPolicyTarget.ModelObjects) == true // Configuration allows caching
-                && (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy) <= this.m_configuration.LoadStrategy;
+            var useCache = this.m_configuration.CachingPolicy?.Targets.HasFlag(AdoDataCachingPolicyTarget.ModelObjects) == true;
             // TODO: Add caching here
             if (context == null)
             {
@@ -1084,7 +963,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 // Retrieve cache version - check updated time
                 var existing = this.m_dataCacheService?.GetCacheItem<TModel>(dbModel.Key);
-                if (!useCache || existing == null || !this.ValidateCacheItem(existing, dbModel))
+
+                if (!useCache || existing == null || !this.ValidateCacheItem(existing, dbModel) || !this.ValidateCacheItemLoadMode(existing))
                 {
                     var retVal = this.DoConvertToInformationModel(context, dbModel);
 
@@ -1104,11 +984,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 var dbObject = composite.Values.OfType<TDbModel>().First();
                 var existing = this.m_dataCacheService?.GetCacheItem<TModel>(dbObject.Key);
-                if (!useCache || existing == null || !this.ValidateCacheItem(existing, dbObject))
+                if (!useCache || existing == null || !this.ValidateCacheItem(existing, dbObject) || !this.ValidateCacheItemLoadMode(existing))
                 {
                     var retVal = this.DoConvertToInformationModel(context, dbObject, composite.Values.ToArray());
 
-                    if(useCache)
+                    if (useCache)
                     {
                         this.m_dataCacheService?.Add(retVal);
                     }
@@ -1124,6 +1004,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 throw new ArgumentException(nameof(result), String.Format(ErrorMessages.ARGUMENT_INVALID_TYPE, typeof(TDbModel), result.GetType()));
             }
+        }
+
+        /// <summary>
+        /// Validate the cache state of an object from cache
+        /// </summary>
+        private bool ValidateCacheItemLoadMode(TModel existing)
+        {
+            return existing?.GetAnnotations<LoadMode>().Max() >= (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy) == true;
         }
 
         /// <summary>
@@ -1149,7 +1037,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// ADO Persistence provider for query
         /// </summary>
-        IQueryResultSet<TModel> IAdoPersistenceProvider<TModel>.Query(DataContext context, Expression<Func<TModel, bool>> filter) => this.DoQueryModel(context, filter);
+        IQueryResultSet<TModel> IAdoPersistenceProvider<TModel>.Query(DataContext context, Expression<Func<TModel, bool>> filter)
+             => new MappedQueryResultSet<TModel>(this, context).Where(filter);
 
         /// <summary>
         /// ADO Persistence provider for insert
@@ -1167,6 +1056,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         TModel IAdoPersistenceProvider<TModel>.Delete(DataContext context, Guid key, DeleteMode deletionMode) => this.DoDeleteModel(context, key, deletionMode);
 
         /// <summary>
+        /// ADO non-generic delete
+        /// </summary>
+        public IdentifiedData Delete(DataContext context, Guid key, DeleteMode deletionMode) => this.DoDeleteModel(context, key, deletionMode);
+
+        /// <summary>
         /// <summary>
         /// Ensure that the object exists in the database
         /// </summary>
@@ -1182,8 +1076,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 return default(TData);
             }
 
-            var persistenceService = this.GetRelatedPersistenceService<TData>();
-            if (!data.Key.HasValue || !persistenceService.Query(context, o => o.Key == data.Key).Any())
+            var persistenceService = typeof(TData).GetRelatedPersistenceService() as IAdoPersistenceProvider<TData>;
+            if (!data.Key.HasValue || !persistenceService.Exists(context, data.Key.Value))
             {
                 if (this.m_configuration.AutoInsertChildren)
                 {
@@ -1240,7 +1134,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                         if (mode == TransactionMode.Commit)
                         {
                             tx.Commit();
-                           
+
                         }
                     }
 
@@ -1253,7 +1147,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 catch (DbException e)
                 {
                     this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "Data error executing delete operation", key, e);
-                    throw this.TranslateDbException(e);
+                    throw e.TranslateDbException();
                 }
                 catch (Exception e)
                 {
@@ -1303,7 +1197,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 catch (DbException e)
                 {
                     this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "Data error executing delete all operation", expression, e);
-                    throw this.TranslateDbException(e);
+                    throw e.TranslateDbException();
                 }
                 catch (Exception e)
                 {
@@ -1355,7 +1249,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 catch (DbException e)
                 {
                     this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "Data error executing touch operation", key, e);
-                    throw this.TranslateDbException(e);
+                    throw e.TranslateDbException();
                 }
                 catch (Exception e)
                 {
@@ -1366,14 +1260,17 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         }
 
         /// <inheritdoc/>
-        public object Insert(DataContext context, object data) => this.DoInsertModel(context, data.Convert<TModel>());
+        public IdentifiedData Insert(DataContext context, IdentifiedData data) => this.DoInsertModel(context, data.Convert<TModel>());
 
         /// <inheritdoc/>
-        public object Update(DataContext context, object data) => this.DoUpdateModel(context, data.Convert<TModel>());
+        public IdentifiedData Update(DataContext context, IdentifiedData data) => this.DoUpdateModel(context, data.Convert<TModel>());
 
         /// <summary>
         /// Touch the specified object
         /// </summary>
         public TModel Touch(DataContext context, Guid id) => this.DoTouchModel(context, id);
+
+        /// <inheritdoc/>
+        public bool Exists(DataContext context, Guid key) => context.Any<TDbModel>(o => o.Key == key);
     }
 }

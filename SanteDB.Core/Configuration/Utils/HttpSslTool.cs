@@ -31,9 +31,11 @@ using System.Threading.Tasks;
 
 namespace SanteDB.Server.Core.Configuration.Utils
 {
+    /// <summary>
     /// HTTP SSL Tool
     /// </summary>
     /// <remarks>Class from http://www.pinvoke.net/default.aspx/httpapi/HttpSetServiceConfiguration.html</remarks>
+#pragma warning disable CS1591
     public class HttpSslTool
     {
 
@@ -248,4 +250,6 @@ namespace SanteDB.Server.Core.Configuration.Utils
         #endregion
 
     }
+#pragma warning restore CS1591
+
 }

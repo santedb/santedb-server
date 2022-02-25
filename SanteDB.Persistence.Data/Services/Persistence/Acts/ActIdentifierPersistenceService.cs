@@ -6,6 +6,7 @@ using SanteDB.Persistence.Data.Model;
 using SanteDB.Persistence.Data.Model.DataType;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Acts
@@ -38,15 +39,24 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         protected override ActIdentifier DoConvertToInformationModel(DataContext context, DbActIdentifier dbModel, params Object[] referenceObjects)
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
-            switch (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
-                case LoadMode.SyncLoad:
-                    retVal.Authority = this.GetRelatedPersistenceService<AssigningAuthority>().Get(context, dbModel.AuthorityKey);
-                    retVal.SetLoaded(nameof(ActIdentifier.Authority));
-                    goto case LoadMode.FullLoad;
                 case LoadMode.FullLoad:
-                    retVal.IdentifierType = this.GetRelatedPersistenceService<IdentifierType>().Get(context, dbModel.TypeKey.GetValueOrDefault());
-                    retVal.SetLoaded(nameof(ActIdentifier.IdentifierType));
+                    retVal.IdentifierType = retVal.IdentifierType.GetRelatedPersistenceService().Get(context, dbModel.TypeKey.GetValueOrDefault());
+                    retVal.SetLoaded(nameof(EntityIdentifier.IdentifierType));
+                    goto case LoadMode.SyncLoad;
+                case LoadMode.SyncLoad:
+                    retVal.Authority = retVal.Authority.GetRelatedMappingProvider().ToModelInstance(context, referenceObjects.OfType<DbAssigningAuthority>().FirstOrDefault()) ??
+                        retVal.Authority.GetRelatedPersistenceService().Get(context, dbModel.AuthorityKey);
+                    retVal.SetLoaded(o=>o.Authority);
+                    break;
+
+                case LoadMode.QuickLoad:
+                    retVal.Authority = retVal.Authority.GetRelatedMappingProvider().ToModelInstance(context, referenceObjects.OfType<DbAssigningAuthority>().FirstOrDefault());
+                    if (retVal.Authority != null)
+                    {
+                        retVal.SetLoaded(o => o.Authority);
+                    }
                     break;
             }
             return retVal;

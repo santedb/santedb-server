@@ -76,7 +76,16 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
             if (dataInstance == null) return null;
 
-            DbActVersion dbActVersion = (dataInstance as CompositeResult)?.Values.OfType<DbActVersion>().FirstOrDefault() ?? dataInstance as DbActVersion ?? context.FirstOrDefault<DbActVersion>(o => o.VersionKey == (dataInstance as DbActSubTable).ParentKey);
+            Guid parentKey = Guid.Empty;
+            if (dataInstance is CompositeResult cr)
+            {
+                parentKey = cr.Values.OfType<DbActSubTable>().First().ParentKey;
+            }
+            else
+            {
+                parentKey = (dataInstance as DbActSubTable).ParentKey;
+            }
+            DbActVersion dbActVersion = (dataInstance as CompositeResult)?.Values.OfType<DbActVersion>().FirstOrDefault() ?? dataInstance as DbActVersion ?? context.FirstOrDefault<DbActVersion>(o => o.VersionKey == parentKey);
             DbAct dbAct = (dataInstance as CompositeResult)?.Values.OfType<DbAct>().FirstOrDefault() ?? context.FirstOrDefault<DbAct>(o => o.Key == dbActVersion.Key);
             Act retVal = null;
 
@@ -526,6 +535,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 var k = this.QueryKeysInternal(connection, expression, offset, 1000, out totalResults).ToArray();
                 this.BulkPurgeInternal(connection, k);
                 offset += k.Length;
+                
             }
         }
 
@@ -594,6 +604,9 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
 
             context.ResetSequence("ACT_VRSN_SEQ",
                 context.Query<DbActVersion>(o => true).Max(o => o.VersionSequenceId));
+
+            this.PurgeCache(keysToPurge);
+
         }
 
         /// <summary>

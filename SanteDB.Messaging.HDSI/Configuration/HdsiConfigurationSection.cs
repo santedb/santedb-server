@@ -34,6 +34,7 @@ namespace SanteDB.Messaging.HDSI.Configuration
     /// Configuration class for HDSI configuration
     /// </summary>
     [XmlType(nameof(HdsiConfigurationSection), Namespace = "http://santedb.org/configuration")]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage] // Model classes - ignored
     public class HdsiConfigurationSection : IConfigurationSection
     {
         /// <summary>

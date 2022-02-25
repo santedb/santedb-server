@@ -18,12 +18,13 @@
  * User: fyfej
  * Date: 2021-8-27
  */
-
+using SanteDB.Core.Model;
 using SanteDB.BI.Model;
 using SanteDB.BI.Services;
 using SanteDB.BI.Util;
 using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
+using SanteDB.Core.Model.Query;
 using SanteDB.Core.Services;
 using SanteDB.Tools.Debug.Configuration;
 using System;
@@ -46,6 +47,34 @@ namespace SanteDB.Tools.Debug.BI
     [ServiceProvider("File Based BI Repository")]
     public class FileMetadataRepository : IBiMetadataRepository, IDaemonService
     {
+
+        /// <summary>
+        /// Metadata structure holding the file metadata
+        /// </summary>
+        private struct FileBiMetadata
+        {
+
+            /// <summary>
+            /// File BI metadata
+            /// </summary>
+            public FileBiMetadata(BiDefinition definition, String filePath)
+            {
+                this.Definition = definition;
+                this.FilePath = filePath;
+            }
+
+            /// <summary>
+            /// Gets the definition
+            /// </summary>
+            public BiDefinition Definition { get; private set; }
+
+            /// <summary>
+            /// Gets the path to the file
+            /// </summary>
+            public String FilePath { get; private set; }
+
+        }
+
         // Timer
         private Timer m_scanTimer;
 
@@ -53,7 +82,7 @@ namespace SanteDB.Tools.Debug.BI
         private readonly Tracer m_tracer = Tracer.GetTracer(typeof(FileMetadataRepository));
 
         // Asset dictionary
-        private ConcurrentDictionary<String, String> m_assetDictionary = new ConcurrentDictionary<string, string>();
+        private ConcurrentDictionary<String, FileBiMetadata> m_assetDictionary = new ConcurrentDictionary<string, FileBiMetadata>();
 
         // Configuration
         private DebugToolsConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<DebugToolsConfigurationSection>();
@@ -119,13 +148,12 @@ namespace SanteDB.Tools.Debug.BI
         public TBisDefinition Get<TBisDefinition>(string id) where TBisDefinition : BiDefinition
         {
             // Open the path to the specified asset
-            string assetDefinitionPath = null;
-            if (this.m_assetDictionary.TryGetValue(id, out assetDefinitionPath))
+            if (this.m_assetDictionary.TryGetValue(id, out var assetDefinition))
             {
                 // Load and return
                 try
                 {
-                    using (var fs = File.OpenRead(assetDefinitionPath))
+                    using (var fs = File.OpenRead(assetDefinition.FilePath))
                     {
                         return (TBisDefinition)BiDefinition.Load(fs);
                     }
@@ -152,6 +180,7 @@ namespace SanteDB.Tools.Debug.BI
         /// <returns>The stored metadata parameter</returns>
         public TBisDefinition Insert<TBisDefinition>(TBisDefinition metadata) where TBisDefinition : BiDefinition
         {
+
             string path = this.m_configuration.BiMetadataRepository.First().Path;
             foreach (var s in metadata.Id.Split('.'))
                 path = Path.Combine(path, s);
@@ -162,7 +191,7 @@ namespace SanteDB.Tools.Debug.BI
                 if (this.m_assetDictionary.ContainsKey(metadata.Id))
                 {
                     this.m_tracer.TraceInfo("Removing existing definition for {0}", metadata.Id);
-                    this.m_assetDictionary.TryRemove(metadata.Id, out path);
+                    this.m_assetDictionary.TryRemove(metadata.Id, out _);
                 }
                 this.m_tracer.TraceInfo("Saving {0} to {1}", metadata.Id, path);
 
@@ -170,7 +199,7 @@ namespace SanteDB.Tools.Debug.BI
                     Directory.CreateDirectory(Path.GetDirectoryName(path));
                 using (var fs = File.Create(path))
                     metadata.Save(fs);
-                this.m_assetDictionary.TryAdd(metadata.Id, path);
+                this.m_assetDictionary.TryAdd(metadata.Id, new FileBiMetadata(metadata, path));
                 return metadata;
             }
             catch (Exception e)
@@ -190,19 +219,7 @@ namespace SanteDB.Tools.Debug.BI
         /// <returns>The matching records</returns>
         public IEnumerable<TBisDefinition> Query<TBisDefinition>(Expression<Func<TBisDefinition, bool>> filter, int offset, int? count) where TBisDefinition : BiDefinition
         {
-            int r = 0;
-            var filterFn = filter.Compile();
-            foreach (var f in this.m_assetDictionary.Values.Distinct())
-            {
-                using (var fs = File.OpenRead(f))
-                {
-                    var asset = BiDefinition.Load(fs);
-                    if (asset.GetType().IsAssignableFrom(typeof(TBisDefinition)) && filterFn.Invoke((TBisDefinition)asset) && r >= offset && r++ < count + offset)
-                        yield return (TBisDefinition)asset;
-                    else if (r > count + offset)
-                        yield break;
-                }
-            }
+            return this.Query<TBisDefinition>(filter).Skip(offset).Take(count ?? 100);
         }
 
         /// <summary>
@@ -211,13 +228,12 @@ namespace SanteDB.Tools.Debug.BI
         public void Remove<TBisDefinition>(string id) where TBisDefinition : BiDefinition
         {
             // Open the path to the specified asset
-            string assetDefinitionPath = null;
-            if (this.m_assetDictionary.TryGetValue(id, out assetDefinitionPath))
+            if (this.m_assetDictionary.TryGetValue(id, out var assetDefinition))
             {
                 // Load and return
                 try
                 {
-                    File.Move(assetDefinitionPath, Path.ChangeExtension(assetDefinitionPath, "bak"));
+                    File.Move(assetDefinition.FilePath, Path.ChangeExtension(assetDefinition.FilePath, "bak"));
                 }
                 catch (Exception e)
                 {
@@ -285,7 +301,7 @@ namespace SanteDB.Tools.Debug.BI
                         File.Move(f, Path.ChangeExtension(f, "bak"));
                     }
                     else
-                        this.m_assetDictionary.TryAdd(asset.Id, f);
+                        this.m_assetDictionary.TryAdd(asset.Id, new FileBiMetadata(asset, f));
                 }
                 catch (Exception e)
                 {
@@ -305,6 +321,25 @@ namespace SanteDB.Tools.Debug.BI
 
             this.Stopped?.Invoke(this, EventArgs.Empty);
             return true;
+        }
+
+        /// <inheritdoc/>
+        public IQueryResultSet<TBisDefinition> Query<TBisDefinition>(Expression<Func<TBisDefinition, bool>> filter) where TBisDefinition : BiDefinition
+        {
+            int r = 0;
+            var filterFn = filter.Compile();
+            return new TransformQueryResultSet<FileBiMetadata, TBisDefinition>(
+                this.m_assetDictionary.Values.Where(p=>p.Definition is TBisDefinition).Distinct().AsResultSet(),
+                f =>
+                {
+                    using (var fs = File.OpenRead(f.FilePath))
+                    {
+                        // We always load to get the most recent version
+                        var asset = BiDefinition.Load(fs);
+                        return asset as TBisDefinition;
+                    }
+                }
+            );
         }
     }
 }

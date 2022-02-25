@@ -265,6 +265,11 @@ namespace SanteDB.Persistence.Diagnostics.Jira
         {
             throw new NotImplementedException();
         }
+
+        public IQueryResultSet<DiagnosticReport> Query<TExpression>(Expression<Func<TExpression, bool>> query, IPrincipal principal) where TExpression : DiagnosticReport
+        {
+            throw new NotImplementedException();
+        }
     }
 
 #pragma warning restore CS0067

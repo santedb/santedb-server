@@ -45,8 +45,11 @@ namespace SanteDB.Server.Core.Services.Impl
             this.m_identityProvider = identityProvider;
         }
 
+        /// <inheritdoc/>
         protected override string WritePolicy => PermissionPolicyIdentifiers.CreateDevice;
+        /// <inheritdoc/>
         protected override string DeletePolicy => PermissionPolicyIdentifiers.CreateDevice;
+        /// <inheritdoc/>
         protected override string AlterPolicy => PermissionPolicyIdentifiers.CreateDevice;
 
         /// <summary>

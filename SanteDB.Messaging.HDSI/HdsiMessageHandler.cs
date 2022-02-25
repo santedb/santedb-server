@@ -42,10 +42,16 @@ using System.Reflection;
 namespace SanteDB.Messaging.HDSI
 {
     /// <summary>
-    /// The HDSI Message Handler Daemon class
+    /// Implementation of <see cref="IApiEndpointProvider"/> for the Health Data Services Interface REST service
     /// </summary>
+    /// <remarks>
+    /// <para>The HDSI message handler is responsible for the maintenance and lifecycle of SanteDB's 
+    /// <see href="https://help.santesuite.org/developers/service-apis/health-data-service-interface-hdsi">Health Data Service Interface</see>. The service
+    /// starts the necessary REST and query services on start and tears them down on system shutdown.</para>
+    /// </remarks>
     [Description("The primary iCDR Health Data Messaging Service (HDSI) allows sharing of RIM objects in XML or JSON over HTTP")]
     [ApiServiceProvider("Health Data Services Interface", typeof(HdsiServiceBehavior), configurationType: typeof(HdsiConfigurationSection), required: true)]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage] // Model classes - ignored
     public class HdsiMessageHandler : IDaemonService, IApiEndpointProvider
     {
         /// <summary>

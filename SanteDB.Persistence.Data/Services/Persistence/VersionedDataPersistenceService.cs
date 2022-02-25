@@ -28,7 +28,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
     /// Persistence service which handles versioned objects
     /// </summary>
     public abstract class VersionedDataPersistenceService<TModel, TDbModel, TDbKeyModel> : BaseEntityDataPersistenceService<TModel, TDbModel>
-        where TModel : BaseEntityData, IVersionedEntity, IHasState, new()
+        where TModel : BaseEntityData, IVersionedData, IHasState, new()
         where TDbModel : DbVersionedData, IDbHasStatus, new()
         where TDbKeyModel : DbIdentified, new()
     {
@@ -151,7 +151,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 // Get ID
                 DbAssigningAuthority dbAuth = null;
 
-                if (id.Authority.Key.HasValue) // Attempt lookup in adhoc cache then by db
+                if (id.AuthorityKey.HasValue)
+                {
+                    dbAuth = this.m_adhocCache?.Get<DbAssigningAuthority>($"{DataConstants.AdhocAuthorityKey}{id.AuthorityKey}");
+                    if (dbAuth == null)
+                        dbAuth = context.FirstOrDefault<DbAssigningAuthority>(o => o.Key == id.AuthorityKey);
+                }
+                else if (id.Authority.Key.HasValue) // Attempt lookup in adhoc cache then by db
                 {
                     dbAuth = this.m_adhocCache?.Get<DbAssigningAuthority>($"{DataConstants.AdhocAuthorityKey}{id.Authority.Key}");
                     if (dbAuth == null)
@@ -275,7 +281,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
 #endif
 
-                if (!versionKey.HasValue) // fetching the current version
+                if (versionKey.GetValueOrDefault() == Guid.Empty) // fetching the current version
                 {
                     var cacheKey = this.GetAdHocCacheKey(key);
                     if (allowCache && (this.m_configuration?.CachingPolicy?.Targets & Data.Configuration.AdoDataCachingPolicyTarget.DatabaseObjects) == Data.Configuration.AdoDataCachingPolicyTarget.DatabaseObjects)
@@ -406,8 +412,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 }
 
                 // next - we create a new version of dbmodel
-                var newVersion = existing.First().CopyObjectData(model, true);
-                newVersion.ReplacesVersionKey = newVersion.VersionKey;
+                var oldVersion = existing.First();
+                var newVersion = new TDbModel();
+                newVersion.CopyObjectData(model, true);
+                newVersion.ReplacesVersionKey = oldVersion.VersionKey;
                 newVersion.CreationTime = DateTimeOffset.Now;
                 newVersion.CreatedByKey = context.ContextId;
                 newVersion.ObsoletedByKey = null;
@@ -602,6 +610,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                             existing.StatusConceptKey = StatusKeys.Inactive;
                             retVal = this.DoUpdateInternal(context, existing);
                             break;
+                        case DeleteMode.VersionedDelete:
+                            existing.StatusConceptKey = StatusKeys.Purged;
+                            retVal = this.DoUpdateInternal(context, existing);
+                            break;
                         case DeleteMode.PermanentDelete:
                             existing.StatusConceptKey = StatusKeys.Purged;
                             this.DoDeleteReferencesInternal(context, existing.Key);
@@ -648,14 +660,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 this.m_tracer.TraceVerbose("Obsoletion of {0} took {1} ms", key, sw.ElapsedMilliseconds);
             }
 #endif
-        }
-
-        /// <summary>
-        /// Perform a query on the model
-        /// </summary>
-        protected override IQueryResultSet<TModel> DoQueryModel(DataContext context, Expression<Func<TModel, bool>> query)
-        {
-            return new MappedQueryResultSet<TModel>(this, nameof(IDbVersionedData.Key)).Where(query);
         }
 
         /// <summary>
@@ -713,6 +717,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             return base.DoQueryInternalAs<TReturn>(context, query, queryModifier);
         }
 
+        /// <inheritdoc/>
+        protected override IQueryResultSet<TModel> DoQueryModel(Expression<Func<TModel, bool>> query) => new MappedQueryResultSet<TModel>(this, nameof(IDbVersionedData.Key)).Where(query);
+
         /// <summary>
         /// Update associated entities
         /// </summary>
@@ -741,7 +748,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }).ToArray();
 
             // We now want to fetch the perssitence serivce of this
-            var persistenceService = base.GetRelatedPersistenceService<TModelAssociation>();
+            var persistenceService = typeof(TModelAssociation).GetRelatedPersistenceService() as IAdoPersistenceProvider<TModelAssociation>;
             if (persistenceService == null)
             {
                 throw new DataPersistenceException(String.Format(ErrorMessages.RELATED_OBJECT_NOT_AVAILABLE, typeof(TModelAssociation), typeof(TModel)));
@@ -753,15 +760,15 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             var existing = persistenceService.Query(context, o => o.SourceEntityKey == data.Key && !o.ObsoleteVersionSequenceId.HasValue).Select(o => o.Key).ToArray();
 
             // Which are new and which are not?
-            var removedRelationships = existing.Where(o => !associations.Any(a => a.Key == o)).Select(a => persistenceService.Delete(context, a.Value, DeleteMode.LogicalDelete));
-            var addedRelationships = associations.Where(o => !o.Key.HasValue || !existing.Any(a => a == o.Key)).Select(a =>
+            var removedRelationships = existing.Where(o => associations.Any(a=>a.Key == o && a.BatchOperation == BatchOperationType.Delete) || !associations.Any(a => a.Key == o)).Select(a => persistenceService.Delete(context, a.Value, DeleteMode.LogicalDelete));
+            var addedRelationships = associations.Where(o => o.BatchOperation != BatchOperationType.Delete && ( !o.Key.HasValue || !existing.Any(a => a == o.Key))).Select(a =>
             {
                 a.EffectiveVersionSequenceId = data.VersionSequence;
                 a = persistenceService.Insert(context, a);
                 a.BatchOperation = Core.Model.DataTypes.BatchOperationType.Insert;
                 return a;
             });
-            var updatedRelationships = associations.Where(o => o.Key.HasValue && existing.Any(a => a == o.Key)).Select(a =>
+            var updatedRelationships = associations.Where(o => o.BatchOperation != BatchOperationType.Delete && o.Key.HasValue && existing.Any(a => a == o.Key)).Select(a =>
             {
                 a = persistenceService.Update(context, a);
                 a.BatchOperation = Core.Model.DataTypes.BatchOperationType.Update;

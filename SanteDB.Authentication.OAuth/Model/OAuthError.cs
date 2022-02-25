@@ -20,6 +20,7 @@
  */
 using Newtonsoft.Json;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SanteDB.Authentication.OAuth2.Model
 {
@@ -28,11 +29,29 @@ namespace SanteDB.Authentication.OAuth2.Model
     /// </summary>
     public enum OAuthErrorType
     {
+        /// <summary>
+        /// The client sent an invalid request
+        /// </summary>
         invalid_request,
+        /// <summary>
+        /// The client secret is invalid
+        /// </summary>
         invalid_client,
+        /// <summary>
+        /// The grant information was invalid (secret or password)
+        /// </summary>
         invalid_grant,
+        /// <summary>
+        /// The client is not authorized to perform the action
+        /// </summary>
         unauthorized_client,
+        /// <summary>
+        /// The grant type is not supported by this server
+        /// </summary>
         unsupported_grant_type,
+        /// <summary>
+        /// The scope value is invalid
+        /// </summary>
         invalid_scope
     }
 
@@ -40,6 +59,7 @@ namespace SanteDB.Authentication.OAuth2.Model
     /// OAuth error response message
     /// </summary>
     [JsonObject]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage] // Serialization class
     public class OAuthError
     {
 

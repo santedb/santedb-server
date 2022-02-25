@@ -79,7 +79,7 @@ namespace SanteDB.Persistence.Data.Model.Acts
         /// Gets or sets the reason concept
         /// </summary>
         [Column("rsn_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
-        public Guid ReasonConceptKey { get; set; }
+        public Guid? ReasonConceptKey { get; set; }
 
         /// <summary>
         /// Gets or sets the status concept

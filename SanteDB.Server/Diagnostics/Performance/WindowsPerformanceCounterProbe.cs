@@ -45,10 +45,7 @@ namespace SanteDB.Server.Diagnostics.Performance
         public WindowsPerformanceCounterProbe(Guid uuid, String name, String description, String category, String measure, String value) : base(name, description)
         {
             var osiService = ApplicationServiceContext.Current.GetService<IOperatingSystemInfoService>();
-            if (osiService.OperatingSystem == OperatingSystemID.Win32)
-            {
-                this.m_windowsCounter = new PerformanceCounter(category, measure, value, true);
-            }
+            this.m_windowsCounter = new PerformanceCounter(category, measure, value, true);
             this.Uuid = uuid;
         }
 
@@ -65,7 +62,7 @@ namespace SanteDB.Server.Diagnostics.Performance
                 }
                 else
                 {
-                    return 0;
+                    return -1;
                 }
             }
         }
@@ -82,5 +79,11 @@ namespace SanteDB.Server.Diagnostics.Performance
         {
             this.m_windowsCounter.Dispose();
         }
+
+        /// <summary>
+        /// Gets the unit
+        /// </summary>
+        public override string Unit => "%";
+
     }
 }

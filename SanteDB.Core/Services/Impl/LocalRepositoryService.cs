@@ -27,6 +27,7 @@ using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Roles;
+using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
@@ -38,8 +39,16 @@ using System.Xml.Serialization;
 namespace SanteDB.Server.Core.Services.Impl
 {
     /// <summary>
-    /// Daemon service which adds all the repositories for acts
+    /// Registers the <see cref="IRepositoryService"/> instances with the core application context and provides a 
+    /// <see cref="IServiceFactory"/> implementation to construct repository services.
     /// </summary>
+    /// <remarks>
+    /// <para>The instances of <see cref="IRepositoryService"/> which this service constructs contact directly with the 
+    /// equivalent <see cref="IDataPersistenceService"/> for each object. The repository layers add business process
+    /// logic for calling <see cref="IBusinessRulesService"/>, <see cref="IPrivacyEnforcementService"/>, and others as 
+    /// necessary to ensure secure and safe access to the underlying data repositories. All requests to any <see cref="IRepositoryService"/>
+    /// constructed by this service use the <see cref="AuthenticationContext"/> to establish "who" is performing the action.</para>
+    /// </remarks>
     [ServiceProvider("Local (database) repository service", Dependencies = new Type[] { typeof(IDataPersistenceService) })]
     public class LocalRepositoryService : IDaemonService, IServiceFactory
     {
@@ -71,6 +80,7 @@ namespace SanteDB.Server.Core.Services.Impl
                 typeof(GenericLocalMetadataRepository<DeviceEntity>),
                 typeof(GenericLocalMetadataRepository<ApplicationEntity>),
                 typeof(LocalSecurityRepositoryService),
+                typeof(LocalProviderRepository),
                 typeof(LocalTemplateDefinitionRepositoryService),
                 typeof(LocalAuditRepository)
             };

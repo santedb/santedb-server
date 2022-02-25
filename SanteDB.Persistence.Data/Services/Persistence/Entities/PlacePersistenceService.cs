@@ -61,11 +61,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             }
 
             // Deep loading?
-            switch (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
                 case LoadMode.FullLoad:
                 case LoadMode.SyncLoad:
-                    modelData.Services = this.GetRelatedPersistenceService<PlaceService>().Query(context, r => r.SourceEntityKey == dbModel.Key)?.ToList();
+                    modelData.Services = modelData.Services.GetRelatedPersistenceService().Query(context, r => r.SourceEntityKey == dbModel.Key)?.ToList();
                     modelData.SetLoaded(o => o.Services);
                     break;
             }

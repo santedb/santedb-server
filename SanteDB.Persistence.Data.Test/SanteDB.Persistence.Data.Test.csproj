@@ -53,6 +53,8 @@
     <Compile Include="Persistence\Acts\NarrativeTest.cs" />
     <Compile Include="Persistence\CodeSystemAuthorityPersistenceTest.cs" />
     <Compile Include="Persistence\AssigningAuthorityPersistenceTest.cs" />
+    <Compile Include="Persistence\Collections\BundlePersistenceTest.cs" />
+    <Compile Include="Persistence\Collections\BundleReorganizeTest.cs" />
     <Compile Include="Persistence\ConceptClassPersistenceTest.cs" />
     <Compile Include="Persistence\ConceptPersistenceTest.cs" />
     <Compile Include="Persistence\ConceptSetPersistenceServiceTest.cs" />

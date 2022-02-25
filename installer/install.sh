@@ -31,8 +31,8 @@ install_mono() {
     if [[ "$install" =~ ^[nN]$ ]]; then 
         echo "Won't install mono - SanteDB may not work properly!"
     else
-        $SUDO apt install -y mono-complete
-        exit_on_error $? !!
+		$SUDO apt update
+        $SUDO apt install -y mono-complete || exit_on_error $? !!
         echo "Mono installed"
     fi
 }
@@ -41,8 +41,8 @@ install_psql() {
     local install=""
     read_yesno "You don't appear to have PostgreSQL installed, SanteDB iCDR Requires a PostgreSQL - do you want me to install it? (hint: answer no if you have another PostgreSQL server)" install
     if [[ "$install" =~ ^[yY]$ ]]; then 
-        $SUDO apt install -y postgresql
-        exit_on_error $? !!
+		$SUDO apt update
+        $SUDO apt install -y postgresql || exit_on_error $? !!
         echo "PostgreSQL installed"
     fi
 }
@@ -106,6 +106,7 @@ $SUDO cp -rf * $INSTALL_ROOT
 
 echo "Installing Certificates "
 $SUDO mono $INSTALL_ROOT/SanteDB.exe --install-certs 
+$SUDO certmgr -add -c -m CA inter.cer
 
 read_yesno "Do you want me to install SanteDB as a daemon?" daemon
 
@@ -118,8 +119,9 @@ Description=SanteDB iCDR Server
 [Service]
 Type=simple
 RemainAfterExit=yes
-ExecStart=/usr/bin/mono-service -d:$INSTALL_ROOT $INSTALL_ROOT/SanteDB.exe --console 
-ExecStop=kill \`cat /tmp/SanteDB.exe.lock\`
+PIDFile=/run/santedb.pid
+ExecStart=/usr/bin/mono-service -l:/run/santedb.pid -d:$INSTALL_ROOT $INSTALL_ROOT/SanteDB.exe --console 
+ExecStop=kill -sHUP $MAINPID
 
 [Install]
 WantedBy=multi-user.target
@@ -159,10 +161,10 @@ else
 fi
 
 
-#
-# read_yesno "Do you want to configure your SanteDB instance? " config
-# 
-# if [[ "$config" =~ ^[yY]$ ]] 
-# then 
-# 	$SUDO mono $INSTALL_ROOT/ConfigTool.exe
-# fi;
+
+read_yesno "Do you want to configure your SanteDB instance? " config
+ 
+if [[ "$config" =~ ^[yY]$ ]] 
+then 
+	$SUDO mono $INSTALL_ROOT/ConfigTool.exe
+fi;

@@ -41,6 +41,14 @@ namespace SanteDB.Server.Core.Persistence
     /// <summary>
     /// Data initialization service
     /// </summary>
+    /// <remarks>
+    /// <para>This service reads data from the configured directory (usually the <c>data/</c> directory) with extension <c>.dataset</c>
+    /// and imports the data into the SanteDB iCDR instance. Each <see cref="Dataset"/> file is then renamed to <c>.completed</c> to 
+    /// indicate that the import of the provided data was successful. This service allows SanteDB instances to share information between
+    /// deployments easily.</para>
+    /// <para>For more information consult the <see href="https://help.santesuite.org/developers/applets/distributing-data">Distributing Data</see> files</para>
+    /// </remarks>
+    /// <seealso cref="Dataset"/>
     [ServiceProvider("Dataset Installation Service")]
     public class DataInitializationService : IDaemonService, IReportProgressChanged
     {
@@ -198,7 +206,7 @@ namespace SanteDB.Server.Core.Persistence
                                 ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Remove(ivr.SourceEntityKey.Value);
                                 var idt = typeof(IDataPersistenceService<>).MakeGenericType(stype.GetGenericArguments()[0]);
                                 var idp = ApplicationServiceContext.Current.GetService(idt) as IDataPersistenceService;
-                                ivr.EffectiveVersionSequenceId = (idp.Get(ivr.SourceEntityKey.Value) as IVersionedEntity)?.VersionSequence;
+                                ivr.EffectiveVersionSequenceId = (idp.Get(ivr.SourceEntityKey.Value) as IVersionedData)?.VersionSequence;
                                 if (ivr.EffectiveVersionSequenceId == null)
                                     throw new KeyNotFoundException($"Dataset contains a reference to an unkown source entity : {ivr.SourceEntityKey}");
                                 target = ivr;
@@ -221,10 +229,46 @@ namespace SanteDB.Server.Core.Persistence
 
                 // Execute the changes
                 var isqlp = ApplicationServiceContext.Current.GetService<ISqlDataPersistenceService>();
-                foreach (var de in ds.Exec.Where(o => o.InvariantName == isqlp?.InvariantName))
+                foreach (var de in ds.SqlExec.Where(o => o.InvariantName == isqlp?.InvariantName))
                 {
                     this.m_traceSource.TraceInfo("Executing post-dataset SQL instructions for {0}...", ds.Id);
                     isqlp.ExecuteNonQuery(de.QueryText);
+                }
+
+                // Execute the service instructions
+                foreach(var se in ds.ServiceExec)
+                {
+                    this.m_traceSource.TraceInfo("Executing post-dataset service instructions {0}.{1}()...", se.ServiceType, se.Method);
+                    var serviceType = Type.GetType(se.ServiceType);
+                    if(serviceType == null)
+                    {
+                        this.m_traceSource.TraceWarning("Cannot find service type {0}...", se.ServiceType);
+                        continue;
+                    }
+                    var serviceInstance = ApplicationServiceContext.Current.GetService(serviceType);
+                    if(serviceInstance == null)
+                    {
+                        this.m_traceSource.TraceWarning("Cannot find registered service for {0}...", serviceType);
+                        continue;
+                    }
+
+                    // Invoke the method
+                    var method = serviceType.GetRuntimeMethod(se.Method, se.Arguments.Select(o=>o.GetType()).ToArray());
+                    if(method == null)
+                    {
+                        this.m_traceSource.TraceWarning("Cannot find method {0} on service {1}...", se.Method, serviceType);
+                        continue;
+                    }
+
+                    try
+                    {
+                        method.Invoke(serviceInstance, se.Arguments.ToArray());
+                    }
+                    catch (Exception e)
+                    {
+                        this.m_traceSource.TraceWarning("Could not execute post-service call {0} - {1}", se.ServiceType, e);
+                    }
+
                 }
                 this.m_traceSource.TraceInfo("Applied {0} changes", ds.Action.Count);
             }

@@ -1,5 +1,7 @@
 ﻿using SanteDB.Core;
 using SanteDB.Core.BusinessRules;
+using SanteDB.Core.Diagnostics;
+using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Security;
@@ -8,13 +10,16 @@ using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Principal;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
+using SanteDB.OrmLite.MappedResultSets;
 using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Model.Security;
 using SanteDB.Persistence.Data.Security;
 using SanteDB.Persistence.Data.Services.Persistence;
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Security;
 using System.Security.Principal;
@@ -49,8 +54,133 @@ namespace SanteDB.Persistence.Data
         // Localization service
         private static readonly ILocalizationService s_localizationService = ApplicationServiceContext.Current.GetService<ILocalizationService>();
 
+        // Tracer
+        private static readonly Tracer s_tracer = Tracer.GetTracer(typeof(DataContextExtensions));
+
         // Adhoc cache
         private static readonly IAdhocCacheService s_adhocCache = ApplicationServiceContext.Current.GetService<IAdhocCacheService>();
+
+        /// <summary>
+        /// Providers
+        /// </summary>
+        private readonly static ConcurrentDictionary<Type, IAdoPersistenceProvider> s_providers = new ConcurrentDictionary<Type, IAdoPersistenceProvider>();
+
+        // Configuration
+        private readonly static AdoPersistenceConfigurationSection s_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<AdoPersistenceConfigurationSection>();
+
+        /// <summary>
+        /// Providers for mapping
+        /// </summary>
+        private readonly static ConcurrentDictionary<Type, object> s_mapProviders = new ConcurrentDictionary<Type, object>();
+
+        /// <summary>
+        /// Translates a DB exception to an appropriate SanteDB exception
+        /// </summary>
+        public static Exception TranslateDbException(this DbException e)
+        {
+            s_tracer.TraceError("Will Translate DBException: {0} - {1}", e.Data["SqlState"] ?? e.ErrorCode, e.Message);
+            if (e.Data["SqlState"] != null)
+            {
+                switch (e.Data["SqlState"].ToString())
+                {
+                    case "O9001": // SanteDB => Data Validation Error
+                        return new DetectedIssueException(
+                            new DetectedIssue(DetectedIssuePriorityType.Error, e.Data["SqlState"].ToString(), e.Message, DetectedIssueKeys.InvalidDataIssue));
+
+                    case "O9002": // SanteDB => Codification error
+                        return new DetectedIssueException(new List<DetectedIssue>() {
+                                        new DetectedIssue(DetectedIssuePriorityType.Error, e.Data["SqlState"].ToString(),  e.Message, DetectedIssueKeys.CodificationIssue),
+                                        new DetectedIssue(DetectedIssuePriorityType.Information, e.Data["SqlState"].ToString(), "HINT: Select a code that is from the correct concept set or add the selected code to the concept set", DetectedIssueKeys.CodificationIssue)
+                                    });
+
+                    case "23502": // PGSQL - NOT NULL
+                        return new DetectedIssueException(
+                                        new DetectedIssue(DetectedIssuePriorityType.Error, e.Data["SqlState"].ToString(), e.Message, DetectedIssueKeys.InvalidDataIssue)
+                                    );
+
+                    case "23503": // PGSQL - FK VIOLATION
+                        return new DetectedIssueException(
+                                        new DetectedIssue(DetectedIssuePriorityType.Error, e.Data["SqlState"].ToString(), e.Message, DetectedIssueKeys.FormalConstraintIssue)
+                                    );
+
+                    case "23505": // PGSQL - UQ VIOLATION
+                        return new DetectedIssueException(
+                                        new DetectedIssue(DetectedIssuePriorityType.Error, e.Data["SqlState"].ToString(), e.Message, DetectedIssueKeys.AlreadyDoneIssue)
+                                    );
+
+                    case "23514": // PGSQL - CK VIOLATION
+                        return new DetectedIssueException(new List<DetectedIssue>()
+                        {
+                            new DetectedIssue(DetectedIssuePriorityType.Error, e.Data["SqlState"].ToString(), e.Message, DetectedIssueKeys.FormalConstraintIssue),
+                            new DetectedIssue(DetectedIssuePriorityType.Information, e.Data["SqlState"].ToString(), "HINT: The code you're using may be incorrect for the given context", DetectedIssueKeys.CodificationIssue)
+                        });
+
+                    default:
+                        return new DataPersistenceException(e.Message, e);
+                }
+            }
+            else
+            {
+                return new DetectedIssueException(new DetectedIssue(DetectedIssuePriorityType.Error, "dbexception", e.Message, DetectedIssueKeys.OtherIssue));
+            }
+        }
+
+        /// <summary>
+        /// Get related mapping provider
+        /// </summary>
+        /// <typeparam name="TRelated">The model type for which the provider should be returned</typeparam>
+        public static IMappedQueryProvider<TRelated> GetRelatedMappingProvider<TRelated>(this TRelated me)
+        {
+            if (!s_mapProviders.TryGetValue(typeof(TRelated), out object provider))
+            {
+                provider = ApplicationServiceContext.Current.GetService<IMappedQueryProvider<TRelated>>();
+                if (provider != null)
+                {
+                    s_mapProviders.TryAdd(typeof(TRelated), provider);
+                }
+                else
+                {
+                    throw new InvalidOperationException(s_localizationService.GetString(ErrorMessageStrings.MISSING_SERVICE, new { service = typeof(IMappedQueryProvider<TRelated>) }));
+                }
+            }
+            return provider as IMappedQueryProvider<TRelated>;
+        }
+
+        /// <summary>
+        /// Get related persistence service from an enumerable
+        /// </summary>
+        public static IAdoPersistenceProvider<TRelated> GetRelatedPersistenceService<TRelated>(this IEnumerable<TRelated> me) where TRelated : IdentifiedData 
+            => GetRelatedPersistenceService(typeof(TRelated)) as IAdoPersistenceProvider<TRelated>;
+        
+        /// <summary>
+        /// Get related persistence service
+        /// </summary>
+        public static IAdoPersistenceProvider<TRelated> GetRelatedPersistenceService<TRelated>(this TRelated me) where TRelated : IdentifiedData 
+            => GetRelatedPersistenceService(typeof(TRelated)) as IAdoPersistenceProvider<TRelated>;
+
+        /// <summary>
+        /// Get related persistence service that can store model objects of <paramref name="trelated"/>
+        /// </summary>
+        /// <param name="trelated">The related type of object</param>
+        /// <returns>The persistence provider</returns>
+        public static IAdoPersistenceProvider GetRelatedPersistenceService(this Type trelated)
+        {
+            if (!s_providers.TryGetValue(trelated, out IAdoPersistenceProvider provider))
+            {
+                var relType = typeof(IAdoPersistenceProvider<>).MakeGenericType(trelated);
+                provider = ApplicationServiceContext.Current.GetService(relType) as IAdoPersistenceProvider;
+                if (provider != null)
+                {
+                    s_providers.TryAdd(trelated, provider);
+                }
+                else
+                {
+                    // Try TRelated's parent
+                    return trelated.BaseType.GetRelatedPersistenceService();
+                }
+            }
+            return provider;
+        }
 
         /// <summary>
         /// Convert to security policy instance
@@ -101,7 +231,7 @@ namespace SanteDB.Persistence.Data
         {
             me = me.Clone() as TData;
 
-            foreach (var pi in typeof(TData).GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
+            foreach (var pi in me.GetType().GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
             {
                 if (!pi.CanWrite)
                 {
@@ -119,9 +249,16 @@ namespace SanteDB.Persistence.Data
                     switch (harmonizationMode)
                     {
                         case KeyHarmonizationMode.KeyOverridesProperty:
-                            if (keyValue != null) // There is a key for this which is populated, we want to use the key and clear the property
+                            if (keyValue != null && !keyValue.Equals(iddata.Key)) // There is a key for this which is populated, we want to use the key and clear the property
                             {
-                                pi.SetValue(me, null);
+                                if (s_configuration.StrictKeyAgreement)
+                                {
+                                    throw new DataPersistenceException(s_localizationService.GetString(ErrorMessageStrings.DATA_KEY_PROPERTY_DISAGREEMENT, new { keyProperty = keyProperty.ToString(), dataProperty = pi.ToString() }));
+                                }
+                                else
+                                {
+                                    pi.SetValue(me, null);
+                                }
                             }
                             else
                             {
@@ -130,7 +267,7 @@ namespace SanteDB.Persistence.Data
                             break;
 
                         case KeyHarmonizationMode.PropertyOverridesKey:
-                            if (iddata.Key.HasValue)
+                            if (iddata.Key.HasValue) // Data has value
                             {
                                 keyProperty.SetValue(me, iddata.Key);
                             }
@@ -143,9 +280,9 @@ namespace SanteDB.Persistence.Data
                 }
                 else if (piValue is IList list)
                 {
-                    foreach (var itm in list.OfType<IdentifiedData>())
+                    for(var i = 0; i < list.Count; i++)
                     {
-                        itm.HarmonizeKeys(harmonizationMode);
+                        list[i] = (list[i] as IdentifiedData)?.HarmonizeKeys(harmonizationMode) ?? list[i];
                     }
                 }
             }

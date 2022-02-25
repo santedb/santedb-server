@@ -49,6 +49,7 @@ using SanteDB.Server.Core.Configuration;
 using SanteDB.Server.Core.Security;
 using SanteDB.Server.Core.Services;
 using SanteDB.Core.Security.Configuration;
+using Newtonsoft.Json.Linq;
 
 namespace SanteDB.Persistence.Data.ADO.Services
 {
@@ -190,7 +191,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             if (user == null)
                                 throw new KeyNotFoundException(userName);
 
-                            var claims = dataContext.Query<DbUserClaim>(o => o.SourceKey == user.Key && (o.ClaimType == SanteDBClaimTypes.SanteDBOTAuthCode || o.ClaimType == SanteDBClaimTypes.SanteDBCodeAuth) && (!o.ClaimExpiry.HasValue || o.ClaimExpiry > DateTime.Now));
+                            var claims = dataContext.Query<DbUserClaim>(o => o.SourceKey == user.Key && (o.ClaimType == SanteDBClaimTypes.SanteDBOTAuthCode || o.ClaimType == SanteDBClaimTypes.SanteDBCodeAuth) && (!o.ClaimExpiry.HasValue || o.ClaimExpiry > DateTimeOffset.Now));
                             DbUserClaim tfaClaim = claims.FirstOrDefault(o => o.ClaimType == SanteDBClaimTypes.SanteDBOTAuthCode),
                                 noPassword = claims.FirstOrDefault(o => o.ClaimType == SanteDBClaimTypes.SanteDBCodeAuth);
 
@@ -206,11 +207,11 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                 retVal = AdoClaimsIdentity.Create(dataContext, user, true, "Tfa+LastPasswordHash").CreateClaimsPrincipal();
                                 if (retVal.Identity is IClaimsIdentity ici)
                                 {
-                                    //ici.AddClaim(new SanteDBClaim(SanteDBClaimTypes.PurposeOfUse, PurposeOfUseKeys.SecurityAdmin.ToString()));
-                                    //ici.AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, PermissionPolicyIdentifiers.LoginPasswordOnly));
-                                    //ici.AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, PermissionPolicyIdentifiers.ReadMetadata));
-                                    //ici.RemoveClaim(retVal.FindFirst(SanteDBClaimTypes.Expiration));
-                                    //ici.AddClaim(new SanteDBClaim(SanteDBClaimTypes.Expiration, DateTime.Now.AddMinutes(5).ToString("o"))); // Special case, password
+                                    ici.AddClaim(new SanteDBClaim(SanteDBClaimTypes.PurposeOfUse, PurposeOfUseKeys.SecurityAdmin.ToString()));
+                                    ici.AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, PermissionPolicyIdentifiers.LoginPasswordOnly));
+                                    ici.AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, PermissionPolicyIdentifiers.ReadMetadata));
+                                    ici.RemoveClaim(retVal.FindFirst(SanteDBClaimTypes.Expiration));
+                                    ici.AddClaim(new SanteDBClaim(SanteDBClaimTypes.Expiration, DateTimeOffset.Now.AddMinutes(5).ToString("o"))); // Special case, password
                                 }
                             }
                             else if (!String.IsNullOrEmpty(password))
@@ -300,7 +301,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                             // Set expiration
                             var passwordAge = this.m_securityConfiguration?.GetSecurityPolicy<Int32>(SecurityPolicyIdentification.MaxPasswordAge, 3650);
                             if (passwordAge.HasValue)
-                                user.PasswordExpiration = DateTime.Now.AddDays(passwordAge.Value);
+                                user.PasswordExpiration = DateTimeOffset.Now.AddDays(passwordAge.Value);
                             dataContext.Update(user);
                             tx.Commit();
                         }
@@ -440,7 +441,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
 
                     // Obsolete
                     if (lockout)
-                        user.Lockout = DateTime.MaxValue.AddDays(-10);
+                        user.Lockout = DateTimeOffset.MaxValue.AddDays(-10);
                     else
                         user.Lockout = null;
 
@@ -463,7 +464,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
             catch (Exception e)
             {
                 this.m_traceSource.TraceEvent(EventLevel.Error, e.ToString());
-                throw new DataPersistenceException($"Error setting lockout for {userName}");
+                throw new DataPersistenceException($"Error setting lockout for {userName}", e);
             }
         }
 
@@ -507,14 +508,14 @@ namespace SanteDB.Persistence.Data.ADO.Services
                                 SourceKey = user.Key
                             };
                             if (expire.HasValue)
-                                existingClaim.ClaimExpiry = DateTime.Now.Add(expire.Value);
+                                existingClaim.ClaimExpiry = DateTimeOffset.Now.Add(expire.Value);
                             dataContext.Insert(existingClaim);
                         }
                         else
                         {
                             existingClaim.ClaimValue = claimValue;
                             if (expire.HasValue)
-                                existingClaim.ClaimExpiry = DateTime.Now.Add(expire.Value);
+                                existingClaim.ClaimExpiry = DateTimeOffset.Now.Add(expire.Value);
                             dataContext.Update(existingClaim);
                         }
                     }
@@ -566,12 +567,17 @@ namespace SanteDB.Persistence.Data.ADO.Services
         /// <returns>The authenticated principal</returns>
         public IPrincipal Authenticate(ISession session)
         {
+
             try
             {
+
+                var sessionId = new Guid(session.Id.Take(16).ToArray());
+
+                var adhocCache = ApplicationServiceContext.Current.GetService<IAdhocCacheService>();
+                var authCache = adhocCache?.Get<object[]>($"s{sessionId}");
                 using (var context = this.m_configuration.Provider.GetReadonlyConnection())
                 {
                     context.Open();
-                    var sessionId = new Guid(session.Id.Take(16).ToArray());
 
                     var sql = context.CreateSqlStatement<DbSession>().SelectFrom(typeof(DbSession), typeof(DbSecurityApplication), typeof(DbSecurityUser), typeof(DbSecurityDevice))
                         .InnerJoin<DbSecurityApplication>(o => o.ApplicationKey, o => o.Key)
@@ -579,28 +585,57 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         .Join<DbSession, DbSecurityDevice>("LEFT", o => o.DeviceKey, o => o.Key)
                         .Where<DbSession>(s => s.Key == sessionId);
 
-                    var auth = context.FirstOrDefault<CompositeResult<DbSession, DbSecurityApplication, DbSecurityUser, DbSecurityDevice>>(sql);
+
+                    DbSecurityApplication securityApplication = null;
+                    DbSecurityDevice securityDevice = null;
+                    DbSecurityUser securityUser = null;
+                    DbSession securitySession = null;
+
+                    if (authCache == null)
+                    {
+                        var auth = context.FirstOrDefault<CompositeResult<DbSession, DbSecurityApplication, DbSecurityUser, DbSecurityDevice>>(sql);
+                        auth.Object2.Secret = null;
+                        auth.Object3.Password = null;
+                        auth.Object3.SecurityHash = null;
+                        auth.Object4.DeviceSecret = null;
+                        adhocCache.Add($"s{sessionId}", auth.Values, new TimeSpan(0, 5, 0));
+                        securityApplication = auth.Object2;
+                        securityDevice = auth.Object4;
+                        securityUser = auth.Object3;
+                        securitySession = auth.Object1;
+                    }
+                    else
+                    {
+                        securitySession = authCache[0] as DbSession ??
+                            (authCache[0] as JObject).ToObject<DbSession>();
+                        securityApplication = authCache[1] as DbSecurityApplication ??
+                            (authCache[1] as JObject).ToObject<DbSecurityApplication>();
+                        securityUser = authCache[2] as DbSecurityUser ??
+                            (authCache[2] as JObject).ToObject<DbSecurityUser>();
+                        securityDevice = authCache[3] as DbSecurityDevice ??
+                            (authCache[3] as JObject).ToObject<DbSecurityDevice>();
+                    }
 
                     // Identities
                     List<IClaimsIdentity> identities = new List<IClaimsIdentity>(3);
-                    if (auth == null)
+                    if (securitySession == null)
                         throw new SecuritySessionException(SessionExceptionType.NotEstablished, "Session not found", null);
-                    if (auth.Object1.NotAfter < DateTime.Now)
+                    if (securitySession.NotAfter < DateTimeOffset.Now)
                         throw new SecuritySessionException(SessionExceptionType.Expired, "Session expired", null);
-                    else if (auth.Object1.NotBefore > DateTime.Now)
+                    else if (securitySession.NotBefore > DateTimeOffset.Now)
                         throw new SecuritySessionException(SessionExceptionType.NotYetValid, "Session not yet valid", null);
 
-                    if (auth.Object2?.Key != null)
-                        identities.Add(new Server.Core.Security.ApplicationIdentity(auth.Object2.Key, auth.Object2.PublicId, true));
-                    if (auth.Object1.DeviceKey.HasValue)
-                        identities.Add(new DeviceIdentity(auth.Object4.Key, auth.Object4.PublicId, true));
+                    if (securitySession.ApplicationKey != null)
+                        identities.Add(new Server.Core.Security.ApplicationIdentity(securityApplication.Key, securityApplication.PublicId, true));
+                    if (securitySession.DeviceKey.HasValue)
+                        identities.Add(new DeviceIdentity(securityDevice.Key, securityDevice.PublicId, true));
 
-                    var principal = auth.Object1.UserKey.GetValueOrDefault() == Guid.Empty ?
-                        new SanteDBClaimsPrincipal(identities) : AdoClaimsIdentity.Create(context, auth.Object3, true, "SESSION").CreateClaimsPrincipal(identities);
+                    var principal = securitySession.UserKey.GetValueOrDefault() == Guid.Empty ?
+                        new SanteDBClaimsPrincipal(identities) : AdoClaimsIdentity.Create(context, securityUser, true, "SESSION").CreateClaimsPrincipal(identities);
 
-                    identities.First().AddClaim(new SanteDBClaim(SanteDBClaimTypes.AuthenticationInstant, session.NotBefore.ToString("o")));
-                    identities.First().AddClaim(new SanteDBClaim(SanteDBClaimTypes.Expiration, session.NotAfter.ToString("o")));
-                    identities.First().AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBSessionIdClaim, auth.Object1.Key.ToString()));
+                    identities.First().AddClaim(new SanteDBClaim(SanteDBClaimTypes.AuthenticationInstant, securitySession.NotBefore.ToString("o")));
+                    identities.First().AddClaim(new SanteDBClaim(SanteDBClaimTypes.Expiration, securitySession.NotAfter.ToString("o")));
+                    identities.First().AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBSessionIdClaim, securitySession.Key.ToString()));
 
                     // Add claims from session
                     foreach (var clm in session.Claims)

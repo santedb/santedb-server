@@ -101,7 +101,7 @@
            prepareStatements="true">
     
   </section>
-  <section xsi:type="ApplicationServiceContextConfigurationSection" threadPoolSize="4">
+  <section xsi:type="ApplicationServiceContextConfigurationSection" allowUnsignedAssemblies="true" threadPoolSize="4">
     <serviceProviders>
       <add type="SanteDB.Caching.Memory.MemoryCacheService, SanteDB.Caching.Memory" />
       <add type="SanteDB.Caching.Memory.MemoryQueryPersistenceService, SanteDB.Caching.Memory" />

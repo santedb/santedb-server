@@ -30,6 +30,7 @@ using SanteDB.Core.Services;
 using SanteDB.Server.Core.Services;
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Security.Principal;
@@ -41,6 +42,7 @@ namespace SanteDB.Core.Security.Tfa.Twilio
     /// <summary>
     /// Represents a TFA mechanism that uses TWILIO
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class TfaTwilioMechanism : ITfaMechanism
     {
         // Configuration

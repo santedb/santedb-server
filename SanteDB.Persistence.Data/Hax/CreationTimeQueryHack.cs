@@ -56,7 +56,7 @@ namespace SanteDB.Persistence.Data.Hax
         /// </summary>
         public bool HackQuery(QueryBuilder builder, SqlStatement sqlStatement, SqlStatement whereClause, Type tmodel, PropertyInfo property, string queryPrefix, QueryPredicate predicate, object values, IEnumerable<TableMapping> scopedTables, params KeyValuePair<String, object>[] queryFilter)
         {
-            if (property.Name == nameof(IBaseEntityData.CreationTime) && typeof(IVersionedEntity).IsAssignableFrom(tmodel)) // filter by first creation time
+            if (property.Name == nameof(IBaseData.CreationTime) && typeof(IVersionedData).IsAssignableFrom(tmodel)) // filter by first creation time
             {
                 // Get the version table (which has
                 var ormMap = scopedTables.SelectMany(o => o.Columns);

@@ -410,7 +410,7 @@ namespace SanteDB.Persistence.Data.Services
 
                         if (securable is IdentifiedData id1)
                         {
-                            this.m_adhocCache?.Add($"pip.{id1.Type}.{id1.Key}.{id1.Tag}", results);
+                            this.m_adhocCache?.Add($"pip.{id1.Type}.{id1.Key}.{id1.Tag}", results, new TimeSpan(0, 5, 0));
                         }
                     }
                     catch (Exception e)
@@ -513,6 +513,9 @@ namespace SanteDB.Persistence.Data.Services
                 {
                     context.Open();
                     retVal = context.SingleOrDefault<DbSecurityPolicy>(o => o.Oid == policyOid && o.ObsoletionTime == null);
+
+                    this.m_adhocCache?.Add($"pip.{policyOid}", retVal, new TimeSpan(0, 0, 30));
+
                 }
                 catch (Exception e)
                 {

@@ -161,7 +161,7 @@ namespace SanteDB.Persistence.Diagnostics.Email
 
             try
             {
-                var issueId = DateTime.Now.ToString("yyyy-MM-dd-HHmmss");
+                var issueId = DateTimeOffset.Now.ToString("yyyy-MM-dd-HHmmss");
 
                 var subject = $"SANTEDB ISSUE MAILER #{issueId}";
                 var body = $"<html><body><p>{storageData.LoadProperty<SecurityUser>("CreatedBy")?.UserName ?? storageData?.Submitter?.LoadProperty<SecurityUser>("SecurityUser")?.UserName} has reported a bug</p><pre>{storageData.Note}</pre><p>You can reply directly to the reporter by pressing the Reply button in your mail client</p></body></html>";
@@ -252,6 +252,11 @@ namespace SanteDB.Persistence.Diagnostics.Email
         /// Not supported - obsoleting DX reports
         /// </summary>
         public void DeleteAll(Expression<Func<DiagnosticReport, bool>> matching, TransactionMode mode, IPrincipal principal, DeleteMode deletionMode)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IQueryResultSet<DiagnosticReport> Query<TExpression>(Expression<Func<TExpression, bool>> query, IPrincipal principal) where TExpression : DiagnosticReport
         {
             throw new NotImplementedException();
         }

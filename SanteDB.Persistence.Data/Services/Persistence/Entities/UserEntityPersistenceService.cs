@@ -44,10 +44,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                 userData = context.FirstOrDefault<DbUserEntity>(o => o.ParentKey == dbModel.VersionKey);
             }
 
-            switch (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
                 case LoadMode.FullLoad:
-                    modelData.SecurityUser = this.GetRelatedPersistenceService<SecurityUser>().Get(context, userData.SecurityUserKey);
+                    modelData.SecurityUser = modelData.SecurityUser.GetRelatedPersistenceService().Get(context, userData.SecurityUserKey);
                     modelData.SetLoaded(o => o.SecurityUser);
                     break;
             }

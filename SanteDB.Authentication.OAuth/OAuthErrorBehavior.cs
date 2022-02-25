@@ -26,6 +26,7 @@ using SanteDB.Authentication.OAuth2.Model;
 using SanteDB.Core.Diagnostics;
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Tracing;
 using System.IO;
 using System.Text;
@@ -35,6 +36,7 @@ namespace SanteDB.Authentication.OAuth2
     /// <summary>
     /// Generate OAuth error behavior
     /// </summary>
+    [ExcludeFromCodeCoverage]
     internal class OAuthErrorBehavior : IServiceBehavior, IServiceErrorHandler
     {
         private readonly Tracer m_tracer = new Tracer(OAuthConstants.TraceSourceName);

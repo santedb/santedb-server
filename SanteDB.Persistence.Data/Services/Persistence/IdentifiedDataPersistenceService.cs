@@ -3,9 +3,11 @@ using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Model;
 using SanteDB.Core.Model.Interfaces;
+using SanteDB.Core.Model.Query;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
+using SanteDB.OrmLite.MappedResultSets;
 using SanteDB.Persistence.Data.Model;
 using SanteDB.Persistence.Data.Model.Security;
 using System;
@@ -55,6 +57,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         protected override bool ValidateCacheItem(TModel cacheEntry, TDbModel dataModel) => false;
 
         /// <summary>
+        /// Perform query model
+        /// </summary>
+        protected override IQueryResultSet<TModel> DoQueryModel(Expression<Func<TModel, bool>> query) => new MappedQueryResultSet<TModel>(this).Where(query);
+        
+        /// <summary>
         /// Convert <paramref name="model" /> to a <typeparamref name="TDbModel"/>
         /// </summary>
         /// <param name="context">The data context in case data access is required</param>
@@ -93,7 +100,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 throw new ArgumentNullException(nameof(dbModel), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
-            return this.m_modelMapper.MapDomainInstance<TDbModel, TModel>(dbModel);
+            var retVal = this.m_modelMapper.MapDomainInstance<TDbModel, TModel>(dbModel);
+            retVal.AddAnnotation(DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy);
+            return retVal;
         }
 
         /// <summary>
@@ -367,7 +376,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }).ToArray();
 
             // We now want to fetch the perssitence serivce of this
-            var persistenceService = base.GetRelatedPersistenceService<TModelAssociation>();
+            var persistenceService = typeof(TModelAssociation).GetRelatedPersistenceService() as IAdoPersistenceProvider<TModelAssociation>;
             if (persistenceService == null)
             {
                 throw new DataPersistenceException(String.Format(ErrorMessages.RELATED_OBJECT_NOT_AVAILABLE, typeof(TModelAssociation), typeof(TModel)));
@@ -377,17 +386,17 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             var existing = persistenceService.Query(context, o => o.SourceEntityKey == data.Key).Select(o => o.Key).ToArray();
 
             // Which are new and which are not?
-            var removedRelationships = existing.Where(o => !associations.Any(a => a.Key == o)).Select(a =>
+            var removedRelationships = existing.Where(o => associations.Any(a=>a.Key == o && a.BatchOperation == Core.Model.DataTypes.BatchOperationType.Delete) || !associations.Any(a => a.Key == o)).Select(a =>
             {
                 return persistenceService.Delete(context, a.Value, DeleteMode.LogicalDelete);
             });
-            var addedRelationships = associations.Where(o => !o.Key.HasValue || !existing.Any(a => a == o.Key)).Select(a =>
+            var addedRelationships = associations.Where(o => o.BatchOperation != Core.Model.DataTypes.BatchOperationType.Delete && (!o.Key.HasValue || !existing.Any(a => a == o.Key))).Select(a =>
             {
                 persistenceService.Insert(context, a);
                 a.BatchOperation = Core.Model.DataTypes.BatchOperationType.Insert;
                 return a;
             });
-            var updatedRelationships = associations.Where(o => o.Key.HasValue && existing.Any(a => a == o.Key)).Select(a =>
+            var updatedRelationships = associations.Where(o => o.BatchOperation != Core.Model.DataTypes.BatchOperationType.Delete && o.Key.HasValue && existing.Any(a => a == o.Key)).Select(a =>
             {
                 persistenceService.Update(context, a);
                 a.BatchOperation = Core.Model.DataTypes.BatchOperationType.Update;

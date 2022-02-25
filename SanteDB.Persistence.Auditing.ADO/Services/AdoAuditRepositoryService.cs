@@ -47,19 +47,26 @@ using SanteDB.BI.Services;
 using SanteDB.BI.Model;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.OrmLite.Migration;
+using SanteDB.OrmLite.MappedResultSets;
+using SanteDB.OrmLite.Providers;
 
 namespace SanteDB.Persistence.Auditing.ADO.Services
 {
     /// <summary>
     /// Represents a service which is responsible for the storage of audits
     /// </summary>
+    /// TODO: Change this to wrapped call method
     [ServiceProvider("ADO.NET Audit Repository")]
-    public class AdoAuditRepositoryService : IDataPersistenceService<AuditEventData>
+    public class AdoAuditRepositoryService : IDataPersistenceService<AuditEventData>, IMappedQueryProvider<AuditEventData>
     {
         /// <summary>
         /// Gets the service name
         /// </summary>
         public string ServiceName => "ADO.NET Audit Repository";
+
+        public IDbProvider Provider => throw new NotImplementedException();
+
+        public IQueryPersistenceService QueryPersistence => throw new NotImplementedException();
 
         // Lock object
         private object m_lockBox = new object();
@@ -84,6 +91,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         // Trace source name
         private readonly Tracer m_traceSource = Tracer.GetTracer(typeof(AdoAuditRepositoryService));
 
+#pragma warning disable CS0067
         /// <summary>
         /// Fired when data is being inserted
         /// </summary>
@@ -145,6 +153,8 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         public event EventHandler<DataPersistedEventArgs<AuditEventData>> Deleted;
 
         public event EventHandler<DataPersistingEventArgs<AuditEventData>> Deleting;
+
+#pragma warning restore CS0067
 
         /// <summary>
         /// Create new audit repository service
@@ -239,7 +249,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                     ActionCode = (ActionType)res.Object1.ActionCode,
                     EventIdentifier = (EventIdentifierType)res.Object1.EventIdentifier,
                     Outcome = (OutcomeIndicator)res.Object1.Outcome,
-                    Timestamp = res.Object1.Timestamp.DateTime,
+                    Timestamp = res.Object1.Timestamp,
                     Key = res.Object1.Key
                 };
 
@@ -339,26 +349,18 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         {
             if (messageCode == null) return null;
 
-            var codeKey = $"{messageCode.CodeSystem}#{messageCode.Code}";
-
-            var existing = this.m_adhocCache?.Get<DbAuditCode>(codeKey);
-            if (existing != null)
-            {
-                return existing;
-            }
-
             // Try to get from database
             lock (this.m_lockBox)
             {
-                existing = context.FirstOrDefault<DbAuditCode>(o => o.Code == messageCode.Code && o.CodeSystem == messageCode.CodeSystem);
-                if (existing == null)
+                var retVal = context.FirstOrDefault<DbAuditCode>(o => o.Code == messageCode.Code && o.CodeSystem == messageCode.CodeSystem);
+                if (retVal == null)
                 {
                     Guid codeId = Guid.NewGuid();
-                    existing = context.Insert(new DbAuditCode() { Code = messageCode.Code, CodeSystem = messageCode.CodeSystem, Key = codeId });
+                    retVal = context.Insert(new DbAuditCode() { Code = messageCode.Code, CodeSystem = messageCode.CodeSystem, Key = codeId });
                 }
-                this.m_adhocCache?.Add(codeKey, existing);
+                return retVal;
+
             }
-            return existing;
         }
 
         /// <summary>
@@ -391,7 +393,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                     if (eventId != null)
                         dbAudit.EventTypeCode = this.GetOrCreateAuditCode(context, eventId).Key;
 
-                    dbAudit.CreationTime = DateTime.Now;
+                    dbAudit.CreationTime = DateTimeOffset.Now;
                     storageData.Key = Guid.NewGuid();
                     dbAudit.Key = storageData.Key.Value;
                     context.Insert(dbAudit);
@@ -571,16 +573,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         /// <summary>
         /// Execute a query
         /// </summary>
-        public IQueryResultSet<AuditEventData> Query(Expression<Func<AuditEventData, bool>> query, IPrincipal overrideAuthContext = null)
-        {
-            // TODO: Fully refactor the return set of this method to be a proper result set instead of this which will exhaust the entire result set.
-            return this.Query(query, 0, null, out _).AsResultSet<AuditEventData>();
-        }
-
-        /// <summary>
-        /// Executes a query for the specified objects
-        /// </summary>
-        public IEnumerable<AuditEventData> Query(Expression<Func<AuditEventData, bool>> query, int offset, int? count, out int totalCount, IPrincipal overrideAuthContext = null, params ModelSort<AuditEventData>[] orderBy)
+        public IQueryResultSet<AuditEventData> Query(Expression<Func<AuditEventData, bool>> query, IPrincipal overrideAuthContext = null) 
         {
             // TODO: Refactor this with a yield IQueryResultSet iterator
             var preEvtData = new QueryRequestEventArgs<AuditEventData>(query, principal: overrideAuthContext);
@@ -588,7 +581,6 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
             if (preEvtData.Cancel)
             {
                 this.m_traceSource.TraceWarning("Pre-event handler for query indicates cancel : {0}", query);
-                totalCount = 0;
                 return null;
             }
 
@@ -597,29 +589,9 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                 using (var context = this.m_configuration.Provider.GetReadonlyConnection())
                 {
                     context.Open();
+                    var results = new MappedQueryResultSet<AuditEventData>(this).Where(query);
 
-                    var sql = this.m_builder.CreateQuery(query).Build();
-
-                    if (orderBy != null && orderBy.Length > 0)
-                        foreach (var ob in orderBy)
-                            sql = sql.OrderBy(this.m_mapper.MapModelExpression<AuditEventData, DbAuditEventData, dynamic>(ob.SortProperty), ob.SortOrder);
-                    else
-                        sql = sql.OrderBy<DbAuditEventData>(o => o.Timestamp, SortOrderType.OrderByDescending);
-
-                    // Total results
-                    totalCount = context.Count(sql);
-
-                    // Query control
-                    if (count.GetValueOrDefault() == 0)
-                        sql.Offset(offset).Limit(100);
-                    else
-                        sql.Offset(offset).Limit(count.Value);
-                    sql = sql.Build();
-                    var itm = context.Query<CompositeResult<DbAuditEventData, DbAuditCode>>(sql).ToList();
-                    AuditUtil.AuditAuditLogUsed(ActionType.Read, OutcomeIndicator.Success, sql.ToString(), itm.Select(o => o.Object1.Key).ToArray());
-
-                    // TODO: Create a IMappedResultSetProvider for this.
-                    var results = itm.Select(o => this.ToModelInstance(context, o)).ToList().AsResultSet();
+                    AuditUtil.AuditAuditLogUsed(ActionType.Read, OutcomeIndicator.Success, query.ToString(), results.Select(o => o.Key.Value).ToArray());
 
                     // Event args
                     var postEvtArgs = new QueryResultEventArgs<AuditEventData>(query, results, overrideAuthContext);
@@ -633,6 +605,60 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
                 this.m_traceSource.TraceError("Could not query audit {0}: {1}", query, e);
                 throw;
             }
+        }
+
+        /// <summary>
+        /// Executes a query for the specified objects
+        /// </summary>
+        public IEnumerable<AuditEventData> Query(Expression<Func<AuditEventData, bool>> query, int offset, int? count, out int totalCount, IPrincipal overrideAuthContext = null, params ModelSort<AuditEventData>[] orderBy)
+        {
+            var result = this.Query(query, overrideAuthContext);
+            totalCount = result.Count();
+            return result.Skip(offset).Take(count ?? 100);
+        }
+
+        /// <inheritdoc/>
+        public IOrmResultSet ExecuteQueryOrm(DataContext context, Expression<Func<AuditEventData, bool>> query)
+        {
+            var sql = this.m_builder.CreateQuery(query).Build();
+            return context.Query<CompositeResult<DbAuditEventData, DbAuditCode>>(sql);
+        }
+
+        /// <summary>
+        /// Get the specified audit
+        /// </summary>
+        public AuditEventData Get(DataContext context, Guid key)
+        {
+            var auditData = context.FirstOrDefault<DbAuditEventData>(o => o.Key == key);
+            return this.ToModelInstance(context, auditData);
+        }
+
+        /// <summary>
+        /// Map to model instance
+        /// </summary>
+        public AuditEventData ToModelInstance(DataContext context, object result)
+        {
+            switch(result)
+            {
+                case CompositeResult<DbAuditEventData, DbAuditCode> cr:
+                    return this.ToModelInstance(context, cr);
+                case CompositeResult cr2:
+                    return this.ToModelInstance(context, new CompositeResult<DbAuditEventData, DbAuditCode>(cr2.Values.OfType<DbAuditEventData>().First(), cr2.Values.OfType<DbAuditCode>().First()));
+                case DbAuditEventData ae:
+                    var other = context.FirstOrDefault<DbAuditCode>(o => o.Key == ae.EventTypeCode);
+                    return this.ToModelInstance(context, new CompositeResult<DbAuditEventData, DbAuditCode>(ae, other));
+                default:
+                    throw new InvalidOperationException(SanteDB.Core.i18n.ErrorMessages.MAP_INCOMPATIBLE_TYPE);
+
+            }
+        }
+
+        /// <summary>
+        /// Map to a database sort expression
+        /// </summary>
+        public Expression MapPropertyExpression<TReturn>(Expression<Func<AuditEventData, TReturn>> sortExpression)
+        {
+            return this.m_mapper.MapModelExpression<AuditEventData, DbAuditEventData, TReturn>(sortExpression);
         }
 
 #pragma warning restore CS0067

@@ -51,7 +51,7 @@ using SanteDB.Persistence.Data.ADO.Data.Model.Concepts;
 namespace SanteDB.Persistence.Data.ADO.Services
 {
     /// <summary>
-    /// Represents a default implementation of the subscription executor
+    /// An implementation of the <see cref="ISubscriptionExecutor"/> which uses an ADO persistence layer
     /// </summary>
     [ServiceProvider("ADO.NET Subscription Executor", Dependencies = new Type[] { typeof(ISqlDataPersistenceService) })]
     public class AdoSubscriptionExecutor : ISubscriptionExecutor

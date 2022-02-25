@@ -29,6 +29,7 @@ using SanteDB.Server.Core.Rest;
 using SanteDB.Core.Services;
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Tracing;
 using System.Linq;
 using System.Reflection;
@@ -36,9 +37,15 @@ using System.Reflection;
 namespace SanteDB.Authentication.OAuth2
 {
     /// <summary>
-    /// OAuth2 message handler
+    /// Represents a <see cref="IApiEndpointProvider"/> which serves OpenID Connect and 
+    /// OAUTH requests
     /// </summary>
-    [ServiceProvider("OAuth 2.0 Token Service")]
+    /// <remarks>
+    /// <para>This service is responsible for starting and maintaining the <see cref="OAuthTokenBehavior"/> REST service which 
+    /// is responsible for supporting SanteDB's <see href="https://help.santesuite.org/developers/service-apis/openid-connect">OpenID Connect</see> interface</para>
+    /// </remarks>
+    [ServiceProvider("OAuth 2.0 Messaging Service")]
+    [ExcludeFromCodeCoverage]
     public class OAuthMessageHandler : IDaemonService, IApiEndpointProvider
     {
         /// <summary>

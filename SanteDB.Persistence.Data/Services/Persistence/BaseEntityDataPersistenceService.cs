@@ -278,12 +278,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
 
-            switch (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
                 case LoadMode.FullLoad:
-                    retVal.CreatedBy = base.GetRelatedPersistenceService<SecurityProvenance>().Get(context, dbModel.CreatedByKey);
+                    retVal.CreatedBy = retVal.CreatedBy.GetRelatedPersistenceService().Get(context, dbModel.CreatedByKey);
                     retVal.SetLoaded(nameof(BaseEntityData.CreatedBy));
-                    retVal.ObsoletedBy = base.GetRelatedPersistenceService<SecurityProvenance>().Get(context, dbModel.ObsoletedByKey.GetValueOrDefault());
+                    retVal.ObsoletedBy = retVal.ObsoletedBy.GetRelatedPersistenceService().Get(context, dbModel.ObsoletedByKey.GetValueOrDefault());
                     retVal.SetLoaded(nameof(BaseEntityData.ObsoletedBy));
                     break;
             }

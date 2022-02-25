@@ -47,5 +47,11 @@ namespace SanteDB.Persistence.Data.Model.Entities
         /// </summary>
         [Column("hgt_qty")]
         public decimal? HeightQuantity { get; set; }
+
+        /// <summary>
+        /// The lot number of the container
+        /// </summary>
+        [Column("lot")]
+        public string LotNumber { get; set; }
     }
 }

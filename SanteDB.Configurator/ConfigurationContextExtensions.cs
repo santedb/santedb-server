@@ -44,7 +44,7 @@ namespace SanteDB.Configurator
         /// <summary>
         /// Apply the tasks specified in the current task queue
         /// </summary>
-        public static void Apply(this ConfigurationContext me)
+        public static void Apply(this ConfigurationContext me, Form owner)
         {
             var tracer = new Tracer("Configuration Context");
 
@@ -60,17 +60,28 @@ namespace SanteDB.Configurator
                 me.ConfigurationTasks.Add(new RestartServiceTask());
 
             var confirmDlg = new frmTaskList();
-            if (confirmDlg.ShowDialog() != DialogResult.OK)
+            confirmDlg.Owner = owner;
+            try
             {
-                me.ConfigurationTasks.Clear();
-                return;
+                if (confirmDlg.ShowDialog() != DialogResult.OK)
+                {
+                    me.ConfigurationTasks.Clear();
+                    return;
+                }
+            }
+            finally
+            {
+                confirmDlg.Dispose();
             }
 
             var progress = new frmProgress();
-            progress.Show();
-
+            
             try
             {
+                progress.Owner = owner;
+                owner.Hide();
+                progress.Show();
+
                 // Do work in background thread here
                 bool complete = false;
                 Exception errCode = null;
@@ -129,7 +140,13 @@ namespace SanteDB.Configurator
             }
             finally
             {
+                try
+                {
+                    owner.Show();
+                }
+                catch { }
                 progress.Close();
+                progress.Dispose();
             }
         }
     }

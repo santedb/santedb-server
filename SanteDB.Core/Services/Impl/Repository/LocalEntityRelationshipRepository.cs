@@ -83,7 +83,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// <param name="data">The data.</param>
         /// <returns>TModel.</returns>
         /// <exception cref="System.InvalidOperationException">Thrown if the persistence service is not found.</exception>
-        public EntityRelationship Save(EntityRelationship data)
+        public override EntityRelationship Save(EntityRelationship data)
         {
             // force set the version sequence
             if (data.EffectiveVersionSequenceId == null)

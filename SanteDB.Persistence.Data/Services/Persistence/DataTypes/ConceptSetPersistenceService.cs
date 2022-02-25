@@ -28,7 +28,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         protected override ConceptSet DoConvertToInformationModel(DataContext context, DbConceptSet dbModel, params Object[] referenceObjects)
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
-            retVal.ConceptKeys = context.Query<DbConceptSetConceptAssociation>(o => o.SourceKey == dbModel.Key).Select(o => o.ConceptKey).ToList();
+            retVal.ConceptsXml = context.Query<DbConceptSetConceptAssociation>(o => o.SourceKey == dbModel.Key).Select(o => o.ConceptKey).ToList();
             return retVal;
         }
     }

@@ -37,6 +37,14 @@ namespace SanteDB.Persistence.Data.ADO.Security
         internal Guid Key { get; private set; }
 
         /// <summary>
+        /// For serialization
+        /// </summary>
+        public AdoSecuritySession()
+        {
+
+        }
+
+        /// <summary>
         /// Creates a new ADO Session
         /// </summary>
         internal AdoSecuritySession(Guid key, byte[] id, byte[] refreshToken, DateTimeOffset notBefore, DateTimeOffset notAfter, IClaim[] claims) : base(id, refreshToken, notBefore, notAfter, claims)

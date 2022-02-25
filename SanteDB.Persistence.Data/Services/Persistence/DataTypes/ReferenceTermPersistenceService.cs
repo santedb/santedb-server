@@ -50,14 +50,14 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         {
             var retVal = base.DoConvertToInformationModel(context, dbModel, referenceObjects);
 
-            switch (DataPersistenceQueryContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
+            switch (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy)
             {
                 case LoadMode.FullLoad:
-                    retVal.CodeSystem = base.GetRelatedPersistenceService<CodeSystem>().Get(context, dbModel.CodeSystemKey);
+                    retVal.CodeSystem = retVal.CodeSystem.GetRelatedPersistenceService().Get(context, dbModel.CodeSystemKey);
                     retVal.SetLoaded(nameof(ReferenceTerm.CodeSystem));
                     goto case LoadMode.SyncLoad;
                 case LoadMode.SyncLoad:
-                    retVal.DisplayNames = base.GetRelatedPersistenceService<ReferenceTermName>().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
+                    retVal.DisplayNames = retVal.DisplayNames.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
                     retVal.SetLoaded(nameof(ReferenceTerm.DisplayNames));
                     break;
             }

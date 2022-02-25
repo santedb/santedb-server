@@ -97,7 +97,7 @@ namespace SanteDB.Configuration.Editors
                         var bind = context.PropertyDescriptor.Attributes.OfType<BindingAttribute>().FirstOrDefault();
                         if (bind != null)
                         {
-                            list.Items.AddRange(AppDomain.CurrentDomain.GetAllTypes()
+                            list.Items.AddRange(AppDomain.CurrentDomain.GetAllTypes(false)
                                 .Where(t => bind.Binding.IsAssignableFrom(t) && !t.IsInterface && !t.IsGenericTypeDefinition && t.GetCustomAttribute<ObsoleteAttribute>() == null && !t.IsAbstract)
                                 .Select(o => new ListViewItem(new TypeSelectionWrapper(o).ToString())
                                 {
@@ -108,7 +108,7 @@ namespace SanteDB.Configuration.Editors
                         }
                         else
                         {
-                            list.Items.AddRange(AppDomain.CurrentDomain.GetAllTypes()
+                            list.Items.AddRange(AppDomain.CurrentDomain.GetAllTypes(false)
                                 .Where(t => context.PropertyDescriptor.PropertyType.StripGeneric().IsAssignableFrom(t) && !t.IsGenericTypeDefinition && !t.IsInterface && t.GetCustomAttribute<ObsoleteAttribute>() == null && !t.IsAbstract)
                                 .Select(o => new ListViewItem(new TypeSelectionWrapper(o).ToString())
                                 {
@@ -140,14 +140,14 @@ namespace SanteDB.Configuration.Editors
                         var bind = context.PropertyDescriptor.Attributes.OfType<BindingAttribute>().FirstOrDefault();
                         if (bind != null)
                         {
-                            list.Items.AddRange(AppDomain.CurrentDomain.GetAllTypes()
+                            list.Items.AddRange(AppDomain.CurrentDomain.GetAllTypes(false)
                                 .Where(t => bind.Binding.IsAssignableFrom(t) && !t.IsInterface && !t.IsGenericTypeDefinition && t.GetCustomAttribute<ObsoleteAttribute>() == null && !t.IsAbstract)
                                 .Select(o => new TypeSelectionWrapper(o))
                                 .ToArray());
                         }
                         else
                         {
-                            list.Items.AddRange(AppDomain.CurrentDomain.GetAllTypes()
+                            list.Items.AddRange(AppDomain.CurrentDomain.GetAllTypes(false)
                                 .Where(t => context.PropertyDescriptor.PropertyType.IsAssignableFrom(t) && !t.IsGenericTypeDefinition && !t.IsInterface && t.GetCustomAttribute<ObsoleteAttribute>() == null && !t.IsAbstract)
                                 .Select(o => new TypeSelectionWrapper(o))
                                 .ToArray());

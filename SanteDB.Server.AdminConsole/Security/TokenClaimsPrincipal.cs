@@ -122,10 +122,8 @@ namespace SanteDB.Server.AdminConsole.Security
                 throw new SecurityTokenException("Missing NBF or EXP claim");
             else
             {
-                DateTime expiry = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc),
-                    notBefore = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-                expiry = expiry.AddSeconds(Int32.Parse(expiryClaim.Value)).ToLocalTime();
-                notBefore = notBefore.AddSeconds(Int32.Parse(notBeforeClaim.Value)).ToLocalTime();
+                DateTime expiry = expiryClaim.AsDateTime().ToLocalTime(),
+                    notBefore = notBeforeClaim.AsDateTime().ToLocalTime();
 
                 if (expiry == null || expiry < DateTime.Now)
                     throw new SecurityTokenException("Token expired");
