@@ -268,12 +268,6 @@ namespace SanteDB.Server.Core.Http
                             responseHeaders = response.Headers;
                         }
 
-                        var validationResult = this.CategorizeResponse(response);
-                        if (validationResult != ServiceClientErrorType.Ok)
-                        {
-                            this.traceSource.TraceEvent(EventLevel.Error, "Response failed validation : {0}", validationResult);
-                            throw new WebException("Response failed validation", null, WebExceptionStatus.Success, response);
-                        }
                         // De-serialize
                         var responseContentType = response.ContentType;
                         if (responseContentType.Contains(";"))

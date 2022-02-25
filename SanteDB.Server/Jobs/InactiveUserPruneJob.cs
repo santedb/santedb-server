@@ -41,16 +41,29 @@ namespace SanteDB.Server.Jobs
     /// <summary>
     /// A job which prunes old users from the system
     /// </summary>
-    public class InactiveUserPruneJob : IReportProgressJob
+    public class InactiveUserPruneJob : IJob
     {
         private readonly Tracer m_tracer = Tracer.GetTracer(typeof(InactiveUserPruneJob));
         private readonly IRepositoryService<SecurityUser> m_securityUserRepository;
         private readonly IRepositoryService<UserEntity> m_userEntityRepository;
         private readonly INotificationService m_notificationService;
         private readonly INotificationTemplateFiller m_templateFiller;
+        private readonly IJobStateManagerService m_stateManager;
 
         // Cancel flag
-        private bool m_cancelFlag = false;
+        private volatile bool m_cancelFlag = false;
+
+        /// <summary>
+        /// DI constructor
+        /// </summary>
+        public InactiveUserPruneJob(IJobStateManagerService stateManagerService, IRepositoryService<SecurityUser> securityUserRepository, IRepositoryService<UserEntity> userEntityRepository, INotificationService notificationService, INotificationTemplateFiller templateFiller)
+        {
+            this.m_securityUserRepository = securityUserRepository;
+            this.m_userEntityRepository = userEntityRepository;
+            this.m_notificationService = notificationService;
+            this.m_templateFiller = templateFiller;
+            this.m_stateManager = stateManagerService;
+        }
 
         /// <summary>
         /// Get the id of this job
@@ -71,11 +84,6 @@ namespace SanteDB.Server.Jobs
         public bool CanCancel => true;
 
         /// <summary>
-        /// Gets the current state
-        /// </summary>
-        public JobStateType CurrentState { get; private set; }
-
-        /// <summary>
         /// Parameters to the job
         /// </summary>
         public IDictionary<string, Type> Parameters => new Dictionary<String, Type>()
@@ -84,39 +92,12 @@ namespace SanteDB.Server.Jobs
         };
 
         /// <summary>
-        /// Gets last time the job was started
-        /// </summary>
-        public DateTime? LastStarted { get; private set; }
-
-        /// <summary>
-        /// Gets the time that the job was finished
-        /// </summary>
-        public DateTime? LastFinished { get; private set; }
-
-        /// <summary>
-        /// Gets the progress
-        /// </summary>
-        public float Progress { get; private set; }
-
-        /// <summary>
-        /// Gets the status text
-        /// </summary>
-        public string StatusText { get; private set; }
-
-        public InactiveUserPruneJob(IRepositoryService<SecurityUser> securityUserRepository, IRepositoryService<UserEntity> userEntityRepository, INotificationService notificationService, INotificationTemplateFiller templateFiller)
-        {
-            this.m_securityUserRepository = securityUserRepository;
-            this.m_userEntityRepository = userEntityRepository;
-            this.m_notificationService = notificationService;
-            this.m_templateFiller = templateFiller;
-        }
-        /// <summary>
         /// Cancel the operation
         /// </summary>
         public void Cancel()
         {
             this.m_cancelFlag = true;
-            this.CurrentState = JobStateType.Cancelled;
+            this.m_stateManager.SetProgress(this, "Cancel Requested", 0.0f);
         }
 
         /// <summary>
@@ -126,8 +107,7 @@ namespace SanteDB.Server.Jobs
         {
             try
             {
-                this.CurrentState = JobStateType.Running;
-                this.LastStarted = DateTime.Now;
+                this.m_stateManager.SetState(this, JobStateType.Running);
 
                 using (AuthenticationContext.EnterSystemContext())
                 {
@@ -192,19 +172,18 @@ namespace SanteDB.Server.Jobs
                     // Audit that we deleted users
                     if (actionedUser.Count > 0)
                         AuditUtil.AuditSecurityDeletionAction(actionedUser, true, new String[] { "obsoletionTime" });
-                    this.LastFinished = DateTime.Now;
+                    this.m_stateManager.SetState(this, JobStateType.Completed);
                 }
             }
             catch (Exception ex)
             {
                 this.m_tracer.TraceError("Error pruning inactive users : {0}", ex);
-                this.CurrentState = JobStateType.Aborted;
+                this.m_stateManager.SetProgress(this, ex.Message, 0.0f);
+                this.m_stateManager.SetState(this, JobStateType.Aborted);
             }
             finally
             {
                 this.m_cancelFlag = false;
-                this.StatusText = String.Empty;
-                this.Progress = 1.0f;
             }
         }
     }

@@ -22,13 +22,16 @@ namespace SanteDB.Persistence.Data.ADO.Jobs
 
         // Service on which SQL can be run
         private readonly AdoPersistenceConfigurationSection m_configuration;
+        // State manager
+        private readonly IJobStateManagerService m_stateManager;
 
         /// <summary>
         /// DI constructor
         /// </summary>
-        public AdoRebuildFreetextIndexJob(IConfigurationManager configurationManager)
+        public AdoRebuildFreetextIndexJob(IConfigurationManager configurationManager, IJobStateManagerService stateManagerService)
         {
             this.m_configuration = configurationManager.GetSection<AdoPersistenceConfigurationSection>();
+            this.m_stateManager = stateManagerService;
         }
 
         /// <summary>
@@ -50,24 +53,9 @@ namespace SanteDB.Persistence.Data.ADO.Jobs
         public bool CanCancel => false;
 
         /// <summary>
-        /// Gets the current state
-        /// </summary>
-        public JobStateType CurrentState { get; private set; }
-
-        /// <summary>
         /// Gets the parameters
         /// </summary>
         public IDictionary<string, Type> Parameters => new Dictionary<String, Type>();
-
-        /// <summary>
-        /// Last time the job was started
-        /// </summary>
-        public DateTime? LastStarted { get; private set; }
-
-        /// <summary>
-        /// Last time the job was finished
-        /// </summary>
-        public DateTime? LastFinished { get; private set; }
 
         /// <summary>
         /// Cancel the job
@@ -87,20 +75,19 @@ namespace SanteDB.Persistence.Data.ADO.Jobs
                 using(var ctx = this.m_configuration.Provider.GetWriteConnection())
                 {
                     ctx.Open();
-                    this.LastStarted = DateTime.Now;
-                    this.CurrentState = JobStateType.Running;
+                    this.m_stateManager.SetState(this, JobStateType.Running);
                     ctx.CommandTimeout = 360000;
                     ctx.ExecuteProcedure<object>("rfrsh_fti");
 
-                    this.CurrentState = JobStateType.Completed;
-                    this.LastFinished = DateTime.Now;
+                    this.m_stateManager.SetState(this, JobStateType.Completed);
                 }
 
             }
             catch(Exception ex)
             {
                 this.m_tracer.TraceError("Error refreshing ADO FreeText indexes - {0}", ex);
-                this.CurrentState = JobStateType.Aborted;
+                this.m_stateManager.SetState(this, JobStateType.Aborted);
+                this.m_stateManager.SetProgress(this, ex.Message, 0.0f);
             }
         }
     }

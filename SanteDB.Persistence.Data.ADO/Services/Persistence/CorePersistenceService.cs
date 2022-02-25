@@ -151,13 +151,36 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             totalResults = resultCount;
 
 
-            return results.Select(o =>
+            if (!this.m_settingsProvider.GetConfiguration().SingleThreadFetch && results.Count >= Environment.ProcessorCount * 2 && queryId != Guid.Empty && Environment.ProcessorCount > 4)
             {
-                if (o is Guid)
-                    return this.Get(context, (Guid)o);
-                else
-                    return this.CacheConvert(o, context);
-            });
+                return results.AsParallel().AsOrdered().Select(o =>
+                {
+                    var subContext = context;
+                    try
+                    {
+                        using (subContext = subContext.OpenClonedContext())
+                        {
+                            if (o is Guid)
+                                return this.Get(subContext, (Guid)o);
+                            else
+                                return this.CacheConvert(o, subContext);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        this.m_tracer.TraceEvent(EventLevel.Error, "Error performing sub-query: {0}", e);
+                        throw new DataPersistenceException($"Error performing sub-query {query}", e);
+                    }
+                });
+            }
+            else
+                return results.Select(o =>
+                {
+                    if (o is Guid)
+                        return this.Get(context, (Guid)o);
+                    else
+                        return this.CacheConvert(o, context);
+                });
         }
 
         /// <summary>

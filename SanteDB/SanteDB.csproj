@@ -158,6 +158,10 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="config\config.skel" />
+    <None Include="data\000-DetectedIssue.dataset">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="data\000-ActClass.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -472,8 +476,6 @@
           <Project>{ece9b280-9647-4092-babf-eb2e25084670}</Project>
           <Name>SanteDB.Core.Model.ViewModelSerializers</Name>
         </ProjectReference>
-        <ProjectReference Include="..\santedb-msmq\SanteDB.Queue.Msmq\SanteDB.Queue.Msmq.csproj">
-        </ProjectReference>
       </ItemGroup>
     </When>
     <Otherwise>
@@ -520,6 +522,10 @@
     <ProjectReference Include="..\santedb-hl7\SanteDB.Messaging.HL7\SanteDB.Messaging.HL7.csproj">
       <Project>{c1f86ea3-fc84-456f-a9d9-0bf8db0d48d3}</Project>
       <Name>SanteDB.Messaging.HL7</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\santedb-msmq\SanteDB.Queue.Msmq\SanteDB.Queue.Msmq.csproj">
+      <Project>{644e4e13-5f6d-45ef-9a82-dedb01790a60}</Project>
+      <Name>SanteDB.Queue.Msmq</Name>
     </ProjectReference>
     <ProjectReference Include="..\santedb-openapi\SanteDB.Messaging.OpenAPI\SanteDB.Messaging.Metadata.csproj">
       <Project>{1b690052-ed2e-4389-838d-9b9fb188f541}</Project>

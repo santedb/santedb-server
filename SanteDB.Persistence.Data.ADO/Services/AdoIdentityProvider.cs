@@ -114,6 +114,14 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(userName, principal, true));
                 return principal;
             }
+            catch(AuthenticationException e) when (e.Message.Contains("AUTH_LCK"))
+            {
+                throw new AuthenticationException($"Account is locked please contact an administrator");
+            }
+            catch (AuthenticationException e) when (e.Message.Contains("AUTH_INV"))
+            {
+                throw new AuthenticationException($"Invalid username or password");
+            }
             catch (Exception e)
             {
                 this.m_traceSource.TraceEvent(EventLevel.Verbose, "Invalid credentials : {0}/{1}", userName, password);
@@ -598,7 +606,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                         auth.Object3.Password = null;
                         auth.Object3.SecurityHash = null;
                         auth.Object4.DeviceSecret = null;
-                        adhocCache.Add($"s{sessionId}", auth.Values, new TimeSpan(0, 5, 0));
+                        adhocCache?.Add($"s{sessionId}", auth.Values, new TimeSpan(0, 5, 0));
                         securityApplication = auth.Object2;
                         securityDevice = auth.Object4;
                         securityUser = auth.Object3;
@@ -638,7 +646,7 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     identities.First().AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBSessionIdClaim, securitySession.Key.ToString()));
 
                     // Add claims from session
-                    foreach (var clm in session.Claims)
+                    foreach (var clm in session.Claims.Where(o=> o.Type != SanteDBClaimTypes.Sid && o.Type != SanteDBClaimTypes.SanteDBApplicationIdentifierClaim && o.Type != SanteDBClaimTypes.SanteDBDeviceIdentifierClaim))
                         identities.First().AddClaim(clm);
 
                     // TODO: Load additional claims made about the user on the session

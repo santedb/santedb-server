@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS ft_ent_systbl
 	CONSTRAINT fk_ft_cls_cd_id FOREIGN KEY (cls_cd_id) REFERENCES cd_tbl(cd_id)
 );
 
+ALTER TABLE psn_lng_tbl ALTER lng_cs TYPE VARCHAR(5);
 CREATE INDEX ft_ent_ftidx ON ft_ent_systbl USING GIN (terms);
 
 CREATE OR REPLACE FUNCTION rfrsh_fti() 

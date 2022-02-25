@@ -672,6 +672,9 @@ namespace SanteDB.Persistence.PubSub.ADO
                     subscription.IsActive = isActive;
                     subscription.UpdatedByKey = dbExisting.UpdatedByKey = se.Key.Value;
                     subscription.UpdatedTime = dbExisting.UpdatedTime = DateTimeOffset.Now;
+                    dbExisting.ObsoletionTime = null;
+                    dbExisting.ObsoletedByKey = null;
+                    dbExisting.ObsoletedBySpecified = dbExisting.ObsoletionTimeSpecified = true;
                     conn.Update(dbExisting);
                     this.m_cache.Remove(key);
 
