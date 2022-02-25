@@ -46,17 +46,23 @@ namespace SanteDB.Server.Core.Services.Impl
         private readonly IAdhocCacheService m_adhocCacheService;
         private readonly IDataPersistenceService<ConceptName> m_conceptNameService;
         private readonly IDataPersistenceService<ConceptReferenceTerm> m_referenceTermService;
-
+        private readonly IDataPersistenceService<ConceptSet> m_conceptSetService;
         /// <summary>
         /// Privacy enforcement service
         /// </summary>
-        public LocalConceptRepository(IPolicyEnforcementService policyService, ILocalizationService localizationService, IDataPersistenceService<ConceptReferenceTerm> referenceTermService,
+        public LocalConceptRepository(IPolicyEnforcementService policyService, 
+            ILocalizationService localizationService, 
+            IDataPersistenceService<Concept> persistenceService,
+            IDataPersistenceService<ConceptReferenceTerm> referenceTermService,
             IDataPersistenceService<ConceptName> conceptNameService,
-            IPrivacyEnforcementService privacyService = null, IAdhocCacheService adhocCacheService = null) : base(policyService, localizationService, privacyService)
+            IDataPersistenceService<ConceptSet> conceptSetPersistence,
+            IPrivacyEnforcementService privacyService = null, 
+            IAdhocCacheService adhocCacheService = null) : base(policyService, localizationService, persistenceService, privacyService)
         {
             this.m_adhocCacheService = adhocCacheService;
             this.m_conceptNameService = conceptNameService;
             this.m_referenceTermService = referenceTermService;
+            this.m_conceptSetService = conceptSetPersistence;
         }
 
         /// <summary>
@@ -170,7 +176,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// </summary>
         /// <param name="codeSystem">The code system to lookup the reference term</param>
         /// <param name="conceptId">The concept identifier to fetch reference term for</param>
-        /// <param name="relationshipType">The type of relationship (default SAME AS)</param>
+        /// <param name="exact">True if an exact match should be returned</param>
         public ReferenceTerm GetConceptReferenceTerm(Guid conceptId, string codeSystem, bool exact = true)
         {
             var cacheKey = $"refTerm.{conceptId}.{codeSystem}.{exact}";
@@ -196,7 +202,7 @@ namespace SanteDB.Server.Core.Services.Impl
                 filterExpression = Expression.Lambda<Func<ConceptReferenceTerm, bool>>(Expression.MakeBinary(ExpressionType.And, filterExpression.Body, exactExpression), filterExpression.Parameters);
             }
 
-            var refTermEnt = this.m_referenceTermService.Query(filterExpression, 0, 1, out int _, AuthenticationContext.Current.Principal).FirstOrDefault();
+            var refTermEnt = this.m_referenceTermService.Query(filterExpression, AuthenticationContext.Current.Principal).FirstOrDefault();
             retVal = refTermEnt?.LoadProperty<ReferenceTerm>("ReferenceTerm");
 
             this.m_adhocCacheService?.Add(cacheKey, retVal);
@@ -209,20 +215,29 @@ namespace SanteDB.Server.Core.Services.Impl
         /// </summary>
         public IEnumerable<ConceptReferenceTerm> FindReferenceTermsByConcept(Guid conceptId, string codeSystem)
         {
-            int tr;
+
+            var cacheKey = $"refTermAssoc.{conceptId}.{codeSystem}";
+            var retVal = this.m_adhocCacheService?.Get<ConceptReferenceTerm[]>(cacheKey);
+
+            if(retVal != null || this.m_adhocCacheService?.Exists(cacheKey) == true)
+            {
+                return retVal;
+            }
+
             IEnumerable<ConceptReferenceTerm> refTermEnt = null;
 
             Regex oidRegex = new Regex("^(\\d+?\\.){1,}\\d+$");
             Uri uri = null;
             if(String.IsNullOrEmpty(codeSystem)) // all
-                refTermEnt = this.m_referenceTermService.Query(o => o.SourceEntityKey == conceptId && o.ObsoleteVersionSequenceId == null, 0, 100, out tr, AuthenticationContext.Current.Principal);
+                refTermEnt = this.m_referenceTermService.Query(o => o.SourceEntityKey == conceptId && o.ObsoleteVersionSequenceId == null, AuthenticationContext.Current.Principal);
             else if (oidRegex.IsMatch(codeSystem))
-                refTermEnt = this.m_referenceTermService.Query(o => (o.ReferenceTerm.CodeSystem.Oid == codeSystem) && o.SourceEntityKey == conceptId && o.ObsoleteVersionSequenceId == null, 0, 100, out tr, AuthenticationContext.Current.Principal);
+                refTermEnt = this.m_referenceTermService.Query(o => (o.ReferenceTerm.CodeSystem.Oid == codeSystem) && o.SourceEntityKey == conceptId && o.ObsoleteVersionSequenceId == null, AuthenticationContext.Current.Principal);
             else if (Uri.TryCreate(codeSystem, UriKind.Absolute, out uri))
-                refTermEnt = this.m_referenceTermService.Query(o => (o.ReferenceTerm.CodeSystem.Url == codeSystem) && o.SourceEntityKey == conceptId && o.ObsoleteVersionSequenceId == null, 0, 100, out tr, AuthenticationContext.Current.Principal);
+                refTermEnt = this.m_referenceTermService.Query(o => (o.ReferenceTerm.CodeSystem.Url == codeSystem) && o.SourceEntityKey == conceptId && o.ObsoleteVersionSequenceId == null, AuthenticationContext.Current.Principal);
             else
-                refTermEnt = this.m_referenceTermService.Query(o => (o.ReferenceTerm.CodeSystem.Authority == codeSystem) && o.SourceEntityKey == conceptId && o.ObsoleteVersionSequenceId == null, 0, 100, out tr, AuthenticationContext.Current.Principal);
+                refTermEnt = this.m_referenceTermService.Query(o => (o.ReferenceTerm.CodeSystem.Authority == codeSystem) && o.SourceEntityKey == conceptId && o.ObsoleteVersionSequenceId == null, AuthenticationContext.Current.Principal);
 
+            this.m_adhocCacheService?.Add(cacheKey, refTermEnt);
             return refTermEnt;
         }
 
@@ -251,20 +266,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// <returns><c>true</c> if the specified set is member; otherwise, <c>false</c>.</returns>
         /// <exception cref="System.InvalidOperationException">ConceptSet persistence service not found.</exception>
         [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
-        public bool IsMember(ConceptSet set, Concept concept)
-        {
-            var persistence = ApplicationServiceContext.Current.GetService<IDataPersistenceService<ConceptSet>>();
-
-            if (persistence == null)
-            {
-                throw new InvalidOperationException(this.m_localizationService.FormatString("error.server.core.servicePersistence", new
-                    {
-                        param = nameof(IDataPersistenceService<ConceptSet>)
-                    }));
-            }
-
-            return persistence.Count(o => o.Key == set.Key && o.ConceptsXml.Any(c => c == concept.Key)) > 0;
-        }
+        public bool IsMember(ConceptSet set, Concept concept) => this.IsMember(set.Key.GetValueOrDefault(), concept.Key.GetValueOrDefault());
 
         /// <summary>
 		/// Determine if the concept set contains the specified concept
@@ -276,17 +278,7 @@ namespace SanteDB.Server.Core.Services.Impl
 		[PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.ReadMetadata)]
         public bool IsMember(Guid set, Guid concept)
         {
-            var persistence = ApplicationServiceContext.Current.GetService<IDataPersistenceService<ConceptSet>>();
-
-            if (persistence == null)
-            {
-                throw new InvalidOperationException(this.m_localizationService.FormatString("error.server.core.servicePersistence", new
-                    {
-                        param = nameof(IDataPersistenceService<ConceptSet>)
-                    }));
-            }
-
-            return persistence.Count(o => o.Key == set && o.ConceptsXml.Any(c => c == concept)) > 0;
+            return this.m_conceptSetService.Query(o => o.Key == set && o.Concepts.Any(c => c.Key == concept), AuthenticationContext.Current.Principal).Any();
         }
 
         /// <summary>
@@ -298,21 +290,22 @@ namespace SanteDB.Server.Core.Services.Impl
             var retVal = this.m_adhocCacheService?.Get<ReferenceTerm>(cacheKey);
 
             if (retVal != null || this.m_adhocCacheService?.Exists(cacheKey) == true)
+            {
                 return retVal;
+            }
 
-            int tr;
             ConceptReferenceTerm refTermEnt = null;
 
             Regex oidRegex = new Regex("^(\\d+?\\.){1,}\\d+$");
             Uri uri = null;
             if(String.IsNullOrEmpty(codeSystem))
-                refTermEnt = this.m_referenceTermService.Query(o => o.SourceEntity.Mnemonic == conceptMnemonic && o.ObsoleteVersionSequenceId == null && o.RelationshipTypeKey == ConceptRelationshipTypeKeys.SameAs, 0, 1, out tr, AuthenticationContext.Current.Principal).FirstOrDefault();
+                refTermEnt = this.m_referenceTermService.Query(o => o.SourceEntity.Mnemonic == conceptMnemonic && o.ObsoleteVersionSequenceId == null && o.RelationshipTypeKey == ConceptRelationshipTypeKeys.SameAs, AuthenticationContext.Current.Principal).FirstOrDefault();
             else if (oidRegex.IsMatch(codeSystem))
-                refTermEnt = this.m_referenceTermService.Query(o => (o.ReferenceTerm.CodeSystem.Oid == codeSystem) && o.SourceEntity.Mnemonic == conceptMnemonic && o.ObsoleteVersionSequenceId == null && o.RelationshipTypeKey == ConceptRelationshipTypeKeys.SameAs, 0, 1, out tr, AuthenticationContext.Current.Principal).FirstOrDefault();
+                refTermEnt = this.m_referenceTermService.Query(o => (o.ReferenceTerm.CodeSystem.Oid == codeSystem) && o.SourceEntity.Mnemonic == conceptMnemonic && o.ObsoleteVersionSequenceId == null && o.RelationshipTypeKey == ConceptRelationshipTypeKeys.SameAs, AuthenticationContext.Current.Principal).FirstOrDefault();
             else if (Uri.TryCreate(codeSystem, UriKind.Absolute, out uri))
-                refTermEnt = this.m_referenceTermService.Query(o => (o.ReferenceTerm.CodeSystem.Url == codeSystem) && o.SourceEntity.Mnemonic == conceptMnemonic && o.ObsoleteVersionSequenceId == null && o.RelationshipTypeKey == ConceptRelationshipTypeKeys.SameAs, 0, 1, out tr, AuthenticationContext.Current.Principal).FirstOrDefault();
+                refTermEnt = this.m_referenceTermService.Query(o => (o.ReferenceTerm.CodeSystem.Url == codeSystem) && o.SourceEntity.Mnemonic == conceptMnemonic && o.ObsoleteVersionSequenceId == null && o.RelationshipTypeKey == ConceptRelationshipTypeKeys.SameAs, AuthenticationContext.Current.Principal).FirstOrDefault();
             else
-                refTermEnt = this.m_referenceTermService.Query(o => (o.ReferenceTerm.CodeSystem.Authority == codeSystem) && o.SourceEntity.Mnemonic == conceptMnemonic && o.ObsoleteVersionSequenceId == null && o.RelationshipTypeKey == ConceptRelationshipTypeKeys.SameAs, 0, 1, out tr, AuthenticationContext.Current.Principal).FirstOrDefault();
+                refTermEnt = this.m_referenceTermService.Query(o => (o.ReferenceTerm.CodeSystem.Authority == codeSystem) && o.SourceEntity.Mnemonic == conceptMnemonic && o.ObsoleteVersionSequenceId == null && o.RelationshipTypeKey == ConceptRelationshipTypeKeys.SameAs, AuthenticationContext.Current.Principal).FirstOrDefault();
             retVal = refTermEnt.LoadProperty<ReferenceTerm>("ReferenceTerm");
 
             this.m_adhocCacheService?.Add(cacheKey, retVal);
@@ -334,7 +327,7 @@ namespace SanteDB.Server.Core.Services.Impl
             if (retVal != null || this.m_adhocCacheService?.Exists(cacheKey) == true)
                 return retVal.FirstOrDefault(o => o.Language == twoLetterISOLanguageName)?.Name;
 
-            retVal = this.m_conceptNameService.Query(o => o.SourceEntityKey == conceptId && o.ObsoleteVersionSequenceId == null, 0, 100, out _, AuthenticationContext.Current.Principal) ;
+            retVal = this.m_conceptNameService.Query(o => o.SourceEntityKey == conceptId && o.ObsoleteVersionSequenceId == null, AuthenticationContext.Current.Principal) ;
 
             this.m_adhocCacheService?.Add(cacheKey, retVal);
 

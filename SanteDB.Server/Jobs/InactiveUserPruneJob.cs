@@ -117,12 +117,12 @@ namespace SanteDB.Server.Jobs
 
                     DateTimeOffset cutoff = DateTimeOffset.Now.AddDays(-days);
 
-                    this.StatusText = "Pruning Users";
-
                     List<SecurityUser> actionedUser = new List<SecurityUser>(10);
 
+                    var users = this.m_securityUserRepository.Find(o => o.UserClass == UserClassKeys.HumanUser && o.LastLoginTime < cutoff);
+                    int count = users.Count(), i = 0;
                     // Users who haven't logged in
-                    foreach (var usr in this.m_securityUserRepository.Find(o => o.UserClass == UserClassKeys.HumanUser && o.LastLoginTime < cutoff))
+                    foreach (var usr in users)
                     {
                         // Cancel request?
                         if (this.m_cancelFlag) break;
@@ -133,6 +133,7 @@ namespace SanteDB.Server.Jobs
                         else
                             daysSinceLastLogin = DateTimeOffset.Now.Subtract(usr.LastLoginTime.Value).TotalDays;
 
+                        this.m_stateManager.SetProgress(this, "Pruning Inactive Users", (float)i / (float)count);
                         // To which address?
                         String[] to = null;
                         if (usr.EmailConfirmed)
