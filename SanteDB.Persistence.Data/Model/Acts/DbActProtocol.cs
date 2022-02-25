@@ -56,7 +56,7 @@ namespace SanteDB.Persistence.Data.Model.Acts
         /// <summary>
         /// Sequence
         /// </summary>
-        [Column("seq")]
+        [Column("seq"), NotNull]
         public int Sequence { get; set; }
 
         /// <summary>
@@ -65,5 +65,10 @@ namespace SanteDB.Persistence.Data.Model.Acts
         [Column("is_compl")]
         public bool IsComplete { get; set; }
 
+        /// <summary>
+        /// Gets or sets the version of the protocol used
+        /// </summary>
+        [Column("ver")]
+        public string Version { get; set; }
     }
 }

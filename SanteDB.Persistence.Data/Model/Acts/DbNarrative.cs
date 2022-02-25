@@ -49,9 +49,15 @@ namespace SanteDB.Persistence.Data.Model.Acts
         public String Title { get; set; }
 
         /// <summary>
+        /// The mime type of the content
+        /// </summary>
+        [Column("mime")]
+        public String MimeType { get; set; }
+
+        /// <summary>
         /// The text of the narrative section
         /// </summary>
         [Column("text"), NotNull]
-        public String Text { get; set; }
+        public byte[] Text { get; set; }
     }
 }

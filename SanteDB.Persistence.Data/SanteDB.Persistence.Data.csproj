@@ -76,8 +76,6 @@
     <None Remove="SQL\FBSQL\santedb-ddl.sql" />
     <None Remove="SQL\FBSQL\santedb-fn.sql" />
     <None Remove="SQL\FBSQL\santedb-init.sql" />
-    <None Remove="SQL\Performance\ZZ-Partition-PSQL10.sql" />
-    <None Remove="SQL\Performance\ZZ-Partition-PSQL11.sql" />
     <None Remove="SQL\PSQL\santedb-codes.sql" />
     <None Remove="SQL\PSQL\santedb-ddl.sql" />
     <None Remove="SQL\PSQL\santedb-drop.sql" />
@@ -144,11 +142,6 @@
     <None Remove="SQL\Updates\20211218-PSQL.sql" />
     <None Remove="SQL\Updates\20211229-FBSQL.sql" />
     <None Remove="SQL\Updates\20211229-PSQL.sql" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Content Include="SQL\Performance\ZZ-Partition-PSQL10.sql" />
-    <Content Include="SQL\Performance\ZZ-Partition-PSQL11.sql" />
   </ItemGroup>
   
   <ItemGroup>
@@ -341,5 +334,9 @@
     <None Update="SQL\Updates\00OIZ-PSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Folder Include="SQL\PSQL\Partitioning\" />
   </ItemGroup>
 </Project>

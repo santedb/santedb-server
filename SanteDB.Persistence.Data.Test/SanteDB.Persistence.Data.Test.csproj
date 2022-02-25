@@ -49,6 +49,8 @@
     <Compile Include="AdoSessionProviderTest.cs" />
     <Compile Include="DataPersistenceTest.cs" />
     <Compile Include="Persistence\Acts\ActPersistenceTest.cs" />
+    <Compile Include="Persistence\Acts\CarePlanTest.cs" />
+    <Compile Include="Persistence\Acts\NarrativeTest.cs" />
     <Compile Include="Persistence\CodeSystemAuthorityPersistenceTest.cs" />
     <Compile Include="Persistence\AssigningAuthorityPersistenceTest.cs" />
     <Compile Include="Persistence\Collections\BundlePersistenceTest.cs" />
@@ -115,7 +117,9 @@
   <ItemGroup>
     <EmbeddedResource Include="TestConfig.xml" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="example.pdf" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

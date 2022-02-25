@@ -3,6 +3,7 @@ using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Model;
+using SanteDB.Core.Model.Attributes;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Interfaces;
@@ -19,6 +20,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Reflection;
 
 namespace SanteDB.Persistence.Data.Services.Persistence
 {
@@ -31,6 +33,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         where TDbKeyModel : DbIdentified, new()
     {
 
+        // Class key map
+        private Guid[] m_classKeyMap;
 
         /// <summary>
         /// Perform a copy of the existing version inforamtion to a new version
@@ -121,6 +125,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             IQueryPersistenceService queryPersistence = null
             ) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
+            var ccatt = typeof(TModel).GetCustomAttributes<ClassConceptKeyAttribute>();
+            if (typeof(IHasClassConcept).IsAssignableFrom(typeof(TModel)) && ccatt.Any())
+            {
+                this.m_classKeyMap  = AppDomain.CurrentDomain.GetAllTypes().Where(o => typeof(TModel).IsAssignableFrom(o)).SelectMany(o => o.GetCustomAttributes<ClassConceptKeyAttribute>()).Select(o => Guid.Parse(o.ClassConcept)).ToArray();
+            }
         }
 
         /// <summary>
@@ -657,6 +666,31 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     }
                 }
                 query = Expression.Lambda<Func<TModel, bool>>(Expression.And(query.Body, obsoleteFilter), query.Parameters);
+            }
+
+            // Is there any class concept key
+            if (m_classKeyMap != null && !query.ToString().Contains(nameof(IHasClassConcept.ClassConceptKey)))
+            {
+                var classKeyProperty = Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(IHasClassConcept.ClassConceptKey)));
+                classKeyProperty = Expression.MakeMemberAccess(classKeyProperty, classKeyProperty.Type.GetProperty("Value"));
+                
+                Expression classFilter = null;
+                foreach (var itm in this.m_classKeyMap)
+                {
+                    var condition = Expression.MakeBinary(ExpressionType.Equal, classKeyProperty, Expression.Constant(itm));
+                    if (classFilter == null)
+                    {
+                        classFilter = condition;
+                    }
+                    else
+                    {
+                        classFilter = Expression.OrElse(condition, classFilter);
+                    }
+                }
+                if (classFilter != null)
+                {
+                    query = Expression.Lambda<Func<TModel, bool>>(Expression.And(query.Body, classFilter), query.Parameters);
+                }
             }
 
             return base.DoQueryInternalAs<TReturn>(context, query, queryModifier);

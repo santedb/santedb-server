@@ -5,7 +5,7 @@
       <id>eb04fe20-bbbc-4c70-9eef-045bc4f70982</id>
       <creationTime>2018-08-15T19:35:40.4218205-04:00</creationTime>
       <name>ISO639-1 Codes</name>
-      <oid>2.16.840.1.113883.6.99</oid>
+      <oid>1.0.639.1</oid>
       <authority>ISO639-1</authority>
       <url>urn:iso:std:iso:639:1</url>
     </CodeSystem>
