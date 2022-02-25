@@ -188,23 +188,23 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         /// </summary>
         protected override void DoDeleteReferencesInternal(DataContext context, Guid key)
         {
-            context.Delete<DbActParticipation>(o => o.SourceKey == key);
-            context.Delete<DbActProtocol>(o => o.SourceKey == key);
-            context.Delete<DbActRelationship>(o => o.SourceKey == key);
-            context.Delete<DbActExtension>(o => o.SourceKey == key);
-            context.Delete<DbActIdentifier>(o => o.SourceKey == key);
-            context.Delete<DbActNote>(o => o.SourceKey == key);
-            context.Delete<DbActTag>(o => o.SourceKey == key);
+            context.DeleteAll<DbActParticipation>(o => o.SourceKey == key);
+            context.DeleteAll<DbActProtocol>(o => o.SourceKey == key);
+            context.DeleteAll<DbActRelationship>(o => o.SourceKey == key);
+            context.DeleteAll<DbActExtension>(o => o.SourceKey == key);
+            context.DeleteAll<DbActIdentifier>(o => o.SourceKey == key);
+            context.DeleteAll<DbActNote>(o => o.SourceKey == key);
+            context.DeleteAll<DbActTag>(o => o.SourceKey == key);
 
             // Delete act data
-            context.Delete<DbControlAct>(o => o.ParentKey == key);
-            context.Delete<DbCodedObservation>(o => o.ParentKey == key);
-            context.Delete<DbTextObservation>(o => o.ParentKey == key);
-            context.Delete<DbQuantityObservation>(o => o.ParentKey == key);
-            context.Delete<DbObservation>(o => o.ParentKey == key);
-            context.Delete<DbPatientEncounter>(o => o.ParentKey == key);
-            context.Delete<DbProcedure>(o => o.ParentKey == key);
-            context.Delete<DbSubstanceAdministration>(o => o.ParentKey == key);
+            context.DeleteAll<DbControlAct>(o => o.ParentKey == key);
+            context.DeleteAll<DbCodedObservation>(o => o.ParentKey == key);
+            context.DeleteAll<DbTextObservation>(o => o.ParentKey == key);
+            context.DeleteAll<DbQuantityObservation>(o => o.ParentKey == key);
+            context.DeleteAll<DbObservation>(o => o.ParentKey == key);
+            context.DeleteAll<DbPatientEncounter>(o => o.ParentKey == key);
+            context.DeleteAll<DbProcedure>(o => o.ParentKey == key);
+            context.DeleteAll<DbSubstanceAdministration>(o => o.ParentKey == key);
 
             base.DoDeleteReferencesInternal(context, key);
         }
@@ -472,7 +472,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
             if (data.Protocols != null)
             {
                 // This is a special case since the dbactprotocol <> acts are not specifically identified (they are combination)
-                context.Delete<DbActProtocol>(o => o.SourceKey == retVal.Key);
+                context.DeleteAll<DbActProtocol>(o => o.SourceKey == retVal.Key);
                 retVal.Protocols = data.Protocols.Select(p =>
                 {
                     p.SourceEntityKey = retVal.Key;

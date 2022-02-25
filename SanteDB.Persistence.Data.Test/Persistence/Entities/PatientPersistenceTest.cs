@@ -148,6 +148,8 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 var afterInsert = base.TestInsert(patient);
                 Assert.IsNotNull(afterInsert.VersionKey);
 
+                ApplicationServiceContext.Current.GetService<IDataCachingService>().Clear();
+
                 // Attempt to query 
                 var afterQuery = base.TestQuery<Patient>(o => o.Key == afterInsert.Key, 1).AsResultSet().First();
                 Assert.AreEqual(afterInsert.Key, afterQuery.Key);
@@ -169,6 +171,8 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 // Enter a custom query context
                 using (DataPersistenceControlContext.Create(LoadMode.SyncLoad))
                 {
+                    ApplicationServiceContext.Current.GetService<IDataCachingService>().Clear();
+
                     afterQuery = base.TestQuery<Patient>(o => o.Key == afterInsert.Key, 1).AsResultSet().First();
                     Assert.AreEqual(afterInsert.Key, afterQuery.Key);
 
@@ -190,6 +194,8 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 // Enter a custom query context
                 using (DataPersistenceControlContext.Create(LoadMode.FullLoad))
                 {
+                    ApplicationServiceContext.Current.GetService<IDataCachingService>().Clear();
+
                     afterQuery = base.TestQuery<Patient>(o => o.Key == afterInsert.Key, 1).AsResultSet().First();
                     Assert.AreEqual(afterInsert.Key, afterQuery.Key);
 

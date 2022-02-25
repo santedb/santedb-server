@@ -61,10 +61,8 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 Assert.AreEqual(new DateTime(2021, 01, 01), afterInsert.ExpiryDate);
                 Assert.IsTrue(afterInsert.IsAdministrative);
                 Assert.AreEqual(Guid.Parse("66cbce3a-2e77-401d-95d8-ee0361f4f076"), afterInsert.FormConceptKey);
-                Assert.IsNull(afterInsert.FormConcept);
                 Assert.IsNotNull(afterInsert.LoadProperty(o => o.FormConcept));
                 Assert.IsTrue(afterInsert.FormConcept.Mnemonic.Contains("Oral"));
-                Assert.IsNull(afterInsert.QuantityConcept);
                 Assert.IsNotNull(afterInsert.LoadProperty(o => o.QuantityConcept));
                 Assert.AreEqual(1, afterInsert.Quantity);
 
@@ -73,10 +71,8 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 Assert.AreEqual(new DateTime(2021, 01, 01), afterQuery.ExpiryDate);
                 Assert.IsTrue(afterQuery.IsAdministrative);
                 Assert.AreEqual(Guid.Parse("66cbce3a-2e77-401d-95d8-ee0361f4f076"), afterQuery.FormConceptKey);
-                Assert.IsNull(afterQuery.FormConcept);
                 Assert.IsNotNull(afterQuery.LoadProperty(o => o.FormConcept));
                 Assert.IsTrue(afterQuery.FormConcept.Mnemonic.Contains("Oral"));
-                Assert.IsNull(afterQuery.QuantityConcept);
                 Assert.IsNotNull(afterQuery.LoadProperty(o => o.QuantityConcept));
                 Assert.AreEqual(1, afterQuery.Quantity);
 
@@ -96,10 +92,8 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 Assert.AreEqual(new DateTime(2021, 07, 01), afterQuery.ExpiryDate);
                 Assert.IsTrue(afterQuery.IsAdministrative);
                 Assert.AreEqual(Guid.Parse("af3a5fa5-7889-45f3-8809-2294129d49c8"), afterQuery.FormConceptKey);
-                Assert.IsNull(afterQuery.FormConcept);
                 Assert.IsNotNull(afterQuery.LoadProperty(o => o.FormConcept));
                 Assert.IsTrue(afterQuery.FormConcept.Mnemonic.Contains("Otic"));
-                Assert.IsNull(afterQuery.QuantityConcept);
                 Assert.IsNotNull(afterQuery.LoadProperty(o => o.QuantityConcept));
                 Assert.AreEqual(1, afterQuery.Quantity);
             }
@@ -134,7 +128,6 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
 
                 // Now we want to query
                 var afterQuery = base.TestQuery<Entity>(o => o.Names.Any(n => n.Component.Any(c => c.Value == "Inactivated Polio Vaccine")), 1).AsResultSet().First();
-                Assert.IsNull(afterQuery.Names);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Names).Count);
                 Assert.IsInstanceOf<Material>(afterQuery);
                 Assert.AreEqual(Guid.Parse("9902267c-8f77-4233-bfd3-e6b068ab326a"), (afterQuery as Material).FormConceptKey);
@@ -148,7 +141,6 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 Assert.AreEqual(new DateTime(2021, 07, 01), (afterUpdate as Material).ExpiryDate);
 
                 afterQuery = base.TestQuery<Entity>(o => o.Names.Any(n => n.Component.Any(c => c.Value == "Inactivated Polio Vaccine")), 1).AsResultSet().First();
-                Assert.IsNull(afterQuery.Names);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Names).Count);
                 Assert.IsInstanceOf<Material>(afterQuery);
                 Assert.AreEqual(Guid.Parse("9902267c-8f77-4233-bfd3-e6b068ab326a"), (afterQuery as Material).FormConceptKey);

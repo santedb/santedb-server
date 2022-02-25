@@ -211,7 +211,7 @@ namespace SanteDB.Persistence.Diagnostics.Email
         /// <summary>
         /// Not supported
         /// </summary>
-        public DiagnosticReport Delete(Guid storageData, TransactionMode mode, IPrincipal overrideAuthContext, DeleteMode deletionMode)
+        public DiagnosticReport Delete(Guid storageData, TransactionMode mode, IPrincipal overrideAuthContext)
         {
             throw new NotImplementedException();
         }
@@ -248,13 +248,6 @@ namespace SanteDB.Persistence.Diagnostics.Email
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// Not supported - obsoleting DX reports
-        /// </summary>
-        public void DeleteAll(Expression<Func<DiagnosticReport, bool>> matching, TransactionMode mode, IPrincipal principal, DeleteMode deletionMode)
-        {
-            throw new NotImplementedException();
-        }
 
         public IQueryResultSet<DiagnosticReport> Query<TExpression>(Expression<Func<TExpression, bool>> query, IPrincipal principal) where TExpression : DiagnosticReport
         {

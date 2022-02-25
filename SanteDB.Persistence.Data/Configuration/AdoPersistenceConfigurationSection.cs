@@ -58,22 +58,10 @@ namespace SanteDB.Persistence.Data.Configuration
         AssociationVersioning = 2,
 
         /// <summary>
-        /// Logical deletion
-        /// </summary>
-        [XmlEnum("logical-delete")]
-        LogicalDeletion = 4,
-
-        /// <summary>
         /// Default flags
         /// </summary>
         [XmlEnum("default")]
-        Default = FullVersioning | AssociationVersioning | LogicalDeletion,
-
-        /// <summary>
-        /// Lean policy
-        /// </summary>
-        [XmlEnum("lean")]
-        Lean = None | LogicalDeletion,
+        Default = FullVersioning | AssociationVersioning | KeepPurged,
 
         /// <summary>
         /// Keep purged records with a single state of PURGED
@@ -224,6 +212,12 @@ namespace SanteDB.Persistence.Data.Configuration
         /// </summary>
         [XmlAttribute("encryptPublicKeys"), Category("Security"), DisplayName("Encrypt Public Keys"), Description("When true, public keys on applications should be encrypted")]
         public bool EncryptPublicKeys { get; set; }
+
+        /// <summary>
+        /// Gets or sets the deletion strategy
+        /// </summary>
+        [XmlAttribute("deleteStrategy"), Category("behavior"), DisplayName("Delete Strategy"), Description("Sets the default deletion strategy for the persistence layer. LogicalDelete = Set state to Inactive and obsolete time, ObsoleteDelete = Set state to Obsolete and obsolete time, NullifyDelete = Set state to nullify and obsolete time, Versioned Delete = Create a new version with an obsolete time (won't be returned by any calls), Permanent Delete = Purge the data and related data (CASCADES)")]
+        public DeleteMode DeleteStrategy { get; set; }
 
         /// <summary>
         /// Get all peppered combinations of the specified secret

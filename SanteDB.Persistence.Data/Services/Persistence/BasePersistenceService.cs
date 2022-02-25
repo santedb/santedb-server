@@ -35,6 +35,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         IDataPersistenceService<TModel>,
         IDataPersistenceServiceEx<TModel>,
         IStoredQueryDataPersistenceService<TModel>,
+        IReportProgressChanged,
         IAdoPersistenceProvider<TModel>,
         IMappedQueryProvider<TModel>,
         IDataPersistenceService
@@ -126,38 +127,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         public event EventHandler<DataPersistingEventArgs<TModel>> Updating;
 
         /// <summary>
-        /// Fired after obsoletion occurs
-        /// </summary>
-        [Obsolete("Use Deleted", true)]
-        public event EventHandler<DataPersistedEventArgs<TModel>> Obsoleted
-        {
-            add
-            {
-                this.Deleted += value;
-            }
-            remove
-            {
-                this.Deleted -= value;
-            }
-        }
-
-        /// <summary>
-        /// Fired after obsoleting
-        /// </summary>
-        [Obsolete("Use Deleting", true)]
-        public event EventHandler<DataPersistingEventArgs<TModel>> Obsoleting
-        {
-            add
-            {
-                this.Deleting += value;
-            }
-            remove
-            {
-                this.Deleting -= value;
-            }
-        }
-
-        /// <summary>
         /// Fired after data has been queried
         /// </summary>
         public event EventHandler<QueryResultEventArgs<TModel>> Queried;
@@ -186,6 +155,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// Fired before delete
         /// </summary>
         public event EventHandler<DataPersistingEventArgs<TModel>> Deleting;
+        
+        /// <summary>
+        /// Fired when progress changes
+        /// </summary>
+        public event EventHandler<ProgressChangedEventArgs> ProgressChanged;
 
         /// <summary>
         /// Perform the query operation
@@ -241,7 +215,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Perform an obsoletion for all objects matching <paramref name="expression"/>
         /// </summary>
-        protected abstract void DoDeleteAllInternal(DataContext context, Expression<Func<TModel, bool>> expression, DeleteMode deletionMode);
+        protected abstract IEnumerable<TDbModel> DoDeleteAllInternal(DataContext context, Expression<Func<TModel, bool>> expression, DeleteMode deleteMode);
 
         /// <summary>
         /// Called before the object is persisted - this allows implementations to change the object before being persisted
@@ -252,6 +226,16 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// Called after the object is persisted - this allows implementations to change the object before it is returned
         /// </summary>
         protected abstract TModel AfterPersisted(DataContext context, TModel data);
+
+        /// <summary>
+        /// Fires the <see cref="ProgressChanged"/> event
+        /// </summary>
+        /// <param name="status">The status of the progress item</param>
+        /// <param name="progress">The progress to be set</param>
+        protected virtual void FireProgressChanged(String status, float progress)
+        {
+            this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs(progress, status));
+        }
 
         /// <summary>
         /// Perform the actual insert of a model object
@@ -335,9 +319,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         }
 
         /// <summary>
-        /// Do the obsoletion all model objects which match
+        /// Do the deletion all model objects which match
         /// </summary>
-        protected virtual void DoDeleteAllModel(DataContext context, Expression<Func<TModel, bool>> expression, DeleteMode deletionMode)
+        protected virtual void DoDeleteAllModel(DataContext context, Expression<Func<TModel, bool>> expression, DeleteMode deleteMode)
         {
             if (context == null)
             {
@@ -354,7 +338,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 sw.Start();
 #endif
-                this.DoDeleteAllInternal(context, expression, deletionMode);
+                foreach(var itm in this.DoDeleteAllInternal(context, expression, deleteMode))
+                {
+                    this.m_dataCacheService?.Remove(this.DoConvertToInformationModel(context, itm));
+                }
 #if DEBUG
             }
             finally
@@ -368,7 +355,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Perform the actual obsolete of a model object
         /// </summary>
-        protected virtual TModel DoDeleteModel(DataContext context, Guid key, DeleteMode deletionMode)
+        protected virtual TModel DoDeleteModel(DataContext context, Guid key, DeleteMode deleteMode)
         {
             if (context == null)
             {
@@ -381,11 +368,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 sw.Start();
 #endif
-                if (deletionMode == DeleteMode.PermanentDelete)
+                if (deleteMode == DeleteMode.PermanentDelete)
                 {
                     this.DoDeleteReferencesInternal(context, key);
                 }
-                var dbInstance = this.DoDeleteInternal(context, key, deletionMode);
+                var dbInstance = this.DoDeleteInternal(context, key, deleteMode);
                 var retVal = this.m_modelMapper.MapDomainInstance<TDbModel, TModel>(dbInstance);
                 return retVal;
 #if DEBUG
@@ -656,17 +643,20 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                         {
                             this.m_tracer.TraceVerbose("Object {0} already exists - updating instead", data);
                             data = this.DoUpdateModel(context, data);
+                            data.BatchOperation = Core.Model.DataTypes.BatchOperationType.Update;
                         }
                         else
                         {
                             data = this.DoInsertModel(context, data);
+                            data.BatchOperation = Core.Model.DataTypes.BatchOperationType.Insert;
+
                         }
                         data = data.HarmonizeKeys(KeyHarmonizationMode.PropertyOverridesKey);
 
                         if (mode == TransactionMode.Commit)
                         {
                             tx.Commit();
-
+                            this.m_dataCacheService?.Add(data);
                         }
                     }
                 }
@@ -687,34 +677,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "General error executing insert operation", data, e);
                 throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.DATA_GENERAL), e);
             }
-        }
-
-        /// <summary>
-        /// Obsolete the specified data object
-        /// </summary>
-        public object Obsolete(Guid key)
-        {
-            return this.Obsolete(key, TransactionMode.Commit, AuthenticationContext.Current.Principal);
-        }
-
-        /// <summary>
-        /// Obsolete all matching objects
-        /// </summary>
-        public void ObsoleteAll(Expression<Func<TModel, bool>> expression, TransactionMode mode, IPrincipal principal)
-        {
-            this.DeleteAll(expression, mode, principal, DeleteMode.ObsoleteDelete);
-        }
-
-        /// <summary>
-        /// Obsolete the specified
-        /// </summary>
-        /// <param name="id">The data object which is to be obsoleted</param>
-        /// <param name="mode">The method of transaction control</param>
-        /// <param name="principal">The principal which is obsoleting the data</param>
-        /// <returns>The obsoleted data</returns>
-        public TModel Obsolete(Guid id, TransactionMode mode, IPrincipal principal)
-        {
-            return this.Delete(id, mode, principal, DeleteMode.ObsoleteDelete);
         }
 
         /// <summary>
@@ -902,10 +864,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
                         data = data.HarmonizeKeys(KeyHarmonizationMode.KeyOverridesProperty);
                         data = this.DoUpdateModel(context, data);
+                        data.BatchOperation = Core.Model.DataTypes.BatchOperationType.Update;
                         data = data.HarmonizeKeys(KeyHarmonizationMode.PropertyOverridesKey);
                         if (mode == TransactionMode.Commit)
                         {
                             tx.Commit();
+                            this.m_dataCacheService?.Add(data);
 
                         }
                     }
@@ -1011,7 +975,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         private bool ValidateCacheItemLoadMode(TModel existing)
         {
-            return existing?.GetAnnotations<LoadMode>().Max() >= (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy) == true;
+            var loadMode = existing?.GetAnnotations<LoadMode>();
+            return loadMode?.Any() != true || loadMode?.Max() >= (DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy) == true;
         }
 
         /// <summary>
@@ -1053,12 +1018,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// ADO persistence delete
         /// </summary>
-        TModel IAdoPersistenceProvider<TModel>.Delete(DataContext context, Guid key, DeleteMode deletionMode) => this.DoDeleteModel(context, key, deletionMode);
+        TModel IAdoPersistenceProvider<TModel>.Delete(DataContext context, Guid key, DeleteMode deleteMode) => this.DoDeleteModel(context, key, deleteMode);
 
         /// <summary>
         /// ADO non-generic delete
         /// </summary>
-        public IdentifiedData Delete(DataContext context, Guid key, DeleteMode deletionMode) => this.DoDeleteModel(context, key, deletionMode);
+        public IdentifiedData Delete(DataContext context, Guid key, DeleteMode deleteMode) => this.DoDeleteModel(context, key, deleteMode);
 
         /// <summary>
         /// <summary>
@@ -1102,7 +1067,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <param name="principal"></param>
         /// <param name="deletionMode"></param>
         /// <returns></returns>
-        public TModel Delete(Guid key, TransactionMode mode, IPrincipal principal, DeleteMode deletionMode)
+        public TModel Delete(Guid key, TransactionMode mode, IPrincipal principal)
         {
             if (principal == null)
             {
@@ -1129,11 +1094,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                         // Establish provenance object
                         context.EstablishProvenance(principal, null);
 
-                        retVal = this.DoDeleteModel(context, key, deletionMode);
-
+                        retVal = this.DoDeleteModel(context, key, DataPersistenceControlContext.Current?.DeleteMode ?? this.m_configuration.DeleteStrategy);
+                        retVal.BatchOperation = Core.Model.DataTypes.BatchOperationType.Delete;
                         if (mode == TransactionMode.Commit)
                         {
                             tx.Commit();
+                            this.m_dataCacheService?.Remove(retVal);
 
                         }
                     }
@@ -1157,14 +1123,18 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }
         }
 
+        private TModel DoDeleteModel(DataContext context, Guid key, object p)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
-        /// Delete all objects according to <paramref name="deletionMode"/>
+        /// Delete all objects according to the current <see cref="DataPersistenceControlContext"/>
         /// </summary>
         /// <param name="expression">The records which should be deleted</param>
         /// <param name="mode">The transaction mode</param>
         /// <param name="principal">The principal</param>
-        /// <param name="deletionMode">The method of deletion</param>
-        public void DeleteAll(Expression<Func<TModel, bool>> expression, TransactionMode mode, IPrincipal principal, DeleteMode deletionMode)
+        public void DeleteAll(Expression<Func<TModel, bool>> expression, TransactionMode mode, IPrincipal principal)
         {
             if (expression == null)
             {
@@ -1186,7 +1156,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                         // Establish provenance object
                         context.EstablishProvenance(principal, null);
 
-                        this.DoDeleteAllModel(context, expression, deletionMode);
+                        this.DoDeleteAllModel(context, expression, DataPersistenceControlContext.Current?.DeleteMode ?? this.m_configuration.DeleteStrategy);
 
                         if (mode == TransactionMode.Commit)
                         {
@@ -1240,7 +1210,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                         if (mode == TransactionMode.Commit)
                         {
                             tx.Commit();
-                            this.m_dataCacheService?.Remove(key);
+                            this.m_dataCacheService?.Add(retVal);
                         }
                         return retVal;
                     }
@@ -1272,5 +1242,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
         /// <inheritdoc/>
         public bool Exists(DataContext context, Guid key) => context.Any<TDbModel>(o => o.Key == key);
+
+        /// <summary>
+        /// Perform a delete of the specified object
+        /// </summary>
+        public object Delete(Guid id) => this.Delete(id, TransactionMode.Commit, AuthenticationContext.Current.Principal);
     }
 }

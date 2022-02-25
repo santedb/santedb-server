@@ -466,7 +466,7 @@ namespace SanteDB.Persistence.PubSub.ADO
                         dbExisting.Name = name;
                         dbExisting.IsActive = false; // we disable the channel to allow for review
                         conn.Update(dbExisting);
-                        conn.Delete<DbChannelSetting>(o => o.ChannelKey == key);
+                        conn.DeleteAll<DbChannelSetting>(o => o.ChannelKey == key);
 
                         // Insert settings
                         foreach (var itm in settings)
@@ -606,7 +606,7 @@ namespace SanteDB.Persistence.PubSub.ADO
                         dbExisting.Event = (int)events;
 
                         conn.Update(dbExisting);
-                        conn.Delete<DbSubscriptionFilter>(o => o.SubscriptionKey == dbExisting.Key);
+                        conn.DeleteAll<DbSubscriptionFilter>(o => o.SubscriptionKey == dbExisting.Key);
                         // Insert settings
                         conn.InsertAll(hdsiFilter.Split('&').Select(s => new DbSubscriptionFilter()
                         {

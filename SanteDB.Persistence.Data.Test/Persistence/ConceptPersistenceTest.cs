@@ -76,7 +76,6 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                 Assert.AreEqual("TEST-02", afterQuery.Mnemonic);
 
                 // Rule 1: The names are empty
-                Assert.IsNull(afterQuery.ConceptNames);
                 Assert.AreEqual(1, afterQuery.LoadCollection(o => o.ConceptNames).Count());
                 Assert.AreEqual("This is a test concept", afterQuery.LoadCollection(o => o.ConceptNames).First().Name);
             }
@@ -131,16 +130,12 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                 Assert.AreEqual("TEST-03", afterQuery.Mnemonic);
 
                 // Rule 1: The names are empty
-                Assert.IsNull(afterQuery.ConceptNames);
                 Assert.AreEqual(1, afterQuery.LoadCollection(o => o.ConceptNames).Count());
 
                 // Rule 2: Reference terms are empty until loaded
-                Assert.IsNull(afterQuery.ReferenceTerms);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.ReferenceTerms).Count);
                 Assert.AreEqual(ConceptRelationshipTypeKeys.SameAs, afterQuery.ReferenceTerms.First().RelationshipTypeKey);
-                Assert.IsNull(afterQuery.ReferenceTerms.First().ReferenceTerm);
                 Assert.AreEqual("032XX", afterQuery.ReferenceTerms.First().LoadProperty(o => o.ReferenceTerm).Mnemonic);
-                Assert.IsNull(afterQuery.ReferenceTerms.First().ReferenceTerm.DisplayNames);
                 Assert.AreEqual(1, afterQuery.ReferenceTerms.First().ReferenceTerm.LoadProperty(o => o.DisplayNames).Count);
             }
         }
@@ -201,19 +196,15 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                 Assert.AreEqual(StatusKeys.Active, afterQuery.StatusConceptKey);
 
                 // Relationships should not have data accoring to load condition
-                Assert.IsNull(afterQuery.Relationships);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Relationships).Count);
                 Assert.AreEqual(ConceptRelationshipTypeKeys.SameAs, afterQuery.Relationships.First().RelationshipTypeKey);
                 Assert.AreEqual(NullReasonKeys.NotApplicable, afterQuery.Relationships.First().TargetConceptKey);
-                Assert.IsNull(afterQuery.Relationships.First().TargetConcept);
                 Assert.IsNotNull(afterQuery.Relationships.First().LoadProperty(o => o.TargetConcept));
 
                 // Ensure that the concept names count is 0
-                Assert.IsNull(afterQuery.ConceptNames);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.ConceptNames).Count);
 
                 // Ensure reference terms are 0 until loaded
-                Assert.IsNull(afterQuery.ReferenceTerms);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.ReferenceTerms).Count);
 
                 // Concept sets are not a delay loadable property
@@ -318,7 +309,6 @@ namespace SanteDB.Persistence.Data.Test.Persistence
 
                 // Query to ensure the name is not being loaded
                 var afterQuery = base.TestQuery<Concept>(o => o.Mnemonic == "TEST-06", 1).FirstOrDefault();
-                Assert.IsNull(afterQuery.ConceptNames);
                 Assert.AreEqual(2, afterQuery.LoadProperty(o => o.ConceptNames).Count);
                 Assert.AreEqual("en", afterQuery.ConceptNames[0].Language);
                 Assert.AreEqual("fr", afterQuery.ConceptNames[1].Language);
@@ -335,9 +325,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
 
                 // Ensure the query returns the same
                 afterQuery = base.TestQuery<Concept>(o => o.Mnemonic == "TEST-06", 1).FirstOrDefault();
-                Assert.IsNull(afterQuery.ConceptNames);
                 Assert.AreEqual(2, afterQuery.LoadProperty(o => o.ConceptNames).Count);
-                Assert.IsNull(afterQuery.Relationships);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Relationships).Count);
                 Assert.AreEqual("en", afterQuery.ConceptNames[0].Language);
                 Assert.AreEqual("fr", afterQuery.ConceptNames[1].Language);
@@ -364,9 +352,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
 
                 // Now re-query
                 afterQuery = base.TestQuery<Concept>(o => o.Mnemonic == "TEST-06", 1).FirstOrDefault();
-                Assert.IsNull(afterQuery.ConceptNames);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.ConceptNames).Count);
-                Assert.IsNull(afterQuery.Relationships);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Relationships).Count);
                 Assert.AreEqual("en", afterQuery.ConceptNames[0].Language);
                 Assert.AreEqual(2, afterQuery.LoadProperty(o => o.ReferenceTerms).Count);
@@ -531,11 +517,11 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                 Assert.IsNotNull(afterQuery);
 
                 // Test Nullify
-                var afterNullify = base.TestDelete(afterRestore, Core.Services.DeleteMode.NullifyDelete);
+                var afterNullify = base.TestDelete(afterRestore, Core.Services.DeleteMode.LogicalDelete);
                 // Should not be returned in query results since it is restored
                 afterQuery = base.TestQuery<Concept>(o => o.Mnemonic == "TEST-08", 0).FirstOrDefault();
                 Assert.IsNull(afterQuery);
-                afterQuery = base.TestQuery<Concept>(o => o.Mnemonic == "TEST-08" && o.StatusConceptKey == StatusKeys.Nullified, 1).FirstOrDefault();
+                afterQuery = base.TestQuery<Concept>(o => o.Mnemonic == "TEST-08" && o.ObsoletionTime.HasValue, 1).FirstOrDefault();
                 Assert.IsNotNull(afterQuery);
 
                 // Now test purge

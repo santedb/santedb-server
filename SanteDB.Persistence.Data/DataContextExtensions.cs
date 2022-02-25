@@ -159,6 +159,13 @@ namespace SanteDB.Persistence.Data
             => GetRelatedPersistenceService(typeof(TRelated)) as IAdoPersistenceProvider<TRelated>;
 
         /// <summary>
+        /// Get related persistence service
+        /// </summary>
+        public static IAdoPersistenceProvider<TRelated> GetRelatedPersistenceService<TRelated>(this Type me) where TRelated : IdentifiedData
+            => GetRelatedPersistenceService(me) as IAdoPersistenceProvider<TRelated>;
+
+
+        /// <summary>
         /// Get related persistence service that can store model objects of <paramref name="trelated"/>
         /// </summary>
         /// <param name="trelated">The related type of object</param>

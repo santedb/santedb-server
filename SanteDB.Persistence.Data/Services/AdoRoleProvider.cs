@@ -292,7 +292,7 @@ namespace SanteDB.Persistence.Data.Services
                         // Add
                         foreach (var rol in roleIds.SelectMany(r => userIds.ToArray().Select(u => new { U = u, R = r })))
                         {
-                            context.Delete<DbSecurityUserRole>(o => o.UserKey == rol.U && o.RoleKey == rol.R);
+                            context.DeleteAll<DbSecurityUserRole>(o => o.UserKey == rol.U && o.RoleKey == rol.R);
                         }
 
                         tx.Commit();

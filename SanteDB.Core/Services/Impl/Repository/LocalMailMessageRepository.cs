@@ -248,7 +248,7 @@ namespace SanteDB.Server.Core.Services.Impl
             {
                 // obsolete the alert
                 alert = message.ObsoletionTime.HasValue ?
-                    this.m_dataPersistenceService.Delete(message.Key.Value, TransactionMode.Commit, AuthenticationContext.Current.Principal, DeleteMode.LogicalDelete) :
+                    this.m_dataPersistenceService.Delete(message.Key.Value, TransactionMode.Commit, AuthenticationContext.Current.Principal) :
                     this.m_dataPersistenceService.Update(message, TransactionMode.Commit, AuthenticationContext.Current.Principal);
 
                 this.Received?.Invoke(this, new MailMessageEventArgs(alert));
@@ -311,7 +311,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// <summary>
         /// OBsolete / delete an alert
         /// </summary>
-        MailMessage IRepositoryService<MailMessage>.Obsolete(Guid key)
+        MailMessage IRepositoryService<MailMessage>.Delete(Guid key)
         {
             var msg = this.Get(key);
             msg.Flags &= MailMessageFlags.Archived;

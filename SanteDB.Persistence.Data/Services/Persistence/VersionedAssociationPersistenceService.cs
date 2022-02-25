@@ -39,7 +39,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Obsolete all objects
         /// </summary>
-        protected override void DoDeleteAllInternal(DataContext context, Expression<Func<TModel, bool>> expression, DeleteMode deletionMode)
+        protected override IEnumerable<TDbModel> DoDeleteAllInternal(DataContext context, Expression<Func<TModel, bool>> expression, DeleteMode deletionMode)
         {
             if (context == null)
             {
@@ -79,17 +79,18 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 var sourceKey = context.Query<TDbModel>(domainExpression).OrderByDescending(o => o.EffectiveVersionSequenceId).Select(o => o.SourceKey).FirstOrDefault();
                 var sourceSequence = this.GetCurrentVersionSequenceForSource(context, sourceKey);
 
-                switch (deletionMode)
-                {
-                    case DeleteMode.NullifyDelete:
-                    case DeleteMode.LogicalDelete:
-                    case DeleteMode.ObsoleteDelete:
-                        context.UpdateAll(domainExpression, o => o.ObsoleteVersionSequenceId == sourceSequence);
-                        break;
-
-                    default:
-                        context.Delete(domainExpression);
-                        break;
+                foreach (var itm in context.Query<TDbModel>(domainExpression)) {
+                    switch (deletionMode)
+                    {
+                        case DeleteMode.LogicalDelete:
+                                itm.ObsoleteVersionSequenceId = sourceSequence;
+                                context.Update(itm);
+                            break;
+                        default:
+                            context.Delete(itm);
+                            break;
+                    }
+                    yield return itm;
                 }
 #if DEBUG
             }
@@ -124,12 +125,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 switch (deletionMode)
                 {
                     case DeleteMode.LogicalDelete:
-                    case DeleteMode.NullifyDelete:
-                    case DeleteMode.ObsoleteDelete:
-                    case DeleteMode.VersionedDelete:
                         existing.ObsoleteVersionSequenceId = this.GetCurrentVersionSequenceForSource(context, existing.SourceKey);
                         return this.DoUpdateInternal(context, existing);
-
                     default:
                         context.Delete(existing);
                         return existing;

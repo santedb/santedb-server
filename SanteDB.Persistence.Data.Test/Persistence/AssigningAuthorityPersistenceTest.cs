@@ -228,7 +228,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
             Assert.AreEqual(AuthenticationContext.SystemUserSid, aa.CreatedByKey.ToString());
             Assert.IsNotNull(aa.CreationTime);
 
-            var aa2 = persistenceService.Delete(aa.Key.Value, TransactionMode.Commit, AuthenticationContext.SystemPrincipal, DeleteMode.LogicalDelete);
+            var aa2 = persistenceService.Delete(aa.Key.Value, TransactionMode.Commit, AuthenticationContext.SystemPrincipal);
             Assert.IsNotNull(aa2.ObsoletionTime);
             Assert.IsNotNull(aa2.ObsoletedByKey);
             Assert.AreEqual(AuthenticationContext.SystemUserSid, aa2.ObsoletedByKey.ToString());
@@ -278,7 +278,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
             Assert.IsNotNull(aa.CreationTime);
             Assert.AreEqual(1, aa.AuthorityScope.Count);
 
-            var aa2 = persistenceService.Delete(aa.Key.Value, TransactionMode.Commit, AuthenticationContext.SystemPrincipal, DeleteMode.LogicalDelete);
+            var aa2 = persistenceService.Delete(aa.Key.Value, TransactionMode.Commit, AuthenticationContext.SystemPrincipal);
             Assert.IsNotNull(aa2.ObsoletionTime);
             Assert.IsNotNull(aa2.ObsoletedByKey);
             Assert.AreEqual(AuthenticationContext.SystemUserSid, aa2.ObsoletedByKey.ToString());
@@ -316,7 +316,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
             Assert.IsNotNull(aa.CreationTime);
             Assert.AreEqual(1, aa.AuthorityScope.Count);
 
-            var aa2 = persistenceService.Delete(aa.Key.Value, TransactionMode.Commit, AuthenticationContext.SystemPrincipal, DeleteMode.LogicalDelete);
+            var aa2 = persistenceService.Delete(aa.Key.Value, TransactionMode.Commit, AuthenticationContext.SystemPrincipal);
             Assert.IsNotNull(aa2.ObsoletionTime);
             Assert.IsNotNull(aa2.ObsoletedByKey);
             Assert.AreEqual(AuthenticationContext.SystemUserSid, aa2.ObsoletedByKey.ToString());
@@ -369,12 +369,12 @@ namespace SanteDB.Persistence.Data.Test.Persistence
 
                 // Now - obsolete all
                 var pservice = ApplicationServiceContext.Current.GetService<IDataPersistenceService<AssigningAuthority>>() as IDataPersistenceServiceEx<AssigningAuthority>;
-                pservice.DeleteAll(o => o.Oid.Contains("1.2.3.8.%"), TransactionMode.Commit, AuthenticationContext.SystemPrincipal, DeleteMode.LogicalDelete);
+                pservice.DeleteAll(o => o.Oid.Contains("1.2.3.8.%"), TransactionMode.Commit, AuthenticationContext.SystemPrincipal);
                 base.TestQuery<AssigningAuthority>(o => o.Oid.Contains("1.2.3.8.%"), 0); // No results 
                 base.TestQuery<AssigningAuthority>(o => o.Oid.Contains("1.2.3.8.%") && o.ObsoletionTime != null, 9);
 
                 // Now permadelete
-                pservice.DeleteAll(o => o.Oid.Contains("1.2.3.8.%") && o.ObsoletionTime != null, TransactionMode.Commit, AuthenticationContext.SystemPrincipal, DeleteMode.PermanentDelete);
+                pservice.DeleteAll(o => o.Oid.Contains("1.2.3.8.%") && o.ObsoletionTime != null, TransactionMode.Commit, AuthenticationContext.SystemPrincipal);
                 base.TestQuery<AssigningAuthority>(o => o.Oid.Contains("1.2.3.8.%"), 0); // No results 
                 base.TestQuery<AssigningAuthority>(o => o.Oid.Contains("1.2.3.8.%") && o.ObsoletionTime != null, 0);
 
@@ -401,12 +401,15 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                 base.TestQuery<AssigningAuthority>(o => o.AuthorityScope.Any(s => s.Key == EntityClassKeys.Animal), 9); // 9 results 
 
                 // Now - obsolete all
-                pservice.DeleteAll(o => o.AuthorityScope.Any(s => s.Key == EntityClassKeys.Animal), TransactionMode.Commit, AuthenticationContext.SystemPrincipal, DeleteMode.LogicalDelete);
+                pservice.DeleteAll(o => o.AuthorityScope.Any(s => s.Key == EntityClassKeys.Animal), TransactionMode.Commit, AuthenticationContext.SystemPrincipal);
                 base.TestQuery<AssigningAuthority>(o => o.AuthorityScope.Any(s => s.Key == EntityClassKeys.Animal), 0); // No results 
                 base.TestQuery<AssigningAuthority>(o => o.AuthorityScope.Any(s => s.Key == EntityClassKeys.Animal) && o.ObsoletionTime != null, 9);
 
                 // Now permadelete
-                pservice.DeleteAll(o => o.AuthorityScope.Any(s => s.Key == EntityClassKeys.Animal) && o.ObsoletionTime != null, TransactionMode.Commit, AuthenticationContext.SystemPrincipal, DeleteMode.PermanentDelete);
+                using (DataPersistenceControlContext.Create(DeleteMode.PermanentDelete))
+                {
+                    pservice.DeleteAll(o => o.AuthorityScope.Any(s => s.Key == EntityClassKeys.Animal) && o.ObsoletionTime != null, TransactionMode.Commit, AuthenticationContext.SystemPrincipal);
+                }
                 base.TestQuery<AssigningAuthority>(o => o.AuthorityScope.Any(s => s.Key == EntityClassKeys.Animal), 0); // No results 
                 base.TestQuery<AssigningAuthority>(o => o.AuthorityScope.Any(s => s.Key == EntityClassKeys.Animal) && o.ObsoletionTime != null, 0);
             }

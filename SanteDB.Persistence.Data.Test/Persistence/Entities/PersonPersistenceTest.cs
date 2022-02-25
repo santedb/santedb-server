@@ -69,12 +69,9 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 base.TestQuery<Person>(o => o.OccupationKey == occupationKey && o.Template.Mnemonic == "org.santedb.template.sample.santa", 1);
                 var afterQuery = base.TestQuery<Person>(o => o.Occupation.Mnemonic == "OccupationType-BusinessFinance" && o.GenderConceptKey == NullReasonKeys.NoInformation, 1).AsResultSet().First();
 
-                Assert.IsNull(afterQuery.Names);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Names).Count);
                 Assert.IsNotNull(afterQuery.OccupationKey);
-                Assert.IsNull(afterQuery.Occupation);
                 Assert.AreEqual("OccupationType-BusinessFinance", afterQuery.LoadProperty(o => o.Occupation).Mnemonic);
-                Assert.IsNull(afterQuery.GenderConcept);
                 Assert.AreEqual("NullFlavor-NoInformation", afterQuery.LoadProperty(o => o.GenderConcept).Mnemonic);
                 Assert.AreEqual("org.santedb.template.sample.santa", afterQuery.LoadProperty(o => o.Template).Mnemonic);
                 Assert.AreEqual(dtb, afterQuery.DateOfBirth);
@@ -130,7 +127,6 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 // Query on dob and lang
                 var afterQuery = base.TestQuery<Person>(o => o.LanguageCommunication.Any(l => l.LanguageCode == "en" && l.IsPreferred == true), 1).AsResultSet().First();
                 Assert.AreEqual(NullReasonKeys.NotAsked, afterQuery.GenderConceptKey);
-                Assert.IsNull(afterQuery.LanguageCommunication);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.LanguageCommunication).Count);
 
                 // Add language
@@ -142,7 +138,6 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
 
                 base.TestQuery<Person>(o => o.LanguageCommunication.Any(l => l.LanguageCode == "fr" && l.IsPreferred == true), 0);
                 afterQuery = base.TestQuery<Person>(o => o.LanguageCommunication.Any(l => l.LanguageCode == "fr" && l.IsPreferred == false), 1).AsResultSet().First();
-                Assert.IsNull(afterQuery.LanguageCommunication);
                 Assert.AreEqual(2, afterQuery.LoadProperty(o => o.LanguageCommunication).Count);
 
                 // Remove a language
@@ -157,7 +152,6 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 // old FR which is not preferred should be removed
                 base.TestQuery<Person>(o => o.LanguageCommunication.Any(l => l.LanguageCode == "fr" && l.IsPreferred == false), 0);
                 afterQuery = base.TestQuery<Person>(o => o.LanguageCommunication.Any(l => l.LanguageCode == "fr" && l.IsPreferred == true), 1).AsResultSet().First();
-                Assert.IsNull(afterQuery.LanguageCommunication);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.LanguageCommunication).Count);
             }
         }

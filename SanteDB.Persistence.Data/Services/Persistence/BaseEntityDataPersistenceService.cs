@@ -83,7 +83,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Obsolete all objects
         /// </summary>
-        protected override void DoDeleteAllInternal(DataContext context, Expression<Func<TModel, bool>> expression, DeleteMode deletionMode)
+        protected override IEnumerable<TDbModel> DoDeleteAllInternal(DataContext context, Expression<Func<TModel, bool>> expression, DeleteMode deletionMode)
         {
             if (context == null)
             {
@@ -113,25 +113,23 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 var domainExpression = this.m_modelMapper.MapModelExpression<TModel, TDbModel, bool>(expression, false);
                 if (domainExpression != null)
                 {
-                    switch (deletionMode)
-                    {
-                        case DeleteMode.NullifyDelete:
-                            context.UpdateAll<TDbModel, IDbHasStatus>(domainExpression, o => o.StatusConceptKey == StatusKeys.Nullified);
-                            goto case DeleteMode.LogicalDelete;
-                        case DeleteMode.ObsoleteDelete:
-                            context.UpdateAll<TDbModel, IDbHasStatus>(domainExpression, o => o.StatusConceptKey == StatusKeys.Obsolete);
-                            goto case DeleteMode.LogicalDelete;
-                        case DeleteMode.LogicalDelete:
-                            context.UpdateAll(domainExpression, o => o.ObsoletionTime == DateTimeOffset.Now, o => o.ObsoletedByKey == context.ContextId);
-                            break;
 
-                        case DeleteMode.PermanentDelete:
-                            foreach (var obj in context.Query<TDbModel>(domainExpression))
-                            {
+                    foreach (var obj in context.Query(domainExpression))
+                    {
+                        switch (deletionMode)
+                        {
+                            case DeleteMode.LogicalDelete:
+                                obj.ObsoletedByKey = context.ContextId;
+                                obj.ObsoletionTime = DateTimeOffset.Now;
+                                context.Update(obj);
+                                break;
+                            case DeleteMode.PermanentDelete:
                                 this.DoDeleteReferencesInternal(context, obj.Key);
                                 context.Delete(obj);
-                            }
-                            break;
+                                break;
+                        }
+                        yield return obj;
+
                     }
                 }
                 else
@@ -139,36 +137,22 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     this.m_tracer.TraceVerbose("Will use slow query construction due to complex mapped fields");
                     var domainQuery = context.GetQueryBuilder(this.m_modelMapper).CreateQuery(expression);
 
-                    if (deletionMode == DeleteMode.PermanentDelete)
+                    foreach (var obj in context.Query<TDbModel>(domainQuery))
                     {
-                        foreach (var obj in context.Query<TDbModel>(domainQuery))
+                        switch (deletionMode)
                         {
-                            this.DoDeleteReferencesInternal(context, obj.Key);
-                            context.Delete(obj);
+                            case DeleteMode.LogicalDelete:
+                                obj.ObsoletedByKey = context.ContextId;
+                                obj.ObsoletionTime = DateTimeOffset.Now;
+                                break;
+                            case DeleteMode.PermanentDelete:
+                                this.DoDeleteReferencesInternal(context, obj.Key);
+                                context.Delete(obj);
+                                break;
                         }
+                        yield return obj;
                     }
-                    else
-                    {
-                        context.UpdateAll<TDbModel>(context.Query<TDbModel>(domainQuery), o =>
-                        {
-                            if (o is IDbHasStatus hasStatus)
-                            {
-                                switch (deletionMode)
-                                {
-                                    case DeleteMode.NullifyDelete:
-                                        hasStatus.StatusConceptKey = StatusKeys.Nullified;
-                                        break;
 
-                                    case DeleteMode.ObsoleteDelete:
-                                        hasStatus.StatusConceptKey = StatusKeys.Obsolete;
-                                        break;
-                                }
-                            }
-                            o.ObsoletedByKey = context.ContextId;
-                            o.ObsoletionTime = DateTimeOffset.Now;
-                            return o;
-                        });
-                    }
                 }
 
 #if DEBUG
@@ -204,71 +188,52 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <returns>The deleted/obsoleted object</returns>
         protected override TDbModel DoDeleteInternal(DataContext context, Guid key, DeleteMode deletionMode)
         {
-            // Logical deletion is enabled? Then the obsolete is an update
-            if (this.m_configuration.VersioningPolicy.HasFlag(Data.Configuration.AdoVersioningPolicyFlags.LogicalDeletion))
+
+            if (context == null)
             {
-                if (context == null)
-                {
-                    throw new ArgumentNullException(nameof(context), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
-                }
-                if (key == Guid.Empty)
-                {
-                    throw new ArgumentException(nameof(key), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_RANGE));
-                }
+                throw new ArgumentNullException(nameof(context), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
+            }
+            if (key == Guid.Empty)
+            {
+                throw new ArgumentException(nameof(key), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_RANGE));
+            }
 
 #if DEBUG
-                var sw = new Stopwatch();
-                sw.Start();
-                try
-                {
-#endif
-
-                    // Obsolete the data by key
-                    var dbData = context.FirstOrDefault<TDbModel>(o => o.Key == key);
-                    if (dbData == null)
-                    {
-                        throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_FOUND, new { id = key, type = typeof(TModel).Name }));
-                    }
-
-                    switch (deletionMode)
-                    {
-                        case DeleteMode.ObsoleteDelete:
-                            if (dbData is IDbHasStatus obsoleteState)
-                            {
-                                obsoleteState.StatusConceptKey = StatusKeys.Obsolete;
-                            }
-                            goto case DeleteMode.LogicalDelete; // fallthrough hack for C#
-                        case DeleteMode.NullifyDelete:
-                            if (dbData is IDbHasStatus deleteState)
-                            {
-                                deleteState.StatusConceptKey = StatusKeys.Nullified;
-                            }
-                            goto case DeleteMode.LogicalDelete; // fallthrough case hack for C#
-                        case DeleteMode.LogicalDelete:
-                            dbData.ObsoletedByKey = context.ContextId;
-                            dbData.ObsoletionTime = DateTimeOffset.Now;
-                            dbData = context.Update(dbData);
-                            break;
-
-                        case DeleteMode.PermanentDelete:
-                            context.Delete(dbData);
-                            break;
-                    }
-
-                    return dbData;
-#if DEBUG
-                }
-                finally
-                {
-                    sw.Stop();
-                    this.m_tracer.TraceVerbose("Obsolete {0} took {1}ms", key, sw.ElapsedMilliseconds);
-                }
-#endif
-            }
-            else
+            var sw = new Stopwatch();
+            sw.Start();
+            try
             {
-                return base.DoDeleteInternal(context, key, deletionMode);
+#endif
+
+                // Obsolete the data by key
+                var dbData = context.FirstOrDefault<TDbModel>(o => o.Key == key);
+                if (dbData == null)
+                {
+                    throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_FOUND, new { id = key, type = typeof(TModel).Name }));
+                }
+
+                switch (deletionMode)
+                {
+                    case DeleteMode.LogicalDelete:
+                        dbData.ObsoletedByKey = context.ContextId;
+                        dbData.ObsoletionTime = DateTimeOffset.Now;
+                        dbData = context.Update(dbData);
+                        break;
+                    case DeleteMode.PermanentDelete:
+                        context.Delete(dbData);
+                        break;
+                }
+
+                return dbData;
+#if DEBUG
             }
+            finally
+            {
+                sw.Stop();
+                this.m_tracer.TraceVerbose("Obsolete {0} took {1}ms", key, sw.ElapsedMilliseconds);
+            }
+#endif
+
         }
 
         /// <summary>

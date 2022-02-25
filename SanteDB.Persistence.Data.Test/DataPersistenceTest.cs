@@ -50,7 +50,8 @@ namespace SanteDB.Persistence.Data.Test
             "UpdatedTime",
             "ObsoletedBy",
             "ObsoletionTime" ,
-            "StatusConceptKey"
+            "StatusConceptKey",
+            "BatchOperation"
         };
 
         /// <summary>
@@ -65,7 +66,7 @@ namespace SanteDB.Persistence.Data.Test
             TestApplicationContext.TestAssembly = typeof(DataPersistenceTest).Assembly;
             TestApplicationContext.Initialize(TestContext.CurrentContext.TestDirectory);
             this.m_serviceManager = ApplicationServiceContext.Current.GetService<IServiceManager>();
-           this.m_serviceManager.AddServiceProvider(typeof(TestQueryPersistenceService));
+            this.m_serviceManager.AddServiceProvider(typeof(TestQueryPersistenceService));
             this.m_serviceManager.AddServiceProvider(typeof(AdoApplicationIdentityProvider));
             this.m_serviceManager.AddServiceProvider(typeof(AdoDeviceIdentityProvider));
             this.m_serviceManager.AddServiceProvider(typeof(AdoIdentityProvider));
@@ -166,41 +167,19 @@ namespace SanteDB.Persistence.Data.Test
             var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<TData>>();
             Assert.IsNotNull(persistenceService);
 
-            var afterObsolete = persistenceService.Delete(objectToTest.Key.Value, TransactionMode.Commit, AuthenticationContext.Current.Principal, deleteMode);
-
-            // Assert core properties are inserted
-            Assert.IsNotNull(afterObsolete.Key);
-            Assert.IsNotNull(afterObsolete.CreatedByKey);
-            Assert.IsNotNull(afterObsolete.CreationTime);
-
-            if (afterObsolete is IHasState state)
+            using (DataPersistenceControlContext.Create(deleteMode))
             {
-                switch (deleteMode)
-                {
-                    case DeleteMode.LogicalDelete:
-                        Assert.AreEqual(StatusKeys.Inactive, state.StatusConceptKey);
-                        break;
+                var afterObsolete = persistenceService.Delete(objectToTest.Key.Value, TransactionMode.Commit, AuthenticationContext.Current.Principal);
 
-                    case DeleteMode.ObsoleteDelete:
-                        Assert.AreEqual(StatusKeys.Obsolete, state.StatusConceptKey);
-                        break;
-
-                    case DeleteMode.NullifyDelete:
-                        Assert.AreEqual(StatusKeys.Nullified, state.StatusConceptKey);
-                        break;
-
-                    case DeleteMode.PermanentDelete:
-                        Assert.AreEqual(StatusKeys.Purged, state.StatusConceptKey);
-                        break;
-                }
-            }
-            else
-            {
+                // Assert core properties are inserted
+                Assert.IsNotNull(afterObsolete.Key);
+                Assert.IsNotNull(afterObsolete.CreatedByKey);
+                Assert.IsNotNull(afterObsolete.CreationTime);
                 Assert.IsNotNull(afterObsolete.ObsoletedByKey);
                 Assert.IsNotNull(afterObsolete.ObsoletionTime);
+                this.AssertEqual(objectToTest, afterObsolete);
+                return afterObsolete;
             }
-            this.AssertEqual(objectToTest, afterObsolete);
-            return afterObsolete;
         }
     }
 }

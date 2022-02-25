@@ -63,10 +63,8 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 Assert.AreEqual("1234-203", afterInsert.LotNumber);
                 Assert.IsTrue(afterInsert.IsAdministrative);
                 Assert.AreEqual(Guid.Parse("66cbce3a-2e77-401d-95d8-ee0361f4f076"), afterInsert.FormConceptKey);
-                Assert.IsNull(afterInsert.FormConcept);
                 Assert.IsNotNull(afterInsert.LoadProperty(o => o.FormConcept));
                 Assert.IsTrue(afterInsert.FormConcept.Mnemonic.Contains("Oral"));
-                Assert.IsNull(afterInsert.QuantityConcept);
                 Assert.IsNotNull(afterInsert.LoadProperty(o => o.QuantityConcept));
                 Assert.AreEqual(1, afterInsert.Quantity);
 
@@ -76,10 +74,8 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 Assert.IsTrue(afterQuery.IsAdministrative);
                 Assert.AreEqual("1234-203", afterQuery.LotNumber);
                 Assert.AreEqual(Guid.Parse("66cbce3a-2e77-401d-95d8-ee0361f4f076"), afterQuery.FormConceptKey);
-                Assert.IsNull(afterQuery.FormConcept);
                 Assert.IsNotNull(afterQuery.LoadProperty(o => o.FormConcept));
                 Assert.IsTrue(afterQuery.FormConcept.Mnemonic.Contains("Oral"));
-                Assert.IsNull(afterQuery.QuantityConcept);
                 Assert.IsNotNull(afterQuery.LoadProperty(o => o.QuantityConcept));
                 Assert.AreEqual(1, afterQuery.Quantity);
 
@@ -96,9 +92,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 afterQuery = base.TestQuery<ManufacturedMaterial>(o => o.ExpiryDate >= date && o.LotNumber == "432-42" && o.FormConcept.Mnemonic == "AdministrableDrugForm-OralDrops", 1).AsResultSet().FirstOrDefault();
                 Assert.IsTrue(afterQuery.IsAdministrative);
                 Assert.AreEqual("432-42", afterQuery.LotNumber);
-                Assert.IsNull(afterQuery.FormConcept);
                 Assert.IsNotNull(afterQuery.LoadProperty(o => o.FormConcept));
-                Assert.IsNull(afterQuery.QuantityConcept);
                 Assert.IsNotNull(afterQuery.LoadProperty(o => o.QuantityConcept));
                 Assert.AreEqual(1, afterQuery.Quantity);
             }
@@ -135,7 +129,6 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
 
                 // Now we want to query
                 var afterQuery = base.TestQuery<Entity>(o => o.Names.Any(n => n.Component.Any(c => c.Value == "Dilbert Inc. Inactivated Polio Vaccine")), 1).AsResultSet().First();
-                Assert.IsNull(afterQuery.Names);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Names).Count);
                 Assert.IsInstanceOf<Material>(afterQuery);
                 Assert.IsInstanceOf<ManufacturedMaterial>(afterQuery);

@@ -181,7 +181,7 @@ namespace SanteDB.Persistence.Data.Services
                         else
                         {
                             dbSession.NotAfter = dbSession.RefreshExpiration = DateTimeOffset.Now;
-                            context.Delete<DbSessionClaim>(o => o.SessionKey == dbSession.Key);
+                            context.DeleteAll<DbSessionClaim>(o => o.SessionKey == dbSession.Key);
                         }
 
                         context.Update(dbSession);

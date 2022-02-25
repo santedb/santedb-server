@@ -105,16 +105,12 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
 
                 var afterInsert = base.TestInsert(act);
                 Assert.AreEqual(1, afterInsert.Protocols.Count);
-                Assert.IsNull(afterInsert.Template);
                 Assert.AreEqual("act.sample", afterInsert.LoadProperty(o => o.Template).Mnemonic);
 
                 var afterQuery = base.TestQuery<Act>(o => o.Template.Mnemonic == "act.sample", 1).AsResultSet().First();
-                Assert.IsNull(afterQuery.Template);
                 Assert.AreEqual("act.sample", afterQuery.LoadProperty(o => o.Template).Mnemonic);
-                Assert.IsNull(afterQuery.Protocols);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Protocols).Count);
                 Assert.AreEqual(1, afterQuery.Protocols[0].Sequence);
-                Assert.IsNull(afterQuery.Protocols[0].Protocol);
                 Assert.AreEqual("2.25.40430439493043", afterQuery.Protocols[0].LoadProperty(o => o.Protocol).Oid);
                 base.TestQuery<Act>(o => o.Protocols.Any(p => p.Protocol.Oid == "2.25.40430439493043"), 1);
 
@@ -147,13 +143,10 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
                 base.TestQuery<Act>(o => o.Template.Mnemonic == "act.sample", 0);
                 base.TestQuery<Act>(o => o.Template.Mnemonic == "act.sample2", 1);
                 afterQuery = base.TestQuery<Act>(o => o.Protocols.Any(p => p.Protocol.Oid == "2.2.34343433"), 1).AsResultSet().First();
-                Assert.IsNull(afterQuery.Template);
                 Assert.AreEqual("act.sample2", afterQuery.LoadProperty(o => o.Template).Mnemonic);
-                Assert.IsNull(afterQuery.Protocols);
                 Assert.AreEqual(2, afterQuery.LoadProperty(o => o.Protocols).Count);
                 Assert.AreEqual(1, afterQuery.Protocols[0].Sequence);
                 Assert.AreEqual(2, afterQuery.Protocols[1].Sequence);
-                Assert.IsNull(afterQuery.Protocols[0].Protocol);
                 Assert.AreEqual("2.25.40430439493043", afterQuery.Protocols[0].LoadProperty(o => o.Protocol).Oid);
                 Assert.AreEqual("2.2.34343433", afterQuery.Protocols[1].LoadProperty(o => o.Protocol).Oid);
             }
@@ -346,16 +339,12 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
                 Assert.IsNull(afterQuery.ActTime);
 
                 // Delay load properties
-                Assert.IsNull(afterQuery.Template);
                 Assert.AreEqual("act.concern.aefi", afterQuery.LoadProperty(o => o.Template).Mnemonic);
-                Assert.IsNull(afterQuery.Protocols);
                 Assert.AreEqual("2.25.404034939439433", afterQuery.LoadProperty(o => o.Protocols).First().LoadProperty(o => o.Protocol).Oid);
-                Assert.IsNull(afterQuery.Relationships);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Relationships).Count);
                 Assert.AreEqual(ActRelationshipTypeKeys.HasSubject, afterQuery.Relationships[0].RelationshipTypeKey);
                 Assert.AreEqual("HasSubject", afterQuery.Relationships[0].LoadProperty(o => o.RelationshipType).Mnemonic);
                 Assert.AreEqual(IntoleranceObservationTypeKeys.DrugIntolerance, afterQuery.Relationships[0].LoadProperty(o => o.TargetAct).TypeConceptKey);
-                Assert.IsNull(afterQuery.Participations);
                 Assert.AreEqual(3, afterQuery.LoadProperty(o => o.Participations).Count);
                 Assert.AreEqual(ActParticipationKeys.Location, afterQuery.Participations[0].ParticipationRoleKey);
                 Assert.AreEqual(ActParticipationKeys.Authororiginator, afterQuery.Participations[1].ParticipationRoleKey);
@@ -593,7 +582,6 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
 
                     foreach (var l in afterLoadQuery)
                     {
-                        Assert.IsNull(l.Identifiers);
                         Assert.AreEqual(1, l.LoadProperty(o => o.Identifiers).Count());
                     }
                 });
@@ -629,7 +617,10 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
 
                 // Delete all
                 var dpe = ApplicationServiceContext.Current.GetService<IDataPersistenceServiceEx<Act>>();
-                dpe.DeleteAll(o => o.Identifiers.Any(i => i.Value.Contains("TEST_DELETE_%")), TransactionMode.Commit, AuthenticationContext.SystemPrincipal, DeleteMode.LogicalDelete);
+                using (DataPersistenceControlContext.Create(DeleteMode.LogicalDelete))
+                {
+                    dpe.DeleteAll(o => o.Identifiers.Any(i => i.Value.Contains("TEST_DELETE_%")), TransactionMode.Commit, AuthenticationContext.SystemPrincipal);
+                }
 
                 // Ensure no results on regular query
                 afterQuery = this.TestQuery<Act>(o => o.Identifiers.Any(i => i.Value.Contains("TEST_DELETE_%")), 0);
@@ -650,7 +641,10 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
                 afterQuery = this.TestQuery<Act>(o => o.Identifiers.Any(i => i.Value.Contains("TEST_DELETE_%")), 10);
 
                 // Now erase
-                dpe.DeleteAll(o => o.Identifiers.Any(i => i.Value.Contains("TEST_DELETE_%")), TransactionMode.Commit, AuthenticationContext.SystemPrincipal, DeleteMode.PermanentDelete);
+                using (DataPersistenceControlContext.Create(DeleteMode.PermanentDelete))
+                {
+                    dpe.DeleteAll(o => o.Identifiers.Any(i => i.Value.Contains("TEST_DELETE_%")), TransactionMode.Commit, AuthenticationContext.SystemPrincipal);
+                }
                 // Ensure 0 now results
                 afterQuery = this.TestQuery<Act>(o => o.Identifiers.Any(i => i.Value.Contains("TEST_DELETE_%")), 0);
                 // Ensure 0 results on inactive query

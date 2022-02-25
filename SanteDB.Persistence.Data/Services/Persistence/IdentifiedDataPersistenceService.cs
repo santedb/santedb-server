@@ -171,7 +171,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Obsolete all objects
         /// </summary>
-        protected override void DoDeleteAllInternal(DataContext context, Expression<Func<TModel, bool>> expression, DeleteMode deleteMode)
+        protected override IEnumerable<TDbModel> DoDeleteAllInternal(DataContext context, Expression<Func<TModel, bool>> expression, DeleteMode deleteMode)
         {
             if (context == null)
             {
@@ -193,13 +193,21 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 var domainExpression = this.m_modelMapper.MapModelExpression<TModel, TDbModel, bool>(expression, false);
                 if (domainExpression != null)
                 {
-                    context.Delete<TDbModel>(domainExpression);
+                    foreach(var itm in context.Query<TDbModel>(domainExpression))
+                    {
+                        context.Delete(itm);
+                        yield return itm;
+                    }
                 }
                 else
                 {
                     this.m_tracer.TraceVerbose("Will use slow query construction due to complex mapped fields");
                     var domainQuery = context.GetQueryBuilder(this.m_modelMapper).CreateWhere(expression);
-                    context.Delete(domainQuery.Build());
+                    foreach(var itm in context.Query<TDbModel>(domainQuery.Build()))
+                    {
+                        context.Delete(itm);
+                        yield return itm;
+                    }
                 }
 
 #if DEBUG
@@ -388,22 +396,22 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             // Which are new and which are not?
             var removedRelationships = existing.Where(o => associations.Any(a=>a.Key == o && a.BatchOperation == Core.Model.DataTypes.BatchOperationType.Delete) || !associations.Any(a => a.Key == o)).Select(a =>
             {
-                return persistenceService.Delete(context, a.Value, DeleteMode.LogicalDelete);
+                return persistenceService.Delete(context, a.Value, DataPersistenceControlContext.Current?.DeleteMode ?? this.m_configuration.DeleteStrategy);
             });
             var addedRelationships = associations.Where(o => o.BatchOperation != Core.Model.DataTypes.BatchOperationType.Delete && (!o.Key.HasValue || !existing.Any(a => a == o.Key))).Select(a =>
             {
-                persistenceService.Insert(context, a);
+                a = persistenceService.Insert(context, a);
                 a.BatchOperation = Core.Model.DataTypes.BatchOperationType.Insert;
                 return a;
             });
             var updatedRelationships = associations.Where(o => o.BatchOperation != Core.Model.DataTypes.BatchOperationType.Delete && o.Key.HasValue && existing.Any(a => a == o.Key)).Select(a =>
             {
-                persistenceService.Update(context, a);
+                a = persistenceService.Update(context, a);
                 a.BatchOperation = Core.Model.DataTypes.BatchOperationType.Update;
                 return a;
             });
 
-            return addedRelationships.Union(updatedRelationships).Except(removedRelationships).ToArray();
+            return updatedRelationships.Union(addedRelationships).Except(removedRelationships).ToArray();
         }
 
         /// <summary>

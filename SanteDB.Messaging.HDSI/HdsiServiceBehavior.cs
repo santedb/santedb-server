@@ -33,6 +33,7 @@ using System;
 using System.Diagnostics;
 using System.Security.Permissions;
 using SanteDB.Core.Services;
+using SanteDB.Core.Security.Services;
 
 namespace SanteDB.Messaging.HDSI.Wcf
 {
@@ -46,15 +47,7 @@ namespace SanteDB.Messaging.HDSI.Wcf
         /// <summary>
         /// RestSrvr doesn't support DI
         /// </summary>
-        public HdsiServiceBehavior() : this(ApplicationServiceContext.Current.GetService<IDataCachingService>())
-        {
-        }
-
-        /// <summary>
-        /// DI ctor
-        /// </summary>
-        /// <param name="dataCache"></param>
-        public HdsiServiceBehavior(IDataCachingService dataCache) : base(dataCache)
+        public HdsiServiceBehavior() : base(ApplicationServiceContext.Current.GetService<IDataCachingService>(), ApplicationServiceContext.Current.GetService<ILocalizationService>(), ApplicationServiceContext.Current.GetService<IPatchService>(), ApplicationServiceContext.Current.GetService<IPolicyEnforcementService>(), ApplicationServiceContext.Current.GetService<IBarcodeProviderService>(), ApplicationServiceContext.Current.GetService<IResourcePointerService>())
         {
         }
 

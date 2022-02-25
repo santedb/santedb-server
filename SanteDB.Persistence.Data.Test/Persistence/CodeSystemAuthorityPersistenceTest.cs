@@ -114,7 +114,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
             Assert.AreEqual(AuthenticationContext.SystemUserSid, cs.CreatedByKey.ToString());
             Assert.IsNotNull(cs.CreationTime);
 
-            var cs2 = persistenceService.Delete(cs.Key.Value, TransactionMode.Commit, AuthenticationContext.SystemPrincipal, DeleteMode.LogicalDelete);
+            var cs2 = persistenceService.Delete(cs.Key.Value, TransactionMode.Commit, AuthenticationContext.SystemPrincipal);
             Assert.IsNotNull(cs2.ObsoletionTime);
             Assert.IsNotNull(cs2.ObsoletedByKey);
             Assert.AreEqual(AuthenticationContext.SystemUserSid, cs2.ObsoletedByKey.ToString());
@@ -156,7 +156,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence
             Assert.AreEqual(AuthenticationContext.SystemUserSid, cs.CreatedByKey.ToString());
             Assert.IsNotNull(cs.CreationTime);
 
-            var cs2 = persistenceService.Delete(cs.Key.Value, TransactionMode.Commit, AuthenticationContext.SystemPrincipal, DeleteMode.LogicalDelete);
+            var cs2 = persistenceService.Delete(cs.Key.Value, TransactionMode.Commit, AuthenticationContext.SystemPrincipal);
             Assert.IsNotNull(cs2.ObsoletionTime);
             Assert.IsNotNull(cs2.ObsoletedByKey);
             Assert.AreEqual(AuthenticationContext.SystemUserSid, cs2.ObsoletedByKey.ToString());

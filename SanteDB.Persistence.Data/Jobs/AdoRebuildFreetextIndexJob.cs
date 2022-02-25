@@ -44,6 +44,11 @@ namespace SanteDB.Persistence.Data.ADO.Jobs
         public string Name => "Full Rebuild of Freetext Index";
 
         /// <summary>
+        /// Rebuild the fulltext index
+        /// </summary>
+        public string Description => "Re-builds the complete full-text index for the selected ADO provider";
+
+        /// <summary>
         /// Can cancel
         /// </summary>
         public bool CanCancel => false;

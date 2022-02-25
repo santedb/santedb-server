@@ -89,7 +89,7 @@ namespace SanteDB.Server.Core.Services.Impl
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public override Bundle Obsolete(Guid key)
+        public override Bundle Delete(Guid key)
         {
             throw new NotSupportedException(this.m_localizationService.GetString("error.type.NotSupportedException"));
         }

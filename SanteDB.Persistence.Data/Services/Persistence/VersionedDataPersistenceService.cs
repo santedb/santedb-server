@@ -73,7 +73,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 {
                     if (existing.Count() > 1) // We only keep recent and last
                     {
-                        context.Delete<TDbModel>(o => o.Key == key && o.VersionSequenceId <= existing.Last().VersionSequenceId);
+                        context.DeleteAll<TDbModel>(o => o.Key == key && o.VersionSequenceId <= existing.Last().VersionSequenceId);
                     }
                 }
 
@@ -389,7 +389,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 {
                     if (existing.Count() > 1) // We only keep recent and last
                     {
-                        context.Delete<TDbModel>(o => o.Key == model.Key && o.VersionSequenceId <= existing.Last().VersionSequenceId);
+                        context.DeleteAll<TDbModel>(o => o.Key == model.Key && o.VersionSequenceId <= existing.Last().VersionSequenceId);
                     }
                 }
 
@@ -430,7 +430,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Obsolete all objects
         /// </summary>
-        protected override void DoDeleteAllInternal(DataContext context, Expression<Func<TModel, bool>> expression, DeleteMode deletionMode)
+        protected override IEnumerable<TDbModel> DoDeleteAllInternal(DataContext context, Expression<Func<TModel, bool>> expression, DeleteMode deletionMode)
         {
             if (context == null)
             {
@@ -476,59 +476,37 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     // determine our deletion mode
                     switch (deletionMode)
                     {
-                        case DeleteMode.NullifyDelete:
-                        case DeleteMode.ObsoleteDelete:
                         case DeleteMode.LogicalDelete:
-
-                            foreach (var newVersion in context.InsertAll(
-                                context.UpdateAll<TDbModel>(context.Query<TDbModel>(domainExpression), o => // Update the current version
-                                {
-                                    o.ObsoletionTime = DateTimeOffset.Now;
-                                    o.ObsoletedByKey = context.ContextId;
-                                    return o;
-                                }).Select(o => // Insert a new version
-                                {
-                                    o.VersionSequenceId = null;
-                                    o.ReplacesVersionKey = o.VersionKey;
-                                    o.ObsoletedByKey = null;
-                                    o.ObsoletionTime = null;
-                                    o.VersionKey = Guid.NewGuid();
-                                    o.StatusConceptKey = deletionMode == DeleteMode.NullifyDelete ? StatusKeys.Nullified :
-                                        deletionMode == DeleteMode.ObsoleteDelete ? StatusKeys.Obsolete : StatusKeys.Inactive;
-                                    this.m_dataCacheService?.Remove(o.Key);
-                                    return o;
-                                })
-                            ))
+                            context.UpdateAll(domainExpression, o => o.ObsoletionTime == DateTimeOffset.Now, o => o.ObsoletedByKey == context.ContextId);
+                            foreach (var newVersion in context.Query<TDbModel>(o=>o.ObsoletionTime != null && o.ObsoletedByKey == context.ContextId))
                             {
-                                this.DoCopyVersionSubTableInternal(context, newVersion);
+                                yield return newVersion;
                             }
-
-                            break;
-
+                            yield break;
                         case DeleteMode.PermanentDelete:
                             foreach (var existing in context.Query<TDbModel>(domainExpression))
                             {
-                                existing.StatusConceptKey = StatusKeys.Purged;
                                 this.DoDeleteReferencesInternal(context, existing.Key);
                                 this.DoDeleteReferencesInternal(context, existing.VersionKey);
-                                context.Delete<TDbModel>(o => o.VersionKey == existing.VersionKey);
+                                context.DeleteAll<TDbModel>(o => o.VersionKey == existing.VersionKey);
 
                                 // Reverse the history
                                 foreach (var ver in context.Query<TDbModel>(o => o.Key == existing.Key).OrderByDescending(o => o.VersionSequenceId).Select(o => o.VersionKey))
                                 {
                                     this.DoDeleteReferencesInternal(context, ver);
-                                    context.Delete<TDbModel>(o => o.VersionKey == ver);
+                                    context.DeleteAll<TDbModel>(o => o.VersionKey == ver);
 
                                 }
 
                                 if (this.m_configuration.VersioningPolicy.HasFlag(Configuration.AdoVersioningPolicyFlags.KeepPurged))
                                 {
                                     existing.VersionKey = Guid.Empty;
+                                    existing.StatusConceptKey = StatusKeys.Deleted;
                                     context.Insert(existing);
                                 }
                                 else
                                 {
-                                    context.Delete<TDbKeyModel>(o => o.Key == existing.Key);
+                                    context.DeleteAll<TDbKeyModel>(o => o.Key == existing.Key);
                                 }
 
                                 this.m_dataCacheService.Remove(existing.Key);
@@ -589,32 +567,33 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     TDbModel retVal = null;
                     switch (deletionMode)
                     {
-                        case DeleteMode.ObsoleteDelete:
-                            existing.StatusConceptKey = StatusKeys.Obsolete;
-                            retVal = this.DoUpdateInternal(context, existing);
-                            break;
-                        case DeleteMode.NullifyDelete:
-                            existing.StatusConceptKey = StatusKeys.Nullified;
-                            retVal = this.DoUpdateInternal(context, existing);
-                            break;
                         case DeleteMode.LogicalDelete:
-                            existing.StatusConceptKey = StatusKeys.Inactive;
+                            existing.ObsoletionTime = DateTimeOffset.Now;
+                            existing.ObsoletedByKey = context.ContextId;
                             retVal = this.DoUpdateInternal(context, existing);
-                            break;
-                        case DeleteMode.VersionedDelete:
-                            existing.StatusConceptKey = StatusKeys.Purged;
-                            retVal = this.DoUpdateInternal(context, existing);
+
+                            if (this.m_configuration.VersioningPolicy.HasFlag(Configuration.AdoVersioningPolicyFlags.FullVersioning))
+                            {
+                                existing.StatusConceptKey = StatusKeys.Deleted;
+                                existing.ReplacesVersionKey = existing.VersionKey;
+                                // Terminate the head version
+                                existing.ObsoletionTime = existing.CreationTime = DateTimeOffset.Now;
+                                existing.ObsoletedByKey = existing.ObsoletedByKey = context.ContextId;
+                                existing.VersionKey = Guid.Empty;
+                                existing.VersionSequenceId = null;
+                                retVal = context.Insert(existing);
+                            }
                             break;
                         case DeleteMode.PermanentDelete:
-                            existing.StatusConceptKey = StatusKeys.Purged;
+                            existing.StatusConceptKey = StatusKeys.Deleted;
                             this.DoDeleteReferencesInternal(context, existing.Key);
                             this.DoDeleteReferencesInternal(context, existing.VersionKey);
-                            context.Delete<TDbModel>(o => o.VersionKey == existing.VersionKey);
+                            context.DeleteAll<TDbModel>(o => o.VersionKey == existing.VersionKey);
                             // Reverse the history
                             foreach (var ver in context.Query<TDbModel>(o => o.Key == existing.Key).OrderByDescending(o => o.VersionSequenceId).Select(o => o.VersionKey))
                             {
                                 this.DoDeleteReferencesInternal(context, ver);
-                                context.Delete<TDbModel>(o => o.VersionKey == ver);
+                                context.DeleteAll<TDbModel>(o => o.VersionKey == ver);
                             }
 
                             if (this.m_configuration.VersioningPolicy.HasFlag(Configuration.AdoVersioningPolicyFlags.KeepPurged))
@@ -624,7 +603,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                             }
                             else
                             {
-                                context.Delete<TDbKeyModel>(o => o.Key == existing.Key);
+                                context.DeleteAll<TDbKeyModel>(o => o.Key == existing.Key);
                             }
                             return existing;
 
@@ -726,7 +705,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             var existing = persistenceService.Query(context, o => o.SourceEntityKey == data.Key && !o.ObsoleteVersionSequenceId.HasValue).Select(o => o.Key).ToArray();
 
             // Which are new and which are not?
-            var removedRelationships = existing.Where(o => associations.Any(a=>a.Key == o && a.BatchOperation == BatchOperationType.Delete) || !associations.Any(a => a.Key == o)).Select(a => persistenceService.Delete(context, a.Value, DeleteMode.LogicalDelete));
+            var removedRelationships = existing.Where(o => associations.Any(a=>a.Key == o && a.BatchOperation == BatchOperationType.Delete) || !associations.Any(a => a.Key == o)).Select(a => persistenceService.Delete(context, a.Value, DataPersistenceControlContext.Current?.DeleteMode ?? this.m_configuration.DeleteStrategy));
             var addedRelationships = associations.Where(o => o.BatchOperation != BatchOperationType.Delete && ( !o.Key.HasValue || !existing.Any(a => a == o.Key))).Select(a =>
             {
                 a.EffectiveVersionSequenceId = data.VersionSequence;
@@ -741,7 +720,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 return a;
             });
 
-            return addedRelationships.Union(updatedRelationships).Except(removedRelationships).ToArray();
+            return updatedRelationships.Union(addedRelationships).Except(removedRelationships).ToArray();
         }
 
         /// <summary>

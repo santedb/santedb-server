@@ -37,8 +37,6 @@ namespace SanteDB.Server.Core.Services.Impl
         /// <summary>
         /// Privacy for a user entity
         /// </summary>
-        /// <param name="privacyService"></param>
-        /// <param name="policyService"></param>
         public LocalUserEntityRepository(IPolicyEnforcementService policyService, ILocalizationService localizationService, IDataPersistenceService<UserEntity> userEntity, IPrivacyEnforcementService privacyService = null) : base(policyService, localizationService, userEntity, privacyService)
         {
         }
@@ -71,28 +69,5 @@ namespace SanteDB.Server.Core.Services.Impl
             }
         }
 
-        /// <summary>
-        /// Insert the user entity
-        /// </summary>
-        public override UserEntity Insert(UserEntity entity)
-        {
-            return base.Insert(entity);
-        }
-
-        /// <summary>
-        /// Obsolete the user entity
-        /// </summary>
-        public override UserEntity Obsolete(Guid key)
-        {
-            return base.Obsolete(key);
-        }
-
-        /// <summary>
-        /// Update the user entity
-        /// </summary>
-        public override UserEntity Save(UserEntity data)
-        {
-            return base.Save(data);
-        }
     }
 }

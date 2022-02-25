@@ -722,7 +722,7 @@ namespace SanteDB.Persistence.Data.Services
                         throw new KeyNotFoundException(String.Format(this.m_localizationService.GetString(ErrorMessageStrings.USR_INVALID, userName)));
                     }
 
-                    context.Delete<DbUserClaim>(o => o.SourceKey == dbUser && o.ClaimType.ToLowerInvariant() == claimType.ToLowerInvariant());
+                    context.DeleteAll<DbUserClaim>(o => o.SourceKey == dbUser && o.ClaimType.ToLowerInvariant() == claimType.ToLowerInvariant());
                 }
                 catch (Exception e)
                 {

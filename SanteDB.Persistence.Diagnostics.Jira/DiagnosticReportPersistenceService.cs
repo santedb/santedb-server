@@ -261,14 +261,17 @@ namespace SanteDB.Persistence.Diagnostics.Jira
         /// <summary>
         /// Deleting from JIRA not supported
         /// </summary>
-        public DiagnosticReport Delete(Guid key, TransactionMode mode, IPrincipal principal, DeleteMode deletionMode)
+        public DiagnosticReport Delete(Guid key, TransactionMode mode, IPrincipal principal)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
+        /// <summary>
+        /// Not supported to query JIRA
+        /// </summary>
         public IQueryResultSet<DiagnosticReport> Query<TExpression>(Expression<Func<TExpression, bool>> query, IPrincipal principal) where TExpression : DiagnosticReport
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
     }
 

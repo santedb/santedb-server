@@ -43,10 +43,11 @@ namespace SanteDB.Server.Jobs
     /// </summary>
     public class InactiveUserPruneJob : IReportProgressJob
     {
-        /// <summary>
-        /// Tracer for inactivity
-        /// </summary>
         private readonly Tracer m_tracer = Tracer.GetTracer(typeof(InactiveUserPruneJob));
+        private readonly IRepositoryService<SecurityUser> m_securityUserRepository;
+        private readonly IRepositoryService<UserEntity> m_userEntityRepository;
+        private readonly INotificationService m_notificationService;
+        private readonly INotificationTemplateFiller m_templateFiller;
 
         // Cancel flag
         private bool m_cancelFlag = false;
@@ -102,6 +103,13 @@ namespace SanteDB.Server.Jobs
         /// </summary>
         public string StatusText { get; private set; }
 
+        public InactiveUserPruneJob(IRepositoryService<SecurityUser> securityUserRepository, IRepositoryService<UserEntity> userEntityRepository, INotificationService notificationService, INotificationTemplateFiller templateFiller)
+        {
+            this.m_securityUserRepository = securityUserRepository;
+            this.m_userEntityRepository = userEntityRepository;
+            this.m_notificationService = notificationService;
+            this.m_templateFiller = templateFiller;
+        }
         /// <summary>
         /// Cancel the operation
         /// </summary>
@@ -125,73 +133,65 @@ namespace SanteDB.Server.Jobs
                 {
                     this.m_tracer.TraceInfo("Will notify users of inactivity...");
                     int days = parameters.Length > 0 ? (int)parameters[0] : 28;
-                    var userRepository = ApplicationServiceContext.Current.GetService<IRepositoryService<SecurityUser>>();
-                    var entityRepository = ApplicationServiceContext.Current.GetService<IRepositoryService<UserEntity>>();
-                    var notificationService = ApplicationServiceContext.Current.GetService<INotificationService>();
-                    var templateService = ApplicationServiceContext.Current.GetService<INotificationTemplateFiller>();
+                    
 
                     DateTimeOffset cutoff = DateTimeOffset.Now.AddDays(-days);
 
                     this.StatusText = "Pruning Users";
 
-                    int offset = 0, totalResults = 1;
-                    while (offset < totalResults)
+                    List<SecurityUser> actionedUser = new List<SecurityUser>(10);
+
+                    // Users who haven't logged in
+                    foreach (var usr in this.m_securityUserRepository.Find(o => o.UserClass == UserClassKeys.HumanUser && o.LastLoginTime < cutoff))
                     {
-                        this.Progress = (float)offset / (float)totalResults;
-                        List<SecurityUser> actionedUser = new List<SecurityUser>(10);
+                        // Cancel request?
+                        if (this.m_cancelFlag) break;
 
-                        // Users who haven't logged in
-                        foreach (var usr in userRepository.Find(o => o.UserClass == UserClassKeys.HumanUser && o.LastLoginTime < cutoff))
+                        double daysSinceLastLogin = 0;
+                        if (!usr.LastLoginTime.HasValue)
+                            daysSinceLastLogin = DateTimeOffset.Now.Subtract(usr.CreationTime).TotalDays;
+                        else
+                            daysSinceLastLogin = DateTimeOffset.Now.Subtract(usr.LastLoginTime.Value).TotalDays;
+
+                        // To which address?
+                        String[] to = null;
+                        if (usr.EmailConfirmed)
+                            to = new string[] { $"mailto:{usr.Email}" };
+                        else if (usr.PhoneNumberConfirmed)
+                            to = new string[] { $"tel:{usr.Email}" };
+
+                        var entity = this.m_userEntityRepository.Find(o => o.SecurityUserKey == usr.Key).FirstOrDefault();
+                        var lang = entity?.GetPersonLanguages()?.FirstOrDefault(o => o.IsPreferred)?.LanguageCode;
+
+                        // Template and action
+                        string templateId = null;
+                        if (daysSinceLastLogin > days + 7) // a week since we notified them, obsolete
                         {
-                            // Cancel request?
-                            if (this.m_cancelFlag) break;
-
-                            double daysSinceLastLogin = 0;
-                            if (!usr.LastLoginTime.HasValue)
-                                daysSinceLastLogin = DateTimeOffset.Now.Subtract(usr.CreationTime).TotalDays;
-                            else
-                                daysSinceLastLogin = DateTimeOffset.Now.Subtract(usr.LastLoginTime.Value).TotalDays;
-
-                            // To which address?
-                            String[] to = null;
-                            if (usr.EmailConfirmed)
-                                to = new string[] { $"mailto:{usr.Email}" };
-                            else if (usr.PhoneNumberConfirmed)
-                                to = new string[] { $"tel:{usr.Email}" };
-
-                            // Template and action
-                            string templateId = null;
-                            if (daysSinceLastLogin > days + 7) // a week since we notified them, obsolete
-                            {
-                                actionedUser.Add(usr);
-                                this.m_tracer.TraceVerbose("De-activating user {0}...", usr.UserName);
-                                userRepository.Obsolete(usr.Key.Value);
-                                templateId = "org.santedb.notification.security.user.inactiveRemoved";
-                            }
-                            else
-                                templateId = "org.santedb.notification.security.user.inactiveWarned";
-
-                            var entity = entityRepository.Find(o => o.SecurityUserKey == usr.Key).FirstOrDefault();
-                            var lang = entity?.GetPersonLanguages()?.FirstOrDefault(o => o.IsPreferred)?.LanguageCode;
-
-                            var template = templateService.FillTemplate(templateId, lang, new
-                            {
-                                removalDays = Math.Round((days + 7) - daysSinceLastLogin),
-                                removalDate = DateTime.Now.AddDays((days + 7) - daysSinceLastLogin).Date,
-                                user = usr,
-                                entity = entity
-                            });
-
-                            // Send the notification
-                            this.m_tracer.TraceVerbose("Sending {0} notification to {1}...", templateId, usr.UserName);
-                            notificationService.Send(to, template.Subject, template.Body);
+                            actionedUser.Add(usr);
+                            this.m_tracer.TraceVerbose("De-activating user {0}...", usr.UserName);
+                            this.m_securityUserRepository.Delete(usr.Key.Value);
+                            templateId = "org.santedb.notification.security.user.inactiveRemoved";
                         }
-                        offset += 100;
+                        else
+                            templateId = "org.santedb.notification.security.user.inactiveWarned";
 
-                        // Audit that we deleted users
-                        if (actionedUser.Count > 0)
-                            AuditUtil.AuditSecurityDeletionAction(actionedUser, true, new String[] { "obsoletionTime" });
+                       
+                        var template = this.m_templateFiller.FillTemplate(templateId, lang, new
+                        {
+                            removalDays = Math.Round((days + 7) - daysSinceLastLogin),
+                            removalDate = DateTime.Now.AddDays((days + 7) - daysSinceLastLogin).Date,
+                            user = usr,
+                            entity = entity
+                        });
+
+                        // Send the notification
+                        this.m_tracer.TraceVerbose("Sending {0} notification to {1}...", templateId, usr.UserName);
+                        this.m_notificationService.Send(to, template.Subject, template.Body);
                     }
+
+                    // Audit that we deleted users
+                    if (actionedUser.Count > 0)
+                        AuditUtil.AuditSecurityDeletionAction(actionedUser, true, new String[] { "obsoletionTime" });
                     this.LastFinished = DateTime.Now;
                 }
             }

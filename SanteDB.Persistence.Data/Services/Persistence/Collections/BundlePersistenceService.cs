@@ -163,7 +163,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
 
         /// <inheritdoc/>
         /// <exception cref="NotSupportedException">This method is not supported on <see cref="Bundle"/></exception>
-        public Bundle Delete(Guid key, TransactionMode transactionMode, IPrincipal principal, DeleteMode deletionMode)
+        public Bundle Delete(Guid key, TransactionMode transactionMode, IPrincipal principal)
         {
             throw new NotSupportedException();
         }
@@ -220,7 +220,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
                             tx.Commit();
                         }
 
-                        data.Item.ForEach(i => this.m_dataCachingService.Remove(i));
+                        data.Item.ForEach(i => this.m_dataCachingService.Add(i));
                     }
                 }
 
@@ -238,13 +238,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
                 this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "General error executing insert operation", data, e);
                 throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.DATA_GENERAL), e);
             }
-        }
-
-        /// <inheritdoc/>
-        /// <exception cref="NotSupportedException">This method is not supported on <see cref="Bundle"/></exception>
-        public Bundle Obsolete(Guid key, TransactionMode transactionMode, IPrincipal principal)
-        {
-            throw new NotSupportedException();
         }
 
         /// <inheritdoc/>
@@ -286,7 +279,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
                 switch (data.Item[i].BatchOperation)
                 {
                     case BatchOperationType.Delete:
-                        data.Item[i] = persistenceService.Delete(context, data.Item[i].Key.Value, DataPersistenceControlContext.Current?.DeleteMode ?? DeleteMode.LogicalDelete);
+                        data.Item[i] = persistenceService.Delete(context, data.Item[i].Key.Value, DataPersistenceControlContext.Current?.DeleteMode ?? this.m_configuration.DeleteStrategy);
                         data.Item[i].BatchOperation = BatchOperationType.Delete;
                         break;
                     case BatchOperationType.Insert:
@@ -364,7 +357,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
 
         /// <inheritdoc/>
         /// <exception cref="NotSupportedException">This method is not supported on <see cref="Bundle"/></exception>
-        IdentifiedData IAdoPersistenceProvider.Delete(OrmLite.DataContext context, Guid key, DeleteMode deletionMode)
+        IdentifiedData IAdoPersistenceProvider.Delete(OrmLite.DataContext context, Guid key, DeleteMode deleteMode)
         {
             throw new NotSupportedException();
         }
@@ -376,7 +369,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
         object IDataPersistenceService.Update(object data) => this.Update((Bundle)data, TransactionMode.Commit, AuthenticationContext.Current.Principal);
 
         /// <inheritdoc />
-        object IDataPersistenceService.Obsolete(Guid id) => this.Obsolete(id, TransactionMode.Commit, AuthenticationContext.Current.Principal);
+        object IDataPersistenceService.Delete(Guid id) => this.Delete(id, TransactionMode.Commit, AuthenticationContext.Current.Principal);
 
         /// <inheritdoc />
         object IDataPersistenceService.Get(Guid id) => this.Get(id, null, AuthenticationContext.Current.Principal);

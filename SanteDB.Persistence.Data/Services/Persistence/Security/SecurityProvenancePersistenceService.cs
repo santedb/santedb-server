@@ -41,12 +41,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Security
         /// <summary>
         /// Obsoletion of provenance not supported
         /// </summary>
-        protected override void DoDeleteAllInternal(DataContext context, Expression<Func<SecurityProvenance, bool>> expression, DeleteMode deleteMode)
+        protected override IEnumerable<DbSecurityProvenance> DoDeleteAllInternal(DataContext context, Expression<Func<SecurityProvenance, bool>> expression, DeleteMode deleteMode)
         {
             // The user may be trying to purge old provenance objects
             if (deleteMode == DeleteMode.PermanentDelete) // this statement will fail due to RI in the database anyways - so just send it
             {
-                base.DoDeleteAllInternal(context, expression, deleteMode);
+                return base.DoDeleteAllInternal(context, expression, deleteMode);
             }
             else
             {

@@ -516,7 +516,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         /// <summary>
         /// Obsolete the audit - Not supported
         /// </summary>
-        public AuditEventData Delete(Guid storageData, TransactionMode mode, IPrincipal overrideAuthContext, DeleteMode deletionMode)
+        public AuditEventData Delete(Guid storageData, TransactionMode mode, IPrincipal overrideAuthContext)
         {
             throw new NotSupportedException("Delete of audits not permitted");
         }

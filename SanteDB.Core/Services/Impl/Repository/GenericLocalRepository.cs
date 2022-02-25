@@ -107,12 +107,12 @@ namespace SanteDB.Server.Core.Services.Impl
         /// <summary>
         /// Data is obsoleting
         /// </summary>
-        public event EventHandler<DataPersistingEventArgs<TEntity>> Obsoleting;
+        public event EventHandler<DataPersistingEventArgs<TEntity>> Deleting;
 
         /// <summary>
         /// Data has obsoleted
         /// </summary>
-        public event EventHandler<DataPersistedEventArgs<TEntity>> Obsoleted;
+        public event EventHandler<DataPersistedEventArgs<TEntity>> Deleted;
 
         /// <summary>
         /// Gets the policy required for querying
@@ -221,9 +221,9 @@ namespace SanteDB.Server.Core.Services.Impl
         }
 
         /// <summary>
-        /// Obsolete the specified data
+        /// Delete the specified data
         /// </summary>
-        public virtual TEntity Obsolete(Guid key)
+        public virtual TEntity Delete(Guid key)
         {
             // Demand permission
             this.DemandDelete(key);
@@ -248,25 +248,25 @@ namespace SanteDB.Server.Core.Services.Impl
 
             // Fire pre-persistence triggers
             var prePersistence = new DataPersistingEventArgs<TEntity>(entity, TransactionMode.Commit, AuthenticationContext.Current.Principal);
-            this.Obsoleting?.Invoke(this, prePersistence);
+            this.Deleting?.Invoke(this, prePersistence);
             if (prePersistence.Cancel)
             {
                 this.m_traceSource.TraceInfo("Pre-persistence event signal cancel obsolete: {0}", key);
                 // Fired inserted trigger
                 if (prePersistence.Success)
                 {
-                    this.Obsoleted?.Invoke(this, new DataPersistedEventArgs<TEntity>(prePersistence.Data, TransactionMode.Commit, AuthenticationContext.Current.Principal));
+                    this.Deleted?.Invoke(this, new DataPersistedEventArgs<TEntity>(prePersistence.Data, TransactionMode.Commit, AuthenticationContext.Current.Principal));
                 }
                 return this.m_privacyService?.Apply(prePersistence.Data, AuthenticationContext.Current.Principal) ?? prePersistence.Data;
             }
 
             var businessRulesService = ApplicationServiceContext.Current.GetBusinessRulesService<TEntity>();
 
-            entity = businessRulesService?.BeforeObsolete(entity) ?? entity;
-            entity = persistenceService.Delete(entity.Key.Value, TransactionMode.Commit, AuthenticationContext.Current.Principal, DeleteMode.LogicalDelete);
-            entity = businessRulesService?.AfterObsolete(entity) ?? entity;
+            entity = businessRulesService?.BeforeDelete(entity) ?? entity;
+            entity = persistenceService.Delete(entity.Key.Value, TransactionMode.Commit, AuthenticationContext.Current.Principal);
+            entity = businessRulesService?.AfterDelete(entity) ?? entity;
 
-            this.Obsoleted?.Invoke(this, new DataPersistedEventArgs<TEntity>(entity, TransactionMode.Commit, AuthenticationContext.Current.Principal));
+            this.Deleted?.Invoke(this, new DataPersistedEventArgs<TEntity>(entity, TransactionMode.Commit, AuthenticationContext.Current.Principal));
 
             return this.m_privacyService?.Apply(entity, AuthenticationContext.Current.Principal) ?? entity;
         }
@@ -563,9 +563,9 @@ namespace SanteDB.Server.Core.Services.Impl
         /// <summary>
         /// Obsolete
         /// </summary>
-        IdentifiedData IRepositoryService.Obsolete(Guid key)
+        IdentifiedData IRepositoryService.Delete(Guid key)
         {
-            return this.Obsolete(key);
+            return this.Delete(key);
         }
     }
 }

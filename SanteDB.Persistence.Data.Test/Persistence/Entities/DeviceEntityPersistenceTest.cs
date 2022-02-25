@@ -48,19 +48,15 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 var afterInsert = base.TestInsert(deventity);
                 Assert.AreEqual("Test Manufacturer", afterInsert.ManufacturerModelName);
                 Assert.AreEqual("Operating System Inc. OS 4", afterInsert.OperatingSystemName);
-                Assert.IsNull(afterInsert.SecurityDevice);
                 Assert.IsNotNull(afterInsert.LoadProperty(o => o.SecurityDevice));
                 Assert.AreEqual("SOME_DEVICE_ID", afterInsert.SecurityDevice.Name);
-                Assert.IsNull(afterInsert.GeoTag);
                 Assert.IsNotNull(afterInsert.LoadProperty(o => o.GeoTag));
 
                 // Now we want to query
                 var afterQuery = base.TestQuery<DeviceEntity>(o => o.ManufacturerModelName == "Test Manufacturer" && o.OperatingSystemName == "Operating System Inc. OS 4", 1).AsResultSet().First();
-                Assert.IsNull(afterQuery.Names);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Names).Count);
                 Assert.AreEqual("Test Manufacturer", afterQuery.ManufacturerModelName);
                 Assert.AreEqual("Operating System Inc. OS 4", afterQuery.OperatingSystemName);
-                Assert.IsNull(afterQuery.GeoTag);
                 Assert.IsNotNull(afterQuery.GeoTagKey);
                 Assert.IsNotNull(afterQuery.LoadProperty(o => o.GeoTag));
                 Assert.AreEqual(12.0f, afterQuery.GeoTag.Lat);
@@ -75,7 +71,6 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
 
                 afterQuery = base.TestQuery<DeviceEntity>(o => o.ManufacturerModelName == "Test Manufacturer" && o.OperatingSystemName == "Operating System Inc. OS 4", 0).AsResultSet().FirstOrDefault();
                 afterQuery = base.TestQuery<DeviceEntity>(o => o.ManufacturerModelName == "Some Test Manufacturer" && o.OperatingSystemName == "Operating System Inc. OS 5", 1).AsResultSet().FirstOrDefault();
-                Assert.IsNull(afterQuery.Names);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Names).Count);
             }
         }
@@ -109,7 +104,6 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
 
                 // Now we want to query
                 var afterQuery = base.TestQuery<Entity>(o => o.Names.Any(n => n.Component.Any(c => c.Value == "Some Device 2")), 1).AsResultSet().First();
-                Assert.IsNull(afterQuery.Names);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Names).Count);
                 Assert.IsInstanceOf<DeviceEntity>(afterQuery);
                 Assert.AreEqual("Test Manufacturer", (afterQuery as DeviceEntity).ManufacturerModelName);
@@ -123,7 +117,6 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 Assert.AreEqual("Operating System Inc. OS 5", (afterUpdate as DeviceEntity).OperatingSystemName);
 
                 afterQuery = base.TestQuery<Entity>(o => o.Names.Any(n => n.Component.Any(c => c.Value == "Some Device 2")), 1).AsResultSet().FirstOrDefault();
-                Assert.IsNull(afterQuery.Names);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Names).Count);
                 Assert.AreEqual("Operating System Inc. OS 5", (afterQuery as DeviceEntity).OperatingSystemName);
             }

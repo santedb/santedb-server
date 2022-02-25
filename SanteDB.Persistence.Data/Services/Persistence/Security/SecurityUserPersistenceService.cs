@@ -1,6 +1,9 @@
-﻿using SanteDB.Core.Model.Security;
+﻿using SanteDB.Core.Model.Entities;
+using SanteDB.Core.Model.Security;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
+using SanteDB.Persistence.Data.Model.Entities;
+using SanteDB.Persistence.Data.Model.Roles;
 using SanteDB.Persistence.Data.Model.Security;
 using System;
 using System.Collections.Generic;
@@ -20,6 +23,19 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Security
         {
         }
 
+        /// <inheritdoc/>
+        protected override void DoDeleteReferencesInternal(DataContext context, Guid key)
+        {
+            // is there a CDR user entity which points to this? 
+            foreach(var cdrUe in context.Query<DbUserEntity>(o => o.SecurityUserKey == key)) { 
+                cdrUe.SecurityUserKey = Guid.Empty;
+                context.Update(cdrUe);
+            }
+
+            base.DoDeleteReferencesInternal(context, key);
+        }
+
+        /// <inheritdoc/>
         protected override SecurityUser BeforePersisting(DataContext context, SecurityUser data)
         {
             if (!String.IsNullOrEmpty(data.Password))
@@ -36,9 +52,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Security
             return base.BeforePersisting(context, data);
         }
 
-        /// <summary>
-        /// Called after persistence is completed
-        /// </summary>
+        /// <inheritdoc/>
         protected override SecurityUser AfterPersisted(DataContext context, SecurityUser data)
         {
             data.Password = null;

@@ -25,7 +25,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         /// </summary>
         protected override void DoDeleteReferencesInternal(DataContext context, Guid key)
         {
-            context.Delete<DbReferenceTerm>(o => o.CodeSystemKey == key);
+            context.DeleteAll<DbReferenceTerm>(o => o.CodeSystemKey == key);
             base.DoDeleteReferencesInternal(context, key);
         }
     }

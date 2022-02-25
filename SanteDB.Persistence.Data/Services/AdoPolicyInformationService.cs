@@ -101,7 +101,7 @@ namespace SanteDB.Persistence.Data.Services
                         {
                             case SecurityRole sr:
                                 {
-                                    context.Delete<DbSecurityRolePolicy>(o => policies.Contains(o.PolicyKey) && o.SourceKey == sr.Key && policies.Contains(o.PolicyKey));
+                                    context.DeleteAll<DbSecurityRolePolicy>(o => policies.Contains(o.PolicyKey) && o.SourceKey == sr.Key && policies.Contains(o.PolicyKey));
                                     context.InsertAll(policies.Select(o => new DbSecurityRolePolicy()
                                     {
                                         GrantType = (int)rule,
@@ -112,7 +112,7 @@ namespace SanteDB.Persistence.Data.Services
                                 }
                             case SecurityApplication sa:
                                 {
-                                    context.Delete<DbSecurityApplicationPolicy>(o => policies.Contains(o.PolicyKey) && o.SourceKey == sa.Key && policies.Contains(o.PolicyKey));
+                                    context.DeleteAll<DbSecurityApplicationPolicy>(o => policies.Contains(o.PolicyKey) && o.SourceKey == sa.Key && policies.Contains(o.PolicyKey));
                                     context.InsertAll(policies.Select(o => new DbSecurityApplicationPolicy()
                                     {
                                         GrantType = (int)rule,
@@ -123,7 +123,7 @@ namespace SanteDB.Persistence.Data.Services
                                 }
                             case SecurityDevice sd:
                                 {
-                                    context.Delete<DbSecurityDevicePolicy>(o => policies.Contains(o.PolicyKey) && o.SourceKey == sd.Key && policies.Contains(o.PolicyKey));
+                                    context.DeleteAll<DbSecurityDevicePolicy>(o => policies.Contains(o.PolicyKey) && o.SourceKey == sd.Key && policies.Contains(o.PolicyKey));
                                     context.InsertAll(policies.Select(o => new DbSecurityDevicePolicy()
                                     {
                                         GrantType = (int)rule,
@@ -572,23 +572,23 @@ namespace SanteDB.Persistence.Data.Services
 
                         if (securable is SecurityRole sr)
                         {
-                            context.Delete<DbSecurityRolePolicy>(o => policies.Contains(o.PolicyKey) && o.SourceKey == sr.Key && policies.Contains(o.PolicyKey));
+                            context.DeleteAll<DbSecurityRolePolicy>(o => policies.Contains(o.PolicyKey) && o.SourceKey == sr.Key && policies.Contains(o.PolicyKey));
                         }
                         else if (securable is SecurityApplication sa)
                         {
-                            context.Delete<DbSecurityApplicationPolicy>(o => policies.Contains(o.PolicyKey) && o.SourceKey == sa.Key && policies.Contains(o.PolicyKey));
+                            context.DeleteAll<DbSecurityApplicationPolicy>(o => policies.Contains(o.PolicyKey) && o.SourceKey == sa.Key && policies.Contains(o.PolicyKey));
                         }
                         else if (securable is SecurityDevice sd)
                         {
-                            context.Delete<DbSecurityDevicePolicy>(o => policies.Contains(o.PolicyKey) && o.SourceKey == sd.Key && policies.Contains(o.PolicyKey));
+                            context.DeleteAll<DbSecurityDevicePolicy>(o => policies.Contains(o.PolicyKey) && o.SourceKey == sd.Key && policies.Contains(o.PolicyKey));
                         }
                         else if (securable is Entity entity)
                         {
-                            context.Delete<DbEntitySecurityPolicy>(o => o.SourceKey == entity.Key && policies.Contains(o.PolicyKey));
+                            context.DeleteAll<DbEntitySecurityPolicy>(o => o.SourceKey == entity.Key && policies.Contains(o.PolicyKey));
                         }
                         else if (securable is Act act)
                         {
-                            context.Delete<DbActSecurityPolicy>(o => o.SourceKey == act.Key && policies.Contains(o.PolicyKey));
+                            context.DeleteAll<DbActSecurityPolicy>(o => o.SourceKey == act.Key && policies.Contains(o.PolicyKey));
                         }
                         else
                         {

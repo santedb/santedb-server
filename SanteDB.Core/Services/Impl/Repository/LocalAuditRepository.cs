@@ -132,14 +132,7 @@ namespace SanteDB.Server.Core.Services.Impl
         [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AccessAuditLog)]
         public AuditEventData Get(Guid key, Guid versionKey)
         {
-            var service = ApplicationServiceContext.Current.GetService<IDataPersistenceService<AuditEventData>>();
-            if (service == null)
-            {
-                this.m_tracer.TraceError("Cannot find the data persistence service for audits");
-                throw new InvalidOperationException(this.m_localizationService.GetString("error.server.core.auditPersistenceService"));
-            }
-            var result = service.Get(key, versionKey, AuthenticationContext.Current.Principal);
-            return result;
+            return this.m_persistenceService.Get(key, versionKey, AuthenticationContext.Current.Principal);
         }
 
         /// <summary>
@@ -147,30 +140,16 @@ namespace SanteDB.Server.Core.Services.Impl
         /// </summary>
         public AuditEventData Insert(AuditEventData audit)
         {
-            var service = ApplicationServiceContext.Current.GetService<IDataPersistenceService<AuditEventData>>();
-            if (service == null)
-            {
-                this.m_tracer.TraceError("Cannot find the data persistence service for audits");
-                throw new InvalidOperationException(this.m_localizationService.GetString("error.server.core.auditPersistenceService"));
-            }
-            var result = service.Insert(audit, TransactionMode.Commit, AuthenticationContext.Current.Principal);
-            return result;
+            return this.m_persistenceService.Insert(audit, TransactionMode.Commit, AuthenticationContext.Current.Principal);
         }
 
         /// <summary>
         /// Obsolete the specified data
         /// </summary>
         [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AccessAuditLog)]
-        public AuditEventData Obsolete(Guid key)
+        public AuditEventData Delete(Guid key)
         {
-            var service = ApplicationServiceContext.Current.GetService<IDataPersistenceService<AuditEventData>>();
-            if (service == null)
-            {
-                this.m_tracer.TraceError("Cannot find the data persistence service for audits");
-                throw new InvalidOperationException(this.m_localizationService.GetString("error.server.core.auditPersistenceService"));
-            }
-            var result = service.Delete(key, TransactionMode.Commit, AuthenticationContext.Current.Principal, DeleteMode.LogicalDelete);
-            return result;
+            return this.m_persistenceService.Delete(key, TransactionMode.Commit, AuthenticationContext.Current.Principal);
         }
 
         /// <summary>
@@ -179,22 +158,15 @@ namespace SanteDB.Server.Core.Services.Impl
         [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.AccessAuditLog)]
         public AuditEventData Save(AuditEventData data)
         {
-            var service = ApplicationServiceContext.Current.GetService<IDataPersistenceService<AuditEventData>>();
-            if (service == null)
-            {
-                this.m_tracer.TraceError("Cannot find the data persistence service for audits");
-                throw new InvalidOperationException(this.m_localizationService.GetString("error.server.core.auditPersistenceService"));
-            }
-            var existing = service.Get(data.Key.Value, null, AuthenticationContext.Current.Principal);
+            var existing = this.m_persistenceService.Get(data.Key.Value, null, AuthenticationContext.Current.Principal);
             if (existing == null)
             {
-                data = service.Update(data, TransactionMode.Commit, AuthenticationContext.Current.Principal);
+                return this.m_persistenceService.Update(data, TransactionMode.Commit, AuthenticationContext.Current.Principal);
             }
             else
             {
-                data = service.Insert(data, TransactionMode.Commit, AuthenticationContext.Current.Principal);
+                return this.m_persistenceService.Insert(data, TransactionMode.Commit, AuthenticationContext.Current.Principal);
             }
-            return data;
         }
     }
 }

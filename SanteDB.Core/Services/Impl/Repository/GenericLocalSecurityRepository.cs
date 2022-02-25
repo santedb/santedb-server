@@ -62,9 +62,9 @@ namespace SanteDB.Server.Core.Services.Impl
         /// <summary>
         /// Obsolete the object
         /// </summary>
-        public override TSecurityEntity Obsolete(Guid key)
+        public override TSecurityEntity Delete(Guid key)
         {
-            var retVal = base.Obsolete(key);
+            var retVal = base.Delete(key);
             return retVal;
         }
     }

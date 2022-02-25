@@ -43,9 +43,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
 
                 // Now we want to query
                 var afterQuery = base.TestQuery<Organization>(o => o.IndustryConceptKey == IndustryTypeKeys.Manufacturing && o.Names.Any(n => n.Component.Any((c => c.Value == "123 Organization Inc."))), 1).AsResultSet().First();
-                Assert.IsNull(afterQuery.Names);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Names).Count);
-                Assert.IsNull(afterQuery.IndustryConcept);
                 Assert.AreEqual(IndustryTypeKeys.Manufacturing, afterQuery.IndustryConceptKey);
                 Assert.AreEqual("Industry-Manufacturing", afterQuery.LoadProperty(o => o.IndustryConcept).Mnemonic);
 
@@ -58,9 +56,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 Assert.AreEqual(IndustryTypeKeys.HealthDelivery, afterUpdate.IndustryConceptKey);
 
                 afterQuery = base.TestQuery<Organization>(o => o.IndustryConceptKey == IndustryTypeKeys.HealthDelivery && o.Names.Any(n => n.Component.Any(c => c.Value == "123 Organization Inc.")), 1).AsResultSet().First();
-                Assert.IsNull(afterQuery.Names);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Names).Count);
-                Assert.IsNull(afterQuery.IndustryConcept);
                 Assert.AreEqual(IndustryTypeKeys.HealthDelivery, afterQuery.IndustryConceptKey);
                 Assert.AreEqual("Industry-HealthDelivery", afterQuery.LoadProperty(o => o.IndustryConcept).Mnemonic);
             }
@@ -97,9 +93,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 };
                 var afterQuery = base.TestQuery<Entity>(o => o.Names.Any(n => n.Component.Any(c => c.Value == "324 Organization Inc.")), 1).AsResultSet().First();
                 Assert.IsInstanceOf<Organization>(afterQuery);
-                Assert.IsNull(afterQuery.Names);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Names).Count);
-                Assert.IsNull((afterQuery as Organization).IndustryConcept);
                 Assert.AreEqual(IndustryTypeKeys.Manufacturing, (afterQuery as Organization).IndustryConceptKey);
 
                 // Update the key
@@ -112,7 +106,6 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 Assert.AreEqual(IndustryTypeKeys.HealthDelivery, afterUpdate.IndustryConceptKey);
 
                 afterQuery = base.TestQuery<Entity>(o => o.Names.Any(n => n.Component.Any(c => c.Value == "324 Organization Inc.")), 1).AsResultSet().First();
-                Assert.IsNull(afterQuery.Names);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Names).Count);
                 Assert.AreEqual(IndustryTypeKeys.HealthDelivery, (afterQuery as Organization).IndustryConceptKey);
             }

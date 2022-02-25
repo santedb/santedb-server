@@ -99,7 +99,6 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 Assert.AreEqual(EntityClassKeys.LivingSubject, afterFetch.ClassConceptKey);
                 Assert.AreEqual(EntityClassKeys.Place, afterFetch.TypeConceptKey);
                 Assert.AreEqual(DeterminerKeys.Specific, afterFetch.DeterminerConceptKey);
-                Assert.IsNull(afterFetch.Names); // We're in "Quick" mode so we shouldn't have loaded any properties
                 Assert.AreEqual(2, afterFetch.LoadProperty(o => o.Names).Count);
 
                 // Test query by name
@@ -118,9 +117,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 // Test query by name
                 fetched = base.TestQuery<Entity>(k => k.Names.Any(n => n.NameUseKey == NameUseKeys.Assigned && n.Component.Any(c => c.Value == "Justin")), 1).AsResultSet();
                 afterFetch = fetched.First();
-                Assert.IsNull(afterFetch.Names);
                 Assert.AreEqual(3, afterFetch.LoadProperty(o => o.Names).Count);
-                Assert.IsNull(afterFetch.Names[0].Component);
                 Assert.AreEqual("Justin", afterFetch.Names[0].LoadProperty(o => o.Component)[0].Value);
 
                 // Test name is updated
@@ -134,7 +131,6 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
 
                 fetched = base.TestQuery<Entity>(k => k.Key == afterInsert.Key, 1).AsResultSet();
                 afterFetch = fetched.First();
-                Assert.IsNull(afterFetch.Names);
                 Assert.AreEqual("Robert", afterFetch.LoadProperty(o => o.Names).FirstOrDefault(o => o.NameUseKey == NameUseKeys.Legal).LoadProperty(o => o.Component)[0].Value);
                 Assert.AreEqual("Bobby", afterFetch.Names.FirstOrDefault(o => o.NameUseKey == NameUseKeys.Assigned).LoadProperty(o => o.Component)[0].Value);
                 Assert.Greater(afterFetch.Names[0].Component[0].OrderSequence, 0);
@@ -179,9 +175,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 // Test fetch
                 var fetched = base.TestQuery<Entity>(o => o.Key == afterInsert.Key, 1).AsResultSet();
                 var afterFetch = fetched.First();
-                Assert.IsNull(afterFetch.Addresses);
                 Assert.AreEqual(1, afterFetch.LoadProperty(o => o.Addresses).Count);
-                Assert.IsNull(afterFetch.Addresses[0].Component);
                 Assert.AreEqual(5, afterFetch.Addresses[0].LoadProperty(o => o.Component).Count);
 
                 // Test query by address
@@ -201,7 +195,6 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 // Test fetch
                 fetched = base.TestQuery<Entity>(o => o.Key == afterInsert.Key, 1).AsResultSet();
                 afterFetch = fetched.First();
-                Assert.IsNull(afterFetch.Addresses);
                 Assert.AreEqual(2, afterFetch.LoadProperty(o => o.Addresses).Count);
 
                 // Test Query by either address
@@ -328,10 +321,8 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
 
                 var fetch = base.TestQuery<Entity>(o => o.Identifiers.Where(g => g.Authority.DomainName == "TEST_3").Any(i => i.Value == "TEST3"), 1).AsResultSet();
                 var afterFetch = fetch.First();
-                Assert.IsNull(afterFetch.Identifiers);
                 Assert.AreEqual(1, afterFetch.LoadProperty(o => o.Identifiers).Count);
-                Assert.IsNotNull(afterFetch.Identifiers[0].Authority); // Authority is always loaded
-                Assert.AreEqual("TEST_3", afterFetch.Identifiers[0].Authority.DomainName);
+                Assert.AreEqual("TEST_3", afterFetch.Identifiers[0].LoadProperty(o=>o.Authority).DomainName);
             }
         }
 
@@ -373,7 +364,6 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 var fetch = base.TestQuery<Entity>(o => o.Telecoms.Any(t => t.Value == "mailto:justin@fyfesoftware.ca"), 1).AsResultSet();
                 fetch = base.TestQuery<Entity>(o => o.Key == afterInsert.Key, 1).AsResultSet();
                 var afterFetch = fetch.First();
-                Assert.IsNull(afterFetch.Telecoms);
                 Assert.AreEqual(1, afterFetch.LoadProperty(o => o.Telecoms).Count);
                 Assert.AreEqual(TelecomAddressTypeKeys.Internet, afterFetch.Telecoms[0].TypeConceptKey);
                 Assert.AreEqual(TelecomAddressUseKeys.Public, afterFetch.Telecoms[0].AddressUseKey);
@@ -386,7 +376,6 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                     return o;
                 });
                 afterFetch = fetch.First();
-                Assert.IsNull(afterFetch.Telecoms);
                 Assert.AreEqual(2, afterFetch.LoadProperty(o => o.Telecoms).Count);
 
                 afterUpdate = base.TestUpdate(afterFetch, (o) =>
@@ -395,7 +384,6 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                     return o;
                 });
                 afterFetch = fetch.First();
-                Assert.IsNull(afterFetch.Telecoms);
                 Assert.AreEqual(1, afterFetch.LoadProperty(o => o.Telecoms).Count);
 
                 afterUpdate = base.TestUpdate(afterFetch, (o) =>
@@ -404,7 +392,6 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                     return o;
                 });
                 afterFetch = fetch.First();
-                Assert.IsNull(afterFetch.Telecoms);
                 Assert.AreEqual(1, afterFetch.LoadProperty(o => o.Telecoms).Count);
                 Assert.AreEqual("mailto:justin@fyfesoftware.com", afterFetch.Telecoms[0].Value);
             }
@@ -499,47 +486,36 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 Assert.AreEqual(EntityClassKeys.Place, afterFetch.TypeConceptKey);
                 Assert.AreEqual("Place", afterFetch.LoadProperty(o => o.TypeConcept).Mnemonic);
 
-                Assert.IsNull(afterFetch.Names);
                 Assert.AreEqual(1, afterFetch.LoadProperty(o => o.Names).Count);
                 Assert.AreEqual("Justin8", afterFetch.Names[0].LoadProperty(o => o.Component)[0].Value);
 
-                Assert.IsNull(afterFetch.Addresses);
                 Assert.AreEqual(1, afterFetch.LoadProperty(o => o.Addresses).Count);
 
-                Assert.IsNull(afterFetch.Identifiers);
                 Assert.AreEqual(1, afterFetch.LoadProperty(o => o.Identifiers).Count);
                 Assert.AreEqual("TEST_8", afterFetch.Identifiers[0].Value);
                 Assert.AreEqual("TEST8", afterFetch.Identifiers[0].LoadProperty(o => o.Authority).DomainName);
 
-                Assert.IsNull(afterFetch.Telecoms);
                 Assert.AreEqual(1, afterFetch.LoadProperty(o => o.Telecoms).Count);
                 Assert.AreEqual("mailto:justin2@fyfesoftware.ca", afterFetch.Telecoms[0].Value);
 
-                Assert.IsNull(afterFetch.Relationships);
                 Assert.AreEqual(1, afterFetch.LoadProperty(o => o.Relationships).Count);
                 Assert.AreEqual(EntityRelationshipTypeKeys.Replaces, afterFetch.Relationships[0].RelationshipTypeKey);
-                Assert.IsNull(afterFetch.Relationships[0].TargetEntity);
                 Assert.AreEqual("A name of a parent", afterFetch.Relationships[0].LoadProperty(o => o.TargetEntity).LoadProperty(o => o.Names)[0].LoadProperty(o => o.Component)[0].Value);
 
-                Assert.IsNull(afterFetch.Tags);
                 Assert.AreEqual(1, afterFetch.LoadProperty(o => o.Tags).Count);
                 Assert.AreEqual("foo", afterFetch.Tags[0].TagKey);
                 Assert.AreEqual("bar", afterFetch.Tags[0].Value);
 
-                Assert.IsNull(afterFetch.Extensions);
                 Assert.AreEqual(1, afterFetch.LoadProperty(o => o.Extensions).Count);
                 Assert.AreEqual(ExtensionTypeKeys.DataQualityExtension, afterFetch.Extensions[0].ExtensionTypeKey);
                 Assert.IsNotNull(afterFetch.Extensions[0].ExtensionValue);
 
-                Assert.IsNull(afterFetch.Template);
                 Assert.IsNotNull(afterFetch.LoadProperty(o => o.Template));
                 Assert.AreEqual("A template", afterFetch.Template.Name);
 
                 // Note
-                Assert.IsNull(afterFetch.Notes);
                 Assert.AreEqual(1, afterFetch.LoadProperty(o => o.Notes).Count);
                 Assert.AreEqual("This is a test note", afterFetch.Notes.First().Text);
-                Assert.IsNull(afterFetch.Notes.First().Author);
                 Assert.AreEqual("Testing Author", afterFetch.Notes.First().LoadProperty(o => o.Author).LoadProperty(o => o.Names).First().LoadProperty(o => o.Component).First().Value);
             }
         }
@@ -602,7 +578,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
 
                 var afterDelete = base.TestDelete(afterFetch, Core.Services.DeleteMode.LogicalDelete);
                 base.TestQuery<Entity>(o => o.Key == afterInsert.Key, 0);
-                base.TestQuery<Entity>(o => o.Key == afterInsert.Key && StatusKeys.InactiveStates.Contains(o.StatusConceptKey.Value), 1);
+                base.TestQuery<Entity>(o => o.Key == afterInsert.Key && o.ObsoletionTime.HasValue, 1);
 
                 // Now perma-delete
                 afterDelete = base.TestDelete(afterDelete, Core.Services.DeleteMode.PermanentDelete);
@@ -853,12 +829,12 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
 
                 // Delete all
                 var dpe = ApplicationServiceContext.Current.GetService<IDataPersistenceServiceEx<Entity>>();
-                dpe.DeleteAll(o => o.Names.Any(n => n.Component.Any(c => c.Value == "Delete All")), TransactionMode.Commit, AuthenticationContext.SystemPrincipal, DeleteMode.LogicalDelete);
+                dpe.DeleteAll(o => o.Names.Any(n => n.Component.Any(c => c.Value == "Delete All")), TransactionMode.Commit, AuthenticationContext.SystemPrincipal);
 
                 // Ensure no results on regular query
                 afterQuery = this.TestQuery<Entity>(o => o.Names.Any(n => n.Component.Any(c => c.Value == "Delete All")), 0);
                 // Ensure 10 results on inactive query
-                afterQuery = this.TestQuery<Entity>(o => o.Names.Any(n => n.Component.Any(c => c.Value == "Delete All")) && StatusKeys.InactiveStates.Contains(o.StatusConceptKey.Value), 10);
+                afterQuery = this.TestQuery<Entity>(o => o.Names.Any(n => n.Component.Any(c => c.Value == "Delete All")) && o.ObsoletionTime.HasValue, 10);
 
                 // Restore all
                 var oldData = afterQuery.ToList().Select(q =>
@@ -874,7 +850,10 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 afterQuery = this.TestQuery<Entity>(o => o.Names.Any(n => n.Component.Any(c => c.Value == "Delete All")), 10);
 
                 // Now erase
-                dpe.DeleteAll(o => o.Names.Any(n => n.Component.Any(c => c.Value == "Delete All")), TransactionMode.Commit, AuthenticationContext.SystemPrincipal, DeleteMode.PermanentDelete);
+                using (DataPersistenceControlContext.Create(DeleteMode.PermanentDelete))
+                {
+                    dpe.DeleteAll(o => o.Names.Any(n => n.Component.Any(c => c.Value == "Delete All")), TransactionMode.Commit, AuthenticationContext.SystemPrincipal);
+                }
                 // Ensure 0 now results
                 afterQuery = this.TestQuery<Entity>(o => o.Names.Any(n => n.Component.Any(c => c.Value == "Delete All")), 0);
                 // Ensure 0 results on inactive query

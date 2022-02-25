@@ -216,8 +216,8 @@ namespace SanteDB.Server.Core.Persistence
                                 idpInstance.Insert(target);
                             else if (!(itm is DataInsert))
                                 typeof(IDataPersistenceService).GetMethod(itm.ActionName, new Type[] { typeof(Object) }).Invoke(idpInstance, new object[] { target });
-                            else if (existing != null && itm is DataObsolete obsolete)
-                                idpInstance.Obsolete(obsolete.Element.Key.Value);
+                            else if (existing != null && itm is DataDelete delete)
+                                idpInstance.Delete(delete.Element.Key.Value);
                         }
                         catch (Exception e)
                         {

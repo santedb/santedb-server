@@ -56,51 +56,54 @@ namespace SanteDB.Server.Core.Services.Impl
         /// </summary>
         public void Save(Guid sourceKey, ITag tag)
         {
-            // Don't persist empty tags
-            if ((tag as IdentifiedData)?.IsEmpty() == true || tag.TagKey.StartsWith("$")) return;
-
-            if (tag is EntityTag)
+            using (DataPersistenceControlContext.Create(DeleteMode.PermanentDelete))
             {
-                var idp = ApplicationServiceContext.Current.GetService<IDataPersistenceService<EntityTag>>();
-                var existing = idp.Query(o => o.SourceEntityKey == sourceKey && o.TagKey == tag.TagKey, AuthenticationContext.Current.Principal).FirstOrDefault();
-                if (existing != null)
-                {
-                    existing.Value = tag.Value;
-                    if (existing.Value == null)
-                        idp.Delete(existing.Key.Value, TransactionMode.Commit, AuthenticationContext.Current.Principal, DeleteMode.PermanentDelete);
-                    else
-                        idp.Update(existing as EntityTag, TransactionMode.Commit, AuthenticationContext.Current.Principal);
-                }
-                else
-                {
-                    if (!tag.SourceEntityKey.HasValue)
-                        tag.SourceEntityKey = sourceKey;
-                    idp.Insert(tag as EntityTag, TransactionMode.Commit, AuthenticationContext.Current.Principal);
-                }
-            }
-            else if (tag is ActTag)
-            {
-                var idp = ApplicationServiceContext.Current.GetService<IDataPersistenceService<ActTag>>();
-                int tr = 0;
-                var existing = idp.Query(o => o.SourceEntityKey == sourceKey && o.TagKey == tag.TagKey, AuthenticationContext.Current.Principal).FirstOrDefault();
-                tag.SourceEntityKey = tag.SourceEntityKey ?? sourceKey;
-                if (existing != null)
-                {
-                    existing.Value = tag.Value;
-                    if (existing.Value == null)
-                        idp.Delete(existing.Key.Value, TransactionMode.Commit, AuthenticationContext.Current.Principal, DeleteMode.PermanentDelete);
-                    else
-                        idp.Update(existing as ActTag, TransactionMode.Commit, AuthenticationContext.Current.Principal);
-                }
-                else
-                {
-                    if (!tag.SourceEntityKey.HasValue)
-                        tag.SourceEntityKey = sourceKey;
-                    idp.Insert(tag as ActTag, TransactionMode.Commit, AuthenticationContext.Current.Principal);
-                }
-            }
+                // Don't persist empty tags
+                if ((tag as IdentifiedData)?.IsEmpty() == true || tag.TagKey.StartsWith("$")) return;
 
-            this.m_cacheService?.Remove(sourceKey);
+                if (tag is EntityTag)
+                {
+                    var idp = ApplicationServiceContext.Current.GetService<IDataPersistenceService<EntityTag>>();
+                    var existing = idp.Query(o => o.SourceEntityKey == sourceKey && o.TagKey == tag.TagKey, AuthenticationContext.Current.Principal).FirstOrDefault();
+                    if (existing != null)
+                    {
+                        existing.Value = tag.Value;
+                        if (existing.Value == null)
+                            idp.Delete(existing.Key.Value, TransactionMode.Commit, AuthenticationContext.Current.Principal);
+                        else
+                            idp.Update(existing as EntityTag, TransactionMode.Commit, AuthenticationContext.Current.Principal);
+                    }
+                    else
+                    {
+                        if (!tag.SourceEntityKey.HasValue)
+                            tag.SourceEntityKey = sourceKey;
+                        idp.Insert(tag as EntityTag, TransactionMode.Commit, AuthenticationContext.Current.Principal);
+                    }
+                }
+                else if (tag is ActTag)
+                {
+                    var idp = ApplicationServiceContext.Current.GetService<IDataPersistenceService<ActTag>>();
+                    int tr = 0;
+                    var existing = idp.Query(o => o.SourceEntityKey == sourceKey && o.TagKey == tag.TagKey, AuthenticationContext.Current.Principal).FirstOrDefault();
+                    tag.SourceEntityKey = tag.SourceEntityKey ?? sourceKey;
+                    if (existing != null)
+                    {
+                        existing.Value = tag.Value;
+                        if (existing.Value == null)
+                            idp.Delete(existing.Key.Value, TransactionMode.Commit, AuthenticationContext.Current.Principal);
+                        else
+                            idp.Update(existing as ActTag, TransactionMode.Commit, AuthenticationContext.Current.Principal);
+                    }
+                    else
+                    {
+                        if (!tag.SourceEntityKey.HasValue)
+                            tag.SourceEntityKey = sourceKey;
+                        idp.Insert(tag as ActTag, TransactionMode.Commit, AuthenticationContext.Current.Principal);
+                    }
+                }
+
+                this.m_cacheService?.Remove(sourceKey);
+            }
         }
     }
 }

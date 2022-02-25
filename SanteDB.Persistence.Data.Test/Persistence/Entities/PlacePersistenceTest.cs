@@ -49,19 +49,15 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 Assert.AreEqual(1, afterInsert.LoadProperty(o => o.Identifiers).Count);
                 Assert.AreEqual(AssigningAuthorityKeys.Gs1GlobalLocationNumber, afterInsert.Identifiers.First().AuthorityKey);
                 Assert.AreEqual("34943934943", afterInsert.Identifiers.First().Value);
-                Assert.IsNull(afterInsert.GeoTag);
                 Assert.AreEqual(10, afterInsert.LoadProperty(o => o.GeoTag).Lat);
 
                 // Test querying 
                 var afterQuery = base.TestQuery<Place>(o => o.Identifiers.Any(i => i.Value == "34943934943" && i.Authority.DomainName == "GLN"), 1).AsResultSet().First();
-                Assert.IsNull(afterQuery.Names);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Names).Count);
                 Assert.AreEqual("Good Health Hospital", afterQuery.Names.First().LoadProperty(o => o.Component).First().Value);
-                Assert.IsNull(afterQuery.Identifiers);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Identifiers).Count);
                 Assert.AreEqual(AssigningAuthorityKeys.Gs1GlobalLocationNumber, afterQuery.Identifiers.First().AuthorityKey);
                 Assert.AreEqual("34943934943", afterQuery.Identifiers.First().Value);
-                Assert.IsNull(afterQuery.GeoTag);
                 Assert.IsFalse(afterQuery.IsMobile);
                 Assert.AreEqual(10, afterQuery.LoadProperty(o => o.GeoTag).Lat);
 
@@ -78,15 +74,12 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 afterQuery = base.TestQuery<Place>(o => o.Identifiers.Any(i => i.Value == "34943934943" && i.Authority.DomainName == "GLN"), 0).FirstOrDefault();
                 afterQuery = base.TestQuery<Place>(o => o.Identifiers.Any(i => i.Value == "999999999" && i.Authority.DomainName == "GLN"), 1).AsResultSet().First();
                 afterQuery = base.TestQuery<Place>(o => o.IsMobile == true && o.GeoTag.Lat == 10 && o.GeoTag.Lng == 10, 1).AsResultSet().First();
-                Assert.IsNull(afterQuery.Identifiers);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Identifiers).Count);
                 Assert.AreEqual(AssigningAuthorityKeys.Gs1GlobalLocationNumber, afterQuery.Identifiers.First().AuthorityKey);
                 Assert.AreEqual("999999999", afterQuery.Identifiers.First().Value);
                 Assert.IsTrue(afterQuery.IsMobile);
-                Assert.IsNull(afterQuery.Addresses);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Addresses).Count);
                 Assert.AreEqual("Hamilton", afterQuery.Addresses.First().LoadProperty(o => o.Component).First(o => o.ComponentTypeKey == AddressComponentKeys.City).Value);
-                Assert.IsNull(afterQuery.GeoTag);
                 Assert.AreEqual(10, afterQuery.LoadProperty(o => o.GeoTag).Lat);
             }
         }
@@ -131,7 +124,6 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
 
                 // Test querying 
                 var afterQuery = base.TestQuery<Place>(o => o.Services.Any(s => s.ServiceConceptKey == service1), 1).AsResultSet().First();
-                Assert.IsNull(afterQuery.Services);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Services).Count);
                 Assert.AreEqual(service1, afterQuery.Services.First().ServiceConceptKey);
 
