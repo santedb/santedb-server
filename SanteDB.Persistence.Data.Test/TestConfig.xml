@@ -118,14 +118,13 @@
       <add type="SanteDB.Persistence.Data.Services.AdoPersistenceService, SanteDB.Persistence.Data" />
       <add type="SanteDB.Core.Security.DefaultDataSigningService, SanteDB.Core.Api" />
       <add type="SanteDB.Core.Security.SimpleTfaSecretGenerator, SanteDB.Core.Api" />
-      <add type="SanteDB.Server.Core.Security.SHA256PasswordHashingService, SanteDB.Server.Core" />
-      <add type="SanteDB.Server.Core.Security.SHA256PasswordHashingService, SanteDB.Server.Core" />
       <add type="SanteDB.Core.Security.RegexPasswordValidator, SanteDB.Core.Api" />
       <add type="SanteDB.Core.Security.DefaultPolicyDecisionService, SanteDB.Core.Api" />
       <add type="SanteDB.Core.Services.Impl.DefaultThreadPoolService, SanteDB.Core.Api" />
       <add type="SanteDB.Server.Core.Services.Impl.LocalRepositoryService, SanteDB.Server.Core" />
       <add type="SanteDB.Core.Security.Privacy.DataPolicyFilterService, SanteDB.Core.Api" />
       <add type="SanteDB.Server.Core.Services.Impl.DefaultNetworkInformationService, SanteDB.Server.Core" />
+      <add type="SanteDB.Server.Core.Security.SHA256PasswordHashingService, SanteDB.Server.Core" />
       <add type="SanteDB.Server.Core.Security.AesSymmetricCrypographicProvider,  SanteDB.Server.Core" />
     </serviceProviders>
   </section>

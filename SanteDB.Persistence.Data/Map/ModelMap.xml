@@ -37,77 +37,77 @@
   </class>
 
   <!-- Security Users -->
-  <class modelClass="SanteDB.Core.Model.Security.SecurityUser, SanteDB.Core.Model, Version=1.1.0.0"
-		domainClass="SanteDB.Persistence.Data.Model.Security.DbSecurityUser, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Security.SecurityUser, SanteDB.Core.Model"
+		domainClass="SanteDB.Persistence.Data.Model.Security.DbSecurityUser, SanteDB.Persistence.Data">
     <property modelName="ModifiedOn" domainName="UpdatedTime" />
   </class>
 
   <!-- Security Users -->
-  <class modelClass="SanteDB.Core.Model.Security.SecurityChallenge, SanteDB.Core.Model, Version=1.1.0.0"
-		domainClass="SanteDB.Persistence.Data.Model.Security.DbSecurityChallenge, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Security.SecurityChallenge, SanteDB.Core.Model"
+		domainClass="SanteDB.Persistence.Data.Model.Security.DbSecurityChallenge, SanteDB.Persistence.Data">
     <property modelName="ModifiedOn" domainName="UpdatedTime" />
   </class>
 
   <!-- Security Application -->
-  <class modelClass="SanteDB.Core.Model.Security.SecurityApplication, SanteDB.Core.Model, Version=1.1.0.0"
-		domainClass="SanteDB.Persistence.Data.Model.Security.DbSecurityApplication, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Security.SecurityApplication, SanteDB.Core.Model"
+		domainClass="SanteDB.Persistence.Data.Model.Security.DbSecurityApplication, SanteDB.Persistence.Data">
     <property modelName="Name" domainName="PublicId" />
     <property modelName="ModifiedOn" domainName="CreationTime" />
     <property modelName="ApplicationSecret" domainName="Secret" />
   </class>
 
   <!-- Security Device -->
-  <class modelClass="SanteDB.Core.Model.Security.SecurityDevice, SanteDB.Core.Model, Version=1.1.0.0"
-		domainClass="SanteDB.Persistence.Data.Model.Security.DbSecurityDevice, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Security.SecurityDevice, SanteDB.Core.Model"
+		domainClass="SanteDB.Persistence.Data.Model.Security.DbSecurityDevice, SanteDB.Persistence.Data">
     <property modelName="Name" domainName="PublicId" />
     <property modelName="ModifiedOn" domainName="CreationTime" />
   </class>
 
   <!-- Security Role -->
-  <class modelClass="SanteDB.Core.Model.Security.SecurityRole, SanteDB.Core.Model, Version=1.1.0.0"
-		domainClass="SanteDB.Persistence.Data.Model.Security.DbSecurityRole, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Security.SecurityRole, SanteDB.Core.Model"
+		domainClass="SanteDB.Persistence.Data.Model.Security.DbSecurityRole, SanteDB.Persistence.Data">
     <property modelName="ModifiedOn" domainName="UpdatedTime" />
   </class>
 
-  <class modelClass="SanteDB.Core.Model.Security.SecurityProvenance, SanteDB.Core.Model, Version=1.1.0.0"
-      domainClass="SanteDB.Persistence.Data.Model.Security.DbSecurityProvenance, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Security.SecurityProvenance, SanteDB.Core.Model"
+      domainClass="SanteDB.Persistence.Data.Model.Security.DbSecurityProvenance, SanteDB.Persistence.Data">
     <property modelName="CreationTime" domainName="Established" />
   </class>
 
   <!-- Security Role -->
-  <class modelClass="SanteDB.Core.Model.Security.SecurityPolicyInstance, SanteDB.Core.Model, Version=1.1.0.0"
-		domainClass="SanteDB.Persistence.Data.Model.Security.DbSecurityRolePolicy, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Security.SecurityPolicyInstance, SanteDB.Core.Model"
+		domainClass="SanteDB.Persistence.Data.Model.Security.DbSecurityRolePolicy, SanteDB.Persistence.Data">
     <property modelName="SourceEntityKey" domainName="SourceKey" />
   </class>
-  <class modelClass="SanteDB.Core.Model.Security.SecurityPolicyInstance, SanteDB.Core.Model, Version=1.1.0.0"
-   domainClass="SanteDB.Persistence.Data.Model.Security.DbSecurityDevicePolicy, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Security.SecurityPolicyInstance, SanteDB.Core.Model"
+   domainClass="SanteDB.Persistence.Data.Model.Security.DbSecurityDevicePolicy, SanteDB.Persistence.Data">
     <property modelName="SourceEntityKey" domainName="SourceKey" />
   </class>
-  <class modelClass="SanteDB.Core.Model.Security.SecurityPolicyInstance, SanteDB.Core.Model, Version=1.1.0.0"
-		domainClass="SanteDB.Persistence.Data.Model.Security.DbSecurityApplicationPolicy, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Security.SecurityPolicyInstance, SanteDB.Core.Model"
+		domainClass="SanteDB.Persistence.Data.Model.Security.DbSecurityApplicationPolicy, SanteDB.Persistence.Data">
     <property modelName="SourceEntityKey" domainName="SourceKey" />
   </class>
 
   <!-- Security Role -->
-  <class modelClass="SanteDB.Core.Model.Security.SecurityPolicy, SanteDB.Core.Model, Version=1.1.0.0"
-		domainClass="SanteDB.Persistence.Data.Model.Security.DbSecurityPolicy, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Security.SecurityPolicy, SanteDB.Core.Model"
+		domainClass="SanteDB.Persistence.Data.Model.Security.DbSecurityPolicy, SanteDB.Persistence.Data">
     <property modelName="ModifiedOn" domainName="CreationTime" />
   </class>
 
   <!-- Concepts -->
-  <class modelClass="SanteDB.Core.Model.DataTypes.ConceptSet, SanteDB.Core.Model, Version=1.1.0.0"
-		domainClass="SanteDB.Persistence.Data.Model.Concepts.DbConceptSet, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.DataTypes.ConceptSet, SanteDB.Core.Model"
+		domainClass="SanteDB.Persistence.Data.Model.Concepts.DbConceptSet, SanteDB.Persistence.Data">
     <property modelName="ModifiedOn" domainName="UpdatedTime" />
   </class>
-  <class modelClass="SanteDB.Core.Model.DataTypes.Concept, SanteDB.Core.Model, Version=1.1.0.0"
-         domainClass="SanteDB.Persistence.Data.Model.Concepts.DbConceptVersion, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.DataTypes.Concept, SanteDB.Core.Model"
+         domainClass="SanteDB.Persistence.Data.Model.Concepts.DbConceptVersion, SanteDB.Persistence.Data">
     <property modelName="PreviousVersionKey" domainName="ReplacesVersionKey" />
     <property modelName="VersionSequence" domainName="VersionSequenceId" />
     <property modelName="ModifiedOn" domainName="CreationTime" />
   </class>
 
-  <class modelClass="SanteDB.Core.Model.DataTypes.ConceptClass, SanteDB.Core.Model, Version=1.1.0.0"
-         domainClass="SanteDB.Persistence.Data.Model.Concepts.DbConceptClass, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.DataTypes.ConceptClass, SanteDB.Core.Model"
+         domainClass="SanteDB.Persistence.Data.Model.Concepts.DbConceptClass, SanteDB.Persistence.Data">
     <property modelName="ModifiedOn" domainName="UpdatedTime" />
   </class>
 
@@ -146,176 +146,190 @@
   </class>
 
   <!-- Concept Names -->
-  <class modelClass="SanteDB.Core.Model.DataTypes.ConceptName, SanteDB.Core.Model, Version=1.1.0.0"
-         domainClass="SanteDB.Persistence.Data.Model.Concepts.DbConceptName, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.DataTypes.ConceptName, SanteDB.Core.Model"
+         domainClass="SanteDB.Persistence.Data.Model.Concepts.DbConceptName, SanteDB.Persistence.Data">
     <property modelName="SourceEntityKey" domainName="SourceKey" />
   </class>
 
   <!-- Entity Maps -->
-  <class modelClass="SanteDB.Core.Model.Entities.Entity, SanteDB.Core.Model, Version=1.1.0.0"
-         domainClass="SanteDB.Persistence.Data.Model.Entities.DbEntityVersion, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Entities.Entity, SanteDB.Core.Model"
+         domainClass="SanteDB.Persistence.Data.Model.Entities.DbEntityVersion, SanteDB.Persistence.Data">
     <property modelName="PreviousVersionKey" domainName="ReplacesVersionKey" />
     <property modelName="VersionSequence" domainName="VersionSequenceId" />
     <property modelName="ModifiedOn" domainName="CreationTime" />
   </class>
 
-  <class modelClass="SanteDB.Core.Model.Entities.EntityName, SanteDB.Core.Model, Version=1.1.0.0"
-         domainClass="SanteDB.Persistence.Data.Model.Entities.DbEntityName, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Entities.EntityName, SanteDB.Core.Model"
+         domainClass="SanteDB.Persistence.Data.Model.Entities.DbEntityName, SanteDB.Persistence.Data">
     <property modelName="NameUseKey" domainName="UseConceptKey" />
     <property modelName="SourceEntityKey" domainName="SourceKey" />
   </class>
 
-  <class modelClass="SanteDB.Core.Model.Entities.EntityNameComponent, SanteDB.Core.Model, Version=1.1.0.0"
-         domainClass="SanteDB.Persistence.Data.Model.Entities.DbEntityNameComponent, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Entities.EntityNameComponent, SanteDB.Core.Model"
+         domainClass="SanteDB.Persistence.Data.Model.Entities.DbEntityNameComponent, SanteDB.Persistence.Data">
     <property modelName="SourceEntityKey" domainName="SourceKey" />
   </class>
 
-  <class modelClass="SanteDB.Core.Model.Entities.EntityAddress, SanteDB.Core.Model, Version=1.1.0.0"
-       domainClass="SanteDB.Persistence.Data.Model.Entities.DbEntityAddress, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Entities.EntityAddress, SanteDB.Core.Model"
+       domainClass="SanteDB.Persistence.Data.Model.Entities.DbEntityAddress, SanteDB.Persistence.Data">
     <property modelName="AddressUseKey" domainName="UseConceptKey" />
     <property modelName="SourceEntityKey" domainName="SourceKey" />
   </class>
 
-  <class modelClass="SanteDB.Core.Model.Entities.EntityAddressComponent, SanteDB.Core.Model, Version=1.1.0.0"
-         domainClass="SanteDB.Persistence.Data.Model.Entities.DbEntityAddressComponent, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Entities.EntityAddressComponent, SanteDB.Core.Model"
+         domainClass="SanteDB.Persistence.Data.Model.Entities.DbEntityAddressComponent, SanteDB.Persistence.Data">
     <property modelName="SourceEntityKey" domainName="SourceKey" />
   </class>
 
-  <class modelClass="SanteDB.Core.Model.Entities.EntityRelationship, SanteDB.Core.Model, Version=1.1.0.0"
-       domainClass="SanteDB.Persistence.Data.Model.Entities.DbEntityRelationship, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Entities.EntityRelationship, SanteDB.Core.Model"
+       domainClass="SanteDB.Persistence.Data.Model.Entities.DbEntityRelationship, SanteDB.Persistence.Data">
     <property modelName="SourceEntityKey" domainName="SourceKey" />
     <property modelName="TargetEntityKey" domainName="TargetKey" />
   </class>
 
-  <class modelClass="SanteDB.Core.Model.DataTypes.EntityIdentifier, SanteDB.Core.Model, Version=1.1.0.0"
-         domainClass="SanteDB.Persistence.Data.Model.DataType.DbEntityIdentifier, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.DataTypes.EntityIdentifier, SanteDB.Core.Model"
+         domainClass="SanteDB.Persistence.Data.Model.DataType.DbEntityIdentifier, SanteDB.Persistence.Data">
     <property modelName="IdentifierTypeKey" domainName="TypeKey" />
     <property modelName="SourceEntityKey" domainName="SourceKey" />
   </class>
 
-  <class modelClass="SanteDB.Core.Model.DataTypes.IdentifierType, SanteDB.Core.Model, Version=1.1.0.0"
-         domainClass="SanteDB.Persistence.Data.Model.DataType.DbIdentifierType, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.DataTypes.IdentifierType, SanteDB.Core.Model"
+         domainClass="SanteDB.Persistence.Data.Model.DataType.DbIdentifierType, SanteDB.Persistence.Data">
     <property modelName="ModifiedOn" domainName="CreationTime" />
   </class>
 
-  <class modelClass="SanteDB.Core.Model.DataTypes.GeoTag, SanteDB.Core.Model, Version=1.1.0.0"
-       domainClass="SanteDB.Persistence.Data.Model.DataType.DbGeoTag, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.DataTypes.GeoTag, SanteDB.Core.Model"
+       domainClass="SanteDB.Persistence.Data.Model.DataType.DbGeoTag, SanteDB.Persistence.Data">
   </class>
 
-  <class modelClass="SanteDB.Core.Model.DataTypes.AssigningAuthority, SanteDB.Core.Model, Version=1.1.0.0"
-       domainClass="SanteDB.Persistence.Data.Model.DataType.DbAssigningAuthority, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.DataTypes.AssigningAuthority, SanteDB.Core.Model"
+       domainClass="SanteDB.Persistence.Data.Model.DataType.DbAssigningAuthority, SanteDB.Persistence.Data">
     <property modelName="ModifiedOn" domainName="UpdatedTime" />
   </class>
 
-  <class modelClass="SanteDB.Core.Model.Entities.EntityTelecomAddress, SanteDB.Core.Model, Version=1.1.0.0"
-     domainClass="SanteDB.Persistence.Data.Model.Entities.DbTelecomAddress, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Entities.EntityTelecomAddress, SanteDB.Core.Model"
+     domainClass="SanteDB.Persistence.Data.Model.Entities.DbTelecomAddress, SanteDB.Persistence.Data">
     <property modelName="AddressUseKey" domainName="TelecomUseKey" />
     <property modelName="SourceEntityKey" domainName="SourceKey" />
   </class>
 
-  <class modelClass="SanteDB.Core.Model.DataTypes.EntityExtension, SanteDB.Core.Model, Version=1.1.0.0"
-   domainClass="SanteDB.Persistence.Data.Model.Extensibility.DbEntityExtension, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.DataTypes.EntityExtension, SanteDB.Core.Model"
+   domainClass="SanteDB.Persistence.Data.Model.Extensibility.DbEntityExtension, SanteDB.Persistence.Data">
     <property modelName="SourceEntityKey" domainName="SourceKey" />
     <property modelName="ExtensionValueXml" domainName="Value" />
     <property modelName="ExtensionDisplay" domainName="Display" />
   </class>
 
-  <class modelClass="SanteDB.Core.Model.DataTypes.EntityNote, SanteDB.Core.Model, Version=1.1.0.0"
- domainClass="SanteDB.Persistence.Data.Model.Extensibility.DbEntityNote, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.DataTypes.EntityNote, SanteDB.Core.Model"
+ domainClass="SanteDB.Persistence.Data.Model.Extensibility.DbEntityNote, SanteDB.Persistence.Data">
     <property modelName="SourceEntityKey" domainName="SourceKey" />
   </class>
 
-  <class modelClass="SanteDB.Core.Model.DataTypes.EntityTag, SanteDB.Core.Model, Version=1.1.0.0"
- domainClass="SanteDB.Persistence.Data.Model.Extensibility.DbEntityTag, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.DataTypes.EntityTag, SanteDB.Core.Model"
+ domainClass="SanteDB.Persistence.Data.Model.Extensibility.DbEntityTag, SanteDB.Persistence.Data">
     <property modelName="SourceEntityKey" domainName="SourceKey" />
   </class>
 
-  <class modelClass="SanteDB.Core.Model.DataTypes.ExtensionType, SanteDB.Core.Model, Version=1.1.0.0"
-   domainClass="SanteDB.Persistence.Data.Model.Extensibility.DbExtensionType, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.DataTypes.ExtensionType, SanteDB.Core.Model"
+   domainClass="SanteDB.Persistence.Data.Model.Extensibility.DbExtensionType, SanteDB.Persistence.Data">
     <property modelName="ModifiedOn" domainName="CreationTime" />
   </class>
 
   <!-- Person Maps -->
-  <class modelClass="SanteDB.Core.Model.Entities.NonPersonLivingSubject, SanteDB.Core.Model, Version=1.1.0.0"
-       domainClass="SanteDB.Persistence.Data.Model.Entities.DbNonPersonLivingSubject, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Entities.NonPersonLivingSubject, SanteDB.Core.Model"
+       domainClass="SanteDB.Persistence.Data.Model.Entities.DbNonPersonLivingSubject, SanteDB.Persistence.Data">
     <property modelName="VersionKey" domainName="ParentKey" />
   </class>
   
   <!-- Person Maps -->
-  <class modelClass="SanteDB.Core.Model.Entities.Person, SanteDB.Core.Model, Version=1.1.0.0"
-       domainClass="SanteDB.Persistence.Data.Model.Entities.DbPerson, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Entities.Person, SanteDB.Core.Model"
+       domainClass="SanteDB.Persistence.Data.Model.Entities.DbPerson, SanteDB.Persistence.Data">
     <property modelName="VersionKey" domainName="ParentKey" />
   </class>
 
   <!-- Container Maps -->
-  <class modelClass="SanteDB.Core.Model.Entities.Container, SanteDB.Core.Model, Version=1.1.0.0"
-       domainClass="SanteDB.Persistence.Data.Model.Entities.DbContainer, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Entities.Container, SanteDB.Core.Model"
+       domainClass="SanteDB.Persistence.Data.Model.Entities.DbContainer, SanteDB.Persistence.Data">
     <property modelName="VersionKey" domainName="ParentKey" />
   </class>
 
-  <class modelClass="SanteDB.Core.Model.Entities.PersonLanguageCommunication, SanteDB.Core.Model, Version=1.1.0.0"
-       domainClass="SanteDB.Persistence.Data.Model.Entities.DbPersonLanguageCommunication, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Entities.PersonLanguageCommunication, SanteDB.Core.Model"
+       domainClass="SanteDB.Persistence.Data.Model.Entities.DbPersonLanguageCommunication, SanteDB.Persistence.Data">
     <property modelName="SourceEntityKey" domainName="SourceKey" />
   </class>
 
+  <!-- Document Maps -->
+  <class modelClass="SanteDB.Core.Model.Acts.Narrative, SanteDB.Core.Model"
+       domainClass="SanteDB.Persistence.Data.Model.Acts.DbNarrative, SanteDB.Persistence.Data">
+    <property modelName="VersionKey" domainName="ParentKey" />
+  </class>
+  
   <!-- Patient Maps -->
-  <class modelClass="SanteDB.Core.Model.Roles.Patient, SanteDB.Core.Model, Version=1.1.0.0"
-       domainClass="SanteDB.Persistence.Data.Model.Roles.DbPatient, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Roles.Patient, SanteDB.Core.Model"
+       domainClass="SanteDB.Persistence.Data.Model.Roles.DbPatient, SanteDB.Persistence.Data">
     <property modelName="VersionKey" domainName="ParentKey" />
   </class>
 
   <!-- Material Maps -->
-  <class modelClass="SanteDB.Core.Model.Entities.Material, SanteDB.Core.Model, Version=1.1.0.0"
-       domainClass="SanteDB.Persistence.Data.Model.Entities.DbMaterial, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Entities.Material, SanteDB.Core.Model"
+       domainClass="SanteDB.Persistence.Data.Model.Entities.DbMaterial, SanteDB.Persistence.Data">
     <property modelName="VersionKey" domainName="ParentKey" />
   </class>
 
-  <class modelClass="SanteDB.Core.Model.Entities.ManufacturedMaterial, SanteDB.Core.Model, Version=1.1.0.0"
-     domainClass="SanteDB.Persistence.Data.Model.Entities.DbManufacturedMaterial, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Entities.ManufacturedMaterial, SanteDB.Core.Model"
+     domainClass="SanteDB.Persistence.Data.Model.Entities.DbManufacturedMaterial, SanteDB.Persistence.Data">
     <property modelName="VersionKey" domainName="ParentKey" />
   </class>
 
   <!-- Provider Maps -->
-  <class modelClass="SanteDB.Core.Model.Roles.Provider, SanteDB.Core.Model, Version=1.1.0.0"
-       domainClass="SanteDB.Persistence.Data.Model.Roles.DbProvider, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Roles.Provider, SanteDB.Core.Model"
+       domainClass="SanteDB.Persistence.Data.Model.Roles.DbProvider, SanteDB.Persistence.Data">
     <property modelName="VersionKey" domainName="ParentKey" />
   </class>
 
   <!-- Industry Maps -->
-  <class modelClass="SanteDB.Core.Model.Entities.Organization, SanteDB.Core.Model, Version=1.1.0.0"
-       domainClass="SanteDB.Persistence.Data.Model.Entities.DbOrganization, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Entities.Organization, SanteDB.Core.Model"
+       domainClass="SanteDB.Persistence.Data.Model.Entities.DbOrganization, SanteDB.Persistence.Data">
     <property modelName="VersionKey" domainName="ParentKey" />
   </class>
 
-  <class modelClass="SanteDB.Core.Model.Entities.Place, SanteDB.Core.Model, Version=1.1.0.0"
-       domainClass="SanteDB.Persistence.Data.Model.Entities.DbPlace, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Entities.Place, SanteDB.Core.Model"
+       domainClass="SanteDB.Persistence.Data.Model.Entities.DbPlace, SanteDB.Persistence.Data">
     <property modelName="VersionKey" domainName="ParentKey" />
   </class>
 
-  <class modelClass="SanteDB.Core.Model.Entities.PlaceService, SanteDB.Core.Model, Version=1.1.0.0"
-       domainClass="SanteDB.Persistence.Data.Model.Entities.DbPlaceService, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Entities.PlaceService, SanteDB.Core.Model"
+       domainClass="SanteDB.Persistence.Data.Model.Entities.DbPlaceService, SanteDB.Persistence.Data">
     <property modelName="SourceEntityKey" domainName="SourceKey" />
   </class>
 
   <!-- Security entities -->
-  <class modelClass="SanteDB.Core.Model.Entities.ApplicationEntity, SanteDB.Core.Model, Version=1.1.0.0"
-       domainClass="SanteDB.Persistence.Data.Model.Entities.DbApplicationEntity, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Entities.ApplicationEntity, SanteDB.Core.Model"
+       domainClass="SanteDB.Persistence.Data.Model.Entities.DbApplicationEntity, SanteDB.Persistence.Data">
     <property modelName="VersionKey" domainName="ParentKey" />
   </class>
 
-  <class modelClass="SanteDB.Core.Model.Entities.DeviceEntity, SanteDB.Core.Model, Version=1.1.0.0"
-       domainClass="SanteDB.Persistence.Data.Model.Entities.DbDeviceEntity, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Entities.DeviceEntity, SanteDB.Core.Model"
+       domainClass="SanteDB.Persistence.Data.Model.Entities.DbDeviceEntity, SanteDB.Persistence.Data">
     <property modelName="VersionKey" domainName="ParentKey" />
   </class>
 
-  <class modelClass="SanteDB.Core.Model.Entities.UserEntity, SanteDB.Core.Model, Version=1.1.0.0"
-       domainClass="SanteDB.Persistence.Data.Model.Entities.DbUserEntity, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Entities.UserEntity, SanteDB.Core.Model"
+       domainClass="SanteDB.Persistence.Data.Model.Entities.DbUserEntity, SanteDB.Persistence.Data">
     <property modelName="VersionKey" domainName="ParentKey" />
   </class>
 
   <!-- Represents Act Model -->
-  <class modelClass="SanteDB.Core.Model.Acts.Act, SanteDB.Core.Model, Version=1.1.0.0"
-         domainClass="SanteDB.Persistence.Data.Model.Acts.DbActVersion, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Acts.Act, SanteDB.Core.Model"
+         domainClass="SanteDB.Persistence.Data.Model.Acts.DbActVersion, SanteDB.Persistence.Data">
+    <property modelName="PreviousVersionKey" domainName="ReplacesVersionKey" />
+    <property modelName="VersionSequence" domainName="VersionSequenceId" />
+    <property modelName="ModifiedOn" domainName="CreationTime" />
+  </class>
+
+  <!-- Represents Act Model -->
+  <class modelClass="SanteDB.Core.Model.Acts.CarePlan, SanteDB.Core.Model"
+         domainClass="SanteDB.Persistence.Data.Model.Acts.DbActVersion, SanteDB.Persistence.Data">
     <property modelName="PreviousVersionKey" domainName="ReplacesVersionKey" />
     <property modelName="VersionSequence" domainName="VersionSequenceId" />
     <property modelName="ModifiedOn" domainName="CreationTime" />
@@ -323,104 +337,104 @@
 
   <!-- Represents Act Model -->
   <!--
-  <class modelClass="SanteDB.Core.Model.Acts.ActProtocol, SanteDB.Core.Model, Version=1.1.0.0"
-         domainClass="SanteDB.Persistence.Data.Model.Acts.DbActProtocol, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Acts.ActProtocol, SanteDB.Core.Model"
+         domainClass="SanteDB.Persistence.Data.Model.Acts.DbActProtocol, SanteDB.Persistence.Data">
     <property modelName="SourceEntityKey" domainName="SourceKey" />
 </class>-->
-  <class modelClass="SanteDB.Core.Model.DataTypes.ActExtension, SanteDB.Core.Model, Version=1.1.0.0"
- domainClass="SanteDB.Persistence.Data.Model.Extensibility.DbActExtension, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.DataTypes.ActExtension, SanteDB.Core.Model"
+ domainClass="SanteDB.Persistence.Data.Model.Extensibility.DbActExtension, SanteDB.Persistence.Data">
     <property modelName="SourceEntityKey" domainName="SourceKey" />
     <property modelName="ExtensionValueXml" domainName="Value" />
     <property modelName="ExtensionDisplay" domainName="Display" />
   </class>
 
-  <class modelClass="SanteDB.Core.Model.DataTypes.ActNote, SanteDB.Core.Model, Version=1.1.0.0"
- domainClass="SanteDB.Persistence.Data.Model.Extensibility.DbActNote, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.DataTypes.ActNote, SanteDB.Core.Model"
+ domainClass="SanteDB.Persistence.Data.Model.Extensibility.DbActNote, SanteDB.Persistence.Data">
     <property modelName="SourceEntityKey" domainName="SourceKey" />
   </class>
 
-  <class modelClass="SanteDB.Core.Model.DataTypes.ActTag, SanteDB.Core.Model, Version=1.1.0.0"
- domainClass="SanteDB.Persistence.Data.Model.Extensibility.DbActTag, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.DataTypes.ActTag, SanteDB.Core.Model"
+ domainClass="SanteDB.Persistence.Data.Model.Extensibility.DbActTag, SanteDB.Persistence.Data">
     <property modelName="SourceEntityKey" domainName="SourceKey" />
   </class>
 
-  <class modelClass="SanteDB.Core.Model.Acts.ActRelationship, SanteDB.Core.Model, Version=1.1.0.0"
-       domainClass="SanteDB.Persistence.Data.Model.Acts.DbActRelationship, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Acts.ActRelationship, SanteDB.Core.Model"
+       domainClass="SanteDB.Persistence.Data.Model.Acts.DbActRelationship, SanteDB.Persistence.Data">
     <property modelName="SourceEntityKey" domainName="SourceKey" />
     <property modelName="TargetActKey" domainName="TargetKey" />
   </class>
 
-  <class modelClass="SanteDB.Core.Model.DataTypes.ActIdentifier, SanteDB.Core.Model, Version=1.1.0.0"
-         domainClass="SanteDB.Persistence.Data.Model.DataType.DbActIdentifier, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.DataTypes.ActIdentifier, SanteDB.Core.Model"
+         domainClass="SanteDB.Persistence.Data.Model.DataType.DbActIdentifier, SanteDB.Persistence.Data">
     <property modelName="IdentifierTypeKey" domainName="TypeKey" />
     <property modelName="SourceEntityKey" domainName="SourceKey" />
   </class>
 
-  <class modelClass="SanteDB.Core.Model.Acts.ActParticipation, SanteDB.Core.Model, Version=1.1.0.0"
-         domainClass="SanteDB.Persistence.Data.Model.Acts.DbActParticipation, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Acts.ActParticipation, SanteDB.Core.Model"
+         domainClass="SanteDB.Persistence.Data.Model.Acts.DbActParticipation, SanteDB.Persistence.Data">
     <property modelName="PlayerEntityKey" domainName="TargetKey" />
     <property modelName="SourceEntityKey" domainName="SourceKey" />
     <property modelName="ActKey" domainName="SourceKey" />
     <property modelName="PlayerEntityKey" domainName="TargetKey" />
   </class>
 
-  <class modelClass="SanteDB.Core.Model.Acts.SubstanceAdministration, SanteDB.Core.Model, Version=1.1.0.0"
-       domainClass="SanteDB.Persistence.Data.Model.Acts.DbSubstanceAdministration, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Acts.SubstanceAdministration, SanteDB.Core.Model"
+       domainClass="SanteDB.Persistence.Data.Model.Acts.DbSubstanceAdministration, SanteDB.Persistence.Data">
     <property modelName="RouteKey" domainName="RouteConceptKey" />
     <property modelName="SiteKey" domainName="SiteConceptKey" />
     <property modelName="DoseUnitKey" domainName="DoseUnitConceptKey" />
     <property modelName="VersionKey" domainName="ParentKey" />
   </class>
 
-  <class modelClass="SanteDB.Core.Model.Acts.Procedure, SanteDB.Core.Model, Version=1.1.0.0"
-       domainClass="SanteDB.Persistence.Data.Model.Acts.DbProcedure, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Acts.Procedure, SanteDB.Core.Model"
+       domainClass="SanteDB.Persistence.Data.Model.Acts.DbProcedure, SanteDB.Persistence.Data">
     <property modelName="MethodKey" domainName="MethodConceptKey" />
     <property modelName="ApproachSiteKey" domainName="ApproachSiteConceptKey" />
     <property modelName="TargetSiteKey" domainName="TargetSiteConceptKey" />
     <property modelName="VersionKey" domainName="ParentKey" />
   </class>
 
-  <class modelClass="SanteDB.Core.Model.Acts.PatientEncounter, SanteDB.Core.Model, Version=1.1.0.0"
-       domainClass="SanteDB.Persistence.Data.Model.Acts.DbPatientEncounter, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Acts.PatientEncounter, SanteDB.Core.Model"
+       domainClass="SanteDB.Persistence.Data.Model.Acts.DbPatientEncounter, SanteDB.Persistence.Data">
     <property modelName="VersionKey" domainName="ParentKey" />
   </class>
 
-  <class modelClass="SanteDB.Core.Model.Acts.Observation, SanteDB.Core.Model, Version=1.1.0.0"
-       domainClass="SanteDB.Persistence.Data.Model.Acts.DbObservation, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Acts.Observation, SanteDB.Core.Model"
+       domainClass="SanteDB.Persistence.Data.Model.Acts.DbObservation, SanteDB.Persistence.Data">
     <property modelName="VersionKey" domainName="ParentKey" />
   </class>
 
-  <class modelClass="SanteDB.Core.Model.Acts.QuantityObservation, SanteDB.Core.Model, Version=1.1.0.0"
-       domainClass="SanteDB.Persistence.Data.Model.Acts.DbQuantityObservation, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Acts.QuantityObservation, SanteDB.Core.Model"
+       domainClass="SanteDB.Persistence.Data.Model.Acts.DbQuantityObservation, SanteDB.Persistence.Data">
     <property modelName="VersionKey" domainName="ParentKey" />
   </class>
 
-  <class modelClass="SanteDB.Core.Model.Acts.CodedObservation, SanteDB.Core.Model, Version=1.1.0.0"
-       domainClass="SanteDB.Persistence.Data.Model.Acts.DbCodedObservation, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Acts.CodedObservation, SanteDB.Core.Model"
+       domainClass="SanteDB.Persistence.Data.Model.Acts.DbCodedObservation, SanteDB.Persistence.Data">
     <property modelName="ValueKey" domainName="Value" />
     <property modelName="VersionKey" domainName="ParentKey" />
   </class>
 
-  <class modelClass="SanteDB.Core.Model.Acts.TextObservation, SanteDB.Core.Model, Version=1.1.0.0"
-       domainClass="SanteDB.Persistence.Data.Model.Acts.DbTextObservation, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Acts.TextObservation, SanteDB.Core.Model"
+       domainClass="SanteDB.Persistence.Data.Model.Acts.DbTextObservation, SanteDB.Persistence.Data">
     <property modelName="VersionKey" domainName="ParentKey" />
   </class>
 
-  <class modelClass="SanteDB.Core.Model.DataTypes.TemplateDefinition, SanteDB.Core.Model, Version=1.1.0.0"
-         domainClass="SanteDB.Persistence.Data.Model.Extensibility.DbTemplateDefinition, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.DataTypes.TemplateDefinition, SanteDB.Core.Model"
+         domainClass="SanteDB.Persistence.Data.Model.Extensibility.DbTemplateDefinition, SanteDB.Persistence.Data">
     <property modelName="ModifiedOn" domainName="CreationTime" />
   </class>
 
-  <class modelClass="SanteDB.Core.Model.Acts.Protocol, SanteDB.Core.Model, Version=1.1.0.0"
-         domainClass="SanteDB.Persistence.Data.Model.Acts.DbProtocol, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Acts.Protocol, SanteDB.Core.Model"
+         domainClass="SanteDB.Persistence.Data.Model.Acts.DbProtocol, SanteDB.Persistence.Data">
   </class>
 
-  <class modelClass="SanteDB.Core.Model.Acts.ControlAct, SanteDB.Core.Model, Version=1.1.0.0"
-         domainClass="SanteDB.Persistence.Data.Model.Acts.DbControlAct, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Acts.ControlAct, SanteDB.Core.Model"
+         domainClass="SanteDB.Persistence.Data.Model.Acts.DbControlAct, SanteDB.Persistence.Data">
   </class>
 
-  <class modelClass="SanteDB.Core.Model.Acts.ActProtocol, SanteDB.Core.Model, Version=1.1.0.0"
-       domainClass="SanteDB.Persistence.Data.Model.Acts.DbActProtocol, SanteDB.Persistence.Data, Version=0.5.0.0">
+  <class modelClass="SanteDB.Core.Model.Acts.ActProtocol, SanteDB.Core.Model"
+       domainClass="SanteDB.Persistence.Data.Model.Acts.DbActProtocol, SanteDB.Persistence.Data">
 
     <property modelName="ProtocolKey" domainName="ProtocolKey" />
     <property modelName="SourceEntityKey" domainName="SourceKey" />

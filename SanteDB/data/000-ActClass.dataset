@@ -43,7 +43,7 @@
 
   <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
-      <id>fe6944f7-8937-4e98-ae0d-452b1d8124f4</id>
+      <id>80242F45-C915-47F9-A90C-1B80F7D6AF71</id>
       <mnemonic>DOCCLIN</mnemonic>
       <codeSystem>BAB1D66A-1E98-4BFD-9B4A-7C4BE88F35D1</codeSystem>
       <name>
@@ -60,7 +60,7 @@
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
       <conceptClass>17FD5254-8C25-4ABB-B246-083FBE9AFA15</conceptClass>
       <referenceTerm>
-        <term>fe6944f7-8937-4e98-ae0d-452b1d8124f4</term>
+        <term>80242F45-C915-47F9-A90C-1B80F7D6AF71</term>
         <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
       </referenceTerm>
       <name>
@@ -73,7 +73,7 @@
 
   <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
-      <id>fa6ea735-f243-41f4-bf33-aa78eb2e8466</id>
+      <id>08F44C29-1348-48DC-B426-C9FB2826A895</id>
       <mnemonic>DOCSECT</mnemonic>
       <codeSystem>BAB1D66A-1E98-4BFD-9B4A-7C4BE88F35D1</codeSystem>
       <name>
@@ -90,7 +90,7 @@
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
       <conceptClass>17FD5254-8C25-4ABB-B246-083FBE9AFA15</conceptClass>
       <referenceTerm>
-        <term>fa6ea735-f243-41f4-bf33-aa78eb2e8466</term>
+        <term>08F44C29-1348-48DC-B426-C9FB2826A895</term>
         <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
       </referenceTerm>
       <name>
