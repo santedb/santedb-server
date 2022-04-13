@@ -510,7 +510,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                                 if (this.m_configuration.VersioningPolicy.HasFlag(Configuration.AdoVersioningPolicyFlags.KeepPurged))
                                 {
                                     existing.VersionKey = Guid.Empty;
-                                    existing.StatusConceptKey = StatusKeys.Deleted;
+                                    existing.StatusConceptKey = StatusKeys.Purged;
                                     context.Insert(existing);
                                 }
                                 else
@@ -579,22 +579,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                         case DeleteMode.LogicalDelete:
                             existing.ObsoletionTime = DateTimeOffset.Now;
                             existing.ObsoletedByKey = context.ContextId;
-                            retVal = this.DoUpdateInternal(context, existing);
+                            retVal = context.Update(existing);
 
-                            if (this.m_configuration.VersioningPolicy.HasFlag(Configuration.AdoVersioningPolicyFlags.FullVersioning))
-                            {
-                                existing.StatusConceptKey = StatusKeys.Deleted;
-                                existing.ReplacesVersionKey = existing.VersionKey;
-                                // Terminate the head version
-                                existing.ObsoletionTime = existing.CreationTime = DateTimeOffset.Now;
-                                existing.ObsoletedByKey = existing.ObsoletedByKey = context.ContextId;
-                                existing.VersionKey = Guid.Empty;
-                                existing.VersionSequenceId = null;
-                                retVal = context.Insert(existing);
-                            }
                             break;
                         case DeleteMode.PermanentDelete:
-                            existing.StatusConceptKey = StatusKeys.Deleted;
                             this.DoDeleteReferencesInternal(context, existing.Key);
                             this.DoDeleteReferencesInternal(context, existing.VersionKey);
                             context.DeleteAll<TDbModel>(o => o.VersionKey == existing.VersionKey);
@@ -607,6 +595,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
                             if (this.m_configuration.VersioningPolicy.HasFlag(Configuration.AdoVersioningPolicyFlags.KeepPurged))
                             {
+                                existing.StatusConceptKey = StatusKeys.Purged;
                                 existing.VersionKey = Guid.Empty;
                                 context.Insert(existing);
                             }

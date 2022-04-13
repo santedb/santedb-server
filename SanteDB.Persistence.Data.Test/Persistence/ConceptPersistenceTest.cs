@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using SanteDB.Core.Model;
 using SanteDB.Core;
 using System.Diagnostics.CodeAnalysis;
+using SanteDB.Core.Services;
 
 namespace SanteDB.Persistence.Data.Test.Persistence
 {
@@ -488,17 +489,20 @@ namespace SanteDB.Persistence.Data.Test.Persistence
 
                 // Now obsolete
                 var afterObsolete = base.TestDelete(afterInsert, Core.Services.DeleteMode.LogicalDelete);
-                Assert.AreEqual(StatusKeys.Inactive, afterObsolete.StatusConceptKey); // should be obsolete
-
+                Assert.AreEqual(afterInsert.StatusConceptKey, afterObsolete.StatusConceptKey); // status does not change
+                
                 // Should not be returned in query results
                 afterQuery = base.TestQuery<Concept>(o => o.Mnemonic == "TEST-08", 0).FirstOrDefault();
                 Assert.IsNull(afterQuery);
                 afterQuery = base.TestQuery<Concept>(o => o.ReferenceTerms.Any(r => r.ReferenceTerm.Mnemonic == "TEST08"), 0).FirstOrDefault();
                 Assert.IsNull(afterQuery);
 
-                // Should return if Obsolete is specifically set
-                afterQuery = base.TestQuery<Concept>(o => o.Mnemonic == "TEST-08" && StatusKeys.InactiveStates.Contains(o.StatusConceptKey.Value), 1).FirstOrDefault();
-                Assert.AreEqual(StatusKeys.Inactive, afterQuery.StatusConceptKey);
+                // Retrieve should result in an object
+                var afterFetch = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Concept>>().Get(afterInsert.Key.Value, null, AuthenticationContext.SystemPrincipal);
+                Assert.IsNotNull(afterFetch);
+
+                // Should return if Obsolete time is specifically set
+                afterQuery = base.TestQuery<Concept>(o => o.Mnemonic == "TEST-08" && o.ObsoletionTime != null, 1).FirstOrDefault();
                 Assert.AreEqual("TEST-08", afterQuery.Mnemonic);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.ReferenceTerms).Count);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.ConceptNames).Count);
