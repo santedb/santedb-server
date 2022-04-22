@@ -42,11 +42,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
 
             if((DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy) == LoadMode.FullLoad)
             {
-                retVal.Value = retVal.Value.GetRelatedPersistenceService().Get(context, obsData.Value);
+                retVal.Value = retVal.Value.GetRelatedPersistenceService().Get(context, obsData?.Value ?? Guid.Empty);
                 retVal.SetLoaded(o => o.Value);
             }
 
-            retVal.ValueKey = obsData.Value;
+            retVal.ValueKey = obsData?.Value;
             return retVal;
         }
     }

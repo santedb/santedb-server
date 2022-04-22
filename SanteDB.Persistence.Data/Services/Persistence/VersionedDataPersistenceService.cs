@@ -166,7 +166,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     if (dbAuth == null)
                         dbAuth = context.FirstOrDefault<DbAssigningAuthority>(o => o.Key == id.AuthorityKey);
                 }
-                else if (id.Authority.Key.HasValue) // Attempt lookup in adhoc cache then by db
+                else if (id.Authority == null)
+                {
+                    throw new InvalidOperationException(String.Format(ErrorMessages.DEPENDENT_PROPERTY_NULL, "Authority"));
+                }
+                else if (id.Authority.Key.HasValue ) // Attempt lookup in adhoc cache then by db
                 {
                     dbAuth = this.m_adhocCache?.Get<DbAssigningAuthority>($"{DataConstants.AdhocAuthorityKey}{id.Authority.Key}");
                     if (dbAuth == null)

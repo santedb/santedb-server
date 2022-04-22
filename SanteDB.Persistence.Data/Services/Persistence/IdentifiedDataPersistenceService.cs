@@ -105,6 +105,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             return retVal;
         }
 
+
         /// <summary>
         /// Get a database model version direct from the database
         /// </summary>

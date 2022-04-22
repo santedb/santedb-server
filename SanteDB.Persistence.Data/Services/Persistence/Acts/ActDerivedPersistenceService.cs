@@ -254,6 +254,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
 
         }
 
+
         /// <summary>
         /// Attempts to load the persistence provider for a subclass described by <paramref name="classKey"/>
         /// </summary>
@@ -425,11 +426,17 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         /// <inheritdoc/>
         protected override TAct DoConvertToInformationModel(DataContext context, DbActVersion dbModel, params object[] referenceObjects)
         {
-
-            // Get subclass persister
             if (this.TryGetSubclassPersister(dbModel.ClassConceptKey, out var persistenceProvider) && persistenceProvider is IAdoClassMapper edps)
             {
-                return (TAct)edps.MapToModelInstanceEx(context, dbModel, referenceObjects);
+                var retVal = edps.MapToModelInstanceEx(context, dbModel, referenceObjects);
+                if(retVal is TAct ta)
+                {
+                    return ta;
+                }
+                else
+                {
+                    return this.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
+                }
             }
             else
             {

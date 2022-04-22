@@ -118,13 +118,16 @@ namespace SanteDB.Persistence.Data.Test
         /// <summary>
         /// Tests the query operation
         /// </summary>
-        protected IEnumerable<TData> TestQuery<TData>(Expression<Func<TData, bool>> queryFilter, int expectedResults) where TData : BaseEntityData
+        protected IEnumerable<TData> TestQuery<TData>(Expression<Func<TData, bool>> queryFilter, int? expectedResults) where TData : BaseEntityData
         {
             var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<TData>>();
             Assert.IsNotNull(persistenceService);
 
             var queryResults = persistenceService.Query(queryFilter, AuthenticationContext.Current.Principal);
-            Assert.AreEqual(expectedResults, queryResults.Count());
+            if (expectedResults.HasValue)
+            {
+                Assert.AreEqual(expectedResults, queryResults.Count());
+            }
             return queryResults;
         }
 
@@ -178,7 +181,7 @@ namespace SanteDB.Persistence.Data.Test
                 Assert.IsNotNull(afterObsolete.CreationTime);
                 Assert.IsNotNull(afterObsolete.ObsoletedByKey);
                 Assert.IsNotNull(afterObsolete.ObsoletionTime);
-                this.AssertEqual(objectToTest, afterObsolete);
+                //this.AssertEqual(objectToTest, afterObsolete);
                 return afterObsolete;
             }
         }

@@ -52,6 +52,7 @@
     <Compile Include="Persistence\Acts\CarePlanTest.cs" />
     <Compile Include="Persistence\Acts\NarrativeTest.cs" />
     <Compile Include="Persistence\Acts\ProcedurePersistenceTest.cs" />
+    <Compile Include="Persistence\Acts\TextObservationPersistenceService.cs" />
     <Compile Include="Persistence\CodeSystemAuthorityPersistenceTest.cs" />
     <Compile Include="Persistence\AssigningAuthorityPersistenceTest.cs" />
     <Compile Include="Persistence\Collections\BundlePersistenceTest.cs" />

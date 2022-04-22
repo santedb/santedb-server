@@ -20,7 +20,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         public TextObservationPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
         {
         }
-
+        
         /// <inheritdoc/>
         protected override TextObservation DoConvertToInformationModelEx(DataContext context, DbActVersion dbModel, params object[] referenceObjects)
         {
@@ -31,7 +31,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                 this.m_tracer.TraceWarning("Using slow loading for text observation data");
                 obsData = context.FirstOrDefault<DbTextObservation>(o => o.ParentKey == dbModel.VersionKey);
             }
-            retVal.Value = obsData.Value;
+            retVal.Value = obsData?.Value;
             return retVal;
         }
     }

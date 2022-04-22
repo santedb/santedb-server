@@ -15,7 +15,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
     /// Represents a persistence service which stores and retrieves observation based table
     /// </summary>
     public abstract class ObservationDerivedPersistenceService<TModel, TDbModel> : ActDerivedPersistenceService<TModel, TDbModel, DbObservation>
-        where TDbModel : DbObsSubTable, new()
+        where TDbModel : DbActSubTable, new()
         where TModel : Observation, new()
     {
         /// <summary>
@@ -45,12 +45,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
 
             if((DataPersistenceControlContext.Current?.LoadMode ?? this.m_configuration.LoadStrategy) == LoadMode.FullLoad)
             {
-                retVal.InterpretationConcept = retVal.InterpretationConcept.GetRelatedPersistenceService().Get(context, retVal.InterpretationConceptKey.GetValueOrDefault());
+                retVal.InterpretationConcept = retVal.InterpretationConcept.GetRelatedPersistenceService().Get(context, obsData.InterpretationConceptKey);
                 retVal.SetLoaded(o => o.InterpretationConcept);
             }
 
-            retVal.InterpretationConceptKey = obsData.InterpretationConceptKey;
-            retVal.ValueType = obsData.ValueType;
+            retVal.InterpretationConceptKey = obsData?.InterpretationConceptKey;
+            retVal.ValueType = obsData?.ValueType;
 
             return retVal;
         }

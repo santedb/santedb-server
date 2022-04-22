@@ -9,6 +9,7 @@ using System.Linq;
 using SanteDB.Core.Model;
 using System.Text;
 using System.Threading.Tasks;
+using SanteDB.Core.Model.Entities;
 
 namespace SanteDB.Persistence.Data.Test.Persistence.Acts
 {
@@ -31,7 +32,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
 
                 var procedure = new Procedure()
                 {
-                    ActTime = DateTimeOffset.Now,
+                    ActTime = DateTimeOffset.Now.Date,
                     MoodConceptKey = ActMoodKeys.Intent,
                     ApproachSite = new Core.Model.DataTypes.Concept()
                     {
@@ -60,14 +61,14 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
                     {
                         ClassKey = ConceptClassKeys.Other,
                         Mnemonic = "BodySite-Stomach",
-                        ConceptSetsXml = new List<Guid>() {  ConceptSetKeys.BodySiteOrSystem }
+                        ConceptSetsXml = new List<Guid>() { ConceptSetKeys.BodySiteOrSystem }
                     }
                 };
 
                 var afterInsert = base.TestInsert(procedure);
-                Assert.AreEqual(procedure.ApproachSite.Mnemonic, afterInsert.LoadProperty(o=>o.ApproachSite).Mnemonic);
-                Assert.AreEqual(procedure.TargetSite.Mnemonic, afterInsert.LoadProperty(o=>o.TargetSite).Mnemonic);
-                Assert.AreEqual(procedure.Method.Mnemonic, afterInsert.LoadProperty(o=>o.Method).Mnemonic);
+                Assert.AreEqual(procedure.ApproachSite.Mnemonic, afterInsert.LoadProperty(o => o.ApproachSite).Mnemonic);
+                Assert.AreEqual(procedure.TargetSite.Mnemonic, afterInsert.LoadProperty(o => o.TargetSite).Mnemonic);
+                Assert.AreEqual(procedure.Method.Mnemonic, afterInsert.LoadProperty(o => o.Method).Mnemonic);
 
                 base.TestQuery<Procedure>(o => o.ApproachSite.Mnemonic == "BodySite-Mouth" && o.TargetSite.Mnemonic == "BodySite-Stomach", 1);
                 base.TestQuery<Procedure>(o => o.ApproachSite.Mnemonic == "BodySite-Mouths" && o.TargetSite.Mnemonic == "BodySite-Stomach", 0);
@@ -90,7 +91,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
                     };
                     return o;
                 });
-                Assert.AreEqual("BodySite-UpperIntestine", afterUpdate.LoadProperty(o=>o.TargetSite).Mnemonic);
+                Assert.AreEqual("BodySite-UpperIntestine", afterUpdate.LoadProperty(o => o.TargetSite).Mnemonic);
 
                 // Test re-query 
                 afterQuery = base.TestQuery<Procedure>(o => o.TargetSite.Mnemonic == "BodySite-Stomach", 0).FirstOrDefault();
@@ -102,17 +103,17 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
                 // Test delete
                 base.TestDelete(afterQuery, Core.Services.DeleteMode.LogicalDelete);
                 base.TestQuery<Procedure>(o => o.TargetSite.Mnemonic == "BodySite-UpperIntestine", 0);
-                base.TestQuery<Procedure>(o => o.TargetSite.Mnemonic == "BodySite-UpperIntestine" && o.ObsoletionTime.HasValue, 1);
+                base.TestQuery<Procedure>(o => o.TargetSite.Mnemonic == "BodySite-UpperIntestine" && o.ObsoletionTime != null, 1);
 
                 // Un-Delete
                 afterUpdate = base.TestUpdate(afterQuery, o =>
                 {
-                    o.Notes.Add(new Core.Model.DataTypes.ActNote(Guid.Parse(AuthenticationContext.SystemUserSid), "THIS IS A TEST!!!! IT SHOULD UNDELETE THE RECORD"));
+                    
                     return o;
                 });
 
                 base.TestQuery<Procedure>(o => o.TargetSite.Mnemonic == "BodySite-UpperIntestine", 1);
-                base.TestQuery<Procedure>(o => o.TargetSite.Mnemonic == "BodySite-UpperIntestine" && o.ObsoletionTime.HasValue, 0);
+                base.TestQuery<Procedure>(o => o.TargetSite.Mnemonic == "BodySite-UpperIntestine" && o.ObsoletionTime != null, 0);
 
                 // Test perma delete
                 base.TestDelete(afterQuery, Core.Services.DeleteMode.PermanentDelete);
@@ -126,9 +127,65 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
         /// <summary>
         /// Tests that using the Act class to persistence, read and query the procedures works properly
         /// </summary>
+        [Test]
         public void TestWithImproper()
         {
+            using (AuthenticationContext.EnterSystemContext())
+            {
 
+                var procedure = new Procedure()
+                {
+                    ActTime = DateTimeOffset.Now.Date,
+                    MoodConceptKey = ActMoodKeys.Intent,
+                    ApproachSite = new Core.Model.DataTypes.Concept()
+                    {
+                        ClassKey = ConceptClassKeys.Other,
+                        Mnemonic = "BodySite-LeftLeg",
+                        ConceptSetsXml = new List<Guid>() { ConceptSetKeys.BodySiteOrSystem }
+                    },
+                    Method = new Core.Model.DataTypes.Concept()
+                    {
+                        ClassKey = ConceptClassKeys.Other,
+                        Mnemonic = "ProcedureMethod-StentInsertion",
+                        ConceptSetsXml = new List<Guid>() { ConceptSetKeys.ProcedureTechnique }
+                    },
+                    TargetSite = new Core.Model.DataTypes.Concept()
+                    {
+                        ClassKey = ConceptClassKeys.Other,
+                        Mnemonic = "BodySite-LeftHeart",
+                        ConceptSetsXml = new List<Guid>() { ConceptSetKeys.BodySiteOrSystem }
+                    }
+                };
+
+                var afterInsert = base.TestInsert<Act>(procedure);
+                Assert.IsInstanceOf<Procedure>(afterInsert);
+
+                var afterQuery = base.TestQuery<Act>(o => o.Key == afterInsert.Key, 1).FirstOrDefault();
+                Assert.IsInstanceOf<Procedure>(afterQuery);
+                Assert.IsNull((afterQuery as Procedure).Method);
+                Assert.AreEqual("BodySite-LeftLeg", (afterQuery as Procedure).LoadProperty(o => o.ApproachSite).Mnemonic);
+                Assert.AreEqual("BodySite-LeftHeart", (afterQuery as Procedure).LoadProperty(o => o.TargetSite).Mnemonic);
+
+                // Test updating
+                var afterUpdate = base.TestUpdate<Act>(afterQuery, o =>
+                {
+                    if (o is Procedure p)
+                    {
+                        p.TargetSiteKey = null;
+                        p.TargetSite = new Core.Model.DataTypes.Concept()
+                        {
+                            ClassKey = ConceptClassKeys.Other,
+                            Mnemonic = "BodySite-Heart",
+                            ConceptSetsXml = new List<Guid>() { ConceptSetKeys.BodySiteOrSystem }
+                        };
+                        return p;
+                    }
+                    Assert.Fail();
+                    return o;
+                });
+                Assert.AreEqual("BodySite-Heart", (afterUpdate as Procedure).LoadProperty(o => o.TargetSite).Mnemonic);
+
+            }
         }
     }
 }
