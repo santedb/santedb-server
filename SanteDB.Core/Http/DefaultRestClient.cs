@@ -126,7 +126,7 @@ namespace SanteDB.Server.Core.Http
                         return true;
                     else
                     {
-                        var configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SecurityConfigurationSection>();
+                        var configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SanteDB.Core.Security.Configuration.SecurityConfigurationSection>();
                         this.traceSource.TraceEvent(EventLevel.Warning, "Checking for certificate override for {0}", (certificate as X509Certificate2).Thumbprint);
                         if (new X509Certificate2(certificate).IsTrustedIntern(null, out _))
                             return true;

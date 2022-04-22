@@ -119,7 +119,7 @@ namespace SanteDB.Server.Jobs
 
                     List<SecurityUser> actionedUser = new List<SecurityUser>(10);
 
-                    var users = this.m_securityUserRepository.Find(o => o.UserClass == UserClassKeys.HumanUser && o.LastLoginTime < cutoff);
+                    var users = this.m_securityUserRepository.Find(o => o.UserClass == ActorTypeKeys.HumanUser && o.LastLoginTime < cutoff);
                     int count = users.Count(), i = 0;
                     // Users who haven't logged in
                     foreach (var usr in users)

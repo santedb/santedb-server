@@ -40,6 +40,98 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
     }
 
     /// <summary>
+    /// Entity derived persistence service which is responsible for persisting entities which have an intermediary table
+    /// </summary>
+    /// <remarks>This class is used for higher level entities where the entity is comprised of three sub-tables where 
+    /// <typeparamref name="TDbTopLevelTable"/> links to <see cref="DbActVersion"/> via <typeparamref name="TDbActSubTable"/></remarks>
+    /// <typeparam name="TAct">The type of model entity this table handles</typeparam>
+    /// <typeparam name="TDbActSubTable">The sub-table which points to <see cref="DbActVersion"/></typeparam>
+    /// <typeparam name="TDbTopLevelTable">The top level table which <typeparamref name="TAct"/> stores its data</typeparam>
+    public abstract class ActDerivedPersistenceService<TAct, TDbTopLevelTable, TDbActSubTable> : ActDerivedPersistenceService<TAct, TDbActSubTable>
+        where TAct : Act, IVersionedData, new()
+        where TDbActSubTable : DbActSubTable, new()
+        where TDbTopLevelTable : DbActSubTable, new()
+    {
+
+
+        /// <summary>
+        /// DI constructor
+        /// </summary>
+        protected ActDerivedPersistenceService(IConfigurationManager configurationManager, ILocalizationService localizationService, IAdhocCacheService adhocCacheService = null, IDataCachingService dataCachingService = null, IQueryPersistenceService queryPersistence = null) : base(configurationManager, localizationService, adhocCacheService, dataCachingService, queryPersistence)
+        {
+
+        }
+
+        /// <inheritdoc/>
+        protected override void DoCopyVersionSubTableInternal(DataContext context, DbActVersion newVersion)
+        {
+            base.DoCopyVersionSubTableInternal(context, newVersion);
+            var existingVersion = context.FirstOrDefault<TDbTopLevelTable>(o => o.ParentKey == newVersion.ReplacesVersionKey);
+            if (existingVersion == null)
+            {
+                existingVersion = new TDbTopLevelTable();
+            }
+            existingVersion.ParentKey = newVersion.VersionKey;
+            context.Insert(existingVersion);
+        }
+
+        /// <inheritdoc/>
+        public override IOrmResultSet ExecuteQueryOrm(DataContext context, Expression<Func<TAct, bool>> query)
+        {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
+            }
+            else if (query == null)
+            {
+                throw new ArgumentNullException(nameof(query), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
+            }
+
+            // Perform sub query
+            return base.DoQueryInternalAs<CompositeResult<DbActVersion, TDbActSubTable, TDbTopLevelTable>>(context, query, (o) =>
+            {
+                var columns = TableMapping.Get(typeof(TDbActSubTable)).Columns.Union(
+                        TableMapping.Get(typeof(DbActVersion)).Columns, new ColumnMapping.ColumnComparer()
+                        ).Union(TableMapping.Get(typeof(TDbTopLevelTable)).Columns, new ColumnMapping.ColumnComparer());
+                var retVal = context.CreateSqlStatement().SelectFrom(typeof(DbActVersion), columns.ToArray())
+                    .InnerJoin<DbActVersion, TDbActSubTable>(q => q.VersionKey, q => q.ParentKey)
+                    .InnerJoin<TDbActSubTable, TDbTopLevelTable>(q => q.ParentKey, q => q.ParentKey);
+                return retVal;
+            });
+        }
+
+        /// <inheritdoc/>
+        protected override TAct DoInsertModel(DataContext context, TAct data)
+        {
+            var retVal = base.DoInsertModel(context, data);
+            var dbSubInstance = this.m_modelMapper.MapModelInstance<TAct, TDbTopLevelTable>(data);
+            dbSubInstance.ParentKey = retVal.VersionKey.Value;
+            dbSubInstance = context.Insert(dbSubInstance);
+            retVal.CopyObjectData(this.m_modelMapper.MapDomainInstance<TDbTopLevelTable, TAct>(dbSubInstance), onlyNullFields: true);
+            return retVal;
+        }
+
+        /// <inheritdoc/>
+        protected override TAct DoUpdateModel(DataContext context, TAct data)
+        {
+            var retVal = base.DoUpdateModel(context, data);
+            // Update sub entity table
+            var dbSubEntity = this.m_modelMapper.MapModelInstance<TAct, TDbTopLevelTable>(data);
+            dbSubEntity.ParentKey = retVal.VersionKey.Value;
+            if (this.m_configuration.VersioningPolicy.HasFlag(Configuration.AdoVersioningPolicyFlags.FullVersioning))
+            {
+                dbSubEntity = context.Insert(dbSubEntity);
+            }
+            else
+            {
+                dbSubEntity = context.Update(dbSubEntity);
+            }
+            retVal.CopyObjectData(this.m_modelMapper.MapDomainInstance<TDbTopLevelTable, TAct>(dbSubEntity), onlyNullFields: true);
+            return retVal;
+        }
+    }
+
+    /// <summary>
     /// An act derived persistence service where the act has a sub-table storing child data
     /// </summary>
     /// <typeparam name="TAct">The type of act being persisted</typeparam>

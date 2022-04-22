@@ -73,10 +73,10 @@ namespace SanteDB.Server.Core.Docker
         /// </summary>
         public void Configure(SanteDBConfiguration configuration, IDictionary<string, string> settings)
         {
-            var secSection = configuration.GetSection<SecurityConfigurationSection>();
+            var secSection = configuration.GetSection<SanteDB.Core.Security.Configuration.SecurityConfigurationSection>();
             if (secSection == null)
             {
-                secSection = new SecurityConfigurationSection()
+                secSection = new SanteDB.Core.Security.Configuration.SecurityConfigurationSection()
                 {
                     PasswordRegex = @"^(?=.*\d){1,}(?=.*[a-z]){1,}(?=.*[A-Z]){1,}(?=.*[^\w\d]){1,}.{6,}$",
                     PepExemptionPolicy = PolicyEnforcementExemptionPolicy.NoExemptions,

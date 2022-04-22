@@ -61,7 +61,7 @@ namespace SanteDB.Server.Core.Security.Privacy
     public class ExemptablePolicyFilterService : DataPolicyFilterService
     {
         // Security configuration
-        private SecurityConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SecurityConfigurationSection>();
+        private SanteDB.Core.Security.Configuration.SecurityConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SanteDB.Core.Security.Configuration.SecurityConfigurationSection>();
 
         /// <summary>
         /// Creates a new instance with DI

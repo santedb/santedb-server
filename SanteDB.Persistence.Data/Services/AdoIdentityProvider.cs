@@ -491,7 +491,7 @@ namespace SanteDB.Persistence.Data.Services
                             UserName = userName,
                             Password = this.m_passwordHashingService.ComputeHash(this.m_configuration.AddPepper(password)),
                             SecurityHash = this.m_passwordHashingService.ComputeHash(userName + password),
-                            UserClass = UserClassKeys.HumanUser,
+                            UserClass = ActorTypeKeys.HumanUser,
                             InvalidLoginAttempts = 0,
                             CreatedByKey = context.EstablishProvenance(principal, null),
                             CreationTime = DateTimeOffset.Now

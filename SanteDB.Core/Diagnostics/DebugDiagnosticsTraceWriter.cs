@@ -32,39 +32,17 @@ namespace SanteDB.Server.Core.Diagnostics
     /// A trace writer that uses the System.Diagnostics.Debug class
     /// </summary>
     [DisplayName("Debug Trace Writer")]
-    public class DebugDiagnosticsTraceWriter : TraceWriter
+    [Obsolete("Use SanteDB.Core.Diagnostics.Tracing.DebugDiagnosticsTraceWriter", true)]
+    public class DebugDiagnosticsTraceWriter : SanteDB.Core.Diagnostics.Tracing.DebugDiagnosticsTraceWriter
     {
 
+        public DebugDiagnosticsTraceWriter(): base()
+        {
 
-        /// <summary>
-        /// CTOR for diagnostics
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <param name="fileName"></param>
+        }
+
         public DebugDiagnosticsTraceWriter(EventLevel filter, string fileName, IDictionary<String, EventLevel> sources) : base(filter, fileName, sources)
-        {
-        }
+        { }
 
-        /// <summary>
-        /// Creates a new diagnostics trace writer
-        /// </summary>
-        public DebugDiagnosticsTraceWriter() : base (EventLevel.LogAlways, null, new Dictionary<String, EventLevel>())
-        {
-        }
-
-        /// <summary>
-        /// Write the specified trace
-        /// </summary>
-        protected override void WriteTrace(EventLevel level, string source, string format, params object[] args)
-        {
-            Debug.WriteLine($"{source} [{level}] : {String.Format(format, args)}");
-        }
-
-        /// <summary>
-        /// Trace event data 
-        /// </summary>
-        public override void TraceEventWithData(EventLevel level, string source, string message, object[] data)
-        {
-        }
     }
 }

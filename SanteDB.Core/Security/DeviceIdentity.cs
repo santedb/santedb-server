@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Principal;
 using System;
@@ -42,8 +43,10 @@ namespace SanteDB.Server.Core.Security
 		{
 			this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.Sid, sid.ToString()));
 			this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBDeviceIdentifierClaim, sid.ToString()));
+			this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.Actor, ActorTypeKeys.Device.ToString()));
+
 		}
 
-	
+
 	}
 }

@@ -61,13 +61,8 @@ namespace SanteDB.Persistence.Data.Configuration
         /// Default flags
         /// </summary>
         [XmlEnum("default")]
-        Default = FullVersioning | AssociationVersioning | KeepPurged,
+        Default = FullVersioning | AssociationVersioning,
 
-        /// <summary>
-        /// Keep purged records with a single state of PURGED
-        /// </summary>
-        [XmlEnum("keep-purged")]
-        KeepPurged = 8
     }
 
     /// <summary>
@@ -218,6 +213,12 @@ namespace SanteDB.Persistence.Data.Configuration
         /// </summary>
         [XmlAttribute("deleteStrategy"), Category("behavior"), DisplayName("Delete Strategy"), Description("Sets the default deletion strategy for the persistence layer. LogicalDelete = Set state to Inactive and obsolete time, ObsoleteDelete = Set state to Obsolete and obsolete time, NullifyDelete = Set state to nullify and obsolete time, Versioned Delete = Create a new version with an obsolete time (won't be returned by any calls), Permanent Delete = Purge the data and related data (CASCADES)")]
         public DeleteMode DeleteStrategy { get; set; }
+
+        /// <summary>
+        /// Fast deletion mode
+        /// </summary>
+        [XmlAttribute("fastDelete"), Category("behavior"), DisplayName("Fast Delete"), Description("When true, the DELETE verb will not return the full object rather a summary object")]
+        public bool FastDelete { get; set; }
 
         /// <summary>
         /// Get all peppered combinations of the specified secret

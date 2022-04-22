@@ -496,7 +496,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
                     ClassConceptKey = ActClassKeys.Act,
                     MoodConceptKey = MoodConceptKeys.Goal,
                     TypeConceptKey = EntityClassKeys.Place,
-                    ActTime = DateTimeOffset.Now
+                    ActTime = new DateTimeOffset(2022, 03, 03, 14, 23, 12, TimeSpan.Zero)
                 };
 
                 var afterInsert = base.TestInsert(act);
@@ -508,7 +508,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
 
                 var afterDelete = base.TestDelete(afterFetch, Core.Services.DeleteMode.LogicalDelete);
                 base.TestQuery<Act>(o => o.Key == afterInsert.Key, 0);
-                base.TestQuery<Act>(o => o.Key == afterInsert.Key && StatusKeys.InactiveStates.Contains(o.StatusConceptKey.Value), 1);
+                base.TestQuery<Act>(o => o.Key == afterInsert.Key && o.ObsoletionTime != null, 1);
 
                 // Now un-delete
                 var afterUndelete = base.TestUpdate(afterDelete, (o) =>
@@ -625,7 +625,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
                 // Ensure no results on regular query
                 afterQuery = this.TestQuery<Act>(o => o.Identifiers.Any(i => i.Value.Contains("TEST_DELETE_%")), 0);
                 // Ensure 10 results on inactive query
-                afterQuery = this.TestQuery<Act>(o => o.Identifiers.Any(i => i.Value.Contains("TEST_DELETE_%")) && StatusKeys.InactiveStates.Contains(o.StatusConceptKey.Value), 10);
+                afterQuery = this.TestQuery<Act>(o => o.Identifiers.Any(i => i.Value.Contains("TEST_DELETE_%")) && o.ObsoletionTime.HasValue, 10);
 
                 // Restore all
                 var oldData = afterQuery.ToList().Select(q =>

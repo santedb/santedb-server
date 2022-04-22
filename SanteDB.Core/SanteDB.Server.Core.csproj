@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(VersionNumber)' == ''">
-    <VersionNumber>2.4.0-debug</VersionNumber>
+    <VersionNumber>2.1.0-debug</VersionNumber>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -75,11 +75,12 @@
     <Compile Include="Configuration\Features\WindowsServiceFeature.cs" />
     <Compile Include="Configuration\Utils\HttpSslTool.cs" />
     <Compile Include="Diagnostics\ConsoleTraceWriter.cs" />
-    <Compile Include="Diagnostics\RolloverTextWriterTraceWriter.cs" />
     <Compile Include="Diagnostics\DebugDiagnosticsTraceWriter.cs" />
+    <Compile Include="Diagnostics\RolloverTextWriterTraceWriter.cs" />
     <Compile Include="Diagnostics\SystemDiagnosticsTraceWriter.cs" />
     <Compile Include="Docker\SecurityDockerFeature.cs" />
     <Compile Include="ExtensionMethods.cs" />
+    <Compile Include="Configuration\SecurityConfigurationSection.cs" />
     <Compile Include="Http\DefaultRestClient.cs" />
     <Compile Include="Model\ModelExtensions.cs" />
     <Compile Include="Notification\Templating\RazorNotificationTemplateFiller.cs" />
@@ -210,7 +211,7 @@
       <Name>SanteDB.BI</Name>
     </ProjectReference>
     <ProjectReference Include="..\santedb-i18n\SanteDB.Core.i18n\SanteDB.Core.i18n.csproj">
-      <Project>{41948F21-91D1-4D35-901F-362751EAECF5}</Project>
+      <Project>{ca7b81dc-b789-4af6-a079-ec84259c101a}</Project>
       <Name>SanteDB.Core.i18n</Name>
     </ProjectReference>
     <ProjectReference Include="..\SanteDB.Configuration\SanteDB.Configuration.csproj">

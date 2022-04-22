@@ -273,9 +273,9 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
             if (parms.Active)
                 users.CollectionItem = users.CollectionItem.OfType<SecurityUserInfo>().Where(o => o.Entity.ObsoletionTime.HasValue).OfType<object>().ToList();
             if (parms.Human)
-                users.CollectionItem = users.CollectionItem.OfType<SecurityUserInfo>().Where(o => o.Entity.UserClass == UserClassKeys.HumanUser).OfType<object>().ToList();
+                users.CollectionItem = users.CollectionItem.OfType<SecurityUserInfo>().Where(o => o.Entity.UserClass == ActorTypeKeys.HumanUser).OfType<object>().ToList();
             else if (parms.System)
-                users.CollectionItem = users.CollectionItem.OfType<SecurityUserInfo>().Where(o => o.Entity.UserClass != UserClassKeys.HumanUser).OfType<object>().ToList();
+                users.CollectionItem = users.CollectionItem.OfType<SecurityUserInfo>().Where(o => o.Entity.UserClass != ActorTypeKeys.HumanUser).OfType<object>().ToList();
             DisplayUtil.TablePrint(users.CollectionItem.OfType<SecurityUserInfo>(),
                 new String[] { "SID", "Name", "Last Auth", "Lockout", "ILA", "A" },
                 new int[] { 38, 24, 22, 22, 4, 2 },

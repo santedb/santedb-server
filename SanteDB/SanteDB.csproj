@@ -11,7 +11,7 @@
     </PackageReference>
   </ItemGroup>
   <PropertyGroup Condition="'$(VersionNumber)' == ''">
-    <VersionNumber>2.4.0-debug</VersionNumber>
+    <VersionNumber>2.1.0-debug</VersionNumber>
   </PropertyGroup>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -158,14 +158,17 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="config\config.skel" />
-    <None Include="data\000-DetectedIssue.dataset">
+    <None Include="data\000-ActClass.dataset" />
+    <None Include="data\000-ProcedureTechniques.dataset">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="data\000-ActClass.dataset">
+    <None Include="data\000-BodySites.dataset">
+      <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="data\000-EntityClass.dataset">
+    <None Include="data\000-DetectedIssue.dataset">
+      <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="data\000-DuplicateRelationshipType.dataset">
@@ -411,7 +414,6 @@
           <Project>{16ef1840-0361-439d-806c-92d0411122eb}</Project>
           <Name>RestSrvr</Name>
         </ProjectReference>
-        <ProjectReference Include="..\santedb-msmq\SanteDB.Queue.Msmq.csproj" />
         <ProjectReference Include="..\santedb-api\SanteDB.Core.Api\SanteDB.Core.Api.csproj">
           <Project>{3a45f695-47a2-464c-ace6-bdabbfa39fbc}</Project>
           <Name>SanteDB.Core.Api</Name>
@@ -511,6 +513,14 @@
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe">
       <Version>6.0.0</Version>
     </PackageReference>
+    <ProjectReference Include="..\santedb-cache-memory\SanteDB.Caching.Memory\SanteDB.Caching.Memory.csproj">
+      <Project>{8553abc7-abfa-4a21-b0e8-68b7de76129d}</Project>
+      <Name>SanteDB.Caching.Memory</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\santedb-cache-redis\SanteDB.Caching.Redis\SanteDB.Caching.Redis.csproj">
+      <Project>{86672094-25cc-4cd5-b085-240e50ec4a5e}</Project>
+      <Name>SanteDB.Caching.Redis</Name>
+    </ProjectReference>
     <ProjectReference Include="..\santedb-fhir\SanteDB.Messaging.FHIR\SanteDB.Messaging.FHIR.csproj">
       <Project>{33836324-c699-4139-ab9c-7524570a04d5}</Project>
       <Name>SanteDB.Messaging.FHIR</Name>
@@ -562,10 +572,6 @@
     <ProjectReference Include="..\SanteDB.Persistence.Auditing.ADO\SanteDB.Persistence.Auditing.ADO.csproj">
       <Project>{45ea67a6-48f6-4906-84ec-5c13c80c9cc4}</Project>
       <Name>SanteDB.Persistence.Auditing.ADO</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Persistence.Data\SanteDB.Persistence.Data.csproj">
-      <Project>{0cec131c-dfa0-43c3-9612-3f7d36086633}</Project>
-      <Name>SanteDB.Persistence.Data</Name>
     </ProjectReference>
     <ProjectReference Include="..\SanteDB.Persistence.Diagnostics.Email\SanteDB.Persistence.Diagnostics.Email.csproj">
       <Project>{2a5cea66-8bb3-4567-bdfa-9c174fc215f7}</Project>

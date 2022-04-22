@@ -104,7 +104,7 @@ namespace SanteDB.Server.Core.Configuration.Features
             // Configuration of features
             var config = new GenericFeatureConfiguration();
             config.Options.Add("Configuration", () => ConfigurationOptionType.Object);
-            var configSection = configuration.GetSection<SecurityConfigurationSection>() ?? new SecurityConfigurationSection()
+            var configSection = configuration.GetSection<SanteDB.Core.Security.Configuration.SecurityConfigurationSection>() ?? new SanteDB.Core.Security.Configuration.SecurityConfigurationSection()
             {
                 Signatures = new List<SanteDB.Core.Security.Configuration.SecuritySignatureConfiguration>()
                 {
@@ -278,8 +278,8 @@ namespace SanteDB.Server.Core.Configuration.Features
                     config = this.m_feature.Configuration as GenericFeatureConfiguration;
                 }
 
-                configuration.RemoveSection<SecurityConfigurationSection>();
-                var secSection = config.Values["Configuration"] as SecurityConfigurationSection;
+                configuration.RemoveSection<SanteDB.Core.Security.Configuration.SecurityConfigurationSection>();
+                var secSection = config.Values["Configuration"] as SanteDB.Core.Security.Configuration.SecurityConfigurationSection;
                 configuration.AddSection(secSection);
 
                 // Now add the services

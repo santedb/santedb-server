@@ -119,6 +119,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                         switch (deletionMode)
                         {
                             case DeleteMode.LogicalDelete:
+                                // If logically deleting a logically deleted object it is perma delete
+                                if (obj.ObsoletionTime.HasValue)
+                                {
+                                    goto case DeleteMode.PermanentDelete;
+                                }
                                 obj.ObsoletedByKey = context.ContextId;
                                 obj.ObsoletionTime = DateTimeOffset.Now;
                                 context.Update(obj);
@@ -142,8 +147,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                         switch (deletionMode)
                         {
                             case DeleteMode.LogicalDelete:
+                                if(obj.ObsoletionTime.HasValue)
+                                {
+                                    goto case DeleteMode.PermanentDelete;
+                                }
                                 obj.ObsoletedByKey = context.ContextId;
                                 obj.ObsoletionTime = DateTimeOffset.Now;
+                                context.Update(obj);
                                 break;
                             case DeleteMode.PermanentDelete:
                                 this.DoDeleteReferencesInternal(context, obj.Key);

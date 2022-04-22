@@ -133,11 +133,11 @@ namespace SanteDB.Persistence.Data.ADO.Security
 
                     // Is user allowed to login?
                     var pep = ApplicationServiceContext.Current.GetService<IPolicyEnforcementService>();
-                    if (user.UserClass == UserClassKeys.HumanUser)
+                    if (user.UserClass == ActorTypeKeys.HumanUser)
                     {
                         pep.Demand(PermissionPolicyIdentifiers.Login, new GenericPrincipal(userIdentity, null));
                     }
-                    else if (user.UserClass == UserClassKeys.ApplicationUser)
+                    else if (user.UserClass == ActorTypeKeys.ApplicationUser)
                     {
                         pep.Demand(PermissionPolicyIdentifiers.LoginAsService, new GenericPrincipal(userIdentity, null));
                     }

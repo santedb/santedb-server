@@ -19,6 +19,7 @@
  * Date: 2021-8-27
  */
 using SanteDB.Core.Diagnostics;
+using SanteDB.Core.i18n;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Security;
@@ -49,6 +50,17 @@ namespace SanteDB.Core.Security.Tfa.Twilio
         private TwilioTfaMechanismConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<TwilioTfaMechanismConfigurationSection>();
 
         private readonly Tracer m_tracer = new Tracer("SanteDB.Core.Security.Tfa.Twilio");
+        private readonly ITwoFactorSecretGenerator m_secretGenerator;
+        private readonly IPasswordHashingService m_passwordHasher;
+
+        /// <summary>
+        /// DI constructor
+        /// </summary>
+        public TfaTwilioMechanism(ITwoFactorSecretGenerator secretGenerator, IPasswordHashingService hashingService)
+        {
+            this.m_secretGenerator = secretGenerator;
+            this.m_passwordHasher = hashingService;
+        }
 
         /// <summary>
         /// Identifier of the mechanism
@@ -79,24 +91,47 @@ namespace SanteDB.Core.Security.Tfa.Twilio
         {
             if (user == null)
                 throw new ArgumentNullException(nameof(user));
+            else if (user is IClaimsIdentity icid) {
+                try
+                {
+                    // Generate a TFA secret and add it as a claim on the user
+                    var secret = this.m_passwordHasher.ComputeHash(this.m_secretGenerator.GenerateTfaSecret());
+                    ApplicationServiceContext.Current.GetService<IIdentityProviderService>().AddClaim(user.Name, new SanteDBClaim(SanteDBClaimTypes.SanteDBOTAuthCode, secret), AuthenticationContext.SystemPrincipal, new TimeSpan(0, 5, 0));
+                    var client = new TW.TwilioRestClient(this.m_configuration.Sid, this.m_configuration.Auth);
 
-            try
-            {
-                // Generate a TFA secret and add it as a claim on the user
-                var secret = ApplicationServiceContext.Current.GetService<ITwoFactorSecretGenerator>().GenerateTfaSecret();
-                ApplicationServiceContext.Current.GetService<IIdentityProviderService>().AddClaim(user.Name, new SanteDBClaim(SanteDBClaimTypes.SanteDBOTAuthCode, secret), AuthenticationContext.SystemPrincipal, new TimeSpan(0, 5, 0));
-                var client = new TW.TwilioRestClient(this.m_configuration.Sid, this.m_configuration.Auth);
-                var response = client.SendMessage(this.m_configuration.From, toNumber, String.Format(Strings.default_body, secret));
+                    var toNumber = icid.FindFirst(SanteDBClaimTypes.Telephone).Value;
+                    var response = client.SendMessage(this.m_configuration.From, toNumber, String.Format(Strings.default_body, secret));
 
-                if (response.RestException != null)
-                    throw new Exception(response.RestException.Message ?? "" + " " + (response.RestException.Code ?? "") + " " + (response.RestException.MoreInfo ?? "") + " " + (response.RestException.Status ?? ""));
+                    if (response.RestException != null)
+                        throw new Exception(response.RestException.Message ?? "" + " " + (response.RestException.Code ?? "") + " " + (response.RestException.MoreInfo ?? "") + " " + (response.RestException.Status ?? ""));
 
-                return $"Code sent to ******{user.PhoneNumber.Substring(user.PhoneNumber.Length - 4, 4)}";
+                    return $"Code sent to ******{toNumber.Substring(toNumber.Length - 4, 4)}";
+                }
+                catch (Exception ex)
+                {
+                    this.m_tracer.TraceEvent(EventLevel.Error, "Error sending SMS: {0}", ex);
+                    throw new Exception($"Could not dispatch SMS code to user", ex);
+                }
             }
-            catch (Exception ex)
+            else
             {
-                this.m_tracer.TraceEvent(EventLevel.Error, "Error sending SMS: {0}", ex);
-                throw new Exception($"Could not dispatch SMS code to user", ex);
+                throw new InvalidOperationException(String.Format(ErrorMessages.ARGUMENT_INVALID_TYPE, typeof(IClaimsIdentity), user.GetType()));
+            }
+        }
+
+        /// <summary>
+        /// Validate the secret
+        /// </summary>
+        public bool Validate(IIdentity user, String tfaSecret)
+        {
+            if (user is IClaimsIdentity ci)
+            {
+                return ci.FindFirst(SanteDBClaimTypes.SanteDBOTAuthCode)?.Value == this.m_passwordHasher.ComputeHash(tfaSecret);
+            }
+            else
+            {
+                // TODO: When a non-CI is provided
+                return false;
             }
         }
     }

@@ -91,7 +91,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
         private OAuthConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<OAuthConfigurationSection>();
 
         // Master configuration
-        private SecurityConfigurationSection m_masterConfig = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SecurityConfigurationSection>();
+        private SanteDB.Core.Security.Configuration.SecurityConfigurationSection m_masterConfig = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SanteDB.Core.Security.Configuration.SecurityConfigurationSection>();
 
         // XHTML
         private const string XS_HTML = "http://www.w3.org/1999/xhtml";
@@ -801,7 +801,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
             {
                 RestOperationContext.Current.OutgoingResponse.ContentType = "application/json";
                 var authDiscovery = ApplicationServiceContext.Current.GetService<OAuthMessageHandler>() as IApiEndpointProvider;
-                var securityConfiguration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SecurityConfigurationSection>();
+                var securityConfiguration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SanteDB.Core.Security.Configuration.SecurityConfigurationSection>();
                 var retVal = new OpenIdConfiguration();
 
                 // mex configuration

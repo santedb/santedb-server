@@ -2,7 +2,7 @@
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup Condition="'$(VersionNumber)' == ''">
-    <VersionNumber>2.4.0-debug</VersionNumber>
+    <VersionNumber>2.1.0-debug</VersionNumber>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="MSBuildTasks" Version="1.5.0.235">
@@ -41,9 +41,9 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="JWT" Version="8.4.2" />
-    <PackageReference Include="RestSharp" Version="106.12.0" />
-    <PackageReference Include="Twilio" Version="5.66.0" />
+    <PackageReference Include="JWT" Version="1.3.3" />
+    <PackageReference Include="RestSharp" Version="106.13.0" />
+    <PackageReference Include="Twilio" Version="4.7.2" />
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
@@ -62,7 +62,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Strings.resx</DependentUpon>
     </Compile>
-    <Content Include="TfaTwilioMechanism.cs" />
+    <Compile Include="TfaTwilioMechanism.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -77,6 +77,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\santedb-i18n\SanteDB.Core.i18n\SanteDB.Core.i18n.csproj">
+      <Project>{CA7B81DC-B789-4AF6-A079-EC84259C101A}</Project>
+      <Name>SanteDB.Core.i18n</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SanteDB.Core\SanteDB.Server.Core.csproj">
       <Project>{db9bc05e-45f1-4f96-a161-f36bdecaf566}</Project>
       <Name>SanteDB.Server.Core</Name>

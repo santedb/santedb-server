@@ -128,6 +128,7 @@ namespace SanteDB.Persistence.Data.Services
 
                     // Peppered authentication
                     var pepperSecret = this.m_configuration.GetPepperCombos(deviceSecret).Select(o => this.m_hasher.ComputeHash(o));
+                    
                     // Pepper authentication
                     if (!context.Any<DbSecurityDevice>(a => a.PublicId.ToLowerInvariant() == deviceId.ToLower() && pepperSecret.Contains(a.DeviceSecret)))
                     {

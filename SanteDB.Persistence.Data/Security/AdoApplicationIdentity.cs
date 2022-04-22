@@ -1,4 +1,5 @@
 ﻿using SanteDB.Core.i18n;
+using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Principal;
 using SanteDB.Persistence.Data.Exceptions;
@@ -56,7 +57,7 @@ namespace SanteDB.Persistence.Data.Security
         {
             this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.Sid, this.m_application.Key.ToString()));
             this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBApplicationIdentifierClaim, this.m_application.Key.ToString()));
-            this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.Actor, "APPLICATION"));
+            this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.Actor, ActorTypeKeys.Application.ToString()));
         }
 
         /// <summary>

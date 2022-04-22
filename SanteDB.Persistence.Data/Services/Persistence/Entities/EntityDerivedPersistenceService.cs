@@ -265,8 +265,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                .ToArray();
 
             this.m_classKeyMap = new Dictionary<Guid, Type>();
-            foreach (var ca in classAttributes) { 
-                if(this.m_classKeyMap.ContainsKey(ca.classKey))
+            foreach (var ca in classAttributes)
+            {
+                if (this.m_classKeyMap.ContainsKey(ca.classKey))
                 {
                     throw new InvalidOperationException(String.Format(ErrorMessages.DUPLICATE_CLASS_CONCEPT, ca.classKey, ca.type));
                 }
@@ -282,14 +283,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
         /// </summary>
         protected override void DoDeleteReferencesInternal(DataContext context, Guid key)
         {
-            if (this.m_configuration.VersioningPolicy.HasFlag(Configuration.AdoVersioningPolicyFlags.KeepPurged))
-            {
-                context.DeleteAll<DbEntityRelationship>(o => o.SourceKey == key);
-            }
-            else
-            {
-                context.DeleteAll<DbEntityRelationship>(o => o.SourceKey == key || o.TargetKey == key);
-            }
+            context.DeleteAll<DbEntityRelationship>(o => o.SourceKey == key || o.TargetKey == key);
             var addressIds = context.Query<DbEntityAddress>(o => o.SourceKey == key).Select(o => o.Key).ToArray();
             context.DeleteAll<DbEntityAddressComponent>(o => addressIds.Contains(o.SourceKey));
             context.DeleteAll<DbEntityAddress>(o => addressIds.Contains(o.Key));
@@ -345,7 +339,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             }
             else if (issues.Any()) // There are issues
             {
-                if(data.Extensions == null)
+                if (data.Extensions == null)
                 {
                     if (data.Key.HasValue)
                     {
@@ -454,11 +448,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
             {
                 return (TEntity)edps.MapToModelInstanceEx(context, dbModel, referenceObjects);
             }
-            else 
+            else
             {
                 return this.DoConvertToInformationModelEx(context, dbModel, referenceObjects);
             }
-           
+
         }
 
         /// <summary>

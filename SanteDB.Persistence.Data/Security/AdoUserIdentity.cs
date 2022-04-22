@@ -61,11 +61,11 @@ namespace SanteDB.Persistence.Data.Security
             this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.Name, this.m_securityUser.UserName));
             this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.Sid, this.m_securityUser.Key.ToString()));
             this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.Actor, this.m_securityUser.UserClass.ToString()));
-            if (!String.IsNullOrEmpty(this.m_securityUser.Email))
+            if (!String.IsNullOrEmpty(this.m_securityUser.Email) && this.m_securityUser.EmailConfirmed)
             {
                 this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.Email, this.m_securityUser.Email));
             }
-            if (!String.IsNullOrEmpty(this.m_securityUser.PhoneNumber))
+            if (!String.IsNullOrEmpty(this.m_securityUser.PhoneNumber) && this.m_securityUser.PhoneNumberConfirmed)
             {
                 this.AddClaim(new SanteDBClaim(SanteDBClaimTypes.Telephone, this.m_securityUser.PhoneNumber));
             }

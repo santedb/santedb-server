@@ -83,6 +83,12 @@ namespace SanteDB.Persistence.Data.Model
         public Guid? ReplacesVersionKey { get; set; }
 
         /// <summary>
+        /// True if the verison is the head version
+        /// </summary>
+        [Column("head")]
+        public bool IsHeadVersion { get; set; }
+
+        /// <summary>
         /// True if replaces version key is being nulled
         /// </summary>
         public bool ReplacesVersionKeySpecified { get; set; }

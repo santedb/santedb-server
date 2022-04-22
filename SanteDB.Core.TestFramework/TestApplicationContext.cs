@@ -27,7 +27,7 @@ using SanteDB.Core.Model.EntityLoader;
 using SanteDB.Core.Services;
 using SanteDB.Core.Services.Impl;
 using SanteDB.Persistence.Data.Services;
-using SanteDB.Server.Core.Diagnostics;
+using SanteDB.Core.Diagnostics.Tracing;
 using SanteDB.Server.Core.Services.Impl;
 using System;
 using System.Collections.Generic;

@@ -41,17 +41,18 @@ namespace SanteDB.Persistence.Data.Test
             "ModifiedOn",
             "CreationTimeXml",
             "UpdatedTimeXml",
-            "ObsoletedTimeXml",
+            "ObsoletionTimeXml",
             "VersionKey",
             "Key",
             "CreationTime",
-            "CreatedBy",
-            "UpdatedBy",
+            "CreatedByKey",
+            "UpdatedByKey",
             "UpdatedTime",
-            "ObsoletedBy",
+            "ObsoletedByKey",
             "ObsoletionTime" ,
             "StatusConceptKey",
-            "BatchOperation"
+            "BatchOperation",
+            "IsHeadVersion"
         };
 
         /// <summary>

@@ -373,8 +373,15 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     this.DoDeleteReferencesInternal(context, key);
                 }
                 var dbInstance = this.DoDeleteInternal(context, key, deleteMode);
-                var retVal = this.m_modelMapper.MapDomainInstance<TDbModel, TModel>(dbInstance);
-                return retVal;
+
+                if (!this.m_configuration.FastDelete)
+                {
+                    return this.DoConvertToInformationModel(context, dbInstance);
+                }
+                else
+                {
+                    return this.m_modelMapper.MapDomainInstance<TDbModel, TModel>(dbInstance);
+                }
 #if DEBUG
             }
             finally
@@ -729,6 +736,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             this.Querying?.Invoke(this, preEvt);
             if (preEvt.Cancel)
             {
+
                 this.m_tracer.TraceVerbose("Pre-Query Event Signalled Cancel: {0}", query);
                 return preEvt.Results;
             }

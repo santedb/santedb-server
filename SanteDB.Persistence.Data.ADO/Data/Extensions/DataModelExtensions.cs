@@ -94,7 +94,7 @@ namespace SanteDB.Persistence.Data.ADO.Data
         /// <summary>
         /// Try get by classifier
         /// </summary>
-        public static bool CheckExists(this IIdentifiedEntity me, DataContext context)
+        public static bool CheckExists(this IIdentifiedData me, DataContext context)
         {
             // Is there a classifier?
             var serviceInstance = ApplicationServiceContext.Current.GetService<AdoPersistenceService>();
@@ -109,7 +109,7 @@ namespace SanteDB.Persistence.Data.ADO.Data
         /// <summary>
         /// Try get by classifier
         /// </summary>
-        public static IIdentifiedEntity TryGetExisting(this IIdentifiedEntity me, DataContext context, bool forceDatabase = false)
+        public static IIdentifiedData TryGetExisting(this IIdentifiedData me, DataContext context, bool forceDatabase = false)
         {
             // Is there a classifier?
             var serviceInstance = ApplicationServiceContext.Current.GetService<AdoPersistenceService>();
@@ -117,7 +117,7 @@ namespace SanteDB.Persistence.Data.ADO.Data
 
             var cacheService = new AdoPersistenceCache(context);
 
-            IIdentifiedEntity existing = null;
+            IIdentifiedData existing = null;
 
             // Forcing from database load from
             if (forceDatabase && me.Key.HasValue)
@@ -129,10 +129,10 @@ namespace SanteDB.Persistence.Data.ADO.Data
             //    var tableMap = TableMapping.Get(tableType);
             //    var dbExisting = context.FirstOrDefault(tableType, context.CreateSqlStatement().SelectFrom(tableType).Where($"{tableMap.Columns.FirstOrDefault(o=>o.IsPrimaryKey).Name}=?", me.Key.Value));
             //    if (dbExisting != null)
-            //        existing = idpInstance.ToModelInstance(dbExisting, context, principal) as IIdentifiedEntity;
+            //        existing = idpInstance.ToModelInstance(dbExisting, context, principal) as IIdentifiedData;
             //}
             if (me.Key != Guid.Empty && me.Key != null)
-                existing = idpInstance.Get(context, me.Key.Value) as IIdentifiedEntity;
+                existing = idpInstance.Get(context, me.Key.Value) as IIdentifiedData;
 
             var classAtt = me.GetType().GetCustomAttribute<KeyLookupAttribute>();
             if (classAtt != null && existing == null)
@@ -146,9 +146,9 @@ namespace SanteDB.Persistence.Data.ADO.Data
                 object classifierValue = classProperty.GetValue(me); // Get the classifier
 
                 // Is the classifier a UUID'd item?
-                if (classifierValue is IIdentifiedEntity)
+                if (classifierValue is IIdentifiedData)
                 {
-                    classifierValue = (classifierValue as IIdentifiedEntity).Key.Value;
+                    classifierValue = (classifierValue as IIdentifiedData).Key.Value;
                     classProperty = me.GetType().GetProperty(classProperty.GetCustomAttribute<SerializationReferenceAttribute>()?.RedirectProperty ?? classProperty.Name);
                 }
 
@@ -176,7 +176,7 @@ namespace SanteDB.Persistence.Data.ADO.Data
                         if (existCache != null)
                             existing = existCache as IdentifiedData;
                         else
-                            existing = idpInstance.ToModelInstance(dataObject, context) as IIdentifiedEntity;
+                            existing = idpInstance.ToModelInstance(dataObject, context) as IIdentifiedData;
                     }
                 }
             }
@@ -187,12 +187,12 @@ namespace SanteDB.Persistence.Data.ADO.Data
         /// <summary>
         /// Updates a keyed delay load field if needed
         /// </summary>
-        public static void UpdateParentKeys(this IIdentifiedEntity instance, PropertyInfo field)
+        public static void UpdateParentKeys(this IIdentifiedData instance, PropertyInfo field)
         {
             var delayLoadProperty = field.GetCustomAttribute<SerializationReferenceAttribute>();
             if (delayLoadProperty == null || String.IsNullOrEmpty(delayLoadProperty.RedirectProperty))
                 return;
-            var value = field.GetValue(instance) as IIdentifiedEntity;
+            var value = field.GetValue(instance) as IIdentifiedData;
             if (value == null)
                 return;
             // Get the delay load key property!
@@ -203,16 +203,16 @@ namespace SanteDB.Persistence.Data.ADO.Data
         /// <summary>
         /// Ensures a model has been persisted
         /// </summary>
-        public static IIdentifiedEntity EnsureExists(this IIdentifiedEntity me, DataContext context, bool createIfNotExists = true, Type ensureType = null)
+        public static IIdentifiedData EnsureExists(this IIdentifiedData me, DataContext context, bool createIfNotExists = true, Type ensureType = null)
         {
             if (me == null) return null;
 
             // Me
             var serviceInstance = ApplicationServiceContext.Current.GetService<AdoPersistenceService>();
-            var vMe = me as IVersionedEntity;
+            var vMe = me as IVersionedData;
 
             var idpInstance = serviceInstance.GetPersister(ensureType ?? me.GetType());
-            IIdentifiedEntity existing = me.TryGetExisting(context) ?? idpInstance.Get(context, me.Key.GetValueOrDefault()) as IIdentifiedEntity;
+            IIdentifiedData existing = me.TryGetExisting(context) ?? idpInstance.Get(context, me.Key.GetValueOrDefault()) as IIdentifiedData;
 
             // Don't touch the child just return reference
             if (!serviceInstance.GetConfiguration().AutoInsertChildren || !createIfNotExists)
@@ -220,7 +220,7 @@ namespace SanteDB.Persistence.Data.ADO.Data
                 if (existing != null)
                 {
                     if (me.Key != existing.Key ||
-                        vMe?.VersionKey != (existing as IVersionedEntity)?.VersionKey)
+                        vMe?.VersionKey != (existing as IVersionedData)?.VersionKey)
                         me.CopyObjectData(existing); // copy data into reference
                     return existing;
                 }
@@ -231,25 +231,25 @@ namespace SanteDB.Persistence.Data.ADO.Data
             if (existing != null && me.Key.HasValue)
             {
                 // Exists but is an old version
-                if ((existing as IVersionedEntity)?.VersionSequence < vMe?.VersionSequence &&
+                if ((existing as IVersionedData)?.VersionSequence < vMe?.VersionSequence &&
                     vMe?.VersionKey != null && vMe?.VersionKey != Guid.Empty)
                 {
                     // Update method
-                    IVersionedEntity updated = idpInstance.Update(context, me) as IVersionedEntity;
+                    IVersionedData updated = idpInstance.Update(context, me) as IVersionedData;
                     me.Key = updated.Key;
                     if (vMe != null)
-                        vMe.VersionKey = (updated as IVersionedEntity).VersionKey;
+                        vMe.VersionKey = (updated as IVersionedData).VersionKey;
                     return updated;
                 }
                 return existing;
             }
             else if (existing == null) // Insert
             {
-                IIdentifiedEntity inserted = idpInstance.Insert(context, me) as IIdentifiedEntity;
+                IIdentifiedData inserted = idpInstance.Insert(context, me) as IIdentifiedData;
                 me.Key = inserted.Key;
 
                 if (vMe != null)
-                    vMe.VersionKey = (inserted as IVersionedEntity).VersionKey;
+                    vMe.VersionKey = (inserted as IVersionedData).VersionKey;
                 return inserted;
             }
             return existing;
@@ -322,7 +322,7 @@ namespace SanteDB.Persistence.Data.ADO.Data
         /// <summary>
         /// This method will load all basic properties for the specified model object
         /// </summary>
-        public static void LoadAssociations<TModel>(this TModel me, DataContext context, params String[] loadProperties) where TModel : IIdentifiedEntity
+        public static void LoadAssociations<TModel>(this TModel me, DataContext context, params String[] loadProperties) where TModel : IIdentifiedData
         {
             // I duz not haz a chzbrgr?
             if (me == null || me.LoadState >= context.LoadState)
@@ -389,7 +389,7 @@ namespace SanteDB.Persistence.Data.ADO.Data
                     var assocPersister = adoPersister as IAdoAssociativePersistenceService;
 
                     // We want to query based on our PK and version if applicable
-                    decimal? versionSequence = (me as IBaseEntityData)?.ObsoletionTime.HasValue == true ? (me as IVersionedEntity)?.VersionSequence : null;
+                    decimal? versionSequence = (me as IBaseEntityData)?.ObsoletionTime.HasValue == true ? (me as IVersionedData)?.VersionSequence : null;
                     var assoc = assocPersister.GetFromSource(context, me.Key.Value, versionSequence);
                     if (!m_constructors.TryGetValue(pi.PropertyType, out Func<IEnumerable, IList> creator))
                     {
@@ -410,7 +410,7 @@ namespace SanteDB.Persistence.Data.ADO.Data
                     }
                     pi.SetValue(me, creator(assoc));
                 }
-                else if (typeof(IIdentifiedEntity).IsAssignableFrom(pi.PropertyType)) // Single
+                else if (typeof(IIdentifiedData).IsAssignableFrom(pi.PropertyType)) // Single
                 {
                     // Single property, we want to execute a get on the key property
                     var pid = pi;

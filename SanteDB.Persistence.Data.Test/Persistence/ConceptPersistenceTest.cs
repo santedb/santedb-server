@@ -514,6 +514,14 @@ namespace SanteDB.Persistence.Data.Test.Persistence
                     return o;
                 });
 
+                // We should be able to fetch previous versions
+                var persistenceService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Concept>>();
+                var oldVersion = persistenceService.Get(afterRestore.Key.Value, afterRestore.VersionKey, AuthenticationContext.SystemPrincipal);
+                Assert.IsNotNull(oldVersion);
+                oldVersion = persistenceService.Get(afterRestore.Key.Value, oldVersion.PreviousVersionKey, AuthenticationContext.SystemPrincipal);
+                Assert.IsNotNull(oldVersion);
+                Assert.AreNotEqual(oldVersion.VersionKey, afterRestore.VersionKey);
+                Assert.AreEqual(oldVersion.VersionKey, afterRestore.PreviousVersionKey);
                 // Should now be returned in query results since it is restored
                 afterQuery = base.TestQuery<Concept>(o => o.Mnemonic == "TEST-08", 1).FirstOrDefault();
                 Assert.IsNotNull(afterQuery);

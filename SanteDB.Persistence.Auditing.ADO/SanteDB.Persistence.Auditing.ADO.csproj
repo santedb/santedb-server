@@ -2,7 +2,7 @@
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup Condition="'$(VersionNumber)' == ''">
-    <VersionNumber>2.4.0-debug</VersionNumber>
+    <VersionNumber>2.1.0-debug</VersionNumber>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="MSBuildTasks" Version="1.5.0.235">
@@ -134,7 +134,7 @@
   </Choose>
   <ItemGroup>
     <ProjectReference Include="..\santedb-i18n\SanteDB.Core.i18n\SanteDB.Core.i18n.csproj">
-      <Project>{41948f21-91d1-4d35-901f-362751eaecf5}</Project>
+      <Project>{ca7b81dc-b789-4af6-a079-ec84259c101a}</Project>
       <Name>SanteDB.Core.i18n</Name>
     </ProjectReference>
     <ProjectReference Include="..\SanteDB.Core\SanteDB.Server.Core.csproj">

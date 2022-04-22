@@ -38,7 +38,7 @@ namespace SanteDB.Server.Core.Configuration
     /// <remarks>This class is kept for exising implementations </remarks>
     [XmlType(nameof(SecurityConfigurationSection), Namespace = "http://santedb.org/configuration")]
     [Obsolete("Use SanteDB.Core.Configuration.SecurityConfigurationSection", true)]
-    public class SecurityConfigurationSection : SanteDB.Core.Configuration.SecurityConfigurationSection
+    public class SecurityConfigurationSection : SanteDB.Core.Security.Configuration.SecurityConfigurationSection
     {
     }
 }
