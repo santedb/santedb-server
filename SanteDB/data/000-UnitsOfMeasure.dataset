@@ -346,6 +346,51 @@
       </name>
     </Concept>
   </update>
+
+  <update insertIfNotExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>8904b90b-4e0f-45bb-a939-8e1468b4a9f0</id>
+
+      <mnemonic>[lb_av]</mnemonic>
+      <codeSystem>4853A702-FFF3-4EFB-8DD7-54AACCA53664</codeSystem>
+      <name>
+
+        <language>en</language>
+        <value>US or British Pounds</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>49974584-7c48-457e-a79c-031cdd62714a</id>
+
+      <previousVersion xsi:nil="true" />
+      <version xsi:nil="true" />
+      <sequence xsi:nil="true" />
+      <isReadonly>false</isReadonly>
+      <mnemonic>UnitOfMeasure-Pounds</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>1EF69347-EF03-4FF7-B3C5-6334448845E6</conceptClass>
+      <referenceTerm>
+        <source xsi:nil="true" />
+        <effectiveVersionSequence xsi:nil="true" />
+        <obsoleteVersionSequence xsi:nil="true" />
+        <term>8904b90b-4e0f-45bb-a939-8e1468b4a9f0</term>
+        <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+      </referenceTerm>
+      <name>
+        <source xsi:nil="true" />
+        <effectiveVersionSequence xsi:nil="true" />
+        <obsoleteVersionSequence xsi:nil="true" />
+        <language>en</language>
+        <value>Pounds</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </Concept>
+  </update>
+
+
   <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>1dbfb8d5-1659-40d9-9e4c-828b4047c58e</id>
@@ -432,6 +477,41 @@
   </update>
 
 
+
+  <update insertIfNotExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>92F3893C-CC89-4905-8929-388D4EE164EB</id>
+      <mnemonic>g</mnemonic>
+      <codeSystem>4853A702-FFF3-4EFB-8DD7-54AACCA53664</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Gram</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </ReferenceTerm>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>93424B4A-36F2-4376-B374-1C086C5EBF52</id>
+      <previousVersion xsi:nil="true" />
+      <version xsi:nil="true" />
+      <sequence xsi:nil="true" />
+      <isReadonly>false</isReadonly>
+      <mnemonic>UnitOfMeasure-Gram</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>1EF69347-EF03-4FF7-B3C5-6334448845E6</conceptClass>
+      <referenceTerm>
+        <term>92F3893C-CC89-4905-8929-388D4EE164EB</term>
+        <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+      </referenceTerm>
+      <name>
+        <language>en</language>
+        <value>Grams</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </Concept>
+  </update>
+  
   <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>86F3893C-CC89-4905-8929-388D4EE164EB</id>

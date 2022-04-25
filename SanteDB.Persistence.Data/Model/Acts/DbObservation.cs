@@ -79,11 +79,6 @@ namespace SanteDB.Persistence.Data.Model.Acts
         [Column("qty"), NotNull]
         public Decimal Value { get; set; }
 
-        /// <summary>
-        /// Gets or sets the value of the measure
-        /// </summary>
-        [Column("qty_prc")]
-        public Decimal? Precision { get; set; }
     }
 
     /// <summary>

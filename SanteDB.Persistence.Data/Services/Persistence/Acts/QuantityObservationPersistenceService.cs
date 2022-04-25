@@ -45,6 +45,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                 retVal.UnitOfMeasure = retVal.UnitOfMeasure.GetRelatedPersistenceService().Get(context, obsData?.UnitOfMeasureKey ?? Guid.Empty);
                 retVal.SetLoaded(o => o.UnitOfMeasure);
             }
+            retVal.UnitOfMeasureKey = obsData?.UnitOfMeasureKey;
             retVal.Value = obsData?.Value;
             return retVal;
         }
