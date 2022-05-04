@@ -399,6 +399,12 @@
     <property modelName="VersionKey" domainName="ParentKey" />
   </class>
 
+
+  <class modelClass="SanteDB.Core.Model.Acts.PatientEncounterArrangement, SanteDB.Core.Model"
+       domainClass="SanteDB.Persistence.Data.Model.Acts.DbPatientEncounterArrangement, SanteDB.Persistence.Data">
+    <property modelName="SourceEntityKey" domainName="SourceKey" />
+  </class>
+
   <class modelClass="SanteDB.Core.Model.Acts.Observation, SanteDB.Core.Model"
        domainClass="SanteDB.Persistence.Data.Model.Acts.DbObservation, SanteDB.Persistence.Data">
     <property modelName="VersionKey" domainName="ParentKey" />

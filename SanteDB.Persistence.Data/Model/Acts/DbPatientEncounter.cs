@@ -53,5 +53,11 @@ namespace SanteDB.Persistence.Data.Model.Acts
         /// </summary>
         [Column("dsch_dsp_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
         public Guid DischargeDispositionKey { get; set; }
+
+        /// <summary>
+        /// Idntifies the manner in which the patient was admitted
+        /// </summary>
+        [Column("adm_src_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
+        public Guid AdmissionSourceTypeKey { get; set; }
     }
 }

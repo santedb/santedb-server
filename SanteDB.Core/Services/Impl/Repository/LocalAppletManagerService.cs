@@ -288,9 +288,9 @@ namespace SanteDB.Server.Core.Services.Impl
         {
             byte[] verifyBytes = package.Manifest;
             // First check: Hash - Make sure the HASH is ok
-            if (package is AppletSolution)
+            if (package is AppletSolution asln)
             {
-                verifyBytes = (package as AppletSolution).Include.SelectMany(o => o.Manifest).ToArray();
+                verifyBytes = asln.Include.SelectMany(o => o.Manifest).ToArray();
                 if (BitConverter.ToString(SHA256.Create().ComputeHash(verifyBytes)) != BitConverter.ToString(package.Meta.Hash))
                     throw new InvalidOperationException($"Package contents of {package.Meta.Id} appear to be corrupt!");
             }

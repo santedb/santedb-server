@@ -301,7 +301,7 @@
     <None Include="data\000-ActReason.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="data\000-ActSite.dataset">
+    <None Include="data\000-AdministrationSite.dataset">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

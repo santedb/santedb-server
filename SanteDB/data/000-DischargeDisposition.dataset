@@ -139,6 +139,55 @@
       </name>
     </Concept>
   </update>
+
+
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>fef28777-fc6c-40bd-a50b-e0c98d15892d</id>
+
+      <previousVersion xsi:nil="true" />
+      <version xsi:nil="true" />
+      <sequence xsi:nil="true" />
+      <isReadonly>false</isReadonly>
+      <mnemonic>Disposition-LongTermCare</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+     
+      <name>
+        <source xsi:nil="true" />
+        <effectiveVersionSequence xsi:nil="true" />
+        <obsoleteVersionSequence xsi:nil="true" />
+        <language>en</language>
+        <value>Discharged/transferred long-term care facility</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </Concept>
+  </update>
+
+
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>fba28777-fc6c-40bd-a50b-e0c98d15892d</id>
+
+      <previousVersion xsi:nil="true" />
+      <version xsi:nil="true" />
+      <sequence xsi:nil="true" />
+      <isReadonly>false</isReadonly>
+      <mnemonic>Disposition-Rehabilitation</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+
+      <name>
+        <source xsi:nil="true" />
+        <effectiveVersionSequence xsi:nil="true" />
+        <obsoleteVersionSequence xsi:nil="true" />
+        <language>en</language>
+        <value>Discharged/transferred rehabilitation services</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </Concept>
+  </update>
+  
   <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>1f79e8b5-d3bb-4e83-aad6-90f3ad4a2eb4</id>
@@ -199,7 +248,6 @@
   <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>1a117ead-3882-4692-9ecc-e660adbc6d8c</id>
-      
       <previousVersion xsi:nil="true" />
       <version xsi:nil="true" />
       <sequence xsi:nil="true" />
@@ -213,7 +261,6 @@
         <obsoleteVersionSequence xsi:nil="true" />
         <term>f73402f7-3f0d-4749-9350-353e0bd9cae4</term>
         <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
-
       </referenceTerm>
       <name>
         <source xsi:nil="true" />
@@ -228,11 +275,9 @@
   <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>c0a09e01-64bc-4acb-ba60-6069884afbf0</id>
-      
       <mnemonic>20</mnemonic>
       <codeSystem>5b366752-3254-42f4-9d78-559e75f38b3d</codeSystem>
       <name>
-        
         <language>en</language>
         <value>Died</value>
         <phoneticAlgorithm xsi:nil="true" />
@@ -241,7 +286,7 @@
   </update>
   <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
-      <id>c0a09e01-64bc-4acb-ba60-6069884afbf0</id>
+      <id>c0a09e01-64bc-4acb-ba60-6069884afbf1</id>
       
       <mnemonic>397709008</mnemonic>
       <codeSystem>B3030751-D4DB-420B-B765-E837607820CD</codeSystem>
@@ -269,6 +314,14 @@
         <effectiveVersionSequence xsi:nil="true" />
         <obsoleteVersionSequence xsi:nil="true" />
         <term>c0a09e01-64bc-4acb-ba60-6069884afbf0</term>
+        <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+
+      </referenceTerm>
+      <referenceTerm>
+        <source xsi:nil="true" />
+        <effectiveVersionSequence xsi:nil="true" />
+        <obsoleteVersionSequence xsi:nil="true" />
+        <term>c0a09e01-64bc-4acb-ba60-6069884afbf1</term>
         <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
 
       </referenceTerm>

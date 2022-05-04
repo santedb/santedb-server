@@ -738,7 +738,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             // Next we want to perform a relationship query to establish what is being loaded and what is being persisted
             // TODO: Determine if this line performs better than selecting the entire object (I suspect it would - but need to check)
 
-            var existing = persistenceService.Query(context, o => o.SourceEntityKey == data.Key && !o.ObsoleteVersionSequenceId.HasValue).Select(o => o.Key).ToArray();
+            var existing = persistenceService.Query(context, o => o.SourceEntityKey == data.Key && o.ObsoleteVersionSequenceId == null).Select(o => o.Key).ToArray();
 
             // Which are new and which are not?
             var removedRelationships = existing.Where(o => associations.Any(a => a.Key == o && a.BatchOperation == BatchOperationType.Delete) || !associations.Any(a => a.Key == o)).Select(a => persistenceService.Delete(context, a.Value, DataPersistenceControlContext.Current?.DeleteMode ?? this.m_configuration.DeleteStrategy));
