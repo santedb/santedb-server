@@ -39,7 +39,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SanteDB.Persistence.Data.ADO.Services
+namespace SanteDB.Persistence.Data.Services
 {
     /// <summary>
     /// An implementation of the <see cref="IFreetextSearchService"/> which uses the underlying built-in database functionality
