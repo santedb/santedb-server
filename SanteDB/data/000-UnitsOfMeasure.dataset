@@ -27,7 +27,6 @@
   <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>bb1d639d-aea8-4750-a24c-b2548d2b6fe4</id>
-      
       <previousVersion xsi:nil="true" />
       <version xsi:nil="true" />
       <sequence xsi:nil="true" />
