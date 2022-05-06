@@ -20,6 +20,7 @@ using SanteDB.Core.Model.Constants;
 using SanteDB.OrmLite.Attributes;
 using SanteDB.Persistence.Data.Model.Concepts;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SanteDB.Persistence.Data.Model.Acts
 {
@@ -27,7 +28,7 @@ namespace SanteDB.Persistence.Data.Model.Acts
     /// Represents storage class for a patient encounter
     /// </summary>
     [Table("pat_enc_tbl")]
-    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [ExcludeFromCodeCoverage]
     public class DbPatientEncounter : DbActSubTable
     {
 

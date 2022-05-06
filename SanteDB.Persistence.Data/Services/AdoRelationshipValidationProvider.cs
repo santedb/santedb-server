@@ -1,11 +1,16 @@
 ﻿using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
+using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Constants;
+using SanteDB.Core.Model.Entities;
+using SanteDB.Core.Model.Interfaces;
+using SanteDB.Core.Security;
+using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using SanteDB.Persistence.Data.Configuration;
 using SanteDB.Persistence.Data.Model.Concepts;
-using SanteDB.Persistence.Data.Model.System;
+using SanteDB.Persistence.Data.Model.Sys;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -25,6 +30,7 @@ namespace SanteDB.Persistence.Data.Services
         /// </summary>
         internal AdoRelationshipValidationRule(DbRelationshipValidationRule rule)
         {
+
             this.SourceClassKey = rule.SourceClassKey;
             this.TargetClassKey = rule.TargetClassKey;
             this.RelationshipTypeKey = rule.RelationshipTypeKey;
@@ -76,13 +82,15 @@ namespace SanteDB.Persistence.Data.Services
 
         // Configuration
         private readonly AdoPersistenceConfigurationSection m_configuration;
+        private readonly IPolicyEnforcementService m_pepService;
 
         /// <summary>
         /// DI constructor
         /// </summary>
-        public AdoRelationshipValidationProvider(IConfigurationManager configurationManager)
+        public AdoRelationshipValidationProvider(IConfigurationManager configurationManager, IPolicyEnforcementService pepService)
         {
             this.m_configuration = configurationManager.GetSection<AdoPersistenceConfigurationSection>();
+            this.m_pepService = pepService;
         }
 
         /// <summary>
@@ -91,39 +99,28 @@ namespace SanteDB.Persistence.Data.Services
         public string ServiceName => "ADO.NET Relationship Validation Service";
 
         /// <inheritdoc/>
-        public IRelationshipValidationRule AddValidRelationship(Guid sourceClassKey, Guid targetClassKey, Guid relationshipTypeKey, string description)
+        public IRelationshipValidationRule AddValidRelationship<TRelationship>(Guid sourceClassKey, Guid targetClassKey, Guid relationshipTypeKey, string description)
+            where TRelationship : ITargetedAssociation
         {
+
+            this.m_pepService.Demand(PermissionPolicyIdentifiers.AlterSystemConfiguration);
             using (var context = this.m_configuration.Provider.GetWriteConnection())
             {
 
                 try
                 {
 
-                    var conceptSet = context.Query<DbConceptSetConceptAssociation>(o => o.ConceptKey == relationshipTypeKey).Select(o => o.SourceKey).FirstOrDefault();
+                    context.Open();
+                    var dbInstance = new DbRelationshipValidationRule()
+                    {
+                        Description = description,
+                        RelationshipTypeKey = relationshipTypeKey,
+                        SourceClassKey = sourceClassKey,
+                        TargetClassKey = targetClassKey,
+                        RelationshipClassType = typeof(TRelationship) == typeof(EntityRelationship) ? RelationshipTargetType.EntityRelationship :
+                            typeof(TRelationship) == typeof(ActRelationship) ? RelationshipTargetType.ActRelationship : RelationshipTargetType.ActParticipation
+                    };
 
-                    DbRelationshipValidationRule dbInstance = null;
-
-                    if (conceptSet == ConceptSetKeys.EntityRelationshipType)
-                    {
-                        dbInstance = new DbEntityRelationshipValidationRule();
-                    }
-                    else if (conceptSet == ConceptSetKeys.ActRelationshipType)
-                    {
-                        dbInstance = new DbActRelationshipValidationRule();
-                    }
-                    else if (conceptSet == ConceptSetKeys.ActParticipationType)
-                    {
-                        dbInstance = new DbActParticipationValidationRule();
-                    }
-                    else
-                    {
-                        throw new InvalidOperationException(ErrorMessages.INVALID_CLASS_CODE);
-                    }
-
-                    dbInstance.Description = description;
-                    dbInstance.RelationshipTypeKey = relationshipTypeKey;
-                    dbInstance.SourceClassKey = sourceClassKey;
-                    dbInstance.TargetClassKey = targetClassKey;
                     return new AdoRelationshipValidationRule(context.Insert(dbInstance));
                 }
                 catch (DbException e)
@@ -139,45 +136,54 @@ namespace SanteDB.Persistence.Data.Services
         }
 
         /// <inheritdoc/>
-        public IEnumerable<IRelationshipValidationRule> GetValidRelationships()
+        public IEnumerable<IRelationshipValidationRule> GetValidRelationships<TRelationship>()
+            where TRelationship : ITargetedAssociation
         {
             using (var context = this.m_configuration.Provider.GetReadonlyConnection())
             {
-                foreach (var itm in
-                    context.Query<DbEntityRelationshipValidationRule>(o => true)
-                    .Union(context.Query<DbActRelationshipValidationRule>(o => true))
-                    .Union(context.Query<DbActParticipationValidationRule>(o => true)))
+                var tclass = typeof(TRelationship) == typeof(EntityRelationship) ? RelationshipTargetType.EntityRelationship :
+                            typeof(TRelationship) == typeof(ActRelationship) ? RelationshipTargetType.ActRelationship : RelationshipTargetType.ActParticipation;
+                context.Open();
+
+                foreach (var itm in context.Query<DbRelationshipValidationRule>(o => o.RelationshipClassType == tclass))
                 {
-                    yield return new AdoRelationshipValidationRule(itm as DbActRelationshipValidationRule);
+                    yield return new AdoRelationshipValidationRule(itm);
                 }
             }
         }
 
         /// <inheritdoc/>
-        public IEnumerable<IRelationshipValidationRule> GetValidRelationships(Guid sourceClassKey)
+        public IEnumerable<IRelationshipValidationRule> GetValidRelationships<TRelationship>(Guid sourceClassKey)
+            where TRelationship : ITargetedAssociation
         {
             using (var context = this.m_configuration.Provider.GetWriteConnection())
             {
-                foreach (var itm in
-                    context.Query<DbEntityRelationshipValidationRule>(o => o.SourceClassKey == sourceClassKey)
-                    .Union(context.Query<DbActRelationshipValidationRule>(o => o.SourceClassKey == sourceClassKey))
-                    .Union(context.Query<DbActParticipationValidationRule>(o => o.SourceClassKey == sourceClassKey)))
+                var tclass = typeof(TRelationship) == typeof(EntityRelationship) ? RelationshipTargetType.EntityRelationship :
+                           typeof(TRelationship) == typeof(ActRelationship) ? RelationshipTargetType.ActRelationship : RelationshipTargetType.ActParticipation;
+                context.Open();
+
+                foreach (var itm in context.Query<DbRelationshipValidationRule>(o => o.SourceClassKey == sourceClassKey && o.RelationshipClassType == tclass))
                 {
-                    yield return new AdoRelationshipValidationRule(itm as DbActRelationshipValidationRule);
+                    yield return new AdoRelationshipValidationRule(itm);
                 }
             }
         }
 
         /// <inheritdoc/>
-        public void RemoveValidRelationship(Guid sourceClassKey, Guid targetClassKey, Guid relationshipTypeKey)
+        public void RemoveValidRelationship<TRelationship>(Guid sourceClassKey, Guid targetClassKey, Guid relationshipTypeKey)
+            where TRelationship : ITargetedAssociation
         {
+            this.m_pepService.Demand(PermissionPolicyIdentifiers.AlterSystemConfiguration);
+
             using (var context = this.m_configuration.Provider.GetWriteConnection())
             {
                 try
                 {
-                    context.DeleteAll<DbEntityRelationshipValidationRule>(o => o.SourceClassKey == sourceClassKey && o.TargetClassKey == targetClassKey && o.RelationshipTypeKey == relationshipTypeKey);
-                    context.DeleteAll<DbActRelationshipValidationRule>(o => o.SourceClassKey == sourceClassKey && o.TargetClassKey == targetClassKey && o.RelationshipTypeKey == relationshipTypeKey);
-                    context.DeleteAll<DbActParticipationValidationRule>(o => o.SourceClassKey == sourceClassKey && o.TargetClassKey == targetClassKey && o.RelationshipTypeKey == relationshipTypeKey);
+                    context.Open();
+
+                    var tclass = typeof(TRelationship) == typeof(EntityRelationship) ? RelationshipTargetType.EntityRelationship :
+                           typeof(TRelationship) == typeof(ActRelationship) ? RelationshipTargetType.ActRelationship : RelationshipTargetType.ActParticipation;
+                    context.DeleteAll<DbRelationshipValidationRule>(o => o.SourceClassKey == sourceClassKey && o.TargetClassKey == targetClassKey && o.RelationshipTypeKey == relationshipTypeKey && o.RelationshipClassType == tclass);
                 }
                 catch (DbException e)
                 {

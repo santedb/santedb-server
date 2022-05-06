@@ -56,7 +56,7 @@ namespace SanteDB.Persistence.Data.Services
                 this.m_services.Add(pservice);
             }
             serviceManager.AddServiceProvider(typeof(TagPersistenceService));
-
+            serviceManager.AddServiceProvider(typeof(AdoRelationshipValidationProvider));
             // TODO: Initialize further classes here
         }
 

@@ -78,6 +78,7 @@
     <Compile Include="Persistence\Entities\ProviderPersistenceTest.cs" />
     <Compile Include="Persistence\Entities\UserEntityPersistenceTest.cs" />
     <Compile Include="Persistence\IdentifierTypePersistenceServiceTest.cs" />
+    <Compile Include="Persistence\RelationshipValidationProviderTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ModelMapTest.cs" />
     <Compile Include="TestQueryPersistenceService.cs" />
