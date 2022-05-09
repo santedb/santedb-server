@@ -62,7 +62,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
                 Password = "test_user_hash_store",
                 SecurityHash = "test_security_hash",
                 UserName = "admin",
-                UserClass = UserClassKeys.HumanUser
+                UserClass = ActorTypeKeys.HumanUser
             };
 
             var userAfterTest = base.DoTestInsert(userUnderTest);
@@ -85,7 +85,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
                 Password = hashingService.ComputeHash("password"),
                 SecurityHash = "cert",
                 UserName = "updateTest",
-                UserClass = UserClassKeys.HumanUser
+                UserClass = ActorTypeKeys.HumanUser
 
             };
             
@@ -117,7 +117,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
                 Password = hashingService.ComputeHash("password"),
                 SecurityHash = securityHash,
                 UserName = "queryTest",
-                UserClass = UserClassKeys.HumanUser
+                UserClass = ActorTypeKeys.HumanUser
 
             };
 
@@ -143,7 +143,7 @@ namespace SanteDB.Persistence.Data.ADO.Test
                 Password = hashingService.ComputeHash("password"),
                 SecurityHash = securityHash,
                 UserName = "delayLoadTest",
-                UserClass = UserClassKeys.HumanUser
+                UserClass = ActorTypeKeys.HumanUser
             };
 
 

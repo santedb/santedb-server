@@ -18,7 +18,9 @@
  * User: fyfej
  * Date: 2021-8-27
  */
+using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Security.Claims;
+using System.Linq;
 using System.Security.Principal;
 
 namespace SanteDB.Server.Core.Security

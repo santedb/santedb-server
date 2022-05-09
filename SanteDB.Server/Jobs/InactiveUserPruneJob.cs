@@ -122,7 +122,7 @@ namespace SanteDB.Server.Jobs
                         List<SecurityUser> actionedUser = new List<SecurityUser>(10);
 
                         // Users who haven't logged in 
-                        foreach (var usr in userRepository.Find(o => o.UserClass == UserClassKeys.HumanUser && o.LastLoginTime < cutoff, offset, 100, out totalResults))
+                        foreach (var usr in userRepository.Find(o => o.UserClass == ActorTypeKeys.HumanUser && o.LastLoginTime < cutoff, offset, 100, out totalResults))
                         {
                             // Cancel request?
                             if (this.m_cancelFlag) break;

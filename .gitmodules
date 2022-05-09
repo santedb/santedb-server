@@ -66,3 +66,6 @@
 [submodule "santedb-msmq"]
 	path = santedb-msmq
 	url = https://github.com/santedb/santedb-msmq.git
+[submodule "santedb-rabbitmq"]
+	path = santedb-rabbitmq
+	url = https://github.com/santedb/santedb-rabbitmq.git

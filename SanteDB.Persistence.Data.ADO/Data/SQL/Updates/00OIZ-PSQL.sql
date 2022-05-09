@@ -7,7 +7,7 @@
  * </feature>
  */
  
- INSERT INTO sec_rol_pol_assoc_tbl (rol_id, pol_id, pol_act) values ('f6d2ba1d-5bb5-41e3-b7fb-2ec32418b2e1', '5fb731bf-4e59-4863-80bd-51757d58ea3b', 2);
+INSERT INTO sec_rol_pol_assoc_tbl (rol_id, pol_id, pol_act) values ('f6d2ba1d-5bb5-41e3-b7fb-2ec32418b2e1', '5fb731bf-4e59-4863-80bd-51757d58ea3b', 2) ON CONFLICT DO NOTHING;
 
 -- SECURITY PROVENANCE TABLE
 -- THIS TABLE IS USED TO RECORD THE PROVENANCE OF AN OBJECT AT THE TIME OF CREATION / UPDATION / ETC.
@@ -489,3 +489,68 @@ ALTER TABLE ASGN_AUT_TBL DROP CONSTRAINT fk_asgn_aut_dev_id;
 
 DELETE FROM asgn_aut_tbl WHERE aut_name = 'Test';
 ALTER TABLE ASGN_AUT_TBL ADD CONSTRAINT FK_ASGN_AUT_APP_ID FOREIGN KEY (APP_ID) REFERENCES SEC_APP_TBL(APP_ID);
+
+
+
+-- UN-PARTITION ACT PTCPT TBL
+CREATE TABLE act_ptcpt_np_tbl (
+	act_ptcpt_id uuid NOT NULL DEFAULT uuid_generate_v4(),
+	ent_id uuid NOT NULL,
+	act_id uuid NOT NULL,
+	efft_vrsn_seq_id numeric(20) NOT NULL,
+	obslt_vrsn_seq_id numeric(20) NULL,
+	qty int4 NULL DEFAULT 1,
+	rol_cd_id uuid NOT NULL,
+	ptcpt_seq_id numeric(20) NOT NULL DEFAULT nextval('act_ptcpt_seq'::regclass),
+	CONSTRAINT pk_act_ptcpt_np_tbl PRIMARY KEY (act_ptcpt_id),
+	CONSTRAINT ck_act_ptcpt_np_rol_cd CHECK (ck_is_cd_set_mem(rol_cd_id, 'ActParticipationType'::character varying, true)),
+	CONSTRAINT fk_act_ptcpt_np_act_id FOREIGN KEY (act_id) REFERENCES act_tbl(act_id),
+	CONSTRAINT fk_act_ptcpt_np_ent_id FOREIGN KEY (ent_id) REFERENCES ent_tbl(ent_id),
+	CONSTRAINT fk_act_ptcpt_np_typ_cd FOREIGN KEY (rol_cd_id) REFERENCES cd_tbl(cd_id)
+);
+INSERT INTO act_ptcpt_np_tbl SELECT * FROM act_ptcpt_tbl WHERE obslt_vrsn_seq_id IS NULL;
+
+DROP TABLE act_ptcpt_tbl;
+ALTER TABLE act_ptcpt_np_tbl RENAME TO act_ptcpt_tbl;
+
+CREATE INDEX act_ptcpt_act_idx ON act_ptcpt_tbl (act_id);
+CREATE INDEX act_ptcpt_ent_idx ON act_ptcpt_tbl(ent_id);
+CREATE INDEX act_ptcpt_rol_cd_idx ON act_ptcpt_tbl(rol_cd_id);
+CREATE UNIQUE INDEX act_ptcp_unq_enf ON act_ptcpt_tbl(act_id, ent_id, rol_cd_id);
+
+CREATE TABLE ent_rel_np_tbl (
+	ent_rel_id uuid NOT NULL DEFAULT uuid_generate_v4(),
+	src_ent_id uuid NOT NULL,
+	trg_ent_id uuid NOT NULL,
+	efft_vrsn_seq_id numeric(20) NOT NULL,
+	obslt_vrsn_seq_id numeric(20) NULL,
+	rel_typ_cd_id uuid NOT NULL,
+	qty int4 NULL DEFAULT 1,
+	CONSTRAINT pk_ent_rel_np_tbl PRIMARY KEY (ent_rel_id),
+	CONSTRAINT ck_ent_rel_np_typ_cd CHECK (ck_is_cd_set_mem(rel_typ_cd_id, 'EntityRelationshipType'::character varying, false)),
+	CONSTRAINT fk_ent_rel_np_typ_cd FOREIGN KEY (rel_typ_cd_id) REFERENCES cd_tbl(cd_id),
+	CONSTRAINT fk_ent_rel_np_trg_ent_id FOREIGN KEY (trg_ent_id) REFERENCES ent_tbl(ent_id)
+);
+INSERT INTO ent_rel_np_tbl SELECT * FROM ent_rel_tbl  WHERE obslt_vrsn_seq_id IS NULL;;
+DROP TABLE ent_rel_tbl;
+ALTER TABLE ent_rel_np_tbl RENAME TO ent_rel_tbl;
+
+-- Table Triggers
+CREATE TRIGGER ent_rel_tbl_vrfy BEFORE
+INSERT
+    OR
+UPDATE
+    ON
+    ent_rel_tbl FOR EACH ROW EXECUTE PROCEDURE trg_vrfy_ent_rel_tbl();
+
+
+-- public.ent_rel_part_cont_tbl foreign keys
+CREATE INDEX ent_rel_typ_idx ON ent_rel_tbl(rel_typ_cd_id);
+CREATE INDEX ent_rel_src_ent_idx ON ent_rel_tbl (src_ent_id);
+CREATE INDEX ent_rel_trg_ent_idx ON ent_rel_tbl (trg_ent_id);
+CREATE UNIQUE INDEX ent_rel_uq_idx ON ent_rel_tbl(src_ent_id, trg_ent_id, rel_typ_cd_id);
+
+
+SELECT REG_PATCH('20170725-01');
+SELECT REG_PATCH('20170803-01');
+
