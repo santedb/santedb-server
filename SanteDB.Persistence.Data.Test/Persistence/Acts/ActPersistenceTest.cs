@@ -239,12 +239,13 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
                     StartTime = new DateTimeOffset(2021, 01, 01, 0, 0, 0, new TimeSpan(-5, 0, 0)),
                     Relationships = new List<ActRelationship>()
                     {
-                        new ActRelationship(ActRelationshipTypeKeys.HasSubject, new Act()
+                        new ActRelationship(ActRelationshipTypeKeys.HasSubject, new CodedObservation()
                         {
-                            ClassConceptKey = ActClassKeys.Act, //NB: This should be an observation - but we're testing the act class here.
                             MoodConceptKey = MoodConceptKeys.Eventoccurrence,
                             TypeConceptKey = IntoleranceObservationTypeKeys.DrugIntolerance,
-                            ActTime = DateTime.Now
+                            ActTime = DateTime.Now,
+                            StatusConceptKey = StatusKeys.Completed,
+                            ValueKey = NullReasonKeys.Unknown
                         })
                     },
                     Participations = new List<ActParticipation>()

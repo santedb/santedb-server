@@ -42,8 +42,8 @@ ALTER TABLE QTY_OBS_TBL DROP QTY_PRC; --#!
 CREATE TABLE rel_vrfy_systbl (
 	rel_vrfy_id UUID NOT NULL,
 	rel_typ_cd_id UUID NOT NULL, -- THE TYPE OF RELATIONSHIP
-	src_cls_cd_id UUID NOT NULL, -- THE CLASS CODE OF THE SOURCE ENTITY
-	trg_cls_cd_id UUID NOT NULL, -- THE CLASS CODE OF THE TARGET ENTITY
+	src_cls_cd_id UUID, -- THE CLASS CODE OF THE SOURCE ENTITY
+	trg_cls_cd_id UUID, -- THE CLASS CODE OF THE TARGET ENTITY
 	err_desc VARCHAR(128) NOT NULL, -- THE ERROR CONDITION
 	rel_cls INTEGER NOT NULL CHECK (rel_cls IN (1,2,3)),
 	CONSTRAINT pk_rel_vrfy_systbl PRIMARY KEY (rel_vrfy_id),
@@ -77,16 +77,14 @@ CREATE UNIQUE INDEX rel_vrfy_src_trg_unq ON rel_vrfy_systbl(rel_typ_cd_id, src_c
 -- TRIGGER FUNCTION WHICH VERIFIES ENTITY RELATIONSHIP
 CREATE TRIGGER TG_ENT_VRFY_REL FOR ENT_REL_TBL BEFORE INSERT OR UPDATE POSITION 0 AS 
 BEGIN
-	IF (NEW.obslt_vrsn_seq_id IS NULL AND NOT EXISTS(SELECT rel_vrfy_systbl.err_desc
-	FROM 
-		rel_vrfy_systbl 
-		INNER JOIN ent_vrsn_tbl src_ent ON (src_ent.ent_id = NEW.src_ent_id AND src_ent.head)
-		INNER JOIN ent_vrsn_tbl trg_ent ON (trg_ent.ent_id = NEW.trg_ent_id AND trg_ent.head)
-	WHERE 
-		REL_CLS = 1 AND
-		rel_typ_cd_id = NEW.rel_typ_cd_id 
-		AND src_cls_cd_id = src_ent.cls_cd_id 
-		AND trg_cls_cd_id = trg_ent.cls_cd_id)) THEN
+	IF (NEW.obslt_vrsn_seq_id IS NULL AND NOT EXISTS(SELECT 1 
+		FROM 
+			rel_vrfy_systbl
+		WHERE 
+			EXISTS(SELECT 1 FROM ent_vrsn_tbl WHERE ent_id = NEW.src_ent_id AND head AND cls_cd_id = COALESCE(src_cls_cd_id, cls_cd_id))
+			AND EXISTS(SELECT 1 FROM ent_vrsn_tbl WHERE ent_id = NEW.trg_ent_id AND head AND cls_cd_id = COALESCE(trg_cls_cd_id, cls_cd_id))
+			AND rel_typ_cd_id = NEW.rel_typ_cd_id
+			AND rel_cls = 1)) THEN
 		EXCEPTION invalid_relationships 
 			'Validation error: Relationship ' || uuid_to_char(NEW.rel_typ_cd_id) || ' between ' || uuid_to_char(NEW.src_ent_id) || ' > ' || uuid_to_char(NEW.trg_ent_id) || ' is invalid';
 END;
@@ -94,16 +92,14 @@ END;
 -- TRIGGER FUNCTION WHICH VERIFIES ACT PARTICIPATION
 CREATE TRIGGER TG_ACT_VRFY_REL FOR ACT_REL_TBL BEFORE INSERT OR UPDATE POSITION 0 AS 
 BEGIN
-	IF (NEW.obslt_vrsn_seq_id IS NULL AND NOT EXISTS(SELECT rel_vrfy_systbl.err_desc
-	FROM 
-		rel_vrfy_systbl 
-		INNER JOIN act_vrsn_tbl src_ent ON (src_ent.act_id = NEW.src_act_id AND src_ent.head)
-		INNER JOIN act_vrsn_tbl trg_ent ON (trg_ent.act_id = NEW.trg_act_id AND trg_ent.head)
-	WHERE 
-		REL_CLS = 2 AND
-		rel_typ_cd_id = NEW.rel_typ_cd_id 
-		AND src_cls_cd_id = src_ent.cls_cd_id 
-		AND trg_cls_cd_id = trg_ent.cls_cd_id)) THEN
+	IF (NEW.obslt_vrsn_seq_id IS NULL AND NOT EXISTS(SELECT 1 
+		FROM 
+			rel_vrfy_systbl
+		WHERE 
+			EXISTS(SELECT 1 FROM act_vrsn_tbl WHERE act_id = NEW.src_act_id AND head AND cls_cd_id = COALESCE(src_cls_cd_id, cls_cd_id))
+			AND EXISTS(SELECT 1 FROM act_vrsn_tbl WHERE act_id = NEW.trg_act_id AND head AND cls_cd_id = COALESCE(trg_cls_cd_id, cls_cd_id))
+			AND rel_typ_cd_id = NEW.rel_typ_cd_id
+			AND rel_cls = 2)) THEN
 		EXCEPTION invalid_relationships 
 			'Validation error: Relationship ' || uuid_to_char(NEW.rel_typ_cd_id) || ' between ' || uuid_to_char(NEW.src_act_id) || ' > ' || uuid_to_char(NEW.trg_act_id) || ' is invalid';
 END;
@@ -111,16 +107,14 @@ END;
 -- TRIGGER FUNCTION WHICH VERIFIES ENTITY RELATIONSHIP
 CREATE TRIGGER TG_ACT_VRFY_PTCPT FOR ACT_PTCPT_TBL BEFORE INSERT OR UPDATE POSITION 0 AS 
 BEGIN
-	IF (NEW.obslt_vrsn_seq_id IS NULL AND NOT EXISTS(SELECT rel_vrfy_systbl.err_desc
-	FROM 
-		rel_vrfy_systbl 
-		INNER JOIN act_vrsn_tbl src_ent ON (src_ent.act_id = NEW.act_id AND src_ent.head)
-		INNER JOIN ent_vrsn_tbl trg_ent ON (trg_ent.ent_id = NEW.ent_id AND trg_ent.head)
-	WHERE 
-		REL_CLS = 3 AND
-		rel_typ_cd_id = NEW.rol_cd_id 
-		AND src_cls_cd_id = src_ent.cls_cd_id 
-		AND trg_cls_cd_id = trg_ent.cls_cd_id)) THEN
+	IF (NEW.obslt_vrsn_seq_id IS NULL AND NOT EXISTS(SELECT 1 
+		FROM 
+			rel_vrfy_systbl
+		WHERE 
+			EXISTS(SELECT 1 FROM act_vrsn_tbl WHERE act_id = NEW.act_id AND head AND cls_cd_id = COALESCE(src_cls_cd_id, cls_cd_id))
+			AND EXISTS(SELECT 1 FROM ent_vrsn_tbl WHERE ent_id = NEW.ent_id AND head AND cls_cd_id = COALESCE(trg_cls_cd_id, cls_cd_id))
+			AND rel_typ_cd_id = NEW.rol_cd_id
+			AND rel_cls = 3)) THEN
 		EXCEPTION invalid_relationships 
 			'Validation error: Participation ' || uuid_to_char(NEW.rol_cd_id) || ' between ' || uuid_to_char(NEW.act_id) || ' > ' || uuid_to_char(NEW.ent_id) || ' is invalid';
 END;

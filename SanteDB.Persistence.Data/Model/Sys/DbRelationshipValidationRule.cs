@@ -48,13 +48,13 @@ namespace SanteDB.Persistence.Data.Model.Sys
         /// Gets or sets the source classification code key
         /// </summary>
         [Column("src_cls_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
-        public Guid SourceClassKey { get; set; }
+        public Guid? SourceClassKey { get; set; }
 
         /// <summary>
         /// Gets or sets the target class code key
         /// </summary>
         [Column("trg_cls_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
-        public Guid TargetClassKey { get; set; }
+        public Guid? TargetClassKey { get; set; }
 
         /// <summary>
         /// Gets or sets the description or documentation for the relationship

@@ -44,8 +44,8 @@ ALTER TABLE QTY_OBS_TBL DROP QTY_PRC; --#!
 CREATE TABLE rel_vrfy_systbl (
 	rel_vrfy_id UUID NOT NULL DEFAULT uuid_generate_v1(),
 	rel_typ_cd_id UUID NOT NULL, -- THE TYPE OF RELATIONSHIP
-	src_cls_cd_id UUID NOT NULL, -- THE CLASS CODE OF THE SOURCE ENTITY
-	trg_cls_cd_id UUID NOT NULL, -- THE CLASS CODE OF THE TARGET ENTITY
+	src_cls_cd_id UUID, -- THE CLASS CODE OF THE SOURCE ENTITY
+	trg_cls_cd_id UUID, -- THE CLASS CODE OF THE TARGET ENTITY
 	err_desc VARCHAR(128) NOT NULL, -- THE ERROR CONDITION
 	rel_cls INTEGER NOT NULL CHECK (rel_cls IN (1,2,3)),
 	CONSTRAINT pk_rel_vrfy_systbl PRIMARY KEY (rel_vrfy_id),
@@ -74,9 +74,10 @@ BEGIN
 		FROM 
 			rel_vrfy_systbl
 		WHERE 
-			EXISTS(SELECT 1 FROM ent_vrsn_tbl WHERE ent_id = NEW.src_ent_id AND head AND cls_cd_id = src_cls_cd_id)
-			AND EXISTS(SELECT 1 FROM ent_vrsn_tbl WHERE ent_id = NEW.trg_ent_id AND head AND cls_cd_id = trg_cls_cd_id)
+			EXISTS(SELECT 1 FROM ent_vrsn_tbl WHERE ent_id = NEW.src_ent_id AND head AND cls_cd_id = COALESCE(src_cls_cd_id, cls_cd_id))
+			AND EXISTS(SELECT 1 FROM ent_vrsn_tbl WHERE ent_id = NEW.trg_ent_id AND head AND cls_cd_id = COALESCE(trg_cls_cd_id, cls_cd_id))
 			AND rel_typ_cd_id = NEW.rel_typ_cd_id
+			AND rel_cls = 1
 	)) THEN 
 		RAISE EXCEPTION 'Validation error: Relationship %  between % > % is invalid', NEW.rel_typ_cd_id, NEW.src_ent_id, NEW.trg_ent_id
 			USING ERRCODE = 'O9001';
@@ -97,6 +98,7 @@ BEGIN
 			EXISTS(SELECT 1 FROM act_vrsn_tbl WHERE act_id = NEW.src_act_id AND head AND cls_cd_id = src_cls_cd_id)
 			AND EXISTS(SELECT 1 FROM act_vrsn_tbl WHERE act_id = NEW.trg_act_id AND head AND cls_cd_id = trg_cls_cd_id)
 			AND rel_typ_cd_id = NEW.rel_typ_cd_id
+			AND rel_cls = 2
 	)) THEN 
 		RAISE EXCEPTION 'Validation error: Relationship %  between % > % is invalid', NEW.rel_typ_cd_id, NEW.src_act_id, NEW.trg_act_id
 			USING ERRCODE = 'O9001';
@@ -121,6 +123,7 @@ BEGIN
 			EXISTS(SELECT 1 FROM act_vrsn_tbl WHERE act_id = NEW.act_id AND head AND cls_cd_id = src_cls_cd_id)
 			AND EXISTS(SELECT 1 FROM ent_vrsn_tbl WHERE ent_id = NEW.ent_id AND head AND cls_cd_id = trg_cls_cd_id)
 			AND rel_typ_cd_id = NEW.rel_typ_cd_id
+			AND rel_cls = 3
 	)) THEN 
 		RAISE EXCEPTION 'Validation error: Relationship %  between % > % is invalid', NEW.rel_typ_cd_id, NEW.act_id, NEW.ent_id
 			USING ERRCODE = 'O9001';

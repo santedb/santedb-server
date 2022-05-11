@@ -51,12 +51,12 @@ namespace SanteDB.Persistence.Data.Services
         /// <summary>
         /// Gets the source classification key
         /// </summary>
-        public Guid SourceClassKey { get; }
+        public Guid? SourceClassKey { get; }
 
         /// <summary>
         /// Gets the target classification key
         /// </summary>
-        public Guid TargetClassKey { get; }
+        public Guid? TargetClassKey { get; }
 
         /// <summary>
         /// Gets the type of relationship
@@ -99,7 +99,7 @@ namespace SanteDB.Persistence.Data.Services
         public string ServiceName => "ADO.NET Relationship Validation Service";
 
         /// <inheritdoc/>
-        public IRelationshipValidationRule AddValidRelationship<TRelationship>(Guid sourceClassKey, Guid targetClassKey, Guid relationshipTypeKey, string description)
+        public IRelationshipValidationRule AddValidRelationship<TRelationship>(Guid? sourceClassKey, Guid? targetClassKey, Guid relationshipTypeKey, string description)
             where TRelationship : ITargetedAssociation
         {
 
@@ -162,7 +162,7 @@ namespace SanteDB.Persistence.Data.Services
                            typeof(TRelationship) == typeof(ActRelationship) ? RelationshipTargetType.ActRelationship : RelationshipTargetType.ActParticipation;
                 context.Open();
 
-                foreach (var itm in context.Query<DbRelationshipValidationRule>(o => o.SourceClassKey == sourceClassKey && o.RelationshipClassType == tclass))
+                foreach (var itm in context.Query<DbRelationshipValidationRule>(o => (o.SourceClassKey == sourceClassKey || o.SourceClassKey == null) && o.RelationshipClassType == tclass))
                 {
                     yield return new AdoRelationshipValidationRule(itm);
                 }
@@ -170,7 +170,7 @@ namespace SanteDB.Persistence.Data.Services
         }
 
         /// <inheritdoc/>
-        public void RemoveValidRelationship<TRelationship>(Guid sourceClassKey, Guid targetClassKey, Guid relationshipTypeKey)
+        public void RemoveValidRelationship<TRelationship>(Guid? sourceClassKey, Guid? targetClassKey, Guid relationshipTypeKey)
             where TRelationship : ITargetedAssociation
         {
             this.m_pepService.Demand(PermissionPolicyIdentifiers.AlterSystemConfiguration);
