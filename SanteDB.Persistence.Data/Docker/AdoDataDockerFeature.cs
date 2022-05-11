@@ -26,20 +26,28 @@ namespace SanteDB.Persistence.Data.Docker
         /// </summary>
         public const string ReadonlyConnectionSetting = "RO_CONNECTION";
 
+        public const string VersioningPolicySetting = "VERSIONING";
+
         /// <summary>
-        /// Fuzzy counts
+        /// The deletion mode
         /// </summary>
-        public const string FuzzyTotalSetting = "FUZZY_TOTAL";
+        public const string DeleteModeSetting = "DELETE_MODE";
+
+        /// <summary>
+        /// The loading mode
+        /// </summary>
+        public const string LoadModeSetting = "READ_MODE";
 
         /// <summary>
         /// ID of the docker feature
         /// </summary>
         public string Id => "NUADO";
 
+
         /// <summary>
         /// Gets the settings
         /// </summary>
-        public IEnumerable<string> Settings => new String[] { FuzzyTotalSetting, ConnectionStringSetting, ReadonlyConnectionSetting };
+        public IEnumerable<string> Settings => new String[] { ConnectionStringSetting, ReadonlyConnectionSetting, DeleteModeSetting, LoadModeSetting, VersioningPolicySetting };
 
         /// <summary>
         /// Configure the service
@@ -57,7 +65,15 @@ namespace SanteDB.Persistence.Data.Docker
                     ProviderType = "Npgsql",
                     ReadonlyConnectionString = "MAIN",
                     ReadWriteConnectionString = "MAIN",
-                    UseFuzzyTotals = false,
+                    LoadStrategy = Core.Services.LoadMode.SyncLoad,
+                    CachingPolicy = new AdoPersistenceCachingPolicy()
+                    {
+                        DataObjectExpiry = new TimeSpan(0,0,30)
+                    },
+                    DeleteStrategy = Core.Services.DeleteMode.LogicalDelete,
+                    StrictKeyAgreement= true,
+                    MaxRequests = 1000,
+                    VersioningPolicy = AdoVersioningPolicyFlags.FullVersioning,
                     Validation = new List<AdoValidationPolicy>()
                     {
                         new AdoValidationPolicy()
@@ -73,6 +89,19 @@ namespace SanteDB.Persistence.Data.Docker
                 configuration.AddSection(configSection);
             }
 
+            if(settings.TryGetValue(LoadModeSetting, out string loadModeString) && Enum.TryParse(loadModeString, out Core.Services.LoadMode loadMode))
+            {
+                configSection.LoadStrategy = loadMode;
+            }
+            if(settings.TryGetValue(DeleteModeSetting, out string deleteModeString) && Enum.TryParse(deleteModeString, out Core.Services.DeleteMode deleteMode))
+            {
+                configSection.DeleteStrategy = deleteMode;
+            }
+            if(settings.TryGetValue(VersioningPolicySetting, out string versionModeString) && Enum.TryParse(versionModeString, out AdoVersioningPolicyFlags versionMode))
+            {
+                configSection.VersioningPolicy = versionMode;
+            }
+
             if (settings.TryGetValue(ReadonlyConnectionSetting, out string roConnection))
             {
                 configSection.ReadonlyConnectionString = roConnection;
@@ -83,14 +112,6 @@ namespace SanteDB.Persistence.Data.Docker
                 configSection.ReadWriteConnectionString = rwConnection;
             }
 
-            if (settings.TryGetValue(FuzzyTotalSetting, out string fuzzyTotal))
-            {
-                if (!Boolean.TryParse(fuzzyTotal, out bool fuzzyTotalBool))
-                {
-                    throw new ArgumentException($"{fuzzyTotal} is not a valid Boolean");
-                }
-                configSection.UseFuzzyTotals = fuzzyTotalBool;
-            }
 
             // Service types
             var serviceTypes = new Type[] {

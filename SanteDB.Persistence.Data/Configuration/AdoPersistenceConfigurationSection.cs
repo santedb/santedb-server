@@ -116,15 +116,6 @@ namespace SanteDB.Persistence.Data.Configuration
         public AdoVersioningPolicyFlags VersioningPolicy { get; set; }
 
         /// <summary>
-        /// Gets or sets whether fuzzy totals should be used
-        /// </summary>
-        [XmlAttribute("fuzzyTotal")]
-        [Category("Performance")]
-        [DisplayName("Use Approx. Totals")]
-        [Description("When set to true, the totalResults will not be an exact count, rather an indicator whether additional results are available (this does increase query performance but some clients may not be compatible with it)")]
-        public bool UseFuzzyTotals { get; set; }
-
-        /// <summary>
         /// The peppering characters for authentication hashes
         /// </summary>
         [XmlAttribute("pepper")]

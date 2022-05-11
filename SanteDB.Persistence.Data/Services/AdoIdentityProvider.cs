@@ -243,7 +243,7 @@ namespace SanteDB.Persistence.Data.Services
                             }
                             else if (dbUser.Lockout.GetValueOrDefault() > DateTimeOffset.Now)
                             {
-                                throw new LockedIdentityAuthenticationException();
+                                throw new LockedIdentityAuthenticationException(dbUser.Lockout.Value);
                             }
 
                             // Claims to add to the principal
@@ -316,9 +316,9 @@ namespace SanteDB.Persistence.Data.Services
                             this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(userName, retVal, true));
                             return retVal;
                         }
-                        catch (LockedIdentityAuthenticationException)
+                        catch (LockedIdentityAuthenticationException e)
                         {
-                            throw new AuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_LOCKED));
+                            throw new AuthenticationException(this.m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_LOCKED), e);
                         }
                         catch (InvalidIdentityAuthenticationException) when (dbUser != null)
                         {

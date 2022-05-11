@@ -130,7 +130,7 @@ namespace SanteDB.Persistence.Data.Services
                     // Locked?
                     if (app.Lockout.GetValueOrDefault() > DateTimeOffset.Now)
                     {
-                        throw new LockedIdentityAuthenticationException();
+                        throw new LockedIdentityAuthenticationException(app.Lockout.Value);
                     }
 
                     var pepperSecret = this.m_configuration.GetPepperCombos(applicationSecret).Select(o => this.m_hasher.ComputeHash(o));

@@ -31,7 +31,7 @@ namespace SanteDB.Persistence.Data.Security
             // Has the user been locked since the session was established?
             if (userData.Lockout > DateTimeOffset.Now)
             {
-                throw new LockedIdentityAuthenticationException();
+                throw new LockedIdentityAuthenticationException(userData.Lockout.Value);
             }
             else if (userData.ObsoletionTime.HasValue)
             {

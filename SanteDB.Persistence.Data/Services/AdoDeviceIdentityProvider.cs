@@ -123,7 +123,7 @@ namespace SanteDB.Persistence.Data.Services
 
                     if (dev.Lockout.GetValueOrDefault() > DateTimeOffset.Now)
                     {
-                        throw new LockedIdentityAuthenticationException();
+                        throw new LockedIdentityAuthenticationException(dev.Lockout.Value);
                     }
 
                     // Peppered authentication
