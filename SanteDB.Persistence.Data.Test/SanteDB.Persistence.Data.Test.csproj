@@ -46,6 +46,7 @@
     <Compile Include="AdoIdentityProviderTest.cs" />
     <Compile Include="AdoPolicyInformationTest.cs" />
     <Compile Include="AdoRoleProviderTest.cs" />
+    <Compile Include="AdoSecurityChallengeTest.cs" />
     <Compile Include="AdoSessionProviderTest.cs" />
     <Compile Include="DataPersistenceTest.cs" />
     <Compile Include="Persistence\Acts\ActPersistenceTest.cs" />

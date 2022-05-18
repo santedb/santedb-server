@@ -38,58 +38,14 @@ namespace SanteDB.Server.Core.Security
     /// Represents a default implementation of a TFA relay service which scans the entire application domain for
     /// mechanisms and allows calling of them all
     /// </summary>
-    [ServiceProvider("Default TFA Relay Provider")]
-    public class DefaultTfaRelayService : ITfaRelayService
+    [Obsolete("Use SanteDB.Core.Security.DefaultTfaRelayService", true)]
+    public class DefaultTfaRelayService : SanteDB.Core.Security.DefaultTfaRelayService
     {
-        private readonly Tracer m_tracer = Tracer.GetTracer(typeof(DefaultTfaRelayService));
-
         /// <summary>
-        /// Gets the service name
+        /// DI constructor
         /// </summary>
-        public string ServiceName => "Default TFA Relay Provider";
-
-        /// <summary>
-        /// Construct the default relay service
-        /// </summary>
-        public DefaultTfaRelayService(IServiceManager serviceManager)
+        public DefaultTfaRelayService(IServiceManager serviceManager) : base(serviceManager)
         {
-            this.Mechanisms = serviceManager.CreateInjectedOfAll<ITfaMechanism>();
-        }
-
-        /// <summary>
-        /// Gets the configured mechanisms
-        /// </summary>
-        public IEnumerable<ITfaMechanism> Mechanisms
-        {
-            get; private set;
-        }
-
-        /// <summary>
-        /// Sends the secret via the specified mechanism
-        /// </summary>
-        public String SendSecret(Guid mechanismId, IIdentity user)
-        {
-            // Get the mechanism
-            var mechanism = this.Mechanisms.FirstOrDefault(o => o.Id == mechanismId);
-            if (mechanism == null)
-                throw new SecurityException($"TFA mechanism {mechanismId} not found");
-
-            // send the secret
-            return mechanism.Send(user);
-        }
-
-        /// <summary>
-        /// Validate the secret
-        /// </summary>
-        public bool ValidateSecret(Guid mechanismId, IIdentity user, String secret)
-        {
-            // Get the mechanism
-            var mechanism = this.Mechanisms.FirstOrDefault(o => o.Id == mechanismId);
-            if (mechanism == null)
-                throw new SecurityException($"TFA mechanism {mechanismId} not found");
-
-            // send the secret
-            return mechanism.Validate(user, secret);
         }
     }
 }

@@ -74,7 +74,7 @@ namespace SanteDB.Persistence.Data.Configuration.Features
                 typeof(AdoIdentityProvider),
                 typeof(AdoPolicyInformationService),
                 typeof(AdoApplicationIdentityProvider),
-                //typeof(AdoSecurityChallengeProvider),
+                typeof(AdoSecurityChallengeProvider),
                 typeof(AdoRoleProvider),
                 //typeof(AdoSubscriptionExecutor),
                 typeof(AdoSessionProvider)

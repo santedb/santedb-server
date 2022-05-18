@@ -101,10 +101,7 @@ namespace SanteDB.Persistence.Data.Services
             {
                 throw new ArgumentNullException(nameof(response), ErrorMessages.ARGUMENT_NULL);
             }
-            else if (String.IsNullOrEmpty(tfaSecret))
-            {
-                throw new ArgumentNullException(nameof(tfaSecret), ErrorMessages.ARGUMENT_NULL);
-            }
+            
 
             var preEvtArgs = new AuthenticatingEventArgs(userName);
             this.Authenticating?.Invoke(this, preEvtArgs);
@@ -180,6 +177,7 @@ namespace SanteDB.Persistence.Data.Services
                         else
                         {
                             var identity = new AdoUserIdentity(dbUser, "LOCAL_CHALLENGE");
+                            this.m_policyEnforcementService.Demand(PermissionPolicyIdentifiers.Login, new AdoClaimsPrincipal(identity)); // must still be allowed to login
 
                             // Establish role
                             var roleSql = context.CreateSqlStatement<DbSecurityRole>()
@@ -194,7 +192,6 @@ namespace SanteDB.Persistence.Data.Services
                             identity.AddClaim(new SanteDBClaim(SanteDBClaimTypes.SanteDBScopeClaim, PermissionPolicyIdentifiers.LoginPasswordOnly));
 
                             var retVal = new AdoClaimsPrincipal(identity);
-                            this.m_policyEnforcementService.Demand(PermissionPolicyIdentifiers.Login, retVal); // must still be allowed to login
                             this.Authenticated?.Invoke(this, new AuthenticatedEventArgs(userName, retVal, true));
                             return retVal;
                         }
@@ -366,7 +363,7 @@ namespace SanteDB.Persistence.Data.Services
             if (!userName.Equals(principal.Identity.Name, StringComparison.OrdinalIgnoreCase)
                 || !principal.Identity.IsAuthenticated)
             {
-                this.m_policyEnforcementService.Demand(PermissionPolicyIdentifiers.AlterSecurityChallenge);
+                this.m_policyEnforcementService.Demand(PermissionPolicyIdentifiers.AlterSecurityChallenge, principal);
             }
 
             try
@@ -414,7 +411,7 @@ namespace SanteDB.Persistence.Data.Services
             else if (!userName.Equals(principal.Identity.Name, StringComparison.OrdinalIgnoreCase)
                 || !principal.Identity.IsAuthenticated)
             {
-                this.m_policyEnforcementService.Demand(PermissionPolicyIdentifiers.AlterSecurityChallenge);
+                this.m_policyEnforcementService.Demand(PermissionPolicyIdentifiers.AlterSecurityChallenge, principal);
             }
 
             // Ensure that the user has been explicitly granted the special security policy

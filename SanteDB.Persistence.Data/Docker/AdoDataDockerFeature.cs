@@ -118,11 +118,11 @@ namespace SanteDB.Persistence.Data.Docker
                 typeof(SanteDB.Persistence.Data.Services.AdoApplicationIdentityProvider),
                 typeof(SanteDB.Persistence.Data.Services.AdoDeviceIdentityProvider),
                 typeof(SanteDB.Persistence.Data.Services.AdoIdentityProvider),
-                //typeof(SanteDB.Persistence.Data.Services.AdoSecurityChallengeProvider),
+                typeof(SanteDB.Persistence.Data.Services.AdoSecurityChallengeProvider),
                 typeof(SanteDB.Persistence.Data.Services.AdoSessionProvider),
-                //typeof(SanteDB.Persistence.Data.Services.AdoPolicyInformationService),
-                //typeof(SanteDB.Persistence.Data.Services.AdoRoleProvider),
-                //typeof(SanteDB.Persistence.Data.Services.AdoPersistenceService),
+                typeof(SanteDB.Persistence.Data.Services.AdoPolicyInformationService),
+                typeof(SanteDB.Persistence.Data.Services.AdoRoleProvider),
+                typeof(SanteDB.Persistence.Data.Services.AdoPersistenceService),
                 //typeof(SanteDB.Persistence.Data.Services.AdoSubscriptionExecutor)
               };
             // Add services
