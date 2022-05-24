@@ -37,6 +37,7 @@ using SanteDB.Core.PubSub.Broker;
 using SanteDB.BI.Services.Impl;
 using SanteDB.Core.Notifications;
 using SanteDB.Core.Applets.Services.Impl;
+using SanteDB.Core.Services.Impl.Repository;
 
 namespace SanteDB.Server.Core.Configuration.Features
 {
@@ -55,7 +56,7 @@ namespace SanteDB.Server.Core.Configuration.Features
             typeof(DefaultThreadPoolService),
             typeof(DefaultNetworkInformationService),
             typeof(RestServiceFactory),
-            typeof(LocalRepositoryService),
+            typeof(LocalRepositoryFactory),
             typeof(ExemptablePolicyFilterService),
             typeof(LocalMailMessageRepository),
             typeof(LocalStockManagementRepositoryService),
