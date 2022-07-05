@@ -283,7 +283,7 @@ namespace SanteDB.Persistence.Data.Services
         /// <param name="name">The name of the applicationto fetch</param>
         /// <returns>The secure key</returns>
         /// <remarks>This method fetches the security stamp from the database for things like HMAC shared secrets</remarks>
-        public byte[] GetPublicKey(string name)
+        public byte[] GetPublicSigningKey(string name)
         {
             if (String.IsNullOrEmpty(name))
             {
@@ -303,7 +303,7 @@ namespace SanteDB.Persistence.Data.Services
                     }
 
                     // Key is null
-                    if (app.PublicKey == null)
+                    if (app.PublicSigningKey == null)
                     {
                         return null;
                     }
@@ -311,14 +311,14 @@ namespace SanteDB.Persistence.Data.Services
                     // First 16 bytes are IV
                     if (this.m_configuration.EncryptPublicKeys)
                     {
-                        var ivLength = app.PublicKey[0];
-                        var iv = app.PublicKey.Skip(1).Take(ivLength).ToArray();
-                        var data = app.PublicKey.Skip(1 + ivLength).ToArray();
+                        var ivLength = app.PublicSigningKey[0];
+                        var iv = app.PublicSigningKey.Skip(1).Take(ivLength).ToArray();
+                        var data = app.PublicSigningKey.Skip(1 + ivLength).ToArray();
                         return this.m_symmetricCryptographicProvider.Decrypt(data, this.m_symmetricCryptographicProvider.GetContextKey(), iv);
                     }
                     else
                     {
-                        return app.PublicKey;
+                        return app.PublicSigningKey;
                     }
                 }
                 catch (Exception e)
@@ -522,11 +522,11 @@ namespace SanteDB.Persistence.Data.Services
                         storeData[0] = (byte)iv.Length;
                         Array.Copy(iv, 0, storeData, 1, iv.Length);
                         Array.Copy(encData, 0, storeData, 1 + iv.Length, encData.Length);
-                        dbApp.PublicKey = storeData;
+                        dbApp.PublicSigningKey = storeData;
                     }
                     else
                     {
-                        dbApp.PublicKey = key;
+                        dbApp.PublicSigningKey = key;
                     }
                     dbApp.UpdatedByKey = context.EstablishProvenance(principal, null);
                     dbApp.UpdatedTime = DateTimeOffset.Now;

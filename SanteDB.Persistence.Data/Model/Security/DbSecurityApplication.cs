@@ -87,7 +87,7 @@ namespace SanteDB.Persistence.Data.Model.Security
         /// </summary>
         /// <remarks>This is returned by the GetSecurityKey function</remarks>
         [Column("sgn_key")]
-        public byte[] PublicKey { get; set; }
+        public byte[] PublicSigningKey { get; set; }
 
     }
 }

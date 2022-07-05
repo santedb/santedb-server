@@ -31,13 +31,10 @@ namespace SanteDB.Persistence.Data.Services
     public class AdoIdentityProvider : IIdentityProviderService
     {
         // Tracer
-        private readonly Tracer m_tracer = Tracer.GetTracer(typeof(AdoSessionProvider));
+        private readonly Tracer m_tracer = Tracer.GetTracer(typeof(AdoIdentityProvider));
 
         // Session configuration
         private readonly AdoPersistenceConfigurationSection m_configuration;
-
-        // Data signing service
-        private readonly IDataSigningService m_dataSigningService;
 
         // Hashing service
         private readonly IPasswordHashingService m_passwordHashingService;
@@ -61,7 +58,6 @@ namespace SanteDB.Persistence.Data.Services
         /// Creates a new ADO session identity provider with injected configuration manager
         /// </summary>
         public AdoIdentityProvider(IConfigurationManager configuration,
-            IDataSigningService dataSigning,
             ILocalizationService localizationService,
             IPasswordHashingService passwordHashingService,
             IPolicyEnforcementService policyEnforcementService,
@@ -70,7 +66,6 @@ namespace SanteDB.Persistence.Data.Services
         {
             this.m_configuration = configuration.GetSection<AdoPersistenceConfigurationSection>();
             this.m_securityConfiguration = configuration.GetSection<SecurityConfigurationSection>();
-            this.m_dataSigningService = dataSigning;
             this.m_passwordHashingService = passwordHashingService;
             this.m_pepService = policyEnforcementService;
             this.m_tfaRelay = twoFactorSecretGenerator;

@@ -275,7 +275,7 @@ namespace SanteDB.Persistence.Data.Test
             // First add as system principal and retrieve
             var key = new byte[] { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f };
             serviceProvider.SetPublicKey("TEST_APP_010", key, AuthenticationContext.SystemPrincipal);
-            Assert.IsTrue(serviceProvider.GetPublicKey("TEST_APP_010").SequenceEqual(key));
+            Assert.IsTrue(serviceProvider.GetPublicSigningKey("TEST_APP_010").SequenceEqual(key));
         }
 
         /// <summary>
@@ -371,7 +371,7 @@ namespace SanteDB.Persistence.Data.Test
             // Should be able to set a key on our own
             var key = new byte[] { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f };
             serviceProvider.SetPublicKey("TEST_APP_011", key, principal);
-            Assert.IsTrue(serviceProvider.GetPublicKey("TEST_APP_011").SequenceEqual(key));
+            Assert.IsTrue(serviceProvider.GetPublicSigningKey("TEST_APP_011").SequenceEqual(key));
 
             // Should not be able to change anothers
             try
