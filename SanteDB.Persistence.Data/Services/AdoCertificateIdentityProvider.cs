@@ -179,7 +179,7 @@ namespace SanteDB.Persistence.Data.Services
 
                     var authData = context.Query<CompositeResult<DbCertificateMapping, DbSecurityUser, DbSecurityApplication, DbSecurityDevice>>(authSql).SingleOrDefault();
                     // Was authentication successful?
-                    if (authData.Object1 == null)
+                    if (authData?.Object1 == null)
                     {
                         throw new InvalidIdentityAuthenticationException();
                     }

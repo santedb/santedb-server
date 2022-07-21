@@ -180,8 +180,12 @@ namespace SanteDB.Persistence.Data.Test
                 Assert.IsNotNull(afterObsolete.Key);
                 Assert.IsNotNull(afterObsolete.CreatedByKey);
                 Assert.IsNotNull(afterObsolete.CreationTime);
-                Assert.IsNotNull(afterObsolete.ObsoletedByKey);
-                Assert.IsNotNull(afterObsolete.ObsoletionTime);
+
+                if (deleteMode == DeleteMode.LogicalDelete)
+                {
+                    Assert.IsNotNull(afterObsolete.ObsoletedByKey);
+                    Assert.IsNotNull(afterObsolete.ObsoletionTime);
+                }
                 //this.AssertEqual(objectToTest, afterObsolete);
                 return afterObsolete;
             }

@@ -159,6 +159,7 @@
     </None>
     <None Include="config\config.skel" />
     <None Include="data\000-ActClass.dataset" />
+    <None Include="data\000-ProtocolAdminPolicies.dataset" />
     <None Include="data\000-ProcedureTechniques.dataset">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

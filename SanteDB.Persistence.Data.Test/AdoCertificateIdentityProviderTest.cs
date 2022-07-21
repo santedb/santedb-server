@@ -117,7 +117,7 @@ namespace SanteDB.Persistence.Data.Test
             // Lookup 
             var id = certService.GetCertificateIdentity(this.GetCertificate());
             Assert.IsNotNull(id);
-            Assert.AreEqual("TEST_ADO_X509_02", id.Name);
+            Assert.AreEqual("TEST_ADO_X509_03", id.Name);
 
             certService.RemoveIdentityMap(userIdentity, this.GetCertificate(), AuthenticationContext.SystemPrincipal);
         }
@@ -151,7 +151,7 @@ namespace SanteDB.Persistence.Data.Test
             try
             {
                 certService.Authenticate(this.GetCertificate());
-                Assert.Fail("Shoudl have thrown exception");
+                Assert.Fail("Should have thrown exception");
             }
             catch(AuthenticationException)
             {
