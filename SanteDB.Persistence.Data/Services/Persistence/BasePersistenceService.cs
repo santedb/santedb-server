@@ -34,7 +34,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
     public abstract class BasePersistenceService<TModel, TDbModel> :
         IDataPersistenceService<TModel>,
         IDataPersistenceServiceEx<TModel>,
-        IStoredQueryDataPersistenceService<TModel>,
         IReportProgressChanged,
         IAdoPersistenceProvider<TModel>,
         IMappedQueryProvider<TModel>,
