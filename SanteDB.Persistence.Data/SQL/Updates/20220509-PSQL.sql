@@ -381,5 +381,7 @@ INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
 	VALUES(uuid_generate_v1(), ('9871C3BC-B57A-479D-A031-7B56CB06FA84'), ('1987c53c-7ab8-4461-9ebc-0d428744a8c0'), NULL, 'Condition=[HasSubject]=>*', 2);--#!
 
+alter table sub_adm_tbl alter rte_cd_id set default '61d8f65c-747e-4a99-982f-a42ac5437473';
+alter table sub_adm_tbl alter dos_unt_cd_id set default '61d8f65c-747e-4a99-982f-a42ac5437473';
 
 SELECT REG_PATCH('20220509-01'); --#!

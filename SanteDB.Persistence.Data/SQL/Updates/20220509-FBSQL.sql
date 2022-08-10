@@ -381,6 +381,11 @@ INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
 	VALUES(gen_uuid(), char_to_uuid('9871C3BC-B57A-479D-A031-7B56CB06FA84'), char_to_uuid('1987c53c-7ab8-4461-9ebc-0d428744a8c0'), NULL, 'Condition=[HasSubject]=>*', 2);--#!
 
-
+alter table sub_adm_tbl alter rte_cd_id set default x'61D8F65C747E4A99982FA42AC5437473';--#!
+alter table sub_adm_tbl alter DOS_UNT_CD_ID set default x'61D8F65C747E4A99982FA42AC5437473';--#!
+alter table sub_adm_tbl drop constraint CK_SUB_ADM_RTE_CD; --#!
+alter table sub_adm_tbl drop constraint CK_SUB_ADM_DOS_UNT_CD; --#!
+alter table sub_adm_tbl add constraint CK_SUB_ADM_RTE_CD CHECK (ASSRT_CD_CLS(RTE_CD_ID, 'Route'));--#!
+alter table sub_adm_tbl add constraint CK_SUB_ADM_DOS_UNT_CD CHECK (ASSRT_CD_CLS(DOS_UNT_CD_ID, 'UnitOfMeasure'));--#!
 SELECT REG_PATCH('20220509-01') FROM RDB$DATABASE; --#!
 

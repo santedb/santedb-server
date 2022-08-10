@@ -58,7 +58,7 @@ namespace SanteDB.Persistence.Data.Model.Security
         /// Gets or sets the type of the grant.
         /// </summary>
         /// <value>The type of the grant.</value>
-        [Column("pol_act"), NotNull]
+        [Column("pol_act"), NotNull, DefaultValue(0)]
         public int GrantType
         {
             get;

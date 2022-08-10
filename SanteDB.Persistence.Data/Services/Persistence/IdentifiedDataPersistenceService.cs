@@ -275,6 +275,15 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         }
 
         /// <summary>
+        /// Apply default query filters to the query provided by the caller
+        /// </summary>
+        /// <remarks>This method is used to append filters for obsoletion and version metadata, filtering on permissions or 
+        /// any other restrictions on the filters automatically applied by the persistence layer</remarks>
+        /// <returns>The modified query</returns>
+        /// <param name="query">The query supplied by the caller</param>
+        protected virtual Expression<Func<TModel, bool>> ApplyDefaultQueryFilters(Expression<Func<TModel, bool>> query) => query;
+
+        /// <summary>
         /// Perform the query however return a custom <typeparamref name="TReturn"/>. This function allows you
         /// to modify the query instructions before sending query to the database
         /// </summary>
@@ -291,6 +300,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
             // Convert the query to a domain query so that the object persistence layer can turn the
             // structured LINQ query into a SQL statement
+            query = this.ApplyDefaultQueryFilters(query);
             var domainQuery = context.CreateSqlStatement().SelectFrom(typeof(TDbModel), TableMapping.Get(typeof(TDbModel)).Columns.ToArray());
             if (queryModifier != null)
             {
@@ -376,7 +386,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             // Ensure either the relationship points to (key) (either source or target)
             associations = associations.Select(a =>
             {
-                if (a is ITargetedAssociation target && target.Key != data.Key && a.SourceEntityKey != data.Key ||
+                if (a is ITargetedAssociation target && target.TargetEntityKey != data.Key && a.SourceEntityKey != data.Key ||
                     a.SourceEntityKey.GetValueOrDefault() == Guid.Empty) // The target is a target association
                 {
                     a.SourceEntityKey = data.Key;

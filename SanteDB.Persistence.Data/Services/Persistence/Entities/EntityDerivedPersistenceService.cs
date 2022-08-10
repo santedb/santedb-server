@@ -359,6 +359,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
                 else
                 {
                     var existingValues = extension.GetValue<List<DetectedIssue>>();
+                    if(existingValues == null)
+                    {
+                        throw new InvalidOperationException(this.m_localizationService.GetString(ErrorMessageStrings.EXTENSION_INVALID_TYPE, new { extensionType = extension.ExtensionValue.GetType(), extension = ExtensionTypeKeys.DataQualityExtensionName }));
+                    }
                     existingValues.AddRange(issues);
                     extension.ExtensionValue = existingValues;
                 }

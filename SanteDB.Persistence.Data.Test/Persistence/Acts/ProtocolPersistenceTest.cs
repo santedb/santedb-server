@@ -6,6 +6,7 @@ using SanteDB.Core.Protocol;
 using SanteDB.Core.Security;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,12 +20,14 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
     /// A test for protocol persistence
     /// </summary>
     [TestFixture()]
+    [ExcludeFromCodeCoverage]
     public class ProtocolPersistenceTest : DataPersistenceTest
     {
 
         /// <summary>
         /// Protocol handler class
         /// </summary>
+        [ExcludeFromCodeCoverage]
         private class DummyProtocolHandler : IClinicalProtocol
         {
 
@@ -104,7 +107,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
 
                 // Test querying the protocol
                 var afterQuery = base.TestQuery<Protocol>(o => o.Oid == "1.2.3.4.5.6", 1).AsResultSet().First();
-                base.TestQuery<Protocol>(o => o.Oid == "1.2.3.4.5.7", 0);
+                base.TestQuery<Protocol>(o => o.Oid == "1.2.3.4.5.76", 0);
                 base.TestQuery<Protocol>(o => o.ObsoletionTime == null && o.Name == "Teapot Protocol", 1);
                 Assert.AreEqual(AuthenticationContext.SystemUserSid, afterInsert.CreatedByKey.Value.ToString());
                 Assert.AreEqual(10, afterQuery.Definition.Length);

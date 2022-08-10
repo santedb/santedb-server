@@ -13,7 +13,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
     /// <summary>
     /// Generic observation persistence service to handle Observation calls
     /// </summary>
-    public class ObservationPersistenceService : ObservationDerivedPersistenceService<Observation, DbObservation>
+    public class ObservationPersistenceService : ActDerivedPersistenceService<Observation, DbObservation>
     {
         /// <summary>
         /// DI Constructor

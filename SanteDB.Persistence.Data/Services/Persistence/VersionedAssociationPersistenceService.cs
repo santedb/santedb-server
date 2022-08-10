@@ -188,6 +188,18 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             return base.DoUpdateInternal(context, dbModel);
         }
 
+        /// <inheritdoc/>
+        protected override Expression<Func<TModel, bool>> ApplyDefaultQueryFilters(Expression<Func<TModel, bool>> query)
+        {
+            // TODO: Write a utility function that looks for this
+            if (!query.ToString().Contains(nameof(IVersionedAssociation.ObsoleteVersionSequenceId)))
+            {
+                var obsoletionVersionSequenceClause = Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(IVersionedAssociation.ObsoleteVersionSequenceId)));
+                query = Expression.Lambda<Func<TModel, bool>>(Expression.And(query.Body, Expression.MakeBinary(ExpressionType.Equal, obsoletionVersionSequenceClause, Expression.Constant(null))), query.Parameters);
+            }
+            return base.ApplyDefaultQueryFilters(query);
+        }
+
         /// <summary>
         /// Perform a query (appends the filter for obsolete sequence)
         /// </summary>
@@ -200,13 +212,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             else if (query == null)
             {
                 throw new ArgumentNullException(nameof(query), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
-            }
-
-            // TODO: Write a utility function that looks for this
-            if (!query.ToString().Contains(nameof(IVersionedAssociation.ObsoleteVersionSequenceId)))
-            {
-                var obsoletionVersionSequenceClause = Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(IVersionedAssociation.ObsoleteVersionSequenceId)));
-                query = Expression.Lambda<Func<TModel, bool>>(Expression.And(query.Body, Expression.MakeBinary(ExpressionType.Equal, obsoletionVersionSequenceClause, Expression.Constant(null))), query.Parameters);
             }
             return base.DoQueryInternal(context, query, allowCache);
         }

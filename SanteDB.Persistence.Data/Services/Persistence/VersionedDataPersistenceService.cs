@@ -639,11 +639,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 #endif
         }
 
-        /// <summary>
-        /// Perform a query internal as another
-        /// </summary>
-        protected override OrmResultSet<TReturn> DoQueryInternalAs<TReturn>(DataContext context, Expression<Func<TModel, bool>> query, Func<SqlStatement, SqlStatement> queryModifier = null)
+        /// <inheritdoc/>
+        protected override Expression<Func<TModel, bool>> ApplyDefaultQueryFilters(Expression<Func<TModel, bool>> query)
         {
+
             // First - we determine if the query has an explicit status concept set
             if (typeof(IHasState).IsAssignableFrom(typeof(TModel)) && !query.ToString().Contains(nameof(IHasState.StatusConceptKey)))
             {
@@ -693,9 +692,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
             // Ensure that we always apply HEAD filter
             var headProperty = Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(IVersionedData.IsHeadVersion)));
-            query = Expression.Lambda<Func<TModel, bool>>(Expression.And(query.Body, Expression.MakeBinary(ExpressionType.Equal, headProperty, Expression.Constant(true))), query.Parameters[0]);
-
-            return base.DoQueryInternalAs<TReturn>(context, query, queryModifier);
+            return base.ApplyDefaultQueryFilters(Expression.Lambda<Func<TModel, bool>>(Expression.And(query.Body, Expression.MakeBinary(ExpressionType.Equal, headProperty, Expression.Constant(true))), query.Parameters[0]));
+            
         }
 
         /// <inheritdoc/>
@@ -719,7 +717,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             // Ensure either the relationship points to (key) (either source or target)
             associations = associations.Select(a =>
             {
-                if (a is ITargetedAssociation target && target.Key != data.Key && a.SourceEntityKey != data.Key ||
+                if (a is ITargetedAssociation target && target.TargetEntityKey != data.Key && a.SourceEntityKey != data.Key ||
                     a.SourceEntityKey.GetValueOrDefault() == Guid.Empty) // The target is a target association
                 {
                     a.SourceEntityKey = data.Key;

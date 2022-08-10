@@ -175,10 +175,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 #endif
         }
 
-        /// <summary>
-        /// Perform query and return the specified result set type
-        /// </summary>
-        protected override OrmResultSet<TReturn> DoQueryInternalAs<TReturn>(DataContext context, Expression<Func<TModel, bool>> query, Func<SqlStatement, SqlStatement> queryModifier = null)
+        /// <inheritdoc/>
+        protected override Expression<Func<TModel, bool>> ApplyDefaultQueryFilters(Expression<Func<TModel, bool>> query)
         {
             // If the user has not explicitly set the obsoletion time parameter then we will add it
             if (!query.ToString().Contains(nameof(BaseEntityData.ObsoletionTime)))
@@ -186,9 +184,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 var obsoletionReference = Expression.MakeBinary(ExpressionType.Equal, Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(BaseEntityData.ObsoletionTime))), Expression.Constant(null));
                 query = Expression.Lambda<Func<TModel, bool>>(Expression.MakeBinary(ExpressionType.AndAlso, obsoletionReference, query.Body), query.Parameters);
             }
-
-            return base.DoQueryInternalAs<TReturn>(context, query, queryModifier);
+            return base.ApplyDefaultQueryFilters(query);
         }
+
 
         /// <summary>
         /// Perform an obsolete either logically (if configured) or a hard delete

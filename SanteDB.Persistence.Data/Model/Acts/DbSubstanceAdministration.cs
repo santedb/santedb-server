@@ -41,7 +41,6 @@ namespace SanteDB.Persistence.Data.Model.Acts
             {
                 return base.ParentKey;
             }
-
             set
             {
                 base.ParentKey = value;
@@ -51,13 +50,13 @@ namespace SanteDB.Persistence.Data.Model.Acts
         /// <summary>
         /// Gets or sets the route of administration
         /// </summary>
-        [Column("rte_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
+        [Column("rte_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key)), DefaultValue(NullReasonStrings.NoInformation)]
         public Guid RouteConceptKey { get; set; }
 
         /// <summary>
         /// Gets or sets the dose unit
         /// </summary>
-        [Column("dos_unt_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key))]
+        [Column("dos_unt_cd_id"), ForeignKey(typeof(DbConcept), nameof(DbConcept.Key)), DefaultValue(NullReasonStrings.NoInformation)]
         public Guid DoseUnitConceptKey { get; set; }
 
         /// <summary>
@@ -70,7 +69,7 @@ namespace SanteDB.Persistence.Data.Model.Acts
         /// Gets or sets the dose quantity
         /// </summary>
         [Column("dos_qty")]
-        public Decimal DoseQuantity { get; set; }
+        public Decimal? DoseQuantity { get; set; }
 
         /// <summary>
         /// Gets or sets the sequence number

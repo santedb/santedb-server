@@ -75,7 +75,7 @@ namespace SanteDB.Core.TestFramework
         /// <summary>
         /// Get all strings
         /// </summary>
-        public KeyValuePair<string, string>[] GetStrings(string locale) => new KeyValuePair<string, string>[0];
+        public IEnumerable<KeyValuePair<string, string>> GetStrings(string locale) => new KeyValuePair<string, string>[0];
 
         /// <summary>
         /// Reload strings
