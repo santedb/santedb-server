@@ -67,7 +67,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
                             },
                             Identifiers = new List<Core.Model.DataTypes.EntityIdentifier>()
                             {
-                                new Core.Model.DataTypes.EntityIdentifier(new AssigningAuthority("CP_TEST", "Careplan test", "2.25.4939393933"), "123-CP-1")
+                                new Core.Model.DataTypes.EntityIdentifier(new IdentityDomain("CP_TEST", "Careplan test", "2.25.4939393933"), "123-CP-1")
                             }
                         })
                     },

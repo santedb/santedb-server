@@ -77,6 +77,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
                 // Get maximum source key
                 var sourceKey = context.Query<TDbModel>(domainExpression).OrderByDescending(o => o.EffectiveVersionSequenceId).Select(o => o.SourceKey).FirstOrDefault();
+                if(sourceKey == Guid.Empty) // There is no need to delete related objects
+                {
+                    yield break;
+                }
+
                 var sourceSequence = this.GetCurrentVersionSequenceForSource(context, sourceKey);
 
                 foreach (var itm in context.Query<TDbModel>(domainExpression)) {

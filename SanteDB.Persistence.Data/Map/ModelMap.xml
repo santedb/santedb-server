@@ -202,9 +202,15 @@
        domainClass="SanteDB.Persistence.Data.Model.DataType.DbGeoTag, SanteDB.Persistence.Data">
   </class>
 
-  <class modelClass="SanteDB.Core.Model.DataTypes.AssigningAuthority, SanteDB.Core.Model"
-       domainClass="SanteDB.Persistence.Data.Model.DataType.DbAssigningAuthority, SanteDB.Persistence.Data">
+  <class modelClass="SanteDB.Core.Model.DataTypes.IdentityDomain, SanteDB.Core.Model"
+       domainClass="SanteDB.Persistence.Data.Model.DataType.DbIdentityDomain, SanteDB.Persistence.Data">
     <property modelName="ModifiedOn" domainName="UpdatedTime" />
+  </class>
+
+  <class modelClass="SanteDB.Core.Model.DataTypes.AssigningAuthority, SanteDB.Core.Model"
+     domainClass="SanteDB.Persistence.Data.Model.DataType.DbAssigningAuthority, SanteDB.Persistence.Data">
+    <property modelName="ModifiedOn" domainName="CreationTime" />
+    <property modelName="SourceEntityKey" domainName="SourceKey" />
   </class>
 
   <class modelClass="SanteDB.Core.Model.Entities.EntityTelecomAddress, SanteDB.Core.Model"

@@ -29,11 +29,11 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
         /// </summary>
         private Guid GetOrCreateAA()
         {
-            var aaService = ApplicationServiceContext.Current.GetService<IAssigningAuthorityRepositoryService>();
+            var aaService = ApplicationServiceContext.Current.GetService<IIdentityDomainRepositoryService>();
             var aa = aaService.Get("HIN");
             if (aa == null)
             {
-                aa = aaService.Insert(new AssigningAuthority("HIN", "Health Identification Number", "2.25.303030") { Url = "http://hin.test" });
+                aa = aaService.Insert(new IdentityDomain("HIN", "Health Identification Number", "2.25.303030") { Url = "http://hin.test" });
             }
             return aa.Key.Value;
         }

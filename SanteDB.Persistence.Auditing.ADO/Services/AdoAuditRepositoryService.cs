@@ -656,7 +656,7 @@ namespace SanteDB.Persistence.Auditing.ADO.Services
         /// <summary>
         /// Map to a database sort expression
         /// </summary>
-        public Expression MapPropertyExpression<TReturn>(Expression<Func<AuditEventData, TReturn>> sortExpression)
+        public Expression MapExpression<TReturn>(Expression<Func<AuditEventData, TReturn>> sortExpression)
         {
             return this.m_mapper.MapModelExpression<AuditEventData, DbAuditEventData, TReturn>(sortExpression);
         }

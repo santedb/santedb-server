@@ -158,13 +158,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             foreach (var id in objectToVerify.Identifiers)
             {
                 // Get ID
-                DbAssigningAuthority dbAuth = null;
+                DbIdentityDomain dbAuth = null;
 
                 if (id.AuthorityKey.HasValue)
                 {
-                    dbAuth = this.m_adhocCache?.Get<DbAssigningAuthority>($"{DataConstants.AdhocAuthorityKey}{id.AuthorityKey}");
+                    dbAuth = this.m_adhocCache?.Get<DbIdentityDomain>($"{DataConstants.AdhocAuthorityKey}{id.AuthorityKey}");
                     if (dbAuth == null)
-                        dbAuth = context.FirstOrDefault<DbAssigningAuthority>(o => o.Key == id.AuthorityKey);
+                        dbAuth = context.FirstOrDefault<DbIdentityDomain>(o => o.Key == id.AuthorityKey);
                 }
                 else if (id.Authority == null)
                 {
@@ -172,16 +172,16 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 }
                 else if (id.Authority.Key.HasValue ) // Attempt lookup in adhoc cache then by db
                 {
-                    dbAuth = this.m_adhocCache?.Get<DbAssigningAuthority>($"{DataConstants.AdhocAuthorityKey}{id.Authority.Key}");
+                    dbAuth = this.m_adhocCache?.Get<DbIdentityDomain>($"{DataConstants.AdhocAuthorityKey}{id.Authority.Key}");
                     if (dbAuth == null)
-                        dbAuth = context.FirstOrDefault<DbAssigningAuthority>(o => o.Key == id.Authority.Key);
+                        dbAuth = context.FirstOrDefault<DbIdentityDomain>(o => o.Key == id.Authority.Key);
                 }
                 else
                 {
-                    dbAuth = this.m_adhocCache?.Get<DbAssigningAuthority>($"{DataConstants.AdhocAuthorityKey}{id.Authority.DomainName}");
+                    dbAuth = this.m_adhocCache?.Get<DbIdentityDomain>($"{DataConstants.AdhocAuthorityKey}{id.Authority.DomainName}");
                     if (dbAuth == null)
                     {
-                        dbAuth = context.FirstOrDefault<DbAssigningAuthority>(o => o.DomainName == id.Authority.DomainName);
+                        dbAuth = context.FirstOrDefault<DbIdentityDomain>(o => o.DomainName == id.Authority.DomainName);
                         if (dbAuth != null)
                             id.Authority.Key = dbAuth.Key;
                     }
@@ -216,10 +216,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 ).Any();
 
                 // Verify scope
-                IEnumerable<DbAuthorityScope> scopes = this.m_adhocCache?.Get<DbAuthorityScope[]>($"ado.aa.scp.{dbAuth.Key}");
+                IEnumerable<DbIdentityDomainScope> scopes = this.m_adhocCache?.Get<DbIdentityDomainScope[]>($"ado.aa.scp.{dbAuth.Key}");
                 if (scopes == null)
                 {
-                    scopes = context.Query<DbAuthorityScope>(o => o.SourceKey == dbAuth.Key);
+                    scopes = context.Query<DbIdentityDomainScope>(o => o.SourceKey == dbAuth.Key);
                     this.m_adhocCache?.Add($"{DataConstants.AdhocAuthorityScopeKey}{dbAuth.Key}", scopes.ToArray());
                 }
 
@@ -236,14 +236,19 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     yield return new DetectedIssue(validation.Uniqueness.ToPriority(), DataConstants.IdentifierNotUnique, $"Identifier {id.Value} in domain {dbAuth.DomainName} violates unique constraint", DetectedIssueKeys.FormalConstraintIssue);
                 }
 
-                if (dbAuth.AssigningApplicationKey.HasValue) // Must have permission
+                var asgnAppKeys = this.m_adhocCache.Get<Dictionary<Guid, IdentifierReliability>>($"{DataConstants.AdhocAuthorityAssignerKey}{dbAuth.Key}");
+                if(asgnAppKeys == null)
                 {
-                    if (context.GetProvenance().ApplicationKey == dbAuth.AssigningApplicationKey)
+                    asgnAppKeys = context.Query<DbAssigningAuthority>(o => o.SourceKey == dbAuth.Key && o.ObsoletionTime == null).ToDictionary(o=>o.AssigningApplicationKey, o=>o.Reliability);
+                    this.m_adhocCache.Add($"{DataConstants.AdhocAuthorityAssignerKey}{dbAuth.Key}", asgnAppKeys);
+                }
+                if (asgnAppKeys.Any()) // Must have permission
+                {
+                    if(asgnAppKeys.TryGetValue(context.GetProvenance().ApplicationKey, out var reliability))
                     {
-                        id.Reliability = IdentifierReliability.Authoritative;
+                        id.Reliability = reliability;
                     }
-                    else if (objectToVerify.CreatedByKey != dbAuth.AssigningApplicationKey  // original prov key
-                        && !ownedByMe
+                    else if(!ownedByMe
                         && !ownedByOthers) // and has not already been assigned to me or anyone else (it is a new , unknown identifier)
                     {
                         id.Reliability = IdentifierReliability.Informative;

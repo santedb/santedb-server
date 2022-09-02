@@ -41,7 +41,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                     GenderConceptKey = NullReasonKeys.NoInformation,
                     Identifiers = new List<Core.Model.DataTypes.EntityIdentifier>()
                     {
-                        new Core.Model.DataTypes.EntityIdentifier(AssigningAuthorityKeys.Gs1GlobalTradeIdentificationNumber, "123")
+                        new Core.Model.DataTypes.EntityIdentifier(IdentityDomainKeys.Gs1GlobalTradeIdentificationNumber, "123")
                     },
                     Names = new List<EntityName>()
                     {

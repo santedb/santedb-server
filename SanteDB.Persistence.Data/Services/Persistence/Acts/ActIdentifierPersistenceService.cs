@@ -46,13 +46,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                     retVal.SetLoaded(nameof(EntityIdentifier.IdentifierType));
                     goto case LoadMode.SyncLoad;
                 case LoadMode.SyncLoad:
-                    retVal.Authority = retVal.Authority.GetRelatedMappingProvider().ToModelInstance(context, referenceObjects.OfType<DbAssigningAuthority>().FirstOrDefault()) ??
+                    retVal.Authority = retVal.Authority.GetRelatedMappingProvider().ToModelInstance(context, referenceObjects.OfType<DbIdentityDomain>().FirstOrDefault()) ??
                         retVal.Authority.GetRelatedPersistenceService().Get(context, dbModel.AuthorityKey);
                     retVal.SetLoaded(o=>o.Authority);
                     break;
 
                 case LoadMode.QuickLoad:
-                    retVal.Authority = retVal.Authority.GetRelatedMappingProvider().ToModelInstance(context, referenceObjects.OfType<DbAssigningAuthority>().FirstOrDefault());
+                    retVal.Authority = retVal.Authority.GetRelatedMappingProvider().ToModelInstance(context, referenceObjects.OfType<DbIdentityDomain>().FirstOrDefault());
                     if (retVal.Authority != null)
                     {
                         retVal.SetLoaded(o => o.Authority);

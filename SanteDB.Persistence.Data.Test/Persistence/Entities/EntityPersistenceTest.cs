@@ -311,7 +311,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 },
                     Identifiers = new List<Core.Model.DataTypes.EntityIdentifier>()
                     {
-                        new Core.Model.DataTypes.EntityIdentifier(new AssigningAuthority("TEST_3", "TESTING", "1.2.3.4.5.5"), "TEST3")
+                        new Core.Model.DataTypes.EntityIdentifier(new IdentityDomain("TEST_3", "TESTING", "1.2.3.4.5.5"), "TEST3")
                     }
                 };
 
@@ -420,7 +420,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 },
                     Identifiers = new List<EntityIdentifier>()
                     {
-                        new EntityIdentifier(new AssigningAuthority("TEST8", "TEST8", "2.25.438792"), "TEST_8")
+                        new EntityIdentifier(new IdentityDomain("TEST8", "TEST8", "2.25.438792"), "TEST_8")
                     },
                     Telecoms = new List<EntityTelecomAddress>()
                     {
@@ -596,7 +596,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
             using (AuthenticationContext.EnterSystemContext())
             {
                 Guid aaUuid = Guid.NewGuid();
-                var aa = base.TestInsert<AssigningAuthority>(new AssigningAuthority()
+                var aa = base.TestInsert<IdentityDomain>(new IdentityDomain()
                 {
                     Key = aaUuid,
                     DomainName = "TESTSTRESS",
@@ -664,7 +664,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
             using (AuthenticationContext.EnterSystemContext())
             {
                 Guid aaUuid = Guid.NewGuid();
-                var aa = base.TestInsert<AssigningAuthority>(new AssigningAuthority()
+                var aa = base.TestInsert<IdentityDomain>(new IdentityDomain()
                 {
                     Key = aaUuid,
                     DomainName = "TESTSTRESS3",
@@ -714,7 +714,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
             using (AuthenticationContext.EnterSystemContext())
             {
                 Guid aaUuid = Guid.NewGuid();
-                var aa = base.TestInsert<AssigningAuthority>(new AssigningAuthority()
+                var aa = base.TestInsert<IdentityDomain>(new IdentityDomain()
                 {
                     Key = aaUuid,
                     DomainName = "TESTSTRESS4",

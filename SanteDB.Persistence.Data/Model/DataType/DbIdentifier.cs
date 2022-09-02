@@ -16,6 +16,7 @@
  * User: fyfej (Justin Fyfe)
  * Date: 2019-11-27
  */
+using SanteDB.Core.Model.DataTypes;
 using SanteDB.OrmLite.Attributes;
 using SanteDB.Persistence.Data.Model.Acts;
 using SanteDB.Persistence.Data.Model.Entities;
@@ -57,7 +58,7 @@ namespace SanteDB.Persistence.Data.Model.DataType
         /// Gets or sets the authority identifier.
         /// </summary>
         /// <value>The authority identifier.</value>
-        [Column("aut_id"), ForeignKey(typeof(DbAssigningAuthority), nameof(DbAssigningAuthority.Key)), AlwaysJoin]
+        [Column("dmn_id"), ForeignKey(typeof(DbIdentityDomain), nameof(DbIdentityDomain.Key)), AlwaysJoin]
         public Guid AuthorityKey
         {
             get;
@@ -81,6 +82,12 @@ namespace SanteDB.Persistence.Data.Model.DataType
         /// </summary>
         [Column("chk_dgt")]
         public String CheckDigit { get; set; }
+
+        /// <summary>
+        /// Identifier reliability
+        /// </summary>
+        [Column("rel")]
+        public IdentifierReliability Reliability { get; set; }
     }
 
     /// <summary>

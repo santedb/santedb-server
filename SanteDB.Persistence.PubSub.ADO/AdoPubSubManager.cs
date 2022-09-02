@@ -749,7 +749,7 @@ namespace SanteDB.Persistence.PubSub.ADO
         /// <summary>
         /// Map property expression
         /// </summary>
-        public Expression MapPropertyExpression<TReturn>(Expression<Func<PubSubSubscriptionDefinition, TReturn>> sortExpression)
+        public Expression MapExpression<TReturn>(Expression<Func<PubSubSubscriptionDefinition, TReturn>> sortExpression)
         {
             return this.m_mapper.MapModelExpression<PubSubSubscriptionDefinition, DbSubscription, TReturn>(sortExpression, true);
         }
@@ -786,7 +786,7 @@ namespace SanteDB.Persistence.PubSub.ADO
         /// <summary>
         /// Map property expression
         /// </summary>
-        public Expression MapPropertyExpression<TReturn>(Expression<Func<PubSubChannelDefinition, TReturn>> sortExpression)
+        public Expression MapExpression<TReturn>(Expression<Func<PubSubChannelDefinition, TReturn>> sortExpression)
         {
             return this.m_mapper.MapModelExpression<PubSubChannelDefinition, DbChannel, TReturn>(sortExpression, true);
         }

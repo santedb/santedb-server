@@ -997,7 +997,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// <summary>
         /// Map the sorting expression
         /// </summary>
-        public virtual Expression MapPropertyExpression<TResult>(Expression<Func<TModel, TResult>> sortExpression)
+        public virtual Expression MapExpression<TResult>(Expression<Func<TModel, TResult>> sortExpression)
         {
             if (sortExpression == null)
             {
@@ -1005,6 +1005,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }
             return this.m_modelMapper.MapModelExpression<TModel, TDbModel, TResult>(sortExpression);
         }
+
 
         /// <summary>
         /// ADO Persistence provider for query

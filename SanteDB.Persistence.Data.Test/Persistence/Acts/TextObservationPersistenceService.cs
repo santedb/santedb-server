@@ -22,12 +22,12 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Acts
     public class TextObservationPersistenceService : DataPersistenceTest
     {
 
-        private AssigningAuthority CreateAA()
+        private IdentityDomain CreateAA()
         {
-            var aa = base.TestQuery<AssigningAuthority>(o => o.DomainName == "TEXT-OBSERVATION", null).FirstOrDefault();
+            var aa = base.TestQuery<IdentityDomain>(o => o.DomainName == "TEXT-OBSERVATION", null).FirstOrDefault();
             if (aa == null)
             {
-                aa = new AssigningAuthority("TEXT-OBSERVATION", "TEXT OBSERVATIONS", "2.25.30302932932032");
+                aa = new IdentityDomain("TEXT-OBSERVATION", "TEXT OBSERVATIONS", "2.25.30302932932032");
             }
             return aa;
         }

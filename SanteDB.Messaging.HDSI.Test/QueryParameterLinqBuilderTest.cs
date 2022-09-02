@@ -167,7 +167,7 @@ namespace SanteDB.Messaging.HDSI.Test
 			Expression<Func<Entity, bool>> expected = (o => o.Identifiers.Any(identifier => identifier.Authority.Oid == "1.2.3.4" && identifier.Value == "123"));
 
 			NameValueCollection httpQueryParameters = new NameValueCollection();
-			httpQueryParameters.Add("identifier.authority.oid", "1.2.3.4");
+			httpQueryParameters.Add("identifier.domain.oid", "1.2.3.4");
 			httpQueryParameters.Add("identifier.value", "123");
 			var expr = QueryExpressionParser.BuildLinqExpression<Patient>(httpQueryParameters);
 			Assert.AreEqual(expected.ToString(), expr.ToString());

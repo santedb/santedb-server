@@ -25,6 +25,11 @@ namespace SanteDB.Persistence.Data
         internal const string AdhocAuthorityScopeKey = "ado.aa.scp.";
 
         /// <summary>
+        /// Adhoc authority assignment key
+        /// </summary>
+        internal const string AdhocAuthorityAssignerKey = "ado.aa.asg.";
+
+        /// <summary>
         /// Identity domain could not be found
         /// </summary>
         public const string IdentifierDomainNotFound = "id.aa.notFound";
@@ -58,8 +63,6 @@ namespace SanteDB.Persistence.Data
         /// Identity domain check digit provider returned false
         /// </summary>
         public const string IdentifierCheckDigitFailed = "id.check.fail";
-
-
 
     }
 }
