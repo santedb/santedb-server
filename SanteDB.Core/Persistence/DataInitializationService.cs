@@ -112,7 +112,7 @@ namespace SanteDB.Server.Core.Persistence
 
                 int i = 0;
                 // Can this dataset be installed as a bundle?
-                if (ds.Action.All(o => o is DataUpdate && (o as DataUpdate).InsertIfNotExists && !(o.Element is IVersionedAssociation)) && ds.Action.Count < 1000)
+                if (ds.Action.All(o => o is DataUpdate && (o as DataUpdate).InsertIfNotExists && !(o.Element is IVersionedAssociation)))
                 {
                     this.m_traceSource.TraceVerbose("Will install as a bundle");
                     var bundle = new Bundle()

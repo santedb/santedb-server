@@ -30,10 +30,10 @@
   </sections>
   <section xsi:type="DiagnosticsConfigurationSection">
     <sources>
-      <add name="SanteDB" filter="Verbose" />
+      <add name="SanteDB" filter="Informational" />
     </sources>
     <writers>
-      <add name="main" initializationData="santedb.log" filter="Verbose">
+      <add name="main" initializationData="santedb.log" filter="Informational">
         <writer>SanteDB.Server.Core.Diagnostics.DebugDiagnosticsTraceWriter, SanteDB.Server.Core</writer>
       </add>
     </writers>
@@ -92,7 +92,7 @@
            fuzzyTotal="false"
            readWriteConnectionString="TEST_CONNECTION"
            readOnlyConnectionString="TEST_CONNECTION"
-           traceSql="true"
+           traceSql="false"
            providerType="FirebirdSQL"
            versioning="default"
            staOnly="false"

@@ -1,5 +1,6 @@
 ﻿using SanteDB.Core.i18n;
 using SanteDB.Core.Model;
+using SanteDB.Core.Model.Acts;
 using SanteDB.Core.Model.Interfaces;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
@@ -45,7 +46,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                 versionSequence = context.Query<DbActVersion>(o => o.Key == sourceKey && !o.ObsoletionTime.HasValue).OrderByDescending(o => o.VersionSequenceId).FirstOrDefault()?.VersionSequenceId ?? -1;
                 if (versionSequence == -1)
                 {
-                    throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_FOUND, new { id = sourceKey, type = "Act" }));
+                    throw new KeyNotFoundException(this.m_localizationService.GetString(ErrorMessageStrings.NOT_FOUND, new { id = sourceKey, type = nameof(Act) }));
                 }
                 context.Data.Add($"Act{sourceKey}Version", versionSequence);
                 return versionSequence;

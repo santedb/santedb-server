@@ -503,10 +503,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Entities
 
             if (data.Policies != null)
             {
-                retVal.Policies = this.UpdateInternalAssociations(context, retVal.Key.Value, data.Policies.Select(o => new DbEntitySecurityPolicy()
+                retVal.Policies = this.UpdateInternalVersoinedAssociations(context, retVal.Key.Value, retVal.VersionSequence.GetValueOrDefault(), data.Policies.Select(o => new DbEntitySecurityPolicy()
                 {
                     PolicyKey = o.PolicyKey.Value
-                }), o => o.SourceKey == retVal.Key && !o.ObsoleteVersionSequenceId.HasValue).Select(o => o.ToSecurityPolicyInstance(context)).ToList();
+                })).Select(o => o.ToSecurityPolicyInstance(context)).ToList();
             }
 
             if (data.Relationships != null)

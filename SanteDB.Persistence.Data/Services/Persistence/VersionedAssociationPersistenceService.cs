@@ -125,7 +125,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             if (this.m_configuration.VersioningPolicy.HasFlag(Configuration.AdoVersioningPolicyFlags.AssociationVersioning))
             {
                 var existing = context.FirstOrDefault<TDbModel>(o => o.Key == key);
-
                 // Get the source table
                 switch (deletionMode)
                 {
@@ -189,6 +188,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 dbModel.ObsoleteVersionSequenceId = this.GetCurrentVersionSequenceForSource(context, dbModel.SourceKey);
             }
+            dbModel.ObsoleteVersionSequenceIdSpecified = true;
 
             return base.DoUpdateInternal(context, dbModel);
         }

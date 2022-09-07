@@ -104,7 +104,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 newVersion.VersionKey = Guid.NewGuid();
                 newVersion.IsHeadVersion = true;
 
-                if(oldVersion.IsHeadVersion)
+                if (oldVersion.IsHeadVersion)
                 {
                     oldVersion.IsHeadVersion = false;
                     context.Update(oldVersion);
@@ -170,7 +170,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 {
                     throw new InvalidOperationException(String.Format(ErrorMessages.DEPENDENT_PROPERTY_NULL, "Authority"));
                 }
-                else if (id.Authority.Key.HasValue ) // Attempt lookup in adhoc cache then by db
+                else if (id.Authority.Key.HasValue) // Attempt lookup in adhoc cache then by db
                 {
                     dbAuth = this.m_adhocCache?.Get<DbIdentityDomain>($"{DataConstants.AdhocAuthorityKey}{id.Authority.Key}");
                     if (dbAuth == null)
@@ -236,19 +236,19 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     yield return new DetectedIssue(validation.Uniqueness.ToPriority(), DataConstants.IdentifierNotUnique, $"Identifier {id.Value} in domain {dbAuth.DomainName} violates unique constraint", DetectedIssueKeys.FormalConstraintIssue);
                 }
 
-                var asgnAppKeys = this.m_adhocCache.Get<Dictionary<Guid, IdentifierReliability>>($"{DataConstants.AdhocAuthorityAssignerKey}{dbAuth.Key}");
-                if(asgnAppKeys == null)
+                var asgnAppKeys = this.m_adhocCache?.Get<Dictionary<Guid, IdentifierReliability>>($"{DataConstants.AdhocAuthorityAssignerKey}{dbAuth.Key}");
+                if (asgnAppKeys == null)
                 {
-                    asgnAppKeys = context.Query<DbAssigningAuthority>(o => o.SourceKey == dbAuth.Key && o.ObsoletionTime == null).ToDictionary(o=>o.AssigningApplicationKey, o=>o.Reliability);
-                    this.m_adhocCache.Add($"{DataConstants.AdhocAuthorityAssignerKey}{dbAuth.Key}", asgnAppKeys);
+                    asgnAppKeys = context.Query<DbAssigningAuthority>(o => o.SourceKey == dbAuth.Key && o.ObsoletionTime == null).ToDictionary(o => o.AssigningApplicationKey, o => o.Reliability);
+                    this.m_adhocCache?.Add($"{DataConstants.AdhocAuthorityAssignerKey}{dbAuth.Key}", asgnAppKeys);
                 }
                 if (asgnAppKeys.Any()) // Must have permission
                 {
-                    if(asgnAppKeys.TryGetValue(context.GetProvenance().ApplicationKey, out var reliability))
+                    if (asgnAppKeys.TryGetValue(context.GetProvenance().ApplicationKey, out var reliability))
                     {
                         id.Reliability = reliability;
                     }
-                    else if(!ownedByMe
+                    else if (!ownedByMe
                         && !ownedByOthers) // and has not already been assigned to me or anyone else (it is a new , unknown identifier)
                     {
                         id.Reliability = IdentifierReliability.Informative;
@@ -698,7 +698,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             // Ensure that we always apply HEAD filter
             var headProperty = Expression.MakeMemberAccess(query.Parameters[0], typeof(TModel).GetProperty(nameof(IVersionedData.IsHeadVersion)));
             return base.ApplyDefaultQueryFilters(Expression.Lambda<Func<TModel, bool>>(Expression.And(query.Body, Expression.MakeBinary(ExpressionType.Equal, headProperty, Expression.Constant(true))), query.Parameters[0]));
-            
+
         }
 
         /// <inheritdoc/>
@@ -740,26 +740,44 @@ namespace SanteDB.Persistence.Data.Services.Persistence
 
             // Next we want to perform a relationship query to establish what is being loaded and what is being persisted
             // TODO: Determine if this line performs better than selecting the entire object (I suspect it would - but need to check)
+            var assocKeys = associations.Select(k => k.Key).ToArray();
+            var existing = persistenceService.Query(context, o => o.SourceEntityKey == data.Key && o.ObsoleteVersionSequenceId == null || assocKeys.Contains(o.Key)).Select(o => o.Key).ToArray();
+            var associationKeys = associations.Select(o => o.Key).ToArray();
+            var toDelete = associations.Where(a => a.BatchOperation == BatchOperationType.Delete).Select(o => o.Key)
+                .Union(existing.Where(e=>!associationKeys.Contains(e))).ToArray();
 
-            var existing = persistenceService.Query(context, o => o.SourceEntityKey == data.Key && o.ObsoleteVersionSequenceId == null).Select(o => o.Key).ToArray();
+            // Anything to remove?
+            if (toDelete.Any())
+            {
+                // Deletion mode or update mode for the associations as a batch
+                var dbType = this.m_modelMapper.GetModelMapper(typeof(TModelAssociation)).TargetType;
+                var whereClause = this.m_modelMapper.MapModelExpression<TModelAssociation, bool>(o => toDelete.Contains(o.Key), dbType);
+                if (this.m_configuration.VersioningPolicy.HasFlag(Configuration.AdoVersioningPolicyFlags.AssociationVersioning))
+                {
+                    var updateClause = this.m_modelMapper.MapModelExpression<TModelAssociation, bool>(o => o.ObsoleteVersionSequenceId == data.VersionSequence, dbType);
+                    context.UpdateAll(dbType, whereClause, updateClause);
+                }
+                else
+                {
+                    context.DeleteAll(dbType, whereClause);
+                }
+            }
 
-            // Which are new and which are not?
-            var removedRelationships = existing.Where(o => associations.Any(a => a.Key == o && a.BatchOperation == BatchOperationType.Delete) || !associations.Any(a => a.Key == o)).Select(a => persistenceService.Delete(context, a.Value, DataPersistenceControlContext.Current?.DeleteMode ?? this.m_configuration.DeleteStrategy));
-            var addedRelationships = associations.Where(o => o.BatchOperation != BatchOperationType.Delete && (!o.Key.HasValue || !existing.Any(a => a == o.Key))).Select(a =>
+            var addedRelationships = associations.Where(o => o.BatchOperation != BatchOperationType.Delete && (!o.Key.HasValue || !existing.Contains(o.Key))).Select(a =>
            {
                a.EffectiveVersionSequenceId = data.VersionSequence;
                a = persistenceService.Insert(context, a);
                a.BatchOperation = Core.Model.DataTypes.BatchOperationType.Insert;
                return a;
            });
-            var updatedRelationships = associations.Where(o => o.BatchOperation != BatchOperationType.Delete && o.Key.HasValue && existing.Any(a => a == o.Key)).Select(a =>
+            var updatedRelationships = associations.Where(o => o.BatchOperation != BatchOperationType.Delete && o.Key.HasValue && existing.Contains(o.Key)).Select(a =>
             {
                 a = persistenceService.Update(context, a);
                 a.BatchOperation = Core.Model.DataTypes.BatchOperationType.Update;
                 return a;
             });
 
-            return updatedRelationships.Union(addedRelationships).Except(removedRelationships).ToArray();
+            return updatedRelationships.Union(addedRelationships).ToArray();
         }
 
         /// <summary>

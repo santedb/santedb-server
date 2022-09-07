@@ -52,6 +52,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
     /// </summary>
     public interface IAdoPersistenceProvider<TModel> : IAdoPersistenceProvider
     {
+
         /// <summary>
         /// Query for <paramref name="filter"/> on <paramref name="context"/>
         /// </summary>
