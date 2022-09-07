@@ -21,6 +21,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Reflection;
+using SanteDB.Core.Model.Entities;
 
 namespace SanteDB.Persistence.Data.Services.Persistence
 {
@@ -202,18 +203,39 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 }
 
                 // Get this identifier records which is not owned by my record
-                var ownedByOthers = context.Query<DbEntityIdentifier>(
-                    context.CreateSqlStatement()
-                    .SelectFrom(typeof(DbEntityIdentifier))
-                    .Where<DbEntityIdentifier>(o => o.Value == id.Value && o.AuthorityKey == id.Authority.Key && o.ObsoleteVersionSequenceId == null && o.SourceKey != objectToVerify.Key)
-                    .And("NOT EXISTS (SELECT 1 FROM ent_rel_tbl WHERE (src_ent_id = ? AND trg_ent_id = ent_id_tbl.ent_id OR trg_ent_id = ? AND src_ent_id = ent_id_tbl.ent_id) AND obslt_vrsn_seq_id IS NULL)", objectToVerify.Key, objectToVerify.Key)
-                ).Any();
-                var ownedByMe = context.Query<DbEntityIdentifier>(
-                    context.CreateSqlStatement()
-                    .SelectFrom(typeof(DbEntityIdentifier))
-                    .Where<DbEntityIdentifier>(o => o.Value == id.Value && o.AuthorityKey == id.Authority.Key && o.ObsoleteVersionSequenceId == null)
-                    .And("(ent_id = ? OR EXISTS (SELECT 1 FROM ent_rel_tbl WHERE (src_ent_id = ?  AND trg_ent_id = ent_id_tbl.ent_id) OR (trg_ent_id = ? AND src_ent_id = ent_id_tbl.ent_id) AND obslt_vrsn_seq_id IS NULL))", objectToVerify.Key, objectToVerify.Key, objectToVerify.Key)
-                ).Any();
+                bool ownedByOthers , ownedByMe;
+
+                if (objectToVerify is Entity)
+                {
+                    ownedByOthers = context.Query<DbEntityIdentifier>(
+                        context.CreateSqlStatement()
+                        .SelectFrom(typeof(DbEntityIdentifier))
+                        .Where<DbEntityIdentifier>(o => o.Value == id.Value && o.AuthorityKey == id.Authority.Key && o.ObsoleteVersionSequenceId == null && o.SourceKey != objectToVerify.Key)
+                        .And("NOT EXISTS (SELECT 1 FROM ent_rel_tbl WHERE (src_ent_id = ? AND trg_ent_id = ent_id_tbl.ent_id OR trg_ent_id = ? AND src_ent_id = ent_id_tbl.ent_id) AND obslt_vrsn_seq_id IS NULL)", objectToVerify.Key, objectToVerify.Key)
+                    ).Any();
+                    ownedByMe = context.Query<DbEntityIdentifier>(
+                        context.CreateSqlStatement()
+                        .SelectFrom(typeof(DbEntityIdentifier))
+                        .Where<DbEntityIdentifier>(o => o.Value == id.Value && o.AuthorityKey == id.Authority.Key && o.ObsoleteVersionSequenceId == null)
+                        .And("(ent_id = ? OR EXISTS (SELECT 1 FROM ent_rel_tbl WHERE (src_ent_id = ?  AND trg_ent_id = ent_id_tbl.ent_id) OR (trg_ent_id = ? AND src_ent_id = ent_id_tbl.ent_id) AND obslt_vrsn_seq_id IS NULL))", objectToVerify.Key, objectToVerify.Key, objectToVerify.Key)
+                    ).Any();
+                }
+                else
+                {
+                    ownedByOthers = context.Query<DbActIdentifier>(
+                        context.CreateSqlStatement()
+                        .SelectFrom(typeof(DbActIdentifier))
+                        .Where<DbActIdentifier>(o => o.Value == id.Value && o.AuthorityKey == id.Authority.Key && o.ObsoleteVersionSequenceId == null && o.SourceKey != objectToVerify.Key)
+                        .And("NOT EXISTS (SELECT 1 FROM act_rel_tbl WHERE (src_act_id = ? AND trg_act_id = act_id_tbl.act_id OR trg_act_id = ? AND src_act_id = act_id_tbl.act_id) AND obslt_vrsn_seq_id IS NULL)", objectToVerify.Key, objectToVerify.Key)
+                    ).Any();
+                    ownedByMe = context.Query<DbActIdentifier>(
+                        context.CreateSqlStatement()
+                        .SelectFrom(typeof(DbActIdentifier))
+                        .Where<DbActIdentifier>(o => o.Value == id.Value && o.AuthorityKey == id.Authority.Key && o.ObsoleteVersionSequenceId == null)
+                        .And("(act_id = ? OR EXISTS (SELECT 1 FROM act_rel_tbl WHERE (src_act_id = ?  AND trg_act_id = act_id_tbl.act_id) OR (trg_act_id = ? AND src_act_id = act_id_tbl.act_id) AND obslt_vrsn_seq_id IS NULL))", objectToVerify.Key, objectToVerify.Key, objectToVerify.Key)
+                    ).Any();
+
+                }
 
                 // Verify scope
                 IEnumerable<DbIdentityDomainScope> scopes = this.m_adhocCache?.Get<DbIdentityDomainScope[]>($"ado.aa.scp.{dbAuth.Key}");
