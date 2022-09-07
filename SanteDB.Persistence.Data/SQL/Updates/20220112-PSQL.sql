@@ -4,6 +4,7 @@
  *	<isInstalled>select ck_patch('20220112-01')</isInstalled>
  * </feature>
  */
+ CREATE EXTENSION IF NOT EXISTS fuzzystrmatch;
 CREATE TABLE IF NOT EXISTS ft_ent_systbl 
 (
 	ent_id UUID NOT NULL DEFAULT uuid_generate_v1(),

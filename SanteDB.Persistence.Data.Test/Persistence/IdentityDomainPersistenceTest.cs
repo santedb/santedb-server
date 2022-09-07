@@ -120,7 +120,6 @@ namespace SanteDB.Persistence.Data.Test.Persistence
             Assert.AreEqual(aa.Oid, aa2.Oid);
             Assert.AreEqual(aa.Url, aa2.Url);
             Assert.AreEqual(1, aa2.AuthorityScope.Count);
-            Assert.IsNull(aa2.AssigningAuthority);
             Assert.IsNotNull(aa2.LoadProperty(o => o.AssigningAuthority));
             // Now fetch by name
             var aa3 = persistenceService.Query(o => o.Url == "http://google.com/test2", AuthenticationContext.SystemPrincipal);
