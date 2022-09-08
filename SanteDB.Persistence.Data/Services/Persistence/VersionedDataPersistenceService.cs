@@ -22,6 +22,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Reflection;
 using SanteDB.Core.Model.Entities;
+using System.Collections.Concurrent;
+using SanteDB.Persistence.Data.Configuration;
 
 namespace SanteDB.Persistence.Data.Services.Persistence
 {
@@ -33,6 +35,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         where TDbModel : DbVersionedData, IDbHasStatus, new()
         where TDbKeyModel : DbIdentified, new()
     {
+
+        // Validation configuration
+        private IDictionary<Type, AdoValidationPolicy> m_validationConfiguration;
 
         // Class key map
         private Guid[] m_classKeyMap;
@@ -140,6 +145,9 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             {
                 this.m_classKeyMap = AppDomain.CurrentDomain.GetAllTypes().Where(o => typeof(TModel).IsAssignableFrom(o)).SelectMany(o => o.GetCustomAttributes<ClassConceptKeyAttribute>()).Select(o => Guid.Parse(o.ClassConcept)).ToArray();
             }
+
+            // Validation map
+            this.m_validationConfiguration = this.m_configuration.Validation.Where(o => o.Target == null || typeof(TModel).IsAssignableFrom(o.Target.Type)).ToDictionary(o => o.Target?.Type ?? typeof(Object), o => o);
         }
 
         /// <summary>
@@ -149,9 +157,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             where TToVerify : TModel, IHasIdentifiers
         {
             // Validate unique values for IDs
-            var validation = this.m_configuration.Validation.Find(o => o.Target?.Type == objectToVerify.GetType()) ??
-                this.m_configuration.Validation.Find(o => o.Target == null);
-            if (validation == null) // no special validation
+            if(!this.m_validationConfiguration.TryGetValue(objectToVerify.GetType(), out var validation) &&
+                !this.m_validationConfiguration.TryGetValue(typeof(object), out validation))
             {
                 yield break;
             }

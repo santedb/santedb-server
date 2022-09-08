@@ -688,7 +688,6 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                     };
 
                     base.TestInsert(entity);
-                    Thread.Sleep(250); // forces the creation time to be edited
                 });
 
                 var afterQuery = base.TestQuery<Entity>(o => o.Identifiers.Any(i => i.Value.Contains("TEST_CASE3_%")), 3).AsResultSet() as IOrderableQueryResultSet<Entity>;
