@@ -1,24 +1,22 @@
 @echo off
 set signtool="C:\Program Files (x86)\Windows Kits\10\bin\10.0.17763.0\x64\signtool.exe"
 set version=%1
-
-if exist "c:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\15.0\Bin\MSBuild.exe" (
-	    echo will use VS 2019 Community build tools
-        set msbuild="c:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\15.0\Bin"
-) else ( 
-	if exist "c:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\MSBuild\Current\Bin\MSBuild.exe" (
-        	set msbuild="c:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\MSBuild\Current\Bin"
-	        echo will use VS 2019 Pro build tools
+	if exist "C:\Program Files\Microsoft Visual Studio\2022\Professional\MSBuild\Current\Bin\MsBuild.exe" (
+	        	echo will use VS 2022 Pro build tools
+        		set msbuild="C:\Program Files\Microsoft Visual Studio\2022\Professional\MSBuild\Current\Bin\MsBuild.exe"
 	) else (
-		if exist "c:\Program Files\Microsoft Visual Studio\2022\Professional\MSBuild\Current\Bin\MSBuild.exe" (
-        	set msbuild="c:\Program Files\Microsoft Visual Studio\2022\Professional\MSBuild\Current\Bin"
-	        echo will use VS 2022 Pro build tools
-		) else (
-			echo Unable to locate VS 2019 or 2022 build tools, will use default build tools on path
-			goto :eof
+		if exist "c:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\15.0\Bin\MSBuild.exe" (
+	        	echo will use VS 2019 Community build tools
+        		set msbuild="c:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\15.0\Bin"
+		) else ( 
+			if exist "c:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\MSBuild\Current\Bin\MSBuild.exe" (
+        			set msbuild="c:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\MSBuild\Current\Bin"
+	        		echo will use VS 2019 Pro build tools
+			) else (
+				echo Unable to locate VS 2019 build tools, will use default build tools on path
+			)
 		)
 	)
-)
 
 if exist "c:\Program Files (x86)\Inno Setup 6\ISCC.exe" (
 	set inno="c:\Program Files (x86)\Inno Setup 6\ISCC.exe"
