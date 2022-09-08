@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
- - Copyright 2021-2021 SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ - Copyright 2021-2022 SanteSuite Contributors (See NOTICE.md for full copyright notices)
  - Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  - Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  -
@@ -17,7 +17,7 @@
  - the License.
  -
  - User: fyfej
- - Date: 2021-8-27
+ - Date: 2022-5-30
  -->
 <xs:schema xmlns:tns="http://santedb.org/data" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:q1="http://santedb.org/model" xmlns:q2="http://santedb.org/model" xmlns:q3="http://santedb.org/model" xmlns:q4="http://santedb.org/model" xmlns:q5="http://santedb.org/model" xmlns:q6="http://santedb.org/model" xmlns:q7="http://santedb.org/model" xmlns:q8="http://santedb.org/model" xmlns:q9="http://santedb.org/model" xmlns:q10="http://santedb.org/model" xmlns:q11="http://santedb.org/model" xmlns:q12="http://santedb.org/model" xmlns:q13="http://santedb.org/model" xmlns:q14="http://santedb.org/model" xmlns:q15="http://santedb.org/model" xmlns:q16="http://santedb.org/model" xmlns:q17="http://santedb.org/model" xmlns:q18="http://santedb.org/model" xmlns:q19="http://santedb.org/model" xmlns:q20="http://santedb.org/model" xmlns:q21="http://santedb.org/model" targetNamespace="http://santedb.org/data" elementFormDefault="qualified">
   <xs:import namespace="http://santedb.org/model" schemaLocation="OpenIZModel.xsd"/>

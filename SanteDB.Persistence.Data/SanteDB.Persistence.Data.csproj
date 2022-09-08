@@ -351,4 +351,8 @@
   <ItemGroup>
     <Folder Include="SQL\PSQL\Partitioning\" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <None Include="..\SanteDB.licenseheader" Link="SanteDB.licenseheader" />
+  </ItemGroup>
 </Project>
