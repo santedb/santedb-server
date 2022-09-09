@@ -591,10 +591,10 @@
       <!--<add type="SanteDB.Server.Core.Services.Impl.LocalRepositoryFactoryService, SanteDB.Server.Core" />-->
       <add type="SanteDB.BusinessRules.JavaScript.AppletDataReferenceResolver, SanteDB.BusinessRules.JavaScript" />
 
-      <add type="SanteDB.Server.Core.Services.Impl.LocalRepositoryService, SanteDB.Server.Core" />
-      <add type="SanteDB.Server.Core.Services.Impl.LocalMailMessageRepository, SanteDB.Server.Core" />
-      <add type="SanteDB.Server.Core.Services.Impl.LocalStockManagementRepositoryService, SanteDB.Server.Core" />
-      <add type="SanteDB.Server.Core.Services.Impl.LocalTagPersistenceService, SanteDB.Server.Core" />
+      <add type="SanteDB.Core.Services.Impl.Repository.LocalRepositoryFactory, SanteDB.Core.Api" />
+      <add type="SanteDB.Core.Services.Impl.LocalMailMessageRepository, SanteDB.Core.Api" />
+      <add type="SanteDB.Core.Services.Impl.LocalStockManagementRepositoryService, SanteDB.Core.Api" />
+      <add type="SanteDB.Core.Services.Impl.LocalTagPersistenceService, SanteDB.Core.Api" />
 
       <!-- Subscription Management / Definition Service -->
       <add type="SanteDB.Core.Applets.Services.Impl.AppletSubscriptionRepository, SanteDB.Core.Applets, Version=1.30.0.0, Culture=neutral, PublicKeyToken=null" />

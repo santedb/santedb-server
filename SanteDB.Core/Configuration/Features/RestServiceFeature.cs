@@ -43,6 +43,9 @@ namespace SanteDB.Server.Core.Configuration.Features
     /// <summary>
     /// Configuration for REST services on the gateway
     /// </summary>
+    /// <remarks>
+    /// This class resides in the Server core project rather than core rest services project because it relies on the Windows SSL netsh P/Invokes to bind certificates
+    /// </remarks>
     public class RestServiceFeature : IFeature
     {
         // Tracer

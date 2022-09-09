@@ -168,7 +168,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Npgsql">
-      <Version>6.0.2</Version>
+      <Version>6.0.6</Version>
     </PackageReference>
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe">
       <Version>6.0.0</Version>
@@ -216,6 +216,10 @@
     <ProjectReference Include="..\SanteDB.Core\SanteDB.Server.Core.csproj">
       <Project>{db9bc05e-45f1-4f96-a161-f36bdecaf566}</Project>
       <Name>SanteDB.Server.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SanteDB.Persistence.Data\SanteDB.Persistence.Data.csproj">
+      <Project>{ad152185-7ec6-428d-91a9-f79b83f6f406}</Project>
+      <Name>SanteDB.Persistence.Data</Name>
     </ProjectReference>
     <ProjectReference Include="..\SanteDB.Server\SanteDB.Server.csproj">
       <Project>{1d145e2a-c31e-467c-9f4a-6811e1604b67}</Project>

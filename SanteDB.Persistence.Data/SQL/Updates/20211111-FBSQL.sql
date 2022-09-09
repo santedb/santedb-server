@@ -1,5 +1,5 @@
 ﻿/** 
- * <feature scope="SanteDB.Persistence.Data.ADO" id="20211111-01" name="Update:20211111-01" applyRange="1.1.0.0-1.2.0.0"  invariantName="FirebirdSQL">
+ * <feature scope="SanteDB.Persistence.Data" id="20211111-01" name="Update:20211111-01" applyRange="1.1.0.0-1.2.0.0"  invariantName="FirebirdSQL">
  *	<summary>Update: Add PURGED status key</summary>
  *	<remarks>Adds status key PURGED to the database</remarks>
  *	<isInstalled>select ck_patch('20211111-01') from rdb$database</isInstalled>

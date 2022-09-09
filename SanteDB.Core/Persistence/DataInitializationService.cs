@@ -57,7 +57,7 @@ namespace SanteDB.Server.Core.Persistence
         public string ServiceName => "DataSet Initialization Service";
 
         // Trace source
-        private readonly Tracer m_traceSource = new Tracer(SanteDBConstants.DatasetInstallSourceName);
+        private readonly Tracer m_traceSource = Tracer.GetTracer(typeof(DataInitializationService));
 
         /// <summary>
         /// True when the service is running

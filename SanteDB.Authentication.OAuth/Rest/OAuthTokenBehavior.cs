@@ -56,8 +56,6 @@ using SanteDB.Core.Http;
 using SanteDB.Core.Model.Audit;
 using System.Net;
 using SanteDB.Rest.Common;
-using SanteDB.Server.Core.Rest.Behavior;
-using SanteDB.Server.Core.Rest.Security;
 using SanteDB.Core.Applets.Model;
 using SanteDB.Core.Applets;
 using SanteDB.Core.Security.Principal;
@@ -65,10 +63,9 @@ using SanteDB.Core.Interop;
 using System.Xml;
 using SanteDB.Core.Exceptions;
 using SanteDB.Server.Core.Configuration;
-using SanteDB.Server.Core.Security.Attribute;
-using SanteDB.Server.Core.Security;
 using SanteDB.Server.Core;
 using SanteDB.Core.Security.Configuration;
+using SanteDB.Rest.Common.Security;
 
 namespace SanteDB.Authentication.OAuth2.Rest
 {
@@ -382,11 +379,11 @@ namespace SanteDB.Authentication.OAuth2.Rest
 
             // Signing credentials for the application
             // TODO: Expose this as a configuration option - which key to use other than default
-            var signingCredentials = SecurityUtils.CreateSigningCredentials($"SA.{appid}");
+            var signingCredentials = CreateSigningCredentials($"SA.{appid}");
 
             // Was there a signing credentials provided for this application? If so, then create for default
             if (signingCredentials == null)
-                signingCredentials = SecurityUtils.CreateSigningCredentials(this.m_configuration.JwtSigningKey); // attempt to get default
+                signingCredentials = CreateSigningCredentials(this.m_configuration.JwtSigningKey); // attempt to get default
 
             // Is the default an HMAC256 key?
             if ((signingCredentials == null ||
@@ -422,9 +419,9 @@ namespace SanteDB.Authentication.OAuth2.Rest
         private OAuthTokenResponse EstablishSession(IPrincipal oizPrincipal, IPrincipal clientPrincipal, IPrincipal devicePrincipal, String scope, IEnumerable<IClaim> additionalClaims)
         {
             var claimsPrincipal = oizPrincipal as IClaimsPrincipal;
-            if (clientPrincipal is IClaimsPrincipal && !claimsPrincipal.Identities.OfType<Server.Core.Security.ApplicationIdentity>().Any(o => o.Name == clientPrincipal.Identity.Name))
+            if (clientPrincipal is IClaimsPrincipal && !claimsPrincipal.Identities.OfType<IApplicationIdentity>().Any(o => o.Name == clientPrincipal.Identity.Name))
                 claimsPrincipal.AddIdentity(clientPrincipal.Identity as IClaimsIdentity);
-            if (devicePrincipal is IClaimsPrincipal && !claimsPrincipal.Identities.OfType<DeviceIdentity>().Any(o => o.Name == devicePrincipal.Identity.Name))
+            if (devicePrincipal is IClaimsPrincipal && !claimsPrincipal.Identities.OfType<IDeviceIdentity>().Any(o => o.Name == devicePrincipal.Identity.Name))
                 claimsPrincipal.AddIdentity(devicePrincipal.Identity as IClaimsIdentity);
 
             String remoteIp =
@@ -832,6 +829,56 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 throw new Exception("Error generating OpenID Metadata", e);
             }
         }
+
+        /// <summary>
+        /// Create signing credentials
+        /// </summary>
+        /// <param name="keyName">The name of the key to use in the configuration, or null to use a default key</param>
+        private SigningCredentials CreateSigningCredentials(string keyName)
+        {
+
+            var configuration = this.m_masterConfig.Signatures.FirstOrDefault(o => o.KeyName == keyName || o.KeyName == "default");
+                return null;
+
+            // No specific configuration for the key name is found?
+            SigningCredentials retVal = null;
+
+            // Signing credentials
+            switch (configuration.Algorithm)
+            {
+                case SignatureAlgorithm.RS256:
+                case SignatureAlgorithm.RS512:
+                    var cert = configuration.Certificate;
+                    if (cert == null)
+                        throw new SecurityException("Cannot find certificate to sign data!");
+
+                    // Signature algorithm
+                    string signingAlgorithm = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256",
+                        digestAlgorithm = "http://www.w3.org/2001/04/xmlenc#sha256";
+                    if (configuration.Algorithm == SignatureAlgorithm.RS512)
+                    {
+                        signingAlgorithm = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512";
+                        digestAlgorithm = "http://www.w3.org/2001/04/xmlenc#sha512";
+                    }
+                    retVal = new X509SigningCredentials(cert, new SecurityKeyIdentifier(new NamedKeySecurityKeyIdentifierClause("name", configuration.KeyName ?? "0")), signingAlgorithm, digestAlgorithm);
+                    break;
+                case SignatureAlgorithm.HS256:
+                    byte[] secret = configuration.GetSecret().ToArray();
+                    while (secret.Length < 16)
+                        secret = secret.Concat(secret).ToArray();
+                    retVal = new SigningCredentials(
+                        new InMemorySymmetricSecurityKey(secret),
+                        "http://www.w3.org/2001/04/xmldsig-more#hmac-sha256",
+                        "http://www.w3.org/2001/04/xmlenc#sha256",
+                        new SecurityKeyIdentifier(new NamedKeySecurityKeyIdentifierClause("name", configuration.KeyName ?? "0"))
+                    );
+                    break;
+                default:
+                    throw new SecurityException("Invalid signing configuration");
+            }
+            return retVal;
+        }
+
 
         /// <summary>
         /// Get the specified session information

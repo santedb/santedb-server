@@ -23,7 +23,6 @@ using SanteDB.Core.Model.AMI.Auth;
 using SanteDB.Core.Model.AMI.Collections;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
-using SanteDB.Server.Core.Security.Attribute;
 using SanteDB.Messaging.AMI.Client;
 using SanteDB.Server.AdminConsole.Attributes;
 using SanteDB.Server.AdminConsole.Util;

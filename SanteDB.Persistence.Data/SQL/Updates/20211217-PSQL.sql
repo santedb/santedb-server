@@ -1,5 +1,5 @@
 ﻿/** 
- * <feature scope="SanteDB.Persistence.Data.ADO" id="20211217-01" name="Update:20211217-01" applyRange="1.1.0.0-1.2.0.0"  invariantName="npgsql">
+ * <feature scope="SanteDB.Persistence.Data" id="20211217-01" name="Update:20211217-01" applyRange="1.1.0.0-1.2.0.0"  invariantName="npgsql">
  *	<summary>Update: Change the VIP status concept set</summary>
  *	<isInstalled>select ck_patch('20211217-01')</isInstalled>
  * </feature>

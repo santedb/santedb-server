@@ -25,7 +25,6 @@ using SanteDB.Core.Model.AMI.Diagnostics;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
-using SanteDB.Server.Core.Security.Attribute;
 using SanteDB.Core.Services;
 using SanteDB.Persistence.Diagnostics.Email.Configuration;
 using System;
@@ -45,8 +44,7 @@ using SanteDB.Core.Diagnostics;
 using System.Diagnostics.Tracing;
 using SanteDB.Core.Model.Serialization;
 using SanteDB.Core.Notifications;
-
-using SanteDB.Server.Core.Security.Attribute;
+using SanteDB.Core.Security.Services;
 
 namespace SanteDB.Persistence.Diagnostics.Email
 {
@@ -58,6 +56,16 @@ namespace SanteDB.Persistence.Diagnostics.Email
     [ServiceProvider("E-Mail Diagnostic (Bug) Report Submission")]
     public class DiagnosticReportPersistenceService : IDataPersistenceService<DiagnosticReport>
     {
+
+        /// <summary>
+        /// Policy enforcement service
+        /// </summary>
+        /// <param name="policyEnforcementService"></param>
+        public DiagnosticReportPersistenceService(IPolicyEnforcementService policyEnforcementService)
+        {
+            this.m_pepService = policyEnforcementService;
+        }
+
         /// <summary>
         /// Gets the service name
         /// </summary>
@@ -65,6 +73,7 @@ namespace SanteDB.Persistence.Diagnostics.Email
 
         // Trace source
         private readonly Tracer m_traceSource = new Tracer("SanteDB.Persistence.Diagnostics.Email");
+        private readonly IPolicyEnforcementService m_pepService;
 
         // Configuration
         private DiagnosticEmailServiceConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<DiagnosticEmailServiceConfigurationSection>();
@@ -147,9 +156,11 @@ namespace SanteDB.Persistence.Diagnostics.Email
         /// <summary>
         /// Inserts the specified diagnostic report
         /// </summary>
-        [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.Login)]
         public DiagnosticReport Insert(DiagnosticReport storageData, TransactionMode mode, IPrincipal overrideAuthContext = null)
         {
+
+            this.m_pepService.Demand(PermissionPolicyIdentifiers.Login, overrideAuthContext ?? AuthenticationContext.Current.Principal);
+
             var persistenceArgs = new DataPersistingEventArgs<DiagnosticReport>(storageData, mode, overrideAuthContext);
             this.Inserting?.Invoke(this, persistenceArgs);
             if (persistenceArgs.Cancel)

@@ -25,7 +25,6 @@ using SanteDB.Core.Model.AMI.Diagnostics;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Security;
-using SanteDB.Server.Core.Security.Attribute;
 using SanteDB.Core.Services;
 using SanteDB.Persistence.Diagnostics.Jira.Configuration;
 using System;
@@ -42,7 +41,7 @@ using SanteDB.Core.Model.Query;
 using SanteDB.Core.Diagnostics;
 using System.Diagnostics.Tracing;
 using SanteDB.Core.Model.Serialization;
-using SanteDB.Server.Core.Http;
+using SanteDB.Core.Security.Services;
 
 namespace SanteDB.Persistence.Diagnostics.Jira
 {
@@ -61,6 +60,8 @@ namespace SanteDB.Persistence.Diagnostics.Jira
 
         // Trace source
         private readonly Tracer m_traceSource = new Tracer("SanteDB.Persistence.Diagnostics.Jira");
+        private readonly IPolicyEnforcementService m_pepService;
+        private readonly IRestClientFactory m_restFactory;
 
         // Configuration
         private JiraServiceConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<JiraServiceConfigurationSection>();
@@ -68,8 +69,10 @@ namespace SanteDB.Persistence.Diagnostics.Jira
         /// <summary>
         /// Initializes a new instance of the <see cref="JiraDiagnosticReportPersistenceService"/> class.
         /// </summary>
-        public JiraDiagnosticReportPersistenceService()
+        public JiraDiagnosticReportPersistenceService(IPolicyEnforcementService policyEnforcementService, IRestClientFactory restClientFactory)
         {
+            this.m_pepService = policyEnforcementService;
+            this.m_restFactory = restClientFactory;
         }
 
         /// <summary>
@@ -151,9 +154,11 @@ namespace SanteDB.Persistence.Diagnostics.Jira
         /// <summary>
         /// Inserts the specified diagnostic report
         /// </summary>
-        [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.Login)]
         public DiagnosticReport Insert(DiagnosticReport storageData, TransactionMode mode, IPrincipal overrideAuthContext = null)
         {
+
+            this.m_pepService.Demand(PermissionPolicyIdentifiers.Login, overrideAuthContext ?? AuthenticationContext.Current.Principal);
+
             var persistenceArgs = new DataPersistingEventArgs<DiagnosticReport>(storageData, mode, overrideAuthContext);
             this.Inserting?.Invoke(this, persistenceArgs);
             if (persistenceArgs.Cancel)
@@ -165,9 +170,8 @@ namespace SanteDB.Persistence.Diagnostics.Jira
             try
             {
                 // Send
-                var serviceClient = new JiraServiceClient(new RestClient(this.m_configuration));
+                var serviceClient = new JiraServiceClient(this.m_restFactory.CreateRestClient(this.m_configuration.ApiConfiguration));
 
-                serviceClient.Authenticate(new Model.JiraAuthenticationRequest(this.m_configuration.UserName, this.m_configuration.Password));
                 var issue = serviceClient.CreateIssue(new Model.JiraIssueRequest()
                 {
                     Fields = new Model.JiraIssueFields()

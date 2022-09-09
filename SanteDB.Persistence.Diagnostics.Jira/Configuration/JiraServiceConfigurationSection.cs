@@ -18,7 +18,9 @@
  * User: fyfej
  * Date: 2022-5-30
  */
+using Newtonsoft.Json;
 using SanteDB.Core.Configuration;
+using SanteDB.Core.Configuration.Http;
 using SanteDB.Core.Http;
 using SanteDB.Core.Http.Description;
 using System;
@@ -31,7 +33,7 @@ namespace SanteDB.Persistence.Diagnostics.Jira.Configuration
     /// JIRA Service configuration
     /// </summary>
     [XmlType(nameof(JiraServiceConfigurationSection), Namespace = "http://santedb.org/configuration")]
-    public class JiraServiceConfigurationSection : IConfigurationSection, IRestClientDescription
+    public class JiraServiceConfigurationSection : IConfigurationSection
     {
         /// <summary>
         /// Creates a new jira service configuration
@@ -41,21 +43,10 @@ namespace SanteDB.Persistence.Diagnostics.Jira.Configuration
         }
 
         /// <summary>
-        /// Accept
+        /// Gets the API configuration
         /// </summary>
-        public string Accept => "application/json";
-
-        /// <summary>
-        /// Gets or sets the username
-        /// </summary>
-        [XmlAttribute("userName"), ConfigurationRequired]
-        public String UserName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the password
-        /// </summary>
-        [XmlAttribute("password"), ConfigurationRequired]
-        public String Password { get; set; }
+        [XmlElement("jiraEndpoint"), JsonProperty("jiraEndpoint")]
+        public RestClientDescriptionConfiguration ApiConfiguration { get; set; }
 
         /// <summary>
         /// Gets or sets the project
@@ -63,31 +54,5 @@ namespace SanteDB.Persistence.Diagnostics.Jira.Configuration
         [XmlAttribute("project"), ConfigurationRequired]
         public String Project { get; set; }
 
-        /// <summary>
-        /// Gets whether a tracing is enabled.
-        /// </summary>
-        [XmlAttribute("trace")]
-        public bool Trace { get; }
-
-        /// <summary>
-        /// Gets or sets the endpoint information
-        /// </summary>
-        [XmlAttribute("url"), ConfigurationRequired]
-        public String Endpoint { get; set; }
-
-        /// <summary>
-        /// Get the endpoint
-        /// </summary>
-        [XmlIgnore]
-        List<IRestClientEndpointDescription> IRestClientDescription.Endpoint => new List<IRestClientEndpointDescription>()
-        {
-            new ServiceClientEndpointDescription(this.Endpoint)
-        };
-
-        /// <summary>
-        /// Rest binding
-        /// </summary>
-        [XmlIgnore]
-        IRestClientBindingDescription IRestClientDescription.Binding => new JiraRestClientBindingDescription();
     }
 }

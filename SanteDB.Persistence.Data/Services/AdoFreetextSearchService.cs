@@ -30,7 +30,7 @@ using SanteDB.Core.Model.Roles;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite.Providers;
-using SanteDB.Persistence.Data.ADO.Jobs;
+using SanteDB.Persistence.Data.Jobs;
 using SanteDB.Persistence.Data.Configuration;
 using System;
 using System.Collections.Generic;

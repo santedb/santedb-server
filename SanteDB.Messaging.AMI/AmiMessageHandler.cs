@@ -23,7 +23,6 @@ using RestSrvr;
 using SanteDB.Core;
 using SanteDB.Core.Interop;
 using SanteDB.Server.Core.Rest;
-using SanteDB.Server.Core.Rest.Behavior;
 using SanteDB.Messaging.AMI.Configuration;
 using SanteDB.Messaging.AMI.Wcf;
 using SanteDB.Rest.Common;
@@ -40,6 +39,7 @@ using System.Diagnostics.Tracing;
 using SanteDB.Core.Model.Serialization;
 using SanteDB.Core.Model.AMI.Auth;
 using SanteDB.Core.Interfaces;
+using SanteDB.Rest.Common.Behavior;
 
 namespace SanteDB.Messaging.AMI
 {

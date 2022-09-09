@@ -39,7 +39,6 @@ using SanteDB.Core.Security;
 using SanteDB.Core.Security.Services;
 using System.Collections.Concurrent;
 using System.Linq.Expressions;
-using SanteDB.Server.Core.Diagnostics;
 
 namespace SanteDB.Server
 {

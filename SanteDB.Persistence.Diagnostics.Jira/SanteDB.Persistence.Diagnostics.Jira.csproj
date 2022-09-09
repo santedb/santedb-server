@@ -53,8 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configuration\JiraCredentialProvider.cs" />
-    <Compile Include="Configuration\JiraRestClientBindingDescription.cs" />
-    <Compile Include="Configuration\JiraSecurityDescription.cs" />
+    <Compile Include="Configuration\JiraCredentials.cs" />
     <Compile Include="Configuration\JiraServiceConfigurationSection.cs" />
     <Compile Include="DiagnosticReportPersistenceService.cs" />
     <Compile Include="JiraServiceClient.cs" />

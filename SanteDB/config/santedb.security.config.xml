@@ -20,7 +20,7 @@
  -->
 <SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://santedb.org/configuration">
   <sections>
-    <add type="SanteDB.Core.Configuration.SecurityConfigurationSection, SanteDB.Core.Api" />
+    <add type="SanteDB.Core.Security.Configuration.SecurityConfigurationSection, SanteDB.Core.Api" />
   </sections>
   <!-- Represents this server's internal security configuration -->
   <section xsi:type="SecurityConfigurationSection"

@@ -21,7 +21,7 @@
 using Newtonsoft.Json.Linq;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Claims;
-using SanteDB.Server.Core.Security;
+using SanteDB.Rest.Common.Security;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -93,7 +93,7 @@ namespace SanteDB.Server.AdminConsole.Security
             // Attempt to get the certificate
             if (((String)headers["alg"]).StartsWith("RS"))
             {
-                var cert = SecurityUtils.FindCertificate(X509FindType.FindByThumbprint, StoreLocation.CurrentUser, StoreName.My, headers["x5t"].ToString());
+                var cert = X509CertificateUtils.FindCertificate(X509FindType.FindByThumbprint, StoreLocation.CurrentUser, StoreName.My, headers["x5t"].ToString());
                 //if (cert == null)
                 //	throw new SecurityTokenException(SecurityTokenExceptionType.KeyNotFound, String.Format ("Cannot find certificate {0}", headers ["x5t"]));
                 // TODO: Verify signature

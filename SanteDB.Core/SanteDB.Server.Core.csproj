@@ -62,60 +62,16 @@
     <Reference Include="System.Xml.Serialization" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Configuration\Features\AppletBusinessRulesFeature.cs" />
     <Compile Include="Configuration\Features\CoreServerFeatures.cs" />
-    <Compile Include="Configuration\Features\JobManagerFeature.cs" />
-    <Compile Include="Configuration\Features\LocalAppletManagerFeature.cs" />
     <Compile Include="Configuration\Features\RestServiceFeature.cs" />
-    <Compile Include="Configuration\Features\ServerSecurityFeature.cs" />
-    <Compile Include="Configuration\FileSystemNotificationTemplateConfigurationSection.cs" />
-    <Compile Include="Configuration\AppletConfigurationSection.cs" />
-    <Compile Include="Configuration\FileSystemQueueConfigurationSection.cs" />
-    <Compile Include="Configuration\RestConfigurationSection.cs" />
     <Compile Include="Configuration\Features\WindowsServiceFeature.cs" />
     <Compile Include="Configuration\Utils\HttpSslTool.cs" />
-    <Compile Include="Diagnostics\ConsoleTraceWriter.cs" />
-    <Compile Include="Diagnostics\DebugDiagnosticsTraceWriter.cs" />
-    <Compile Include="Diagnostics\RolloverTextWriterTraceWriter.cs" />
-    <Compile Include="Diagnostics\SystemDiagnosticsTraceWriter.cs" />
-    <Compile Include="Docker\SecurityDockerFeature.cs" />
-    <Compile Include="Configuration\SecurityConfigurationSection.cs" />
-    <Compile Include="Http\DefaultRestClient.cs" />
-    <Compile Include="Model\ModelExtensions.cs" />
     <Compile Include="Notification\Templating\RazorNotificationTemplateFiller.cs" />
-    <Compile Include="Rest\Behavior\ErrorServiceBehavior.cs" />
-    <Compile Include="Rest\RestErrorHandler.cs" />
-    <Compile Include="Rest\RestServiceFactory.cs" />
-    <Compile Include="Rest\Security\TokenAuthorizationAccessBehavior.cs" />
-    <Compile Include="SanteDBConstants.cs" />
     <Compile Include="Persistence\DataInitializationService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Security\AesSymmetricCryptographicProvider.cs" />
-    <Compile Include="Security\ApplicationPrincipal.cs" />
-    <Compile Include="Security\Claims\OverrideClaimHandler.cs" />
-    <Compile Include="Security\Claims\PurposeOfUseClaimHandler.cs" />
-    <Compile Include="Security\DefaultDataSigningService.cs" />
-    <Compile Include="Security\DefaultTfaRelayService.cs" />
-    <Compile Include="Security\DeviceIdentity.cs" />
-    <Compile Include="Security\DevicePrincipal.cs" />
-    <Compile Include="Security\DefaultPasswordValidationService.cs" />
-    <Compile Include="Security\Permission\PolicyPermissionAttribute.cs" />
-    <Compile Include="Security\PasswordHashingServices.cs" />
-    <Compile Include="Security\Privacy\ExemptablePolicyFilterService.cs" />
-    <Compile Include="Security\TwoFactorSecretGenerators.cs" />
-    <Compile Include="Security\SecurityUtils.cs" />
-    <Compile Include="Services\Daemons\AppletBusinessRulesDaemon.cs" />
-    <Compile Include="Services\Impl\DefaultNetworkInformationService.cs" />
-    <Compile Include="Services\Impl\DefaultOperatingSystemInfoService.cs" />
-    <Compile Include="Services\Impl\FileNotificationTemplateRepository.cs" />
-    <Compile Include="Services\Impl\FileSystemQueueService.cs" />
     <Compile Include="Services\Impl\FileConfigurationService.cs" />
-    <Compile Include="Services\Impl\LocalAppletManagerService.cs" />
-    <Compile Include="Services\Impl\LocalRepositoryService.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Configuration\Editors\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="..\SanteDB.licenseheader">
       <Link>SanteDB.licenseheader</Link>

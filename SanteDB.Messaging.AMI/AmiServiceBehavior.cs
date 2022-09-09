@@ -33,8 +33,6 @@ using SanteDB.Core.Model.AMI.Diagnostics;
 using SanteDB.Core.Model.AMI.Logging;
 using SanteDB.Server.Core.Rest;
 using SanteDB.Core.Security;
-using SanteDB.Server.Core.Security.Attribute;
-using SanteDB.Server.Core.Security.Claims;
 using SanteDB.Core.Services;
 using SanteDB.Messaging.AMI.Configuration;
 using SanteDB.Rest.Common;
@@ -70,7 +68,6 @@ namespace SanteDB.Messaging.AMI.Wcf
         /// Get a list of TFA mechanisms
         /// </summary>
         /// <returns>Returns a list of TFA mechanisms.</returns>
-        [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.Login)]
         [Demand(PermissionPolicyIdentifiers.Login)]
         public override AmiCollection GetTfaMechanisms()
         {
@@ -90,7 +87,6 @@ namespace SanteDB.Messaging.AMI.Wcf
         /// <summary>
         /// Create a diagnostic report
         /// </summary>
-        [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.Login)]
         [Demand(PermissionPolicyIdentifiers.Login)]
         public override DiagnosticReport CreateDiagnosticReport(DiagnosticReport report)
         {
@@ -105,7 +101,6 @@ namespace SanteDB.Messaging.AMI.Wcf
         /// </summary>
         /// <param name="logId">The log identifier.</param>
         /// <returns>Returns the log file information.</returns>
-        [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.UnrestrictedAdministration)]
         [Demand(PermissionPolicyIdentifiers.UnrestrictedAdministration)]
         public override LogFileInfo GetLog(string logId)
         {
@@ -152,7 +147,6 @@ namespace SanteDB.Messaging.AMI.Wcf
         /// </summary>
         /// <param name="logId">The log identifier.</param>
         /// <returns>Returns the log file information.</returns>
-        [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.UnrestrictedAdministration)]
         [Demand(PermissionPolicyIdentifiers.UnrestrictedAdministration)]
         public override Stream DownloadLog(string logId)
         {
@@ -174,7 +168,6 @@ namespace SanteDB.Messaging.AMI.Wcf
         /// Get log files on the server and their sizes.
         /// </summary>
         /// <returns>Returns a collection of log files.</returns>
-        [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.UnrestrictedAdministration)]
         [Demand(PermissionPolicyIdentifiers.UnrestrictedAdministration)]
         public override AmiCollection GetLogs()
         {
@@ -258,7 +251,6 @@ namespace SanteDB.Messaging.AMI.Wcf
         /// Gets a server diagnostic report.
         /// </summary>
         /// <returns>Returns the created diagnostic report.</returns>
-        [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.UnrestrictedAdministration)]
         [Demand(PermissionPolicyIdentifiers.UnrestrictedAdministration)]
         public override DiagnosticReport GetServerDiagnosticReport()
         {

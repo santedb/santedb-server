@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31702.278
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32519.379
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB", "SanteDB\SanteDB.csproj", "{649B7C70-EC21-4AC4-B918-C34C84753126}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -26,8 +26,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.Core.Security.Tfa.Twilio", "SanteDB.Core.Security.Tfa.Twilio\SanteDB.Core.Security.Tfa.Twilio.csproj", "{5A60D6E2-72DD-478A-91A6-E928208CA1BA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.Messaging.AMI", "SanteDB.Messaging.AMI\SanteDB.Messaging.AMI.csproj", "{D882323C-2BC9-4A1D-B70F-D833CF2E91A1}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.Messaging.HDSI", "SanteDB.Messaging.HDSI\SanteDB.Messaging.HDSI.csproj", "{04E3C581-5A04-4691-82AC-F339947FCE75}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.Messaging.HDSI.Test", "SanteDB.Messaging.HDSI.Test\SanteDB.Messaging.HDSI.Test.csproj", "{B25778DB-97DA-4BA1-BF77-72838658B148}"
 EndProject
@@ -187,7 +185,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.Queue.Msmq", "sante
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.Core.Applets.Test", "santedb-applets\SanteDB.Core.Applets.Test\SanteDB.Core.Applets.Test.csproj", "{F322715B-FBAD-4C8C-B523-AA723490C05E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.Queue.RabbitMq", "santedb-rabbitmq\SanteDB.Queue.RabbitMq\SanteDB.Queue.RabbitMq.csproj", "{4696CE1F-1F0A-4125-98F8-5A2ECB735065}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SanteDB.Queue.RabbitMq", "santedb-rabbitmq\SanteDB.Queue.RabbitMq\SanteDB.Queue.RabbitMq.csproj", "{4696CE1F-1F0A-4125-98F8-5A2ECB735065}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SanteDB.Core.i18n", "santedb-i18n\SanteDB.Core.i18n\SanteDB.Core.i18n.csproj", "{CA7B81DC-B789-4AF6-A079-EC84259C101A}"
 EndProject
@@ -221,10 +219,6 @@ Global
 		{D882323C-2BC9-4A1D-B70F-D833CF2E91A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D882323C-2BC9-4A1D-B70F-D833CF2E91A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D882323C-2BC9-4A1D-B70F-D833CF2E91A1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{04E3C581-5A04-4691-82AC-F339947FCE75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{04E3C581-5A04-4691-82AC-F339947FCE75}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{04E3C581-5A04-4691-82AC-F339947FCE75}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{04E3C581-5A04-4691-82AC-F339947FCE75}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B25778DB-97DA-4BA1-BF77-72838658B148}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B25778DB-97DA-4BA1-BF77-72838658B148}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B25778DB-97DA-4BA1-BF77-72838658B148}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -467,7 +461,6 @@ Global
 		{DB9BC05E-45F1-4F96-A161-F36BDECAF566} = {58D303FA-0113-4888-AA67-A9436DDEBFAD}
 		{5A60D6E2-72DD-478A-91A6-E928208CA1BA} = {8AE6EB13-2C0F-4282-B871-073E2ED119B5}
 		{D882323C-2BC9-4A1D-B70F-D833CF2E91A1} = {5506BB6D-FFA3-40A2-83F5-425C6149DFF4}
-		{04E3C581-5A04-4691-82AC-F339947FCE75} = {5506BB6D-FFA3-40A2-83F5-425C6149DFF4}
 		{B25778DB-97DA-4BA1-BF77-72838658B148} = {5506BB6D-FFA3-40A2-83F5-425C6149DFF4}
 		{45EA67A6-48F6-4906-84EC-5C13C80C9CC4} = {8AE6EB13-2C0F-4282-B871-073E2ED119B5}
 		{F38ED54C-E4E4-499A-882E-736289F332C0} = {C6921DBD-1FCB-43A7-98A6-AF24C3C6652A}

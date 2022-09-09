@@ -30,7 +30,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SanteDB.Persistence.Data.ADO.Jobs
+namespace SanteDB.Persistence.Data.Jobs
 {
     /// <summary>
     /// Rebuild ADO.NET Freetext index
@@ -38,7 +38,7 @@ namespace SanteDB.Persistence.Data.ADO.Jobs
     [ExcludeFromCodeCoverage]
     public class AdoRebuildFreetextIndexJob : IJob
     {
-
+        
         // Tracer
         private readonly Tracer m_tracer = Tracer.GetTracer(typeof(AdoRebuildFreetextIndexJob));
 

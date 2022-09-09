@@ -89,9 +89,7 @@
 
       <!-- Repository Services -->
       <!--<add type="SanteDB.Server.Core.Services.Impl.LocalRepositoryFactoryService, SanteDB.Server.Core" />-->
-      <add type="SanteDB.Server.Core.Services.Impl.LocalRepositoryService, SanteDB.Server.Core" />
-      <add type="SanteDB.Server.Core.Services.Impl.LocalMailMessageRepository, SanteDB.Server.Core" />
-      <add type="SanteDB.Server.Core.Services.Impl.LocalStockManagementRepositoryService, SanteDB.Server.Core" />
+      <add type="SanteDB.Server.Core.Services.Impl.Repository.LocalRepositoryService, SanteDB.Core.Api" />
       <add type="SanteDB.Server.Core.Services.Impl.LocalTagPersistenceService, SanteDB.Server.Core" />
       <add type="SanteDB.Core.Applets.Services.Impl.AppletSubscriptionRepository, SanteDB.Core.Applets" />
       <add type="SanteDB.Core.Security.Audit.AuditDaemonService, SanteDB.Core.Api" />

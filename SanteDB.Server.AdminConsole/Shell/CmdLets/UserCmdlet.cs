@@ -25,7 +25,6 @@ using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Patch;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
-using SanteDB.Server.Core.Security.Attribute;
 using SanteDB.Messaging.AMI.Client;
 using SanteDB.Server.AdminConsole.Attributes;
 using SanteDB.Server.AdminConsole.Util;

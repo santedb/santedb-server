@@ -24,77 +24,11 @@ using SanteDB.Server.AdminConsole.Shell;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Security.Cryptography.X509Certificates;
 
 namespace SanteDB.Server.AdminConsole.Security
 {
-    /// <summary>
-    /// Rest Client Security Description
-    /// </summary>
-    [ExcludeFromCodeCoverage]
-    public class SecurityConfigurationDescription : IRestClientSecurityDescription
-    {
-
-        // Cert validator
-        private ICertificateValidator m_certificateValidator = new ConsoleCertificateValidator();
-
-        /// <summary>
-        /// Authentication realm
-        /// </summary>
-        public string AuthRealm
-        {
-            get
-            {
-                return ApplicationContext.Current.RealmId;
-            }
-        }
-
-        /// <summary>
-        /// Certificate validator
-        /// </summary>
-        public ICertificateValidator CertificateValidator
-        {
-            get
-            {
-                return this.m_certificateValidator;
-            }
-        }
-
-        /// <summary>
-        /// Gets the client certificate
-        /// </summary>
-        public IRestClientCertificateDescription ClientCertificate
-        {
-            get
-            {
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// Gets the credential provider
-        /// </summary>
-        public ICredentialProvider CredentialProvider
-        {
-            get; set;
-        }
-
-        /// <summary>
-        /// Security scheme
-        /// </summary>
-        public SecurityScheme Mode
-        {
-            get; set;
-        }
-
-        /// <summary>
-        /// Preemtive authentication?
-        /// </summary>
-        public bool PreemptiveAuthentication
-        {
-            get; set;
-        }
-    }
-
+ 
     /// <summary>
     /// Certificate validator
     /// </summary>

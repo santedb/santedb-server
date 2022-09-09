@@ -19,6 +19,7 @@
  * Date: 2022-5-30
  */
 using SanteDB.Core;
+using SanteDB.Core.Configuration.Http;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Http;
 using SanteDB.Core.Http.Description;
@@ -30,7 +31,6 @@ using SanteDB.Core.Services.Impl;
 using SanteDB.Messaging.AMI.Client;
 using SanteDB.Server.AdminConsole.Security;
 using SanteDB.Server.AdminConsole.Util;
-using SanteDB.Server.Core.Http;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -160,11 +160,14 @@ namespace SanteDB.Server.AdminConsole.Shell
             try
             {
                 // Options on AMI
-                var optionDescription = new AdminClientDescription()
+                var optionDescription = new RestClientDescriptionConfiguration()
                 {
-                    Binding = new ServiceClientBindingDescription()
+                    Binding = new RestClientBindingConfiguration()
                     {
-                        Security = new SecurityConfigurationDescription()
+                        Security = new RestClientSecurityConfiguration()
+                        {
+                            CertificateValidatorXml = new SanteDB.Core.Configuration.TypeReferenceConfiguration(typeof(ConsoleCertificateValidator)),
+                        }
                     },
                     Accept = "application/xml"
                 };
@@ -177,7 +180,7 @@ namespace SanteDB.Server.AdminConsole.Shell
 
                 this.m_tracer.TraceVerbose("Setting up endpoint : {0}/ami", host);
 
-                optionDescription.Endpoint.Add(new AdminClientEndpointDescription($"{host}/ami"));
+                optionDescription.Endpoint.Add(new RestClientEndpointConfiguration($"{host}/ami"));
                 var amiServiceClient = new AmiServiceClient(new RestClient(optionDescription));
 
                 // get options
@@ -191,36 +194,48 @@ namespace SanteDB.Server.AdminConsole.Shell
                 {
                     this.m_tracer.TraceInfo("Server supports {0} at {1}", itm.ServiceType, String.Join(",", itm.BaseUrl).Replace("0.0.0.0", this.m_configuration.RealmId));
 
-                    var config = new AdminClientDescription() { Accept = "application/xml", Binding = new ServiceClientBindingDescription() };
+                    var config = new RestClientDescriptionConfiguration()
+                    {
+                        Accept = "application/xml",
+                        Binding = new RestClientBindingConfiguration()
+                        {
+
+                        }
+                    };
+
                     if (itm.Capabilities.HasFlag(ServiceEndpointCapabilities.Compression))
                         config.Binding.Optimize = true;
 
                     if (itm.Capabilities.HasFlag(ServiceEndpointCapabilities.BearerAuth))
-                        config.Binding.Security = new SecurityConfigurationDescription()
+                        config.Binding.Security = new RestClientSecurityConfiguration()
                         {
                             CredentialProvider = new TokenCredentialProvider(),
                             Mode = SecurityScheme.Bearer,
-                            PreemptiveAuthentication = true
+                            PreemptiveAuthentication = true,
+                            CertificateValidatorXml = new SanteDB.Core.Configuration.TypeReferenceConfiguration(typeof(ConsoleCertificateValidator))
+
                         };
                     else if (itm.Capabilities.HasFlag(ServiceEndpointCapabilities.BasicAuth))
                     {
                         if (itm.ServiceType == ServiceEndpointType.AuthenticationService)
-                            config.Binding.Security = new SecurityConfigurationDescription()
+                            config.Binding.Security = new RestClientSecurityConfiguration()
                             {
                                 CredentialProvider = new OAuth2CredentialProvider(),
                                 Mode = this.m_configuration.OAuthBasic ? SecurityScheme.Basic : SecurityScheme.None,
-                                PreemptiveAuthentication = true
+                                PreemptiveAuthentication = true,
+                                CertificateValidatorXml = new SanteDB.Core.Configuration.TypeReferenceConfiguration(typeof(ConsoleCertificateValidator))
                             };
                         else
-                            config.Binding.Security = new SecurityConfigurationDescription()
+                            config.Binding.Security = new RestClientSecurityConfiguration()
                             {
                                 CredentialProvider = new HttpBasicTokenCredentialProvider(),
                                 Mode = SecurityScheme.Basic,
-                                PreemptiveAuthentication = true
+                                PreemptiveAuthentication = true,
+                                CertificateValidatorXml = new SanteDB.Core.Configuration.TypeReferenceConfiguration(typeof(ConsoleCertificateValidator))
                             };
                     }
 
-                    config.Endpoint.AddRange(itm.BaseUrl.Select(o => new AdminClientEndpointDescription(o.Replace("0.0.0.0", this.m_configuration.RealmId))));
+                    config.Endpoint.AddRange(itm.BaseUrl.Select(o => new RestClientEndpointConfiguration(o.Replace("0.0.0.0", this.m_configuration.RealmId)))); //  new   new AdminClientEndpointDescription(o.Replace("0.0.0.0", this.m_configuration.RealmId))));
 
                     // Add client
                     if (!this.m_restClients.ContainsKey(itm.ServiceType))

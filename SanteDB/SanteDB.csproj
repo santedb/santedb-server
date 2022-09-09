@@ -534,6 +534,10 @@
       <Project>{c1f86ea3-fc84-456f-a9d9-0bf8db0d48d3}</Project>
       <Name>SanteDB.Messaging.HL7</Name>
     </ProjectReference>
+    <ProjectReference Include="..\santedb-i18n\SanteDB.Core.i18n\SanteDB.Core.i18n.csproj">
+      <Project>{ca7b81dc-b789-4af6-a079-ec84259c101a}</Project>
+      <Name>SanteDB.Core.i18n</Name>
+    </ProjectReference>
     <ProjectReference Include="..\santedb-msmq\SanteDB.Queue.Msmq\SanteDB.Queue.Msmq.csproj">
       <Project>{644e4e13-5f6d-45ef-9a82-dedb01790a60}</Project>
       <Name>SanteDB.Queue.Msmq</Name>
@@ -566,13 +570,13 @@
       <Project>{976e1627-b0da-4237-977d-9b3020b60dc1}</Project>
       <Name>SanteDB.Messaging.Atna</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Messaging.HDSI\SanteDB.Messaging.HDSI.csproj">
-      <Project>{04e3c581-5a04-4691-82ac-f339947fce75}</Project>
-      <Name>SanteDB.Messaging.HDSI</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SanteDB.Persistence.Auditing.ADO\SanteDB.Persistence.Auditing.ADO.csproj">
       <Project>{45ea67a6-48f6-4906-84ec-5c13c80c9cc4}</Project>
       <Name>SanteDB.Persistence.Auditing.ADO</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SanteDB.Persistence.Data\SanteDB.Persistence.Data.csproj">
+      <Project>{ad152185-7ec6-428d-91a9-f79b83f6f406}</Project>
+      <Name>SanteDB.Persistence.Data</Name>
     </ProjectReference>
     <ProjectReference Include="..\SanteDB.Persistence.Diagnostics.Email\SanteDB.Persistence.Diagnostics.Email.csproj">
       <Project>{2a5cea66-8bb3-4567-bdfa-9c174fc215f7}</Project>

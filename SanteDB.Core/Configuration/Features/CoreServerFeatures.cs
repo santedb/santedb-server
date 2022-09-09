@@ -25,8 +25,6 @@ using SanteDB.Core.Security;
 using SanteDB.Core.Security.Privacy;
 using SanteDB.Core.Services;
 using SanteDB.Core.Services.Impl;
-using SanteDB.Server.Core.Security.Privacy;
-using SanteDB.Server.Core.Services.Impl;
 using System;
 using System.Collections.Generic;
 using System.Linq;

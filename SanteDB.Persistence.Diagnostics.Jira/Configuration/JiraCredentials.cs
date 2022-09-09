@@ -18,47 +18,48 @@
  * User: fyfej
  * Date: 2022-5-30
  */
+using SanteDB.Core;
 using SanteDB.Core.Http;
-using SanteDB.Core.Http.Description;
+using SanteDB.Core.Services;
+using SanteDB.Persistence.Diagnostics.Jira.Model;
+using System;
+using System.Collections.Generic;
+using System.Security.Principal;
 
 namespace SanteDB.Persistence.Diagnostics.Jira.Configuration
 {
+
     /// <summary>
-    /// Represents a JIRA REST client binding description
+    /// Represents a JIRA session credential
     /// </summary>
-    public class JiraRestClientBindingDescription : IRestClientBindingDescription
+    internal class JiraCredentials : Credentials
     {
+
+
+       
+        // JIRA service configuration
+        private JiraServiceConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<JiraServiceConfigurationSection>();
+
+        // Authentication
+        private JiraAuthenticationResponse m_authentication;
+
         /// <summary>
-        /// Gets the content type mapper
+        /// Create JIRA credentials
         /// </summary>
-        public IContentTypeMapper ContentTypeMapper
+        public JiraCredentials(JiraAuthenticationResponse authResponse) : base(null)
         {
-            get
-            {
-                return new DefaultContentTypeMapper();
-            }
+            this.m_authentication = authResponse;
         }
 
         /// <summary>
-        /// Whether optimizations should be performed
+        /// Get the HTTP headers
         /// </summary>
-        public bool Optimize
+        public override Dictionary<string, string> GetHttpHeaders()
         {
-            get
+            return new Dictionary<string, string>()
             {
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Gets the security description
-        /// </summary>
-        public IRestClientSecurityDescription Security
-        {
-            get
-            {
-                return new JiraSecurityDescription();
-            }
+                { "Cookie", String.Format("{0}={1}", this.m_authentication.Session.Name, this.m_authentication.Session.Value) }
+            };
         }
     }
 }

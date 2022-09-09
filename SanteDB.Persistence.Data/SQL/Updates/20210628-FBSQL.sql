@@ -1,5 +1,5 @@
 ﻿/** 
- * <feature scope="SanteDB.Persistence.Data.ADO" id="20210628-01" name="Update:20210628-01" applyRange="1.1.0.0-1.2.0.0"  invariantName="FirebirdSQL">
+ * <feature scope="SanteDB.Persistence.Data" id="20210628-01" name="Update:20210628-01" applyRange="1.1.0.0-1.2.0.0"  invariantName="FirebirdSQL">
  *	<summary>Update: Adds key relationship codes which were missing in the original SDB</summary>
  *	<isInstalled>select ck_patch('20210628-01') from RDB$DATABASE</isInstalled>
  * </feature>

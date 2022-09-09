@@ -22,6 +22,7 @@ using SanteDB.Core.Http;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Services;
+using SanteDB.Rest.Common.Security;
 using SanteDB.Server.AdminConsole.Shell;
 using System;
 using System.Diagnostics.CodeAnalysis;

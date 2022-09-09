@@ -26,6 +26,7 @@
     <Company>SanteSuite Contributors</Company>
     <PackageIconUrl>http://santesuite.org/assets/img/logo.png</PackageIconUrl>
     <PackageProjectUrl>http://santesuite.org</PackageProjectUrl>
+    <BaseOutputPath>..\bin\</BaseOutputPath>
   </PropertyGroup>
   
   <Choose>
@@ -354,5 +355,10 @@
   
   <ItemGroup>
     <None Include="..\SanteDB.licenseheader" Link="SanteDB.licenseheader" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="9.0.2" />
+    <PackageReference Include="Npgsql" Version="6.0.6" />
   </ItemGroup>
 </Project>
