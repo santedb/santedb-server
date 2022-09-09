@@ -22,7 +22,6 @@ using SanteDB.Core.Services;
 using RestSrvr;
 using SanteDB.Core;
 using SanteDB.Core.Interop;
-using SanteDB.Server.Core.Rest;
 using SanteDB.Messaging.AMI.Configuration;
 using SanteDB.Messaging.AMI.Wcf;
 using SanteDB.Rest.Common;
@@ -43,23 +42,7 @@ using SanteDB.Rest.Common.Behavior;
 
 namespace SanteDB.Messaging.AMI
 {
-    /// <summary>
-    /// Http helper extensions
-    /// </summary>
-    public static class HttpHelperExtensions
-    {
-        /// <summary>
-        /// Convert query types
-        /// </summary>
-        public static SanteDB.Core.Model.Query.NameValueCollection ToQuery(this System.Collections.Specialized.NameValueCollection nvc)
-        {
-            var retVal = new SanteDB.Core.Model.Query.NameValueCollection();
-            foreach (var k in nvc.AllKeys)
-                retVal.Add(k, new List<String>(nvc.GetValues(k)));
-            return retVal;
-        }
-    }
-
+   
     /// <summary>
     /// An implementation of the <see cref="IApiEndpointProvider"/> which hosts and manages the 
     /// <see href="https://help.santesuite.org/developers/service-apis/administration-management-interface-ami">Administrative Management Interface</see> REST services.

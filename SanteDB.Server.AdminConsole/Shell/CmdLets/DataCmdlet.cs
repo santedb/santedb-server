@@ -37,6 +37,7 @@ using System.Linq.Expressions;
 using SanteDB.Core.Model.Export;
 using System.Xml.Serialization;
 using SanteDB.Core.Interop;
+using System.Collections.Specialized;
 
 namespace SanteDB.Server.AdminConsole.Shell.CmdLets
 {

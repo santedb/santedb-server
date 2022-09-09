@@ -20,12 +20,8 @@
  -->
 <SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://santedb.org/configuration">
   <sections>
-    <add type="SanteDB.Server.Core.Configuration.AppletConfigurationSection, SanteDB.Server.Core,Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
+    <add type="SanteDB.Core.Applets.Configuration.AppletConfigurationSection, SanteDB.Core.Applets" />
   </sections>
   <section xsi:type="AppletConfigurationSection" appletDirectory="applets" allowUnsignedApplets="true">
-    <trustedPublishers>
-      <add>82C63E1E9B87578D0727E871D7613F2F0FAF683B</add>
-      <add>4326A4421216AC254DA93DC61B93160B08925BB1</add>
-    </trustedPublishers>
   </section>
 </SanteDBConfiguration>

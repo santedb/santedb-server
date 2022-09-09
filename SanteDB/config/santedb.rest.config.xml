@@ -20,7 +20,7 @@
  -->
 <SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://santedb.org/configuration">
   <sections>
-    <add type="SanteDB.Server.Core.Configuration.RestConfigurationSection, SanteDB.Server.Core" />
+    <add type="SanteDB.Rest.Common.Configuration.RestConfigurationSection, SanteDB.Rest.Common" />
   </sections>
   <section xsi:type="RestConfigurationSection">
     <service name="META">

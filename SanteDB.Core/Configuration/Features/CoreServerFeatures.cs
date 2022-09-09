@@ -20,7 +20,6 @@
  */
 using SanteDB.Core.Configuration;
 using SanteDB.Server.Core.Persistence;
-using SanteDB.Server.Core.Rest;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Privacy;
 using SanteDB.Core.Services;
@@ -35,6 +34,7 @@ using SanteDB.BI.Services.Impl;
 using SanteDB.Core.Notifications;
 using SanteDB.Core.Applets.Services.Impl;
 using SanteDB.Core.Services.Impl.Repository;
+using SanteDB.Rest.Common;
 
 namespace SanteDB.Server.Core.Configuration.Features
 {

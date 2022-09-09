@@ -21,6 +21,7 @@
 using MohawkCollege.Util.Console.Parameters;
 using Mono.Unix;
 using SanteDB.Core;
+using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Model;
 using SanteDB.Core.Security;
@@ -29,6 +30,7 @@ using SanteDB.Server;
 using SanteDB.Server.Core.Services.Impl;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -90,6 +92,37 @@ namespace SanteDB
                 // What to do?
                 if (parameters.ShowHelp)
                     parser.WriteHelp(Console.Out);
+                else if(parameters.ConfigTest)
+                {
+                    IEnumerable<String> configFilesToTest = null;
+                    if(String.IsNullOrEmpty(parameters.ConfigFile))
+                    {
+                        configFilesToTest = Directory.GetFiles(Path.Combine(Path.GetDirectoryName(typeof(Program).Assembly.Location), "config"), "*.xml", SearchOption.AllDirectories);
+                    }
+                    else
+                    {
+                        configFilesToTest = new String[] { parameters.ConfigFile };
+                    }
+                    Console.WriteLine("Testing configuration files");
+                    foreach(var file in configFilesToTest)
+                    {
+                        try
+                        {
+                            Console.WriteLine("Testing {0}...", file);
+                            using (var stream = File.OpenRead(file))
+                            {
+                                foreach (DetectedIssue itm in SanteDBConfiguration.Validate(stream))
+                                {
+                                    Console.WriteLine("\t{0} - {1}", itm.Priority, itm.Text);
+                                }
+                            }
+                        }
+                        catch(Exception e)
+                        {
+                            Console.WriteLine("\tFAIL: {0}", e);
+                        }
+                    }
+                }
                 else if (parameters.InstallCerts)
                 {
                     Console.WriteLine("Installing security certificates...");

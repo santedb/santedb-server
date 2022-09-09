@@ -20,7 +20,7 @@
  -->
 <SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://santedb.org/configuration">
   <sections>
-    <add type="SanteDB.Server.Core.Configuration.BasicAuthorizationConfigurationSection, SanteDB.Server.Core" />
+    <add type=" SanteDB.Rest.Common.Configuration.BasicAuthorizationConfigurationSection, SanteDB.Rest.Common" />
   </sections>
   <!--Basic Authorization Configuration-->
   <section xsi:type="BasicAuthorizationConfigurationSection" requireClientAuth="true" realm="127.0.0.1">

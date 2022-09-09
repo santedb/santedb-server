@@ -20,6 +20,7 @@
  */
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using NUnit.Framework;
@@ -94,7 +95,7 @@ namespace SanteDB.Messaging.HDSI.Test
             Guid id = Guid.Empty;
             var qstr = "classConcept.mnemonic=GenderCode&statusConcept.mnemonic=ACTIVE";
             
-            var query = QueryExpressionParser.BuildLinqExpression<Place>(NameValueCollection.ParseQueryString(qstr));
+            var query = QueryExpressionParser.BuildLinqExpression<Place>(qstr.ParseQueryString());
 
 
 

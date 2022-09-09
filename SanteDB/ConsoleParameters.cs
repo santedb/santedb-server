@@ -62,6 +62,13 @@ namespace SanteDB
         public bool StartupTest { get; set; }
 
         /// <summary>
+        /// Test configuration files
+        /// </summary>
+        [Description("Instructs the host process to perform a configuration test")]
+        [Parameter("test-config")]
+        public bool ConfigTest { get; set; }
+
+        /// <summary>
         /// Generate configuartion
         /// </summary>
         [Parameter("genconfig")]

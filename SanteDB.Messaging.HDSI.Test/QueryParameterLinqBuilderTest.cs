@@ -19,6 +19,7 @@
  * Date: 2022-5-30
  */
 using System;
+using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
@@ -273,8 +274,8 @@ namespace SanteDB.Messaging.HDSI.Test
             NameValueCollection httpQueryParameters = new NameValueCollection();
             httpQueryParameters.Add("name[Legal|OfficialRecord].component[Given|Family].value", "John");
             var expr = QueryExpressionParser.BuildLinqExpression<Patient>(httpQueryParameters);
-            var pexpr = new NameValueCollection(QueryExpressionBuilder.BuildQuery<Patient>(expr, true).ToArray());
-            Assert.AreEqual(httpQueryParameters.ToString(), pexpr.ToString());
+			var pexpr = QueryExpressionBuilder.BuildQuery<Patient>(expr, true).ToNameValueCollection();
+            Assert.AreEqual(httpQueryParameters.ToHttpString(), pexpr.ToHttpString());
 
         }
 
@@ -288,8 +289,8 @@ namespace SanteDB.Messaging.HDSI.Test
             NameValueCollection httpQueryParameters = new NameValueCollection();
             httpQueryParameters.Add("extension.display", "1");
             var expr = QueryExpressionParser.BuildLinqExpression<Patient>(httpQueryParameters);
-            var pexpr = new NameValueCollection(QueryExpressionBuilder.BuildQuery<Patient>(expr, true).ToArray());
-            Assert.AreEqual(httpQueryParameters.ToString(), pexpr.ToString());
+			var pexpr = QueryExpressionBuilder.BuildQuery<Patient>(expr, true).ToNameValueCollection();
+			Assert.AreEqual(httpQueryParameters.ToHttpString(), pexpr.ToHttpString());
 
         }
 

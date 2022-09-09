@@ -221,10 +221,10 @@
     </sources>
     <writers>
       <add name="main" initializationData="santedb.log" filter="Warning">
-        <writer>SanteDB.Server.Core.Diagnostics.RolloverTextWriterTraceWriter, SanteDB.Server.Core</writer>
+        <writer type="SanteDB.Core.Diagnostics.RolloverTextWriterTraceWriter, SanteDB.Core.Api"/>
       </add>
       <add name="console" initializationData="santedb.log" filter="Warning">
-        <writer>SanteDB.Server.Core.Diagnostics.ConsoleTraceWriter, SanteDB.Server.Core</writer>
+        <writer type="SanteDB.Core.Diagnostics.ConsoleTraceWriter, SanteDB.Server.Core" />
       </add>
     </writers>
   </section>

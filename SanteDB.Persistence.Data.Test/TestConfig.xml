@@ -35,7 +35,7 @@
     </sources>
     <writers>
       <add name="main" initializationData="santedb.log" filter="Informational">
-        <writer>SanteDB.Server.Core.Diagnostics.DebugDiagnosticsTraceWriter, SanteDB.Server.Core</writer>
+        <writer type="SanteDB.Core.Diagnostics.Tracing.DebugDiagnosticsTraceWriter, SanteDB.Core.Api"/>
       </add>
     </writers>
   </section>
@@ -124,11 +124,11 @@
       <add type="SanteDB.Core.Security.RegexPasswordValidator, SanteDB.Core.Api" />
       <add type="SanteDB.Core.Security.DefaultPolicyDecisionService, SanteDB.Core.Api" />
       <add type="SanteDB.Core.Services.Impl.DefaultThreadPoolService, SanteDB.Core.Api" />
-      <add type="SanteDB.Server.Core.Services.Impl.LocalRepositoryService, SanteDB.Server.Core" />
+      <add type="SanteDB.Core.Services.Impl.Repository.LocalRepositoryFactory, SanteDB.Core.Api" />
       <add type="SanteDB.Core.Security.Privacy.DataPolicyFilterService, SanteDB.Core.Api" />
-      <add type="SanteDB.Server.Core.Services.Impl.DefaultNetworkInformationService, SanteDB.Server.Core" />
-      <add type="SanteDB.Server.Core.Security.SHA256PasswordHashingService, SanteDB.Server.Core" />
-      <add type="SanteDB.Server.Core.Security.AesSymmetricCrypographicProvider,  SanteDB.Server.Core" />
+      <add type="SanteDB.Core.Services.Impl.DefaultNetworkInformationService,SanteDB.Core.Api" />
+      <add type="SanteDB.Core.Security.SHA256PasswordHashingService,SanteDB.Core.Api" />
+      <add type="SanteDB.Core.Security.AesSymmetricCrypographicProvider,SanteDB.Core.Api" />
     </serviceProviders>
   </section>
 </SanteDBConfiguration>
