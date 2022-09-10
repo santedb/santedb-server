@@ -24,18 +24,21 @@
   <!-- Mail -->
   <class modelClass="SanteDB.Core.Mail.MailMessage, SanteDB.Core.Api"
   domainClass="SanteDB.Persistence.Data.Model.Mail.DbMailMessage, SanteDB.Persistence.Data">
-    <property modelName="Key" domainName="Key" />
-    <property modelName="CreationTime" domainName="CreationTime" />
-    <property modelName="CreatedByKey" domainName="CreatedByKey" />
-    <property modelName="UpdatedByKey" domainName="UpdatedByKey" />
-    <property modelName="ObsoletedByKey" domainName="ObsoletedByKey" />
     <property modelName="ModifiedOn" domainName="UpdatedTime" />
     <property modelName="From" domainName="FromInfo" />
     <property modelName="TimeStamp" domainName="MessageUtc" />
-    <property modelName="Subject" domainName="Subject" />
-    <property modelName="Body" domainName="Body" />
     <property modelName="To" domainName="ToInfo" />
   </class>
+
+  <class modelClass="SanteDB.Core.Mail.Mailbox, SanteDB.Core.Api"
+  domainClass="SanteDB.Persistence.Data.Model.Mail.DbMailbox, SanteDB.Persistence.Data">
+    <property modelName="ModifiedOn" domainName="CreationTime" />
+  </class>
+
+  <class modelClass="SanteDB.Core.Mail.MailboxMailMessage, SanteDB.Core.Api"
+    domainClass="SanteDB.Persistence.Data.Model.Mail.DbMailboxMessageAssociation, SanteDB.Persistence.Data">
+  </class>
+
 
   <!-- Security Users -->
   <class modelClass="SanteDB.Core.Model.Security.SecurityUser, SanteDB.Core.Model"
