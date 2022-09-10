@@ -79,10 +79,10 @@ namespace SanteDB.Persistence.Data.Test
         /// Setup the test
         /// </summary>
         [OneTimeSetUp]
-        public void Setup()
+        public virtual void Setup()
         {
             // Force load of the DLL
-
+            if (TestApplicationContext.Current.IsRunning) return;
             var p = FirebirdSql.Data.FirebirdClient.FbCharset.Ascii;
             TestApplicationContext.TestAssembly = typeof(DataPersistenceTest).Assembly;
             TestApplicationContext.Initialize(TestContext.CurrentContext.TestDirectory);

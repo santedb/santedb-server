@@ -44,6 +44,7 @@ using SanteDB.Core.Model.Map;
 using SanteDB.OrmLite.Providers;
 using System.Collections;
 using SanteDB.Core.Security;
+using SanteDB.OrmLite;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Collections
 {

@@ -102,7 +102,10 @@ namespace SanteDB.Core.TestFramework
             this.m_serviceProvider.AddServiceProvider(typeof(SanteDB.Core.Security.DefaultPolicyEnforcementService));
             this.m_serviceProvider.AddServiceProvider(typeof(DefaultOperatingSystemInfoService));
 #if DEBUG
-            Tracer.AddWriter(new DebugDiagnosticsTraceWriter(), System.Diagnostics.Tracing.EventLevel.Verbose);
+            if (Tracer.GetWriter<DebugDiagnosticsTraceWriter>() == null)
+            {
+                Tracer.AddWriter(new DebugDiagnosticsTraceWriter(), System.Diagnostics.Tracing.EventLevel.Verbose);
+            }
 #endif
         }
 

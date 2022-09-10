@@ -109,6 +109,7 @@
       <add type="SanteDB.Caching.Memory.MemoryAdhocCacheService, SanteDB.Caching.Memory" />
 
       <add type="SanteDB.Persistence.Data.Test.TestQueryPersistenceService, SanteDB.Persistence.Data.Test" />
+      <add type="SanteDB.Persistence.Data.Test.TestSubscriptionRepository, SanteDB.Persistence.Data.Test" />
       <add type="SanteDB.Persistence.Data.Services.AdoApplicationIdentityProvider, SanteDB.Persistence.Data" />
       <add type="SanteDB.Persistence.Data.Services.AdoDeviceIdentityProvider, SanteDB.Persistence.Data" />
       <add type="SanteDB.Persistence.Data.Services.AdoIdentityProvider, SanteDB.Persistence.Data" />
@@ -119,6 +120,7 @@
       <add type="SanteDB.Persistence.Data.Services.AdoSessionProvider, SanteDB.Persistence.Data" />
       <add type="SanteDB.Persistence.Data.Services.AdoPersistenceService, SanteDB.Persistence.Data" />
       <add type="SanteDB.Persistence.Data.Services.AdoPersistenceService, SanteDB.Persistence.Data" />
+      <add type="SanteDB.Persistence.Data.Services.AdoSubscriptionExecutor, SanteDB.Persistence.Data" />
       <add type="SanteDB.Core.Security.DefaultDataSigningService, SanteDB.Core.Api" />
       <add type="SanteDB.Core.Security.SimpleTfaSecretGenerator, SanteDB.Core.Api" />
       <add type="SanteDB.Core.Security.RegexPasswordValidator, SanteDB.Core.Api" />

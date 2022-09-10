@@ -57,7 +57,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         IReportProgressChanged,
         IAdoPersistenceProvider<TModel>,
         IMappedQueryProvider<TModel>,
-        IDataPersistenceService
+        IDataPersistenceService,
+        IQuerySetProvider
         where TModel : IdentifiedData, new()
         where TDbModel : class, IDbIdentified, new()
     {
@@ -1032,6 +1033,12 @@ namespace SanteDB.Persistence.Data.Services.Persistence
         /// </summary>
         IQueryResultSet<TModel> IAdoPersistenceProvider<TModel>.Query(DataContext context, Expression<Func<TModel, bool>> filter)
              => new MappedQueryResultSet<TModel>(this, context).Where(filter);
+
+        /// <summary>
+        /// Query according to the provided <paramref name="query"/>
+        /// </summary>
+        IQueryResultSet IQuerySetProvider.Query(SqlStatement query)
+             => new MappedQueryResultSet<TModel>(this).Execute<TDbModel>(query);
 
         /// <summary>
         /// ADO Persistence provider for insert

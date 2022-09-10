@@ -70,10 +70,6 @@
   </Choose>
   
   <ItemGroup>
-    <Compile Remove="Services\AdoSubscriptionExecutor.cs" />
-  </ItemGroup>
-  
-  <ItemGroup>
     <None Remove="Map\ModelMap.xml" />
     <None Remove="SQL\20210414-FBSQL.sql" />
     <None Remove="SQL\20210414-PSQL.sql" />
@@ -359,7 +355,6 @@
   
   <ItemGroup>
     <None Include="..\SanteDB.licenseheader" Link="SanteDB.licenseheader" />
-    <None Include="Services\AdoSubscriptionExecutor.cs" />
   </ItemGroup>
   
   <ItemGroup>
