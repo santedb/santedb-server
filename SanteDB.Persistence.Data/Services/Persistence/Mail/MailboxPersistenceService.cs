@@ -4,6 +4,7 @@ using SanteDB.OrmLite;
 using SanteDB.Persistence.Data.Model.Mail;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace SanteDB.Persistence.Data.Services.Persistence.Mail
@@ -37,8 +38,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Mail
                     retVal.SetLoaded(o => o.Owner);
                     goto case LoadMode.SyncLoad;
                 case LoadMode.SyncLoad:
-                    retVal.Messages = retVal.Messages.GetRelatedPersistenceService().Query(context, o=>o.SourceEntityKey == dbModel.Key)
+                    retVal.Messages = retVal.Messages.GetRelatedPersistenceService().Query(context, o => o.SourceEntityKey == dbModel.Key).ToList();
+                    retVal.SetLoaded(o => o.Messages);
+                    break;
             }
+            return retVal;
         }
     }
 }

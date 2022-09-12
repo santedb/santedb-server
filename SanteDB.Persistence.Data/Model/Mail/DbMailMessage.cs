@@ -28,7 +28,7 @@ namespace SanteDB.Persistence.Data.Model.Mail
     /// Represents an alert message.
     /// </summary>
     [Table("mail_msg_tbl")]
-    [AssociativeTable(typeof(DbSecurityUser), typeof(DbMailMessageRcptTo))]
+    [AssociativeTable(typeof(DbMailbox), typeof(DbMailboxMessageAssociation))]
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
 	public class DbMailMessage : DbNonVersionedBaseData
 	{
