@@ -100,10 +100,8 @@ namespace SanteDB.Persistence.Data.Test
             }
             catch (AuthenticationException e) when (e.Message == this.m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_LOCKED))
             { }
-            catch
-            {
-                Assert.Fail("Invalid exception type");
-            }
+            catch (Exception e) { Assert.Fail($"Invalid exception thrown. Expected AuthenticationException with message {ErrorMessageStrings.AUTH_USR_LOCKED} but got {e.GetType().Name} with message {e.Message}"); }
+
         }
 
         /// <summary>
@@ -128,10 +126,8 @@ namespace SanteDB.Persistence.Data.Test
             catch (AuthenticationException e) when (e.Message == this.m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_LOCKED))
             {
             }
-            catch
-            {
-                Assert.Fail("Invalid exception type");
-            }
+            catch (Exception e) { Assert.Fail($"Invalid exception thrown. Expected AuthenticationException with message {ErrorMessageStrings.AUTH_USR_LOCKED} but got {e.GetType().Name} with message {e.Message}"); }
+
 
             service.SetLockout("TEST_04", false, adminPrincipal);
             service.Authenticate("TEST_04", "@TESTPa$$w0rd");
@@ -160,10 +156,8 @@ namespace SanteDB.Persistence.Data.Test
             catch (AuthenticationException e) when (e.Message == this.m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_INVALID))
             {
             }
-            catch
-            {
-                Assert.Fail("Invalid exception type/message");
-            }
+            catch (Exception e) { Assert.Fail($"Invalid exception thrown. Expected AuthenticationException with message {ErrorMessageStrings.AUTH_USR_INVALID} but got {e.GetType().Name} with message {e.Message}"); }
+
         }
 
         /// <summary>
@@ -188,7 +182,7 @@ namespace SanteDB.Persistence.Data.Test
             }
             catch (AuthenticationException e) when (e.Message == this.m_localizationService.GetString(ErrorMessageStrings.AUTH_USR_INVALID))
             { }
-            catch { Assert.Fail("Invalid exception thrown"); }
+            catch (Exception e) { Assert.Fail($"Invalid exception thrown. Expected AuthenticationException with message {ErrorMessageStrings.AUTH_USR_INVALID} but got {e.GetType().Name} with message {e.Message}"); }
 
             principal = service.Authenticate("TEST_06", "4$1mpl3P4wrE");
         }
@@ -214,10 +208,8 @@ namespace SanteDB.Persistence.Data.Test
             catch (PolicyViolationException e) when (e.PolicyId == PermissionPolicyIdentifiers.ChangePassword)
             {
             }
-            catch
-            {
-                Assert.Fail("Wrong exception message thrown");
-            }
+            catch (Exception e) { Assert.Fail($"Invalid exception thrown. Expected PolicyViolationException but got {e.GetType().Name} with message {e.Message}"); }
+
 
             principal = service.Authenticate("TEST_07B", "@TESTPa$$w0rd");
         }

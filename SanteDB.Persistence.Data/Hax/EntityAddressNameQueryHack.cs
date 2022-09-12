@@ -38,7 +38,7 @@ namespace SanteDB.Persistence.Data.Hax
         /// <summary>
         /// Hack the query
         /// </summary>
-        public bool HackQuery(QueryBuilder builder, SqlStatement sqlStatement, SqlStatement whereClause, Type tmodel, PropertyInfo property, string queryPrefix, QueryPredicate predicate, object values, IEnumerable<TableMapping> scopedTables, params KeyValuePair<String, object>[] queryFilter)
+        public bool HackQuery(QueryBuilder builder, SqlStatement sqlStatement, SqlStatement whereClause, Type tmodel, PropertyInfo property, string queryPrefix, QueryPredicate predicate, String[] values, IEnumerable<TableMapping> scopedTables, IDictionary<String, String[]> queryFilter)
         {
             String cmpTblType = String.Empty, keyName = String.Empty;
             Type guardType = null, componentType = null;
@@ -98,18 +98,12 @@ namespace SanteDB.Persistence.Data.Hax
                     guardFilter = $"AND {queryPrefix}{cmpTblType}.typ_cd_id IN ({String.Join(",", guards.Select(o => $"'{o}'"))})";
                 }
 
-                // Filter on the component value
-                var value = itm.Value;
-                if (value is String)
-                    value = new List<Object>() { value };
-                var qValues = value as List<Object>;
-
                 // Filter based on type and prefix :)
                 whereClause
                         .Append($" SELECT {queryPrefix}{cmpTblType}.{keyName} ")
                             .Append($" FROM {cmpTblType} AS {queryPrefix}{cmpTblType} ")
                             .Append(" WHERE ")
-                            .Append(builder.CreateSqlPredicate($"{queryPrefix}{cmpTblType}", "val", componentType.GetProperty("Value"), qValues))
+                            .Append(builder.CreateSqlPredicate($"{queryPrefix}{cmpTblType}", "val", componentType.GetProperty("Value"), itm.Value))
                             .Append(guardFilter)
                             .Append(" INTERSECT ");
             }

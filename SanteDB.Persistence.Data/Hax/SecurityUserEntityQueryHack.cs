@@ -40,12 +40,12 @@ namespace SanteDB.Persistence.Data.Hax
         /// <summary>
         /// Hack the query
         /// </summary>
-        public bool HackQuery(QueryBuilder builder, SqlStatement sqlStatement, SqlStatement whereClause, Type tmodel, PropertyInfo property, string queryPrefix, QueryPredicate predicate, object values, IEnumerable<TableMapping> scopedTables, params KeyValuePair<string, object>[] queryFilter)
+        public bool HackQuery(QueryBuilder builder, SqlStatement sqlStatement, SqlStatement whereClause, Type tmodel, PropertyInfo property, string queryPrefix, QueryPredicate predicate, String[] values, IEnumerable<TableMapping> scopedTables, IDictionary<string, string[]> queryFilter)
         {
             if(typeof(SecurityUser) == tmodel && property.Name == nameof(SecurityUser.UserEntity))
             {
                 var userkey = TableMapping.Get(typeof(DbUserEntity)).GetColumn(nameof(DbUserEntity.SecurityUserKey), false);
-                var personSubSelect = builder.CreateQuery(typeof(UserEntity), queryFilter.Select(p => new KeyValuePair<String, Object>(p.Key.Replace("userEntity.", ""), p.Value)), null, userkey);
+                var personSubSelect = builder.CreateQuery(typeof(UserEntity), queryFilter.ToDictionary(p => p.Key.Replace("userEntity.", ""), p=>p.Value), null, userkey);
                 var userIdKey = TableMapping.Get(typeof(DbSecurityUser)).PrimaryKey.FirstOrDefault();
                 whereClause.And($"{userIdKey.Name} IN (").Append(personSubSelect).Append(")");
                 return true;

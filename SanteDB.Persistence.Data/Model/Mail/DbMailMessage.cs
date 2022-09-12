@@ -49,7 +49,7 @@ namespace SanteDB.Persistence.Data.Model.Mail
 		/// <summary>
 		/// Gets or sets the alert message flags.
 		/// </summary>
-		[Column("flags")]
+		[Column("flags"), NotNull]
 		public int Flags { get; set; }
 		
 		/// <summary>

@@ -37,6 +37,8 @@
 
   <class modelClass="SanteDB.Core.Mail.MailboxMailMessage, SanteDB.Core.Api"
     domainClass="SanteDB.Persistence.Data.Model.Mail.DbMailboxMessageAssociation, SanteDB.Persistence.Data">
+    <property modelName="SourceEntityKey" domainName="SourceKey" />
+
   </class>
 
 

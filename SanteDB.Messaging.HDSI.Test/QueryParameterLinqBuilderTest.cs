@@ -274,7 +274,7 @@ namespace SanteDB.Messaging.HDSI.Test
             NameValueCollection httpQueryParameters = new NameValueCollection();
             httpQueryParameters.Add("name[Legal|OfficialRecord].component[Given|Family].value", "John");
             var expr = QueryExpressionParser.BuildLinqExpression<Patient>(httpQueryParameters);
-			var pexpr = QueryExpressionBuilder.BuildQuery<Patient>(expr, true).ToNameValueCollection();
+			var pexpr = QueryExpressionBuilder.BuildQuery<Patient>(expr, true);
             Assert.AreEqual(httpQueryParameters.ToHttpString(), pexpr.ToHttpString());
 
         }
@@ -289,7 +289,7 @@ namespace SanteDB.Messaging.HDSI.Test
             NameValueCollection httpQueryParameters = new NameValueCollection();
             httpQueryParameters.Add("extension.display", "1");
             var expr = QueryExpressionParser.BuildLinqExpression<Patient>(httpQueryParameters);
-			var pexpr = QueryExpressionBuilder.BuildQuery<Patient>(expr, true).ToNameValueCollection();
+			var pexpr = QueryExpressionBuilder.BuildQuery<Patient>(expr, true);
 			Assert.AreEqual(httpQueryParameters.ToHttpString(), pexpr.ToHttpString());
 
         }

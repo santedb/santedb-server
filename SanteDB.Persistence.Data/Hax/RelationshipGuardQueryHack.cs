@@ -41,7 +41,7 @@ namespace SanteDB.Persistence.Data.Hax
         /// <summary>
         /// Hack query builder based on clause
         /// </summary>
-        public bool HackQuery(QueryBuilder builder, SqlStatement sqlStatement, SqlStatement whereClause, Type tmodel, PropertyInfo property, string queryPrefix, QueryPredicate predicate, object values, IEnumerable<TableMapping> scopedTables, params KeyValuePair<String, object>[] queryFilter)
+        public bool HackQuery(QueryBuilder builder, SqlStatement sqlStatement, SqlStatement whereClause, Type tmodel, PropertyInfo property, string queryPrefix, QueryPredicate predicate, String[] values, IEnumerable<TableMapping> scopedTables, IDictionary<String, string[]> queryFilter)
         {
             string columnName = String.Empty;
             Type scanType = null;

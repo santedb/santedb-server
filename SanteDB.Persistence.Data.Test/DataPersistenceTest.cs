@@ -82,6 +82,7 @@ namespace SanteDB.Persistence.Data.Test
         public virtual void Setup()
         {
             // Force load of the DLL
+            this.m_localizationService = new TestLocalizationService();
             if (TestApplicationContext.Current.IsRunning) return;
             var p = FirebirdSql.Data.FirebirdClient.FbCharset.Ascii;
             TestApplicationContext.TestAssembly = typeof(DataPersistenceTest).Assembly;
@@ -93,7 +94,6 @@ namespace SanteDB.Persistence.Data.Test
             this.m_serviceManager.AddServiceProvider(typeof(AdoIdentityProvider));
             this.m_serviceManager.AddServiceProvider(typeof(AdoSessionProvider));
             this.m_serviceManager.AddServiceProvider(typeof(AdoPersistenceService));
-            this.m_localizationService = new TestLocalizationService();
 
         }
 

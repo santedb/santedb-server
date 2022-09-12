@@ -203,7 +203,7 @@ namespace SanteDB.Persistence.PubSub.ADO
         /// </summary>
         public PubSubSubscriptionDefinition RegisterSubscription<TModel>(string name, string description, PubSubEventType events, Expression<Func<TModel, bool>> filter, Guid channelId, String supportAddress = null, DateTimeOffset? notBefore = null, DateTimeOffset? notAfter = null)
         {
-            var hdsiFilter = QueryExpressionBuilder.BuildQuery(filter, true).ToArray().ToNameValueCollection().ToHttpString();
+            var hdsiFilter = QueryExpressionBuilder.BuildQuery(filter, true).ToHttpString();
             return this.RegisterSubscription(typeof(TModel), name, description, events, hdsiFilter, channelId, supportAddress, notBefore, notAfter);
         }
 

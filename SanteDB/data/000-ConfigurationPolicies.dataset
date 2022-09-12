@@ -9,6 +9,15 @@
       <canOverride>false</canOverride>
     </SecurityPolicy>
   </update>
+  <update insertIfNotExists="true">
+    <SecurityPolicy xmlns="http://santedb.org/model">
+      <id>fe34b4b2-3672-11ec-8d3d-0242ac130003</id>
+      <name>Administer Internal Mail / Messages</name>
+      <oid>1.3.6.1.4.1.33349.3.1.5.9.2.0.17</oid>
+      <isPublic>true</isPublic>
+      <canOverride>false</canOverride>
+    </SecurityPolicy>
+  </update>
   <exec>
     <service type="SanteDB.Core.Security.Services.IPolicyDecisionService, SanteDB.Core.Api" method="ClearCache">
       <args>

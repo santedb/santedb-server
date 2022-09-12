@@ -51,6 +51,7 @@
     <Compile Include="AdoSessionProviderTest.cs" />
     <Compile Include="AdoSubscriptionExecutorTest.cs" />
     <Compile Include="DataPersistenceTest.cs" />
+    <Compile Include="Persistence\Mail\LocalMailManagementPersistenceTest.cs" />
     <Compile Include="TestSubscriptionRepository.cs" />
     <Compile Include="Persistence\Acts\ActPersistenceTest.cs" />
     <Compile Include="Persistence\Acts\CarePlanTest.cs" />
