@@ -7,6 +7,7 @@ using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,6 +18,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Mail
     /// Persistence of mailboxes and sending of mail test
     /// </summary>
     [TestFixture]
+    [ExcludeFromCodeCoverage]
     public class LocalMailManagementPersistenceTest : DataPersistenceTest
     {
 

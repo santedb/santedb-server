@@ -19,6 +19,7 @@
  * Date: 2022-9-7
  */
 using SanteDB.Core.Diagnostics;
+using SanteDB.Core.i18n;
 using SanteDB.Core.Jobs;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
@@ -38,25 +39,32 @@ namespace SanteDB.Persistence.Data.Jobs
     [ExcludeFromCodeCoverage]
     public class AdoRebuildFreetextIndexJob : IJob
     {
-        
+
+        /// <summary>
+        /// Job's UUID
+        /// </summary>
+        public const string JobUuid = "4D7A0641-762F-45BC-83AF-2001887648B1";
+
         // Tracer
         private readonly Tracer m_tracer = Tracer.GetTracer(typeof(AdoRebuildFreetextIndexJob));
 
         // Service on which SQL can be run
         private readonly AdoPersistenceConfigurationSection m_configuration;
+        private readonly IJobStateManagerService m_jobStateManager;
 
         /// <summary>
         /// DI constructor
         /// </summary>
-        public AdoRebuildFreetextIndexJob(IConfigurationManager configurationManager)
+        public AdoRebuildFreetextIndexJob(IConfigurationManager configurationManager, IJobStateManagerService jobStateManager)
         {
             this.m_configuration = configurationManager.GetSection<AdoPersistenceConfigurationSection>();
+            this.m_jobStateManager = jobStateManager;
         }
 
         /// <summary>
         /// Get the ID of this job
         /// </summary>
-        public Guid Id => Guid.Parse("4D7A0641-762F-45BC-83AF-2001887648B1");
+        public Guid Id => Guid.Parse(JobUuid);
 
         /// <summary>
         /// Get the name of the index
@@ -74,24 +82,9 @@ namespace SanteDB.Persistence.Data.Jobs
         public bool CanCancel => false;
 
         /// <summary>
-        /// Gets the current state
-        /// </summary>
-        public JobStateType CurrentState { get; private set; }
-
-        /// <summary>
         /// Gets the parameters
         /// </summary>
         public IDictionary<string, Type> Parameters => new Dictionary<String, Type>();
-
-        /// <summary>
-        /// Last time the job was started
-        /// </summary>
-        public DateTime? LastStarted { get; private set; }
-
-        /// <summary>
-        /// Last time the job was finished
-        /// </summary>
-        public DateTime? LastFinished { get; private set; }
 
         /// <summary>
         /// Cancel the job
@@ -108,23 +101,25 @@ namespace SanteDB.Persistence.Data.Jobs
         {
             try
             {
+                this.m_jobStateManager.SetState(this, JobStateType.Running);
                 using (var ctx = this.m_configuration.Provider.GetWriteConnection())
                 {
                     ctx.Open();
-                    this.LastStarted = DateTime.Now;
-                    this.CurrentState = JobStateType.Running;
 
                     ctx.ExecuteProcedure<object>("rfrsh_fti");
 
-                    this.CurrentState = JobStateType.Completed;
-                    this.LastFinished = DateTime.Now;
                 }
+
+                this.m_jobStateManager.SetState(this, JobStateType.Completed);
+                this.m_jobStateManager.SetProgress(this, UserMessages.COMPLETE, 1.0f);
 
             }
             catch (Exception ex)
             {
                 this.m_tracer.TraceError("Error refreshing ADO FreeText indexes - {0}", ex);
-                this.CurrentState = JobStateType.Aborted;
+                this.m_jobStateManager.SetState(this, JobStateType.Aborted);
+                this.m_jobStateManager.SetProgress(this, ex.Message, 0.0f);
+                throw;
             }
         }
     }

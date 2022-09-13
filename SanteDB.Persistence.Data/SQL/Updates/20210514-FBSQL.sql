@@ -1,6 +1,6 @@
 ﻿/** 
  * <feature scope="SanteDB.Persistence.Data" id="20210514-01" name="Update:20210514-01" applyRange="1.1.0.0-1.2.0.0"  invariantName="FirebirdSQL">
- *	<summary>Update: Fixes session abandon constraint</summary>
+ *	<summary>Update: Upgrades primary database from Version 2.0 to Version 3.0</summary>
  *	<isInstalled>select ck_patch('20210514-01') from RDB$DATABASE</isInstalled>
  * </feature>
  */

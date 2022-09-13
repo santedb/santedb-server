@@ -119,6 +119,7 @@
       <add type="SanteDB.Persistence.Data.Services.AdoSecurityChallengeProvider, SanteDB.Persistence.Data" />
       <add type="SanteDB.Persistence.Data.Services.AdoSessionProvider, SanteDB.Persistence.Data" />
       <add type="SanteDB.Persistence.Data.Services.AdoPersistenceService, SanteDB.Persistence.Data" />
+      <add type="SanteDB.Persistence.Data.Services.AdoFreetextSearchService, SanteDB.Persistence.Data" />
       <add type="SanteDB.Persistence.Data.Services.AdoPersistenceService, SanteDB.Persistence.Data" />
       <add type="SanteDB.Persistence.Data.Services.AdoSubscriptionExecutor, SanteDB.Persistence.Data" />
       <add type="SanteDB.Core.Security.DefaultDataSigningService, SanteDB.Core.Api" />

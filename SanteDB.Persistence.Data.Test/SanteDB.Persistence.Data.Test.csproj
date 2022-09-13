@@ -44,6 +44,7 @@
     <Compile Include="AdoCertificateIdentityProviderTest.cs" />
     <Compile Include="AdoDeviceIdentityProviderTest.cs" />
     <Compile Include="AdoApplicationIdentityProviderTest.cs" />
+    <Compile Include="AdoFreetextSearchTest.cs" />
     <Compile Include="AdoIdentityProviderTest.cs" />
     <Compile Include="AdoPolicyInformationTest.cs" />
     <Compile Include="AdoRoleProviderTest.cs" />

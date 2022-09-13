@@ -5,6 +5,7 @@ using SanteDB.Core.Model.Subscription;
 using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -13,6 +14,7 @@ namespace SanteDB.Persistence.Data.Test
     /// <summary>
     /// Subsription repository
     /// </summary>
+    [ExcludeFromCodeCoverage]
     internal class TestSubscriptionRepository : ISubscriptionRepository
     {
 

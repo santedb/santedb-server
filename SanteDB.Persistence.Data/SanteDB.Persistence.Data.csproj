@@ -149,6 +149,7 @@
     <None Remove="SQL\Updates\20220509-PSQL.sql" />
     <None Remove="SQL\Updates\20220530-FBSQL.sql" />
     <None Remove="SQL\Updates\20220530-PSQL.sql" />
+    <None Remove="SQL\Updates\20220912-FBSQL.sql" />
   </ItemGroup>
   
   <ItemGroup>
@@ -333,6 +334,7 @@
     <EmbeddedResource Include="SQL\Updates\20210217-FBSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="SQL\Updates\20220912-FBSQL.sql" />
     <EmbeddedResource Include="SQL\Updates\20220530-PSQL.sql" />
     <EmbeddedResource Include="SQL\Updates\20220530-FBSQL.sql" />
     <EmbeddedResource Include="SQL\Updates\20220509-PSQL.sql" />

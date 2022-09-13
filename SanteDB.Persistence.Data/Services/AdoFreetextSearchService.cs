@@ -110,7 +110,7 @@ namespace SanteDB.Persistence.Data.Services
             if (idps == null)
                 throw new InvalidOperationException("Cannot find a UNION query repository service");
 
-            var searchTerm = String.Join(" and ", term);
+            var searchTerm = String.Join(" and ", term.SelectMany(t=>t.Split(' ')));
             return idps.Query(o => o.FreetextSearch(searchTerm), AuthenticationContext.Current.Principal);
         }
 
