@@ -59,7 +59,6 @@ SELECT
 FROM 
 	ent_rel_vrfy_cdtbl;
 	--#!
-
 DROP INDEX ent_rel_vrfy_src_trg_unq;--#!
 DROP TRIGGER TG_ENT_REL_VRFY_CDTBL_SEQ;--#!
 DROP TRIGGER TG_VRFY_ENT_REL;--#!

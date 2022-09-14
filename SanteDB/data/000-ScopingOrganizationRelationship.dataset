@@ -18,7 +18,7 @@
     <exec invariant="npgsql">
       <![CDATA[
 -- FOR MASTER RELATIONSHIP TYPE
-INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) 
+INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) 
 	SELECT 
 		'FCD37959-5BC2-48DB-BBB5-36AFD9EDF19A', CD_ID, '7c08bd55-4d42-49cd-92f8-6388d6c4183f', 'SCOPING ORGANIZATION'
 	FROM CD_SET_MEM_ASSOC_TBL WHERE SET_ID = '4E6DA567-0094-4F23-8555-11DA499593AF'
@@ -28,7 +28,7 @@ INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err
     <exec invariant="FirebirdSQL">
       <![CDATA[
 -- FOR MASTER RELATIONSHIP TYPE
-INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) 
+INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) 
 	SELECT 
 		char_to_uuid('FCD37959-5BC2-48DB-BBB5-36AFD9EDF19A'), CD_ID, char_to_uuid('7c08bd55-4d42-49cd-92f8-6388d6c4183f'), 'SCOPING ORGANIZATION'
 	FROM CD_SET_MEM_ASSOC_TBL WHERE SET_ID = char_to_uuid('4e6da567-0094-4f23-8555-11da499593af')

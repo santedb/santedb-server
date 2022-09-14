@@ -21,7 +21,7 @@
 <SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://santedb.org/configuration">
   <sections>
     <add type="SanteDB.Messaging.AMI.Configuration.AmiConfigurationSection, SanteDB.Messaging.AMI" />
-    <add type="SanteDB.Messaging.HDSI.Configuration.HdsiConfigurationSection, SanteDB.Messaging.HDSI" />
+    <add type="SanteDB.Rest.HDSI.Configuration.HdsiConfigurationSection, SanteDB.Rest.HDSI" />
   </sections>
   <!-- This section configures the AMI -->
   <section xsi:type="AmiConfigurationSection">

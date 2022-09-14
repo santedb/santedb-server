@@ -24,6 +24,7 @@ using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Exceptions;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Model;
+using SanteDB.Core.Model.Attributes;
 using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Claims;
@@ -41,6 +42,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
+using System.Reflection;
 using System.Security;
 using System.Security.Principal;
 using System.Text;
@@ -260,7 +262,7 @@ namespace SanteDB.Persistence.Data
 
             foreach (var pi in me.GetType().GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance))
             {
-                if (!pi.CanWrite)
+                if (!pi.CanWrite || pi.GetCustomAttribute<SerializationMetadataAttribute>() != null)
                 {
                     continue;
                 }

@@ -67,16 +67,16 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 Assert.AreEqual(1, afterInsert.LoadProperty(o => o.Names).Count);
                 Assert.AreEqual("Good Health Hospital", afterInsert.Names.First().LoadProperty(o=> o.Component).First().Value);
                 Assert.AreEqual(1, afterInsert.LoadProperty(o => o.Identifiers).Count);
-                Assert.AreEqual(IdentityDomainKeys.Gs1GlobalLocationNumber, afterInsert.Identifiers.First().AuthorityKey);
+                Assert.AreEqual(IdentityDomainKeys.Gs1GlobalLocationNumber, afterInsert.Identifiers.First().IdentityDomainKey);
                 Assert.AreEqual("34943934943", afterInsert.Identifiers.First().Value);
                 Assert.AreEqual(10, afterInsert.LoadProperty(o => o.GeoTag).Lat);
 
                 // Test querying 
-                var afterQuery = base.TestQuery<Place>(o => o.Identifiers.Any(i => i.Value == "34943934943" && i.Authority.DomainName == "GLN"), 1).AsResultSet().First();
+                var afterQuery = base.TestQuery<Place>(o => o.Identifiers.Any(i => i.Value == "34943934943" && i.IdentityDomain.DomainName == "GLN"), 1).AsResultSet().First();
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Names).Count);
                 Assert.AreEqual("Good Health Hospital", afterQuery.Names.First().LoadProperty(o => o.Component).First().Value);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Identifiers).Count);
-                Assert.AreEqual(IdentityDomainKeys.Gs1GlobalLocationNumber, afterQuery.Identifiers.First().AuthorityKey);
+                Assert.AreEqual(IdentityDomainKeys.Gs1GlobalLocationNumber, afterQuery.Identifiers.First().IdentityDomainKey);
                 Assert.AreEqual("34943934943", afterQuery.Identifiers.First().Value);
                 Assert.IsFalse(afterQuery.IsMobile);
                 Assert.AreEqual(10, afterQuery.LoadProperty(o => o.GeoTag).Lat);
@@ -91,11 +91,11 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 });
                 Assert.IsTrue(afterUpdate.IsMobile);
 
-                afterQuery = base.TestQuery<Place>(o => o.Identifiers.Any(i => i.Value == "34943934943" && i.Authority.DomainName == "GLN"), 0).FirstOrDefault();
-                afterQuery = base.TestQuery<Place>(o => o.Identifiers.Any(i => i.Value == "999999999" && i.Authority.DomainName == "GLN"), 1).AsResultSet().First();
+                afterQuery = base.TestQuery<Place>(o => o.Identifiers.Any(i => i.Value == "34943934943" && i.IdentityDomain.DomainName == "GLN"), 0).FirstOrDefault();
+                afterQuery = base.TestQuery<Place>(o => o.Identifiers.Any(i => i.Value == "999999999" && i.IdentityDomain.DomainName == "GLN"), 1).AsResultSet().First();
                 afterQuery = base.TestQuery<Place>(o => o.IsMobile == true && o.GeoTag.Lat == 10 && o.GeoTag.Lng == 10, 1).AsResultSet().First();
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Identifiers).Count);
-                Assert.AreEqual(IdentityDomainKeys.Gs1GlobalLocationNumber, afterQuery.Identifiers.First().AuthorityKey);
+                Assert.AreEqual(IdentityDomainKeys.Gs1GlobalLocationNumber, afterQuery.Identifiers.First().IdentityDomainKey);
                 Assert.AreEqual("999999999", afterQuery.Identifiers.First().Value);
                 Assert.IsTrue(afterQuery.IsMobile);
                 Assert.AreEqual(1, afterQuery.LoadProperty(o => o.Addresses).Count);
@@ -158,7 +158,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                     return o;
                 });
 
-                afterQuery = base.TestQuery<Place>(o => o.Identifiers.Any(i => i.Value == "1234567890987654321" && i.Authority.DomainName == "GLN"), 1).AsResultSet().First();
+                afterQuery = base.TestQuery<Place>(o => o.Identifiers.Any(i => i.Value == "1234567890987654321" && i.IdentityDomain.DomainName == "GLN"), 1).AsResultSet().First();
                 afterQuery = base.TestQuery<Place>(o => o.Services.Any(s => s.ServiceConceptKey == service2), 1).AsResultSet().First();
                 Assert.AreEqual(2, afterQuery.LoadProperty(o => o.Services).Count);
 

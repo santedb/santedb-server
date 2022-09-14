@@ -47,7 +47,7 @@ CREATE TABLE rel_vrfy_systbl (
 	src_cls_cd_id UUID, -- THE CLASS CODE OF THE SOURCE ENTITY
 	trg_cls_cd_id UUID, -- THE CLASS CODE OF THE TARGET ENTITY
 	err_desc VARCHAR(128) NOT NULL, -- THE ERROR CONDITION
-	rel_cls INTEGER NOT NULL CHECK (rel_cls IN (1,2,3)),
+	rel_cls INTEGER NOT NULL DEFAULT 1 CHECK (rel_cls IN (1,2,3)),
 	CONSTRAINT pk_rel_vrfy_systbl PRIMARY KEY (rel_vrfy_id),
 	CONSTRAINT fk_rel_vrfy_rel_typ_cd FOREIGN KEY (rel_typ_cd_id) REFERENCES cd_tbl(cd_id),
 	CONSTRAINT fk_rel_vrfy_src_cls_cd FOREIGN KEY (src_cls_cd_id) REFERENCES cd_tbl(cd_id),

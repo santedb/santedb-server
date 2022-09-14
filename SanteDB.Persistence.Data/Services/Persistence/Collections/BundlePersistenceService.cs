@@ -51,7 +51,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
     /// <summary>
     /// Represents a persistence service that wraps and persists the objects in a bundle
     /// </summary>
-    public sealed class BundlePersistenceService : IDataPersistenceService<Bundle>, IAdoPersistenceProvider<Bundle>, IDataPersistenceService
+    public sealed class BundlePersistenceService : IDataPersistenceService<Bundle>, IAdoPersistenceProvider<Bundle>, IDataPersistenceService, IReportProgressChanged
     {
 
         private readonly Tracer m_tracer = Tracer.GetTracer(typeof(BundlePersistenceService));
@@ -112,6 +112,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
         public event EventHandler<DataRetrievingEventArgs<Bundle>> Retrieving;
         /// <inheritdoc/>
         public event EventHandler<DataRetrievedEventArgs<Bundle>> Retrieved;
+        /// <inheritdoc/>
+        public event EventHandler<ProgressChangedEventArgs> ProgressChanged;
 #pragma warning restore CS0067
 
         /// <summary>
@@ -256,7 +258,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
             }
             catch(Exception e)
             {
-                this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "General error executing insert operation", data, e);
                 throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.DATA_GENERAL), e);
             }
         }
@@ -296,38 +297,49 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Collections
             data = this.ReorganizeForInsert(data);
             for (var i = 0; i < data.Item.Count; i++)
             {
+                this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs((float)i / (float)data.Item.Count, UserMessages.PROCESSING));
                 var persistenceService = data.Item[i].GetType().GetRelatedPersistenceService();
-                switch (data.Item[i].BatchOperation)
+                try
                 {
-                    case BatchOperationType.Delete:
-                        data.Item[i] = persistenceService.Delete(context, data.Item[i].Key.Value, DataPersistenceControlContext.Current?.DeleteMode ?? this.m_configuration.DeleteStrategy);
-                        data.Item[i].BatchOperation = BatchOperationType.Delete;
-                        break;
-                    case BatchOperationType.Insert:
-                        data.Item[i] = persistenceService.Insert(context, data.Item[i]);
-                        data.Item[i].BatchOperation = BatchOperationType.Insert;
-                        break;
-                    case BatchOperationType.Update:
-                        data.Item[i] = persistenceService.Update(context, data.Item[i]);
-                        data.Item[i].BatchOperation = BatchOperationType.Update;
-                        break;
-                    case BatchOperationType.InsertOrUpdate:
-                    case BatchOperationType.Auto:
-
-                        // Ensure that the object exists
-                        if (data.Item[i].Key.HasValue && persistenceService.Exists(context, data.Item[i].Key.Value))
-                        {
-                            data.Item[i] = persistenceService.Update(context, data.Item[i]);
-                            data.Item[i].BatchOperation = BatchOperationType.Update;
-                        }
-                        else
-                        {
+                    switch (data.Item[i].BatchOperation)
+                    {
+                        case BatchOperationType.Delete:
+                            data.Item[i] = persistenceService.Delete(context, data.Item[i].Key.Value, DataPersistenceControlContext.Current?.DeleteMode ?? this.m_configuration.DeleteStrategy);
+                            data.Item[i].BatchOperation = BatchOperationType.Delete;
+                            break;
+                        case BatchOperationType.Insert:
                             data.Item[i] = persistenceService.Insert(context, data.Item[i]);
                             data.Item[i].BatchOperation = BatchOperationType.Insert;
-                        }
-                        break;
-                }
+                            break;
+                        case BatchOperationType.Update:
+                            data.Item[i] = persistenceService.Update(context, data.Item[i]);
+                            data.Item[i].BatchOperation = BatchOperationType.Update;
+                            break;
+                        case BatchOperationType.InsertOrUpdate:
+                        case BatchOperationType.Auto:
 
+                            // Ensure that the object exists
+                            if (data.Item[i].Key.HasValue && persistenceService.Exists(context, data.Item[i].Key.Value))
+                            {
+                                data.Item[i] = persistenceService.Update(context, data.Item[i]);
+                                data.Item[i].BatchOperation = BatchOperationType.Update;
+                            }
+                            else
+                            {
+                                data.Item[i] = persistenceService.Insert(context, data.Item[i]);
+                                data.Item[i].BatchOperation = BatchOperationType.Insert;
+                            }
+                            break;
+                    }
+                }
+                catch(DbException e)
+                {
+                    throw new DataPersistenceException(String.Format(ErrorMessages.BUNDLE_PERSISTENCE_ERROR, i, data.Item[i]), e.TranslateDbException());
+                }
+                catch(Exception e)
+                {
+                    throw new DataPersistenceException(String.Format(ErrorMessages.BUNDLE_PERSISTENCE_ERROR, i, data.Item[i]), e);
+                }
             }
 
             // Give the bundle a UUID indicating it was persisted (use the prov id)

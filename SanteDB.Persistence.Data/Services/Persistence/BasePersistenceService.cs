@@ -288,7 +288,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             finally
             {
                 sw.Stop();
-                this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Verbose, $"PERFORMANCE: DoInsertModel - {sw.ElapsedMilliseconds}ms", data, new StackTrace());
+                this.m_tracer.TraceVerbose($"PERFORMANCE: DoInsertModel - {sw.ElapsedMilliseconds}ms");
             }
 #endif
         }
@@ -333,7 +333,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             finally
             {
                 sw.Stop();
-                this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Verbose, $"PERFORMANCE: DoUpdateModel - {sw.ElapsedMilliseconds}ms", data, new StackTrace());
+                this.m_tracer.TraceVerbose($"PERFORMANCE: DoUpdateModel - {sw.ElapsedMilliseconds}ms");
+
             }
 #endif
         }
@@ -367,7 +368,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             finally
             {
                 sw.Stop();
-                this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Verbose, $"PERFORMANCE: DoObsoleteModel - {sw.ElapsedMilliseconds}ms", expression, new StackTrace());
+                this.m_tracer.TraceVerbose($"PERFORMANCE: DoObsoleteModel - {sw.ElapsedMilliseconds}ms");
+
             }
 #endif
         }
@@ -407,7 +409,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             finally
             {
                 sw.Stop();
-                this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Verbose, $"PERFORMANCE: DoObsoleteModel - {sw.ElapsedMilliseconds}ms", key, new StackTrace());
+                this.m_tracer.TraceVerbose($"PERFORMANCE: DoObsoleteModel - {sw.ElapsedMilliseconds}ms");
+
             }
 #endif
         }
@@ -477,7 +480,8 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             finally
             {
                 sw.Stop();
-                this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Verbose, $"PERFORMANCE: DoGetModel - {sw.ElapsedMilliseconds}ms", key, new StackTrace());
+                this.m_tracer.TraceVerbose($"PERFORMANCE: DoGetModel - {sw.ElapsedMilliseconds}ms");
+
             }
 #endif
         }
@@ -504,12 +508,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 }
                 catch (DbException e)
                 {
-                    this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "Data error executing count operation", query, e);
                     throw e.TranslateDbException();
                 }
                 catch (Exception e)
                 {
-                    this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "General error executing count operation", query, e);
                     throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.DATA_GENERAL), e);
                 }
             }
@@ -588,12 +590,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     }
                     catch (DbException e)
                     {
-                        this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "Data error executing get operation", key, e);
                         throw e.TranslateDbException();
                     }
                     catch (Exception e)
                     {
-                        this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "General error executing get operation", key, e);
                         throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.DATA_GENERAL), e);
                     }
                 }
@@ -696,12 +696,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }
             catch (DbException e)
             {
-                this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "Data error executing insert operation", data, e);
                 throw e.TranslateDbException();
             }
             catch (Exception e)
             {
-                this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "General error executing insert operation", data, e);
                 throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.DATA_GENERAL), e);
             }
         }
@@ -868,7 +866,6 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             this.Updating?.Invoke(this, preEvt);
             if (preEvt.Cancel)
             {
-                this.m_tracer.TraceVerbose("Pre-Persistence Event for Update indicates cancel for {0}", data);
                 return preEvt.Data;
             }
 
@@ -910,12 +907,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 }
                 catch (DbException e)
                 {
-                    this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "Data error executing update operation", data, e);
                     throw e.TranslateDbException();
                 }
                 catch (Exception e)
                 {
-                    this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "General error executing update operation", data, e);
                     throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.DATA_GENERAL), e);
                 }
             }
@@ -1147,12 +1142,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 }
                 catch (DbException e)
                 {
-                    this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "Data error executing delete operation", key, e);
                     throw e.TranslateDbException();
                 }
                 catch (Exception e)
                 {
-                    this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "General error executing delete operation", key, e);
                     throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.DATA_GENERAL), e);
                 }
             }
@@ -1201,12 +1194,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 }
                 catch (DbException e)
                 {
-                    this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "Data error executing delete all operation", expression, e);
                     throw e.TranslateDbException();
                 }
                 catch (Exception e)
                 {
-                    this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "General error executing delete all operation", expression, e);
                     throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.DATA_GENERAL), e);
                 }
             }
@@ -1253,12 +1244,10 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 }
                 catch (DbException e)
                 {
-                    this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "Data error executing touch operation", key, e);
                     throw e.TranslateDbException();
                 }
                 catch (Exception e)
                 {
-                    this.m_tracer.TraceData(System.Diagnostics.Tracing.EventLevel.Error, "General error executing touch operation", key, e);
                     throw new DataPersistenceException(this.m_localizationService.GetString(ErrorMessageStrings.DATA_GENERAL), e);
                 }
             }

@@ -37,7 +37,7 @@
     </sources>
     <writers>
       <add name="main" initializationData="santedb.log" filter="Warning">
-        <writer type="SanteDB.Server.Core.Diagnostics.RolloverTextWriterTraceWriter, SanteDB.Server.Core"/>
+        <writer type="SanteDB.Core.Diagnostics.Tracing.RolloverTextWriterTraceWriter, SanteDB.Core.Api"/>
       </add>
     </writers>
   </section>

@@ -54,27 +54,13 @@
     providerType="npgsql"
     autoUpdateExisting="true"
     autoInsertChildren="true"
-    prepareStatements="true"
-      validationLevel="Warning" />
-  <section xsi:type="AdoPersistenceConfigurationSection"
-           readWriteConnectionString="PSQL"
-           readOnlyConnectionString="PSQL"
-           traceSql="false"
-			     providerType="Npgsql"
-           staOnly="false"
-		       fuzzyTotal="false"
-           autoUpdateExisting="true"
-           autoInsertChildren="true"
-           prepareStatements="true"
-      validationLevel="Warning">
-    <!-- Any corrective handlers should be added here
-    <corrections>
-      <add>value</add>
-    </corrections>
-    To limit the resources that can be persisted in ADO.NET add them here
-    <resources>
-      <add>value</add>
-    </resources>
-    -->
+    prepareStatements="true" />
+  <section xsi:type="AdoPersistenceConfigurationSection" readWriteConnectionString="PSQL" readOnlyConnectionString="PSQL" traceSql="false" providerType="npgsql" versioning="default"  autoUpdateExisting="true" keyValidation="false" autoInsertChildren="true" prepareStatements="true" loadStrategy="SyncLoad" encryptPublicKeys="false" deleteStrategy="LogicalDelete" >
+    <validation unique="loose" scope="loose" authority="loose" format="loose" checkDigit="loose" />
+    <maxPageSize xsi:nil="true" />
+    <caching>
+      <target>ModelObjects</target>
+      <dataObjectExpiration />
+    </caching>
   </section>
 </SanteDBConfiguration>

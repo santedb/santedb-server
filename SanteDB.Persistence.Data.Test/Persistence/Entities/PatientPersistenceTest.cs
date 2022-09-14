@@ -97,7 +97,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 Assert.AreEqual(afterInsert.Key, afterQuery.Key);
                 Assert.IsNull(afterQuery.GenderConcept);
                 Assert.AreEqual("NullFlavor-Other", afterQuery.LoadProperty(o => o.GenderConcept).Mnemonic);
-                Assert.AreEqual(this.GetOrCreateAA(), afterQuery.LoadProperty(o => o.Identifiers).First().AuthorityKey);
+                Assert.AreEqual(this.GetOrCreateAA(), afterQuery.LoadProperty(o => o.Identifiers).First().IdentityDomainKey);
 
                 // Attempt query by marital status (special patient property)
                 afterQuery = base.TestQuery<Patient>(o => o.MaritalStatusKey == NullReasonKeys.NotAsked, 1).AsResultSet().First();
@@ -358,7 +358,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 var afterQuery = base.TestQuery<Entity>(o => o.Names.Any(n => n.Component.Where(g => g.ComponentType.Mnemonic == "Given").Any(c => c.Value == "Entity1")), 1).AsResultSet().First();
                 Assert.AreEqual(afterInsert.Key, afterQuery.Key);
                 Assert.IsInstanceOf<Patient>(afterQuery);
-                Assert.AreEqual(this.GetOrCreateAA(), afterQuery.LoadProperty(o => o.Identifiers).First().AuthorityKey);
+                Assert.AreEqual(this.GetOrCreateAA(), afterQuery.LoadProperty(o => o.Identifiers).First().IdentityDomainKey);
                 Assert.AreEqual(NullReasonKeys.NotAsked, (afterQuery as Patient).MaritalStatusKey);
 
                 var separated = Guid.Parse("fcba6282-a886-444d-b534-c5dc263e2539");
@@ -372,7 +372,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
 
                 afterQuery = base.TestQuery<Entity>(o => o.Names.Any(n => n.Component.Where(g => g.ComponentType.Mnemonic == "Given").Any(c => c.Value == "Entity1")), 1).AsResultSet().First();
                 Assert.IsInstanceOf<Patient>(afterQuery);
-                Assert.AreEqual(this.GetOrCreateAA(), afterQuery.LoadProperty(o => o.Identifiers).First().AuthorityKey);
+                Assert.AreEqual(this.GetOrCreateAA(), afterQuery.LoadProperty(o => o.Identifiers).First().IdentityDomainKey);
                 Assert.AreEqual(separated, (afterQuery as Patient).MaritalStatusKey);
 
             }
@@ -413,7 +413,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 var afterQuery = base.TestQuery<Person>(o => o.Names.Any(n => n.Component.Where(g => g.ComponentType.Mnemonic == "Given").Any(c => c.Value == "Person1")) && o.DateOfBirth == patient.DateOfBirth, 1).AsResultSet().First();
                 Assert.AreEqual(afterInsert.Key, afterQuery.Key);
                 Assert.IsInstanceOf<Patient>(afterQuery);
-                Assert.AreEqual(this.GetOrCreateAA(), afterQuery.LoadProperty(o => o.Identifiers).First().AuthorityKey);
+                Assert.AreEqual(this.GetOrCreateAA(), afterQuery.LoadProperty(o => o.Identifiers).First().IdentityDomainKey);
                 Assert.AreEqual(NullReasonKeys.NotAsked, (afterQuery as Patient).MaritalStatusKey);
 
                 var separated = Guid.Parse("fcba6282-a886-444d-b534-c5dc263e2539");
@@ -427,7 +427,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
 
                 afterQuery = base.TestQuery<Person>(o => o.Names.Any(n => n.Component.Where(g => g.ComponentType.Mnemonic == "Given").Any(c => c.Value == "Person1")) && o.DateOfBirth == patient.DateOfBirth, 1).AsResultSet().First();
                 Assert.IsInstanceOf<Patient>(afterQuery);
-                Assert.AreEqual(this.GetOrCreateAA(), afterQuery.LoadProperty(o => o.Identifiers).First().AuthorityKey);
+                Assert.AreEqual(this.GetOrCreateAA(), afterQuery.LoadProperty(o => o.Identifiers).First().IdentityDomainKey);
                 Assert.AreEqual(separated, (afterQuery as Patient).MaritalStatusKey);
 
             }

@@ -339,10 +339,10 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
                 Assert.IsNotNull(afterInsert.CreationTime);
                 Assert.AreEqual(1, afterInsert.Identifiers.Count);
 
-                var fetch = base.TestQuery<Entity>(o => o.Identifiers.Where(g => g.Authority.DomainName == "TEST_3").Any(i => i.Value == "TEST3"), 1).AsResultSet();
+                var fetch = base.TestQuery<Entity>(o => o.Identifiers.Where(g => g.IdentityDomain.DomainName == "TEST_3").Any(i => i.Value == "TEST3"), 1).AsResultSet();
                 var afterFetch = fetch.First();
                 Assert.AreEqual(1, afterFetch.LoadProperty(o => o.Identifiers).Count);
-                Assert.AreEqual("TEST_3", afterFetch.Identifiers[0].LoadProperty(o=>o.Authority).DomainName);
+                Assert.AreEqual("TEST_3", afterFetch.Identifiers[0].LoadProperty(o=>o.IdentityDomain).DomainName);
             }
         }
 
@@ -513,7 +513,7 @@ namespace SanteDB.Persistence.Data.Test.Persistence.Entities
 
                 Assert.AreEqual(1, afterFetch.LoadProperty(o => o.Identifiers).Count);
                 Assert.AreEqual("TEST_8", afterFetch.Identifiers[0].Value);
-                Assert.AreEqual("TEST8", afterFetch.Identifiers[0].LoadProperty(o => o.Authority).DomainName);
+                Assert.AreEqual("TEST8", afterFetch.Identifiers[0].LoadProperty(o => o.IdentityDomain).DomainName);
 
                 Assert.AreEqual(1, afterFetch.LoadProperty(o => o.Telecoms).Count);
                 Assert.AreEqual("mailto:justin2@fyfesoftware.ca", afterFetch.Telecoms[0].Value);

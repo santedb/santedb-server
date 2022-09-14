@@ -164,7 +164,7 @@ namespace SanteDB.Messaging.HDSI.Test
 		public void TestEntityIdentifierChain()
 		{
 			var dtString = DateTime.Now;
-			Expression<Func<Entity, bool>> expected = (o => o.Identifiers.Any(identifier => identifier.Authority.Oid == "1.2.3.4" && identifier.Value == "123"));
+			Expression<Func<Entity, bool>> expected = (o => o.Identifiers.Any(identifier => identifier.IdentityDomain.Oid == "1.2.3.4" && identifier.Value == "123"));
 
 			NameValueCollection httpQueryParameters = new NameValueCollection();
 			httpQueryParameters.Add("identifier.domain.oid", "1.2.3.4");

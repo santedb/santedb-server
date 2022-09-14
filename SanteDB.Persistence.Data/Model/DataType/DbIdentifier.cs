@@ -61,7 +61,7 @@ namespace SanteDB.Persistence.Data.Model.DataType
         /// </summary>
         /// <value>The authority identifier.</value>
         [Column("dmn_id"), ForeignKey(typeof(DbIdentityDomain), nameof(DbIdentityDomain.Key)), AlwaysJoin]
-        public Guid AuthorityKey
+        public Guid IdentityDomainKey
         {
             get;
             set;

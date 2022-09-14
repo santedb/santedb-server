@@ -60,6 +60,11 @@ namespace SanteDB.Persistence.Data.Configuration.Features
         public override Type ConfigurationType => typeof(AdoPersistenceConfigurationSection);
 
         /// <summary>
+        /// Group this feature belongs to
+        /// </summary>
+        public override string Group => FeatureGroup.Persistence;
+
+        /// <summary>
         /// Register ADO service providers
         /// </summary>
         private class RegisterAdoProvidersTask : IConfigurationTask
@@ -75,7 +80,7 @@ namespace SanteDB.Persistence.Data.Configuration.Features
                 typeof(AdoApplicationIdentityProvider),
                 typeof(AdoSecurityChallengeProvider),
                 typeof(AdoRoleProvider),
-                //typeof(AdoSubscriptionExecutor),
+                typeof(AdoSubscriptionExecutor),
                 typeof(AdoSessionProvider)
             };
 
@@ -148,6 +153,17 @@ namespace SanteDB.Persistence.Data.Configuration.Features
         {
             AutoInsertChildren = true,
             AutoUpdateExisting = true,
+            Validation = new List<AdoValidationPolicy>()
+            {
+                new AdoValidationPolicy()
+                {
+                    Uniqueness = AdoValidationEnforcement.Loose,
+                    Authority = AdoValidationEnforcement.Loose,
+                    CheckDigit = AdoValidationEnforcement.Loose,
+                    Scope = AdoValidationEnforcement.Strict,
+                    Format = AdoValidationEnforcement.Loose
+                }
+            }
         };
     }
 }

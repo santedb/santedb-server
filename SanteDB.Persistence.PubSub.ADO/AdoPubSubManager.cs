@@ -413,7 +413,7 @@ namespace SanteDB.Persistence.PubSub.ADO
 
             try
             {
-                return new MappedQueryResultSet<PubSubSubscriptionDefinition>(this);
+                return new MappedQueryResultSet<PubSubSubscriptionDefinition>(this).Where(filter);
             }
             catch (Exception e)
             {

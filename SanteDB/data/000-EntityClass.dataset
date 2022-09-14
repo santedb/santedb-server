@@ -2,17 +2,6 @@
 <dataset xmlns="http://santedb.org/data" id="ListActClass Codes">
 
   <update insertIfNotExists="true">
-    <CodeSystem xmlns="http://santedb.org/model">
-      <id>BAB1D66A-1E98-4BFD-9B4A-7C4BE88F35D1</id>
-      <name>ActClass</name>
-      <oid>2.16.840.1.113883.5.6</oid>
-      <authority>HL7 International</authority>
-      <url>http://santedb.org/conceptset/v3-ActClassClinicalDocument</url>
-      <description>Classification codes for Acts</description>
-    </CodeSystem>
-  </update>
-  
-  <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>6a2b00ba-501b-4523-b57c-f96d8ae44684</id>
       <isReadonly>true</isReadonly>
@@ -27,4 +16,112 @@
     </Concept>
   </update>
 
+
+  <sql>
+    <exec invariant="npgsql">
+      <![CDATA[
+      	INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+	VALUES (uuid_generate_v1(), ('0B82357F-5AE0-4543-AB8E-A33E9B315BAB'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Witness]=>UserEntity', 3);--#!
+INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+	VALUES (uuid_generate_v1(), ('F9DC5787-DD4D-42C6-A082-AC7D11956FDA'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Verifier]=>UserEntity', 3);--#!
+INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+	VALUES (uuid_generate_v1(), ('DE3F7527-E3C9-45EF-8574-00CA4495F767'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Transcriber]=>UserEntity', 3);--#!
+INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+	VALUES (uuid_generate_v1(), ('53C694B8-27D8-43DD-95A4-BB318431D17C'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Receiver]=>UserEntity', 3);--#!
+INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+	VALUES (uuid_generate_v1(), ('353F9255-765E-4336-8007-1D61AB09AAD6'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[ReferredBy]=>UserEntity', 3);--#!
+INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+	VALUES (uuid_generate_v1(), ('79F6136C-1465-45E8-917E-E7832BC8E3B2'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[PrimaryPerformer]=>UserEntity', 3);--#!
+INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+	VALUES (uuid_generate_v1(), ('FA5E70A4-A46E-4665-8A20-94D4D7B86FC8'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Performer]=>UserEntity', 3);--#!
+INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+	VALUES (uuid_generate_v1(), ('0716A333-CD46-439D-BFD6-BF788F3885FA'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[LegalAuthenticator]=>UserEntity', 3);--#!
+INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+	VALUES (uuid_generate_v1(), ('A0174216-6439-4351-9483-A241A48029B7'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Admitter]=>UserEntity', 3);--#!
+INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+	VALUES (uuid_generate_v1(), ('1B2DBF82-A503-4CF4-9ECB-A8E111B4674E'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Authenticator]=>UserEntity', 3);--#!
+INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+	VALUES (uuid_generate_v1(), ('F0CB3FAF-435D-4704-9217-B884F757BC14'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[AuthorOrOriginator]=>UserEntity', 3);--#!
+INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+	VALUES (uuid_generate_v1(), ('28C744DF-D889-4A44-BC1A-2E9E9D64AF13'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Beneficiary]=>UserEntity', 3);--#!
+INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+	VALUES (uuid_generate_v1(), ('A2594E6E-E8FE-4C68-82A5-D3A46DBEC87D'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Discharger]=>UserEntity', 3);--#!
+INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+	VALUES (uuid_generate_v1(), ('39604248-7812-4B60-BC54-8CC1FFFB1DE6'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Informant]=>UserEntity', 3);--#!
+
+      ]]>
+    </exec>
+    <exec invariant="FirebirdSQL">
+      <![CDATA[	
+INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+	VALUES (gen_uuid(), char_to_uuid('0B82357F-5AE0-4543-AB8E-A33E9B315BAB'), null, char_to_uuid('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Witness]=>UserEntity', 3);--#!
+]]>
+    </exec>
+    <exec invariant="FirebirdSQL">
+      <![CDATA[INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+	VALUES (gen_uuid(), char_to_uuid('F9DC5787-DD4D-42C6-A082-AC7D11956FDA'), null, char_to_uuid('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Verifier]=>UserEntity', 3);--#!
+]]>
+    </exec>
+    <exec invariant="FirebirdSQL">
+      <![CDATA[INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+	VALUES (gen_uuid(), char_to_uuid('DE3F7527-E3C9-45EF-8574-00CA4495F767'), null, char_to_uuid('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Transcriber]=>UserEntity', 3);--#!
+]]>
+    </exec>
+    <exec invariant="FirebirdSQL">
+      <![CDATA[INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+	VALUES (gen_uuid(), char_to_uuid('53C694B8-27D8-43DD-95A4-BB318431D17C'), null, char_to_uuid('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Receiver]=>UserEntity', 3);--#!
+]]>
+    </exec>
+    <exec invariant="FirebirdSQL">
+      <![CDATA[INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+	VALUES (gen_uuid(), char_to_uuid('353F9255-765E-4336-8007-1D61AB09AAD6'), null, char_to_uuid('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[ReferredBy]=>UserEntity', 3);--#!
+]]>
+    </exec>
+    <exec invariant="FirebirdSQL">
+      <![CDATA[INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+	VALUES (gen_uuid(), char_to_uuid('79F6136C-1465-45E8-917E-E7832BC8E3B2'), null, char_to_uuid('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[PrimaryPerformer]=>UserEntity', 3);--#!
+]]>
+    </exec>
+    <exec invariant="FirebirdSQL">
+      <![CDATA[INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+	VALUES (gen_uuid(), char_to_uuid('FA5E70A4-A46E-4665-8A20-94D4D7B86FC8'), null, char_to_uuid('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Performer]=>UserEntity', 3);--#!
+]]>
+    </exec>
+    <exec invariant="FirebirdSQL">
+      <![CDATA[INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+	VALUES (gen_uuid(), char_to_uuid('0716A333-CD46-439D-BFD6-BF788F3885FA'), null, char_to_uuid('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[LegalAuthenticator]=>UserEntity', 3);--#!
+]]>
+    </exec>
+    <exec invariant="FirebirdSQL">
+      <![CDATA[INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+	VALUES (gen_uuid(), char_to_uuid('39604248-7812-4B60-BC54-8CC1FFFB1DE6'), null, char_to_uuid('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Informant]=>UserEntity', 3);--#!
+]]>
+    </exec>
+    <exec invariant="FirebirdSQL">
+      <![CDATA[INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+	VALUES (gen_uuid(), char_to_uuid('A2594E6E-E8FE-4C68-82A5-D3A46DBEC87D'), null, char_to_uuid('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Discharger]=>UserEntity', 3);--#!
+]]>
+    </exec>
+    <exec invariant="FirebirdSQL">
+      <![CDATA[INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+	VALUES (gen_uuid(), char_to_uuid('28C744DF-D889-4A44-BC1A-2E9E9D64AF13'), null, char_to_uuid('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Beneficiary]=>UserEntity', 3);--#!
+]]>
+    </exec>
+    <exec invariant="FirebirdSQL">
+      <![CDATA[INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+	VALUES (gen_uuid(), char_to_uuid('F0CB3FAF-435D-4704-9217-B884F757BC14'), null, char_to_uuid('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[AuthorOrOriginator]=>UserEntity', 3);--#!
+]]>
+    </exec>
+    <exec invariant="FirebirdSQL">
+      <![CDATA[INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+	VALUES (gen_uuid(), char_to_uuid('1B2DBF82-A503-4CF4-9ECB-A8E111B4674E'), null, char_to_uuid('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Authenticator]=>UserEntity', 3);--#!
+]]>
+    </exec>
+    <exec invariant="FirebirdSQL">
+      <![CDATA[INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+	VALUES (gen_uuid(), char_to_uuid('A0174216-6439-4351-9483-A241A48029B7'), null, char_to_uuid('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Admitter]=>UserEntity', 3);--#!
+]]>
+    </exec>
+
+  </sql>
 </dataset>

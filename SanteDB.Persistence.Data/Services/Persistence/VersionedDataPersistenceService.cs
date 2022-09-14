@@ -167,7 +167,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
             }
 
             // Validation map
-            this.m_validationConfiguration = this.m_configuration.Validation.Where(o => o.Target == null || typeof(TModel).IsAssignableFrom(o.Target.Type)).ToDictionary(o => o.Target?.Type ?? typeof(Object), o => o);
+            this.m_validationConfiguration = 
+                this.m_configuration.Validation
+                .Where(o => o.Target == null || typeof(TModel).IsAssignableFrom(o.Target.Type))
+                .GroupBy(o=>o.Target?.Type ?? typeof(Object))
+                .ToDictionary(o => o.Key ?? typeof(Object), o => o.First());
         }
 
         /// <summary>
@@ -188,11 +192,11 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 // Get ID
                 DbIdentityDomain dbAuth = null;
 
-                if (id.AuthorityKey.HasValue)
+                if (id.IdentityDomainKey.HasValue)
                 {
-                    dbAuth = this.m_adhocCache?.Get<DbIdentityDomain>($"{DataConstants.AdhocAuthorityKey}{id.AuthorityKey}");
+                    dbAuth = this.m_adhocCache?.Get<DbIdentityDomain>($"{DataConstants.AdhocAuthorityKey}{id.IdentityDomainKey}");
                     if (dbAuth == null)
-                        dbAuth = context.FirstOrDefault<DbIdentityDomain>(o => o.Key == id.AuthorityKey);
+                        dbAuth = context.FirstOrDefault<DbIdentityDomain>(o => o.Key == id.IdentityDomainKey);
                 }
                 else if (id.Authority == null)
                 {
@@ -237,13 +241,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     ownedByOthers = context.Query<DbEntityIdentifier>(
                         context.CreateSqlStatement()
                         .SelectFrom(typeof(DbEntityIdentifier))
-                        .Where<DbEntityIdentifier>(o => o.Value == id.Value && o.AuthorityKey == id.Authority.Key && o.ObsoleteVersionSequenceId == null && o.SourceKey != objectToVerify.Key)
+                        .Where<DbEntityIdentifier>(o => o.Value == id.Value && o.IdentityDomainKey == id.Authority.Key && o.ObsoleteVersionSequenceId == null && o.SourceKey != objectToVerify.Key)
                         .And("NOT EXISTS (SELECT 1 FROM ent_rel_tbl WHERE (src_ent_id = ? AND trg_ent_id = ent_id_tbl.ent_id OR trg_ent_id = ? AND src_ent_id = ent_id_tbl.ent_id) AND obslt_vrsn_seq_id IS NULL)", objectToVerify.Key, objectToVerify.Key)
                     ).Any();
                     ownedByMe = context.Query<DbEntityIdentifier>(
                         context.CreateSqlStatement()
                         .SelectFrom(typeof(DbEntityIdentifier))
-                        .Where<DbEntityIdentifier>(o => o.Value == id.Value && o.AuthorityKey == id.Authority.Key && o.ObsoleteVersionSequenceId == null)
+                        .Where<DbEntityIdentifier>(o => o.Value == id.Value && o.IdentityDomainKey == id.Authority.Key && o.ObsoleteVersionSequenceId == null)
                         .And("(ent_id = ? OR EXISTS (SELECT 1 FROM ent_rel_tbl WHERE (src_ent_id = ?  AND trg_ent_id = ent_id_tbl.ent_id) OR (trg_ent_id = ? AND src_ent_id = ent_id_tbl.ent_id) AND obslt_vrsn_seq_id IS NULL))", objectToVerify.Key, objectToVerify.Key, objectToVerify.Key)
                     ).Any();
                 }
@@ -252,13 +256,13 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                     ownedByOthers = context.Query<DbActIdentifier>(
                         context.CreateSqlStatement()
                         .SelectFrom(typeof(DbActIdentifier))
-                        .Where<DbActIdentifier>(o => o.Value == id.Value && o.AuthorityKey == id.Authority.Key && o.ObsoleteVersionSequenceId == null && o.SourceKey != objectToVerify.Key)
+                        .Where<DbActIdentifier>(o => o.Value == id.Value && o.IdentityDomainKey == id.Authority.Key && o.ObsoleteVersionSequenceId == null && o.SourceKey != objectToVerify.Key)
                         .And("NOT EXISTS (SELECT 1 FROM act_rel_tbl WHERE (src_act_id = ? AND trg_act_id = act_id_tbl.act_id OR trg_act_id = ? AND src_act_id = act_id_tbl.act_id) AND obslt_vrsn_seq_id IS NULL)", objectToVerify.Key, objectToVerify.Key)
                     ).Any();
                     ownedByMe = context.Query<DbActIdentifier>(
                         context.CreateSqlStatement()
                         .SelectFrom(typeof(DbActIdentifier))
-                        .Where<DbActIdentifier>(o => o.Value == id.Value && o.AuthorityKey == id.Authority.Key && o.ObsoleteVersionSequenceId == null)
+                        .Where<DbActIdentifier>(o => o.Value == id.Value && o.IdentityDomainKey == id.Authority.Key && o.ObsoleteVersionSequenceId == null)
                         .And("(act_id = ? OR EXISTS (SELECT 1 FROM act_rel_tbl WHERE (src_act_id = ?  AND trg_act_id = act_id_tbl.act_id) OR (trg_act_id = ? AND src_act_id = act_id_tbl.act_id) AND obslt_vrsn_seq_id IS NULL))", objectToVerify.Key, objectToVerify.Key, objectToVerify.Key)
                     ).Any();
 
@@ -471,7 +475,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence
                 }
 
                 // We want to obsolete the non current version(s)
-                foreach (var itm in context.Query<TDbModel>(o => o.Key == model.Key && !o.ObsoletionTime.HasValue))
+                foreach (var itm in context.Query<TDbModel>(o => o.Key == model.Key && !o.ObsoletionTime.HasValue).ToArray())
                 {
                     itm.ObsoletionTime = DateTimeOffset.Now;
                     itm.ObsoletedByKey = context.ContextId;

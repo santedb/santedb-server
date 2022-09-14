@@ -107,7 +107,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         /// </summary>
         protected override ReferenceTerm DoUpdateModel(DataContext context, ReferenceTerm data)
         {
-            var retVal = base.DoInsertModel(context, data);
+            var retVal = base.DoUpdateModel(context, data);
 
             if (data.DisplayNames != null)
             {

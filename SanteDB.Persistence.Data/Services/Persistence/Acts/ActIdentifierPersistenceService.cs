@@ -48,7 +48,7 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
         /// </summary>
         protected override ActIdentifier BeforePersisting(DataContext context, ActIdentifier data)
         {
-            data.AuthorityKey = this.EnsureExists(context, data.Authority)?.Key ?? data.AuthorityKey;
+            data.IdentityDomainKey = this.EnsureExists(context, data.IdentityDomain)?.Key ?? data.IdentityDomainKey;
             data.IdentifierTypeKey = this.EnsureExists(context, data.IdentifierType)?.Key ?? data.IdentifierTypeKey;
             return base.BeforePersisting(context, data);
         }
@@ -66,16 +66,16 @@ namespace SanteDB.Persistence.Data.Services.Persistence.Acts
                     retVal.SetLoaded(nameof(EntityIdentifier.IdentifierType));
                     goto case LoadMode.SyncLoad;
                 case LoadMode.SyncLoad:
-                    retVal.Authority = retVal.Authority.GetRelatedMappingProvider().ToModelInstance(context, referenceObjects.OfType<DbIdentityDomain>().FirstOrDefault()) ??
-                        retVal.Authority.GetRelatedPersistenceService().Get(context, dbModel.AuthorityKey);
-                    retVal.SetLoaded(o=>o.Authority);
+                    retVal.IdentityDomain = retVal.IdentityDomain.GetRelatedMappingProvider().ToModelInstance(context, referenceObjects.OfType<DbIdentityDomain>().FirstOrDefault()) ??
+                        retVal.IdentityDomain.GetRelatedPersistenceService().Get(context, dbModel.IdentityDomainKey);
+                    retVal.SetLoaded(o=>o.IdentityDomain);
                     break;
 
                 case LoadMode.QuickLoad:
-                    retVal.Authority = retVal.Authority.GetRelatedMappingProvider().ToModelInstance(context, referenceObjects.OfType<DbIdentityDomain>().FirstOrDefault());
-                    if (retVal.Authority != null)
+                    retVal.IdentityDomain = retVal.IdentityDomain.GetRelatedMappingProvider().ToModelInstance(context, referenceObjects.OfType<DbIdentityDomain>().FirstOrDefault());
+                    if (retVal.IdentityDomain != null)
                     {
-                        retVal.SetLoaded(o => o.Authority);
+                        retVal.SetLoaded(o => o.IdentityDomain);
                     }
                     break;
             }

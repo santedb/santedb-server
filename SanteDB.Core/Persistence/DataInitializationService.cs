@@ -110,121 +110,37 @@ namespace SanteDB.Server.Core.Persistence
                 this.m_traceSource.TraceInfo("Applying {0} ({1} objects)...", ds.Id, ds.Action.Count);
 
                 int i = 0;
-                // Can this dataset be installed as a bundle?
-                if (ds.Action.All(o => o is DataUpdate && (o as DataUpdate).InsertIfNotExists && !(o.Element is IVersionedAssociation)))
+                var bundle = new Bundle()
                 {
-                    this.m_traceSource.TraceVerbose("Will install as a bundle");
-                    var bundle = new Bundle()
+                    Item = ds.Action.Where(o=>o.Element != null).Select(o =>
                     {
-                        Item = ds.Action.Select(o => o.Element).ToList()
-                    };
-
-                    var progress = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Bundle>>() as IReportProgressChanged;
-                    if (progress != null)
-                        progress.ProgressChanged += this.ProgressChanged;
-                    ApplicationServiceContext.Current.GetService<IDataPersistenceService<Bundle>>().Insert(bundle, TransactionMode.Commit, AuthenticationContext.SystemPrincipal);
-                    if (progress != null)
-                        progress.ProgressChanged -= this.ProgressChanged;
-                }
-                else
-                    foreach (var itm in ds.Action.Where(o => o.Element != null))
-                    {
-                        try
+                        switch (o)
                         {
-                            this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs(i++ / (float)ds.Action.Count, ds.Id));
-                            //if (ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Size > 10000) // Probably a good idea to clear memcache
-                            //    ApplicationServiceContext.Current.GetService<IDataCachingService>().Clear();
-
-                            // IDP Type
-                            Type idpType = typeof(IDataPersistenceService<>);
-                            idpType = idpType.MakeGenericType(new Type[] { itm.Element.GetType() });
-                            var idpInstance = ApplicationServiceContext.Current.GetService(idpType) as IDataPersistenceService;
-
-                            // Don't insert duplicates
-                            var getMethod = idpType.GetMethod("Get");
-
-                            this.m_traceSource.TraceEvent(EventLevel.Verbose, "{0} {1}", itm.ActionName, itm.Element);
-
-                            Object target = null, existing = null;
-                            if (itm.Element.Key.HasValue)
-                            {
-                                ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Remove(itm.Element.Key.Value);
-                                existing = idpInstance.Get(itm.Element.Key.Value);
-                            }
-                            if (existing != null)
-                            {
-                                if ((itm as DataInsert)?.SkipIfExists == true) continue;
-                                target = (existing as IdentifiedData).Clone();
-                                target.CopyObjectData(itm.Element);
-                            }
-                            else
-                                target = itm.Element;
-
-                            // Association
-                            if (itm.Association != null)
-                                foreach (var ascn in itm.Association)
-                                {
-                                    var pi = target.GetType().GetRuntimeProperty(ascn.PropertyName);
-                                    var mi = pi.PropertyType.GetRuntimeMethod("Add", new Type[] { ascn.Element.GetType() });
-                                    mi.Invoke(pi.GetValue(target), new object[] { ascn.Element });
-                                }
-
-                            // ensure version sequence is set
-                            // the reason this exists is because in FHIR code system values have the same mnemonic values in different code systems
-                            // since we cannot insert duplicate mnemonic values, we want to associate the existing concept with the new reference term
-                            // for the new code system
-                            //
-                            // i.e.
-                            //
-                            // Code System Address Use has the following codes:
-                            // home
-                            // work
-                            // temp
-                            // old
-                            // we want to insert reference terms and concepts so we can find an associated concept
-                            // for a given reference term and code system
-                            //
-                            // Code System Contact Point Use has the following codes:
-                            // home
-                            // work
-                            // temp
-                            // old
-                            // mobile
-                            //
-                            // we can insert new reference terms for these reference terms, but cannot insert new concept using the same values for the mnemonic
-                            // so we associate the new reference term and the concept
-                            if (target is IVersionedAssociation)
-                            {
-                                var ivr = target as IVersionedAssociation;
-
-                                // Get the type this is bound to
-                                Type stype = target.GetType();
-                                while (!stype.IsGenericType || stype.GetGenericTypeDefinition() != typeof(VersionedAssociation<>))
-                                    stype = stype.BaseType;
-
-                                ApplicationServiceContext.Current.GetService<IDataCachingService>()?.Remove(ivr.SourceEntityKey.Value);
-                                var idt = typeof(IDataPersistenceService<>).MakeGenericType(stype.GetGenericArguments()[0]);
-                                var idp = ApplicationServiceContext.Current.GetService(idt) as IDataPersistenceService;
-                                ivr.EffectiveVersionSequenceId = (idp.Get(ivr.SourceEntityKey.Value) as IVersionedData)?.VersionSequence;
-                                if (ivr.EffectiveVersionSequenceId == null)
-                                    throw new KeyNotFoundException($"Dataset contains a reference to an unkown source entity : {ivr.SourceEntityKey}");
-                                target = ivr;
-                            }
-
-                            if (existing == null && (itm is DataInsert || (itm is DataUpdate && (itm as DataUpdate).InsertIfNotExists)))
-                                idpInstance.Insert(target);
-                            else if (!(itm is DataInsert))
-                                typeof(IDataPersistenceService).GetMethod(itm.ActionName, new Type[] { typeof(Object) }).Invoke(idpInstance, new object[] { target });
-                            else if (existing != null && itm is DataDelete delete)
-                                idpInstance.Delete(delete.Element.Key.Value);
+                            case DataUpdate du:
+                                if (du.InsertIfNotExists)
+                                    o.Element.BatchOperation = SanteDB.Core.Model.DataTypes.BatchOperationType.InsertOrUpdate;
+                                else
+                                    o.Element.BatchOperation = SanteDB.Core.Model.DataTypes.BatchOperationType.Update;
+                                break;
+                            case DataInsert di:
+                                if (di.SkipIfExists)
+                                    o.Element.BatchOperation = SanteDB.Core.Model.DataTypes.BatchOperationType.InsertOrUpdate;
+                                else
+                                    o.Element.BatchOperation = SanteDB.Core.Model.DataTypes.BatchOperationType.Insert;
+                                break;
+                            case DataDelete dd:
+                                o.Element.BatchOperation = SanteDB.Core.Model.DataTypes.BatchOperationType.Delete;
+                                break;
                         }
-                        catch (Exception e)
-                        {
-                            this.m_traceSource.TraceEvent(EventLevel.Verbose, "There was an issue in the dataset file {0} : {1} @ {2} ", ds.Id, e, itm.Element);
-                            if (!itm.IgnoreErrors)
-                                throw;
-                        }
-                    }
+                        return o.Element;
+                    }).ToList()
+                };
+                var bundleService = ApplicationServiceContext.Current.GetService<IDataPersistenceService<Bundle>>();
+                if (bundleService is IReportProgressChanged progress)
+                    progress.ProgressChanged += this.ProgressChanged;
+                bundleService.Insert(bundle, TransactionMode.Commit, AuthenticationContext.SystemPrincipal);
+                if (bundleService is IReportProgressChanged progress2)
+                    progress2.ProgressChanged -= this.ProgressChanged;
 
                 // Execute the changes
                 var isqlp = ApplicationServiceContext.Current.GetService<ISqlDataPersistenceService>();
@@ -235,25 +151,25 @@ namespace SanteDB.Server.Core.Persistence
                 }
 
                 // Execute the service instructions
-                foreach(var se in ds.ServiceExec)
+                foreach (var se in ds.ServiceExec)
                 {
                     this.m_traceSource.TraceInfo("Executing post-dataset service instructions {0}.{1}()...", se.ServiceType, se.Method);
                     var serviceType = Type.GetType(se.ServiceType);
-                    if(serviceType == null)
+                    if (serviceType == null)
                     {
                         this.m_traceSource.TraceWarning("Cannot find service type {0}...", se.ServiceType);
                         continue;
                     }
                     var serviceInstance = ApplicationServiceContext.Current.GetService(serviceType);
-                    if(serviceInstance == null)
+                    if (serviceInstance == null)
                     {
                         this.m_traceSource.TraceWarning("Cannot find registered service for {0}...", serviceType);
                         continue;
                     }
 
                     // Invoke the method
-                    var method = serviceType.GetRuntimeMethod(se.Method, se.Arguments.Select(o=>o.GetType()).ToArray());
-                    if(method == null)
+                    var method = serviceType.GetRuntimeMethod(se.Method, se.Arguments.Select(o => o.GetType()).ToArray());
+                    if (method == null)
                     {
                         this.m_traceSource.TraceWarning("Cannot find method {0} on service {1}...", se.Method, serviceType);
                         continue;

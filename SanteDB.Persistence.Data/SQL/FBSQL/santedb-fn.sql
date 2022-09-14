@@ -2,7 +2,7 @@
  * <feature scope="SanteDB.Persistence.Data" id="0-003" name="Core Functions" invariantName="FirebirdSQL">
  *	<summary>Install Database Functions</summary>
  *	<remarks>Install the core database functions required for SanteDB operation</remarks>
- *  <isInstalled>SELECT IS_USR_LOCK('SYSTEM') IS NULL FROM RDB$DATABASE;</isInstalled>
+ *  <isInstalled>select true from rdb$database where exists (select 1 from rdb$functions where RDB$FUNCTION_NAME = 'IS_USR_LOCK'); </isInstalled>
  * </feature>
  */
  -- RETURNS WHETHER THE USER ACCOUNT IS LOCKED

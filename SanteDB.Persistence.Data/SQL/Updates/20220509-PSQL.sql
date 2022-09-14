@@ -9,8 +9,6 @@ INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_
 	VALUES (uuid_generate_v1(), ('A0174216-6439-4351-9483-A241A48029B7'), null, ('9de2a846-ddf2-4ebc-902e-84508c5089ea'), '*=[Admitter]=>Person', 3);--#!
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES (uuid_generate_v1(), ('A0174216-6439-4351-9483-A241A48029B7'), null, ('6b04fed8-c164-469c-910b-f824c2bda4f0'), '*=[Admitter]=>HealthcareProvider', 3);--#!
-INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
-	VALUES (uuid_generate_v1(), ('A0174216-6439-4351-9483-A241A48029B7'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Admitter]=>UserEntity', 3);--#!
 
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES (uuid_generate_v1(), ('6CBF29AD-AC51-48C9-885A-CFE3026ECF6E'), null, ('6b04fed8-c164-469c-910b-f824c2bda4f0'), '*=[Attender]=>HealthcareProvider', 3);--#!
@@ -21,8 +19,6 @@ INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES (uuid_generate_v1(), ('1B2DBF82-A503-4CF4-9ECB-A8E111B4674E'), null, ('6b04fed8-c164-469c-910b-f824c2bda4f0'), '*=[Authenticator]=>HealthcareProvider', 3);--#!
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
-	VALUES (uuid_generate_v1(), ('1B2DBF82-A503-4CF4-9ECB-A8E111B4674E'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Authenticator]=>UserEntity', 3);--#!
-INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES (uuid_generate_v1(), ('1B2DBF82-A503-4CF4-9ECB-A8E111B4674E'), null, ('7c08bd55-4d42-49cd-92f8-6388d6c4183f'), '*=[Authenticator]=>Organization', 3);--#!
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES (uuid_generate_v1(), ('1B2DBF82-A503-4CF4-9ECB-A8E111B4674E'), null, ('bacd9c6f-3fa9-481e-9636-37457962804d'), '*=[Authenticator]=>Patient', 3);--#!
@@ -31,8 +27,6 @@ INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_
 	VALUES (uuid_generate_v1(), ('F0CB3FAF-435D-4704-9217-B884F757BC14'), null, ('9de2a846-ddf2-4ebc-902e-84508c5089ea'), '*=[AuthorOrOriginator]=>Person', 3);--#!
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES (uuid_generate_v1(), ('F0CB3FAF-435D-4704-9217-B884F757BC14'), null, ('6b04fed8-c164-469c-910b-f824c2bda4f0'), '*=[AuthorOrOriginator]=>HealthcareProvider', 3);--#!
-INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
-	VALUES (uuid_generate_v1(), ('F0CB3FAF-435D-4704-9217-B884F757BC14'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[AuthorOrOriginator]=>UserEntity', 3);--#!
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES (uuid_generate_v1(), ('F0CB3FAF-435D-4704-9217-B884F757BC14'), null, ('7c08bd55-4d42-49cd-92f8-6388d6c4183f'), '*=[AuthorOrOriginator]=>Organization', 3);--#!
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
@@ -49,8 +43,6 @@ INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_
 	VALUES (uuid_generate_v1(), ('28C744DF-D889-4A44-BC1A-2E9E9D64AF13'), null, ('9de2a846-ddf2-4ebc-902e-84508c5089ea'), '*=[Beneficiary]=>Person', 3);--#!
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES (uuid_generate_v1(), ('28C744DF-D889-4A44-BC1A-2E9E9D64AF13'), null, ('6b04fed8-c164-469c-910b-f824c2bda4f0'), '*=[Beneficiary]=>HealthcareProvider', 3);--#!
-INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
-	VALUES (uuid_generate_v1(), ('28C744DF-D889-4A44-BC1A-2E9E9D64AF13'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Beneficiary]=>UserEntity', 3);--#!
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES (uuid_generate_v1(), ('28C744DF-D889-4A44-BC1A-2E9E9D64AF13'), null, ('7c08bd55-4d42-49cd-92f8-6388d6c4183f'), '*=[Beneficiary]=>Organization', 3);--#!
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
@@ -78,8 +70,6 @@ INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_
 	VALUES (uuid_generate_v1(), ('A2594E6E-E8FE-4C68-82A5-D3A46DBEC87D'), null, ('9de2a846-ddf2-4ebc-902e-84508c5089ea'), '*=[Discharger]=>Person', 3);--#!
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES (uuid_generate_v1(), ('A2594E6E-E8FE-4C68-82A5-D3A46DBEC87D'), null, ('6b04fed8-c164-469c-910b-f824c2bda4f0'), '*=[Discharger]=>HealthcareProvider', 3);--#!
-INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
-	VALUES (uuid_generate_v1(), ('A2594E6E-E8FE-4C68-82A5-D3A46DBEC87D'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Discharger]=>UserEntity', 3);--#!
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES (uuid_generate_v1(), ('A2594E6E-E8FE-4C68-82A5-D3A46DBEC87D'), null, ('bacd9c6f-3fa9-481e-9636-37457962804d'), '*=[Discharger]=>Patient (self-discharged)', 3);--#!
 
@@ -117,16 +107,12 @@ INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES (uuid_generate_v1(), ('39604248-7812-4B60-BC54-8CC1FFFB1DE6'), null, ('6b04fed8-c164-469c-910b-f824c2bda4f0'), '*=[Informant]=>HealthcareProvider', 3);--#!
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
-	VALUES (uuid_generate_v1(), ('39604248-7812-4B60-BC54-8CC1FFFB1DE6'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Informant]=>UserEntity', 3);--#!
-INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES (uuid_generate_v1(), ('39604248-7812-4B60-BC54-8CC1FFFB1DE6'), null, ('7c08bd55-4d42-49cd-92f8-6388d6c4183f'), '*=[Informant]=>Organization', 3);--#!
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES (uuid_generate_v1(), ('39604248-7812-4B60-BC54-8CC1FFFB1DE6'), null, ('bacd9c6f-3fa9-481e-9636-37457962804d'), '*=[Informant]=>Patient', 3);--#!
 
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES (uuid_generate_v1(), ('0716A333-CD46-439D-BFD6-BF788F3885FA'), null, ('9de2a846-ddf2-4ebc-902e-84508c5089ea'), '*=[LegalAuthenticator]=>Person', 3);--#!
-INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
-	VALUES (uuid_generate_v1(), ('0716A333-CD46-439D-BFD6-BF788F3885FA'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[LegalAuthenticator]=>UserEntity', 3);--#!
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES (uuid_generate_v1(), ('0716A333-CD46-439D-BFD6-BF788F3885FA'), null, ('7c08bd55-4d42-49cd-92f8-6388d6c4183f'), '*=[LegalAuthenticator]=>Organization', 3);--#!
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
@@ -160,15 +146,11 @@ INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_
 	VALUES (uuid_generate_v1(), ('FA5E70A4-A46E-4665-8A20-94D4D7B86FC8'), null, ('9de2a846-ddf2-4ebc-902e-84508c5089ea'), '*=[Performer]=>Person', 3);--#!
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES (uuid_generate_v1(), ('FA5E70A4-A46E-4665-8A20-94D4D7B86FC8'), null, ('6b04fed8-c164-469c-910b-f824c2bda4f0'), '*=[Performer]=>HealthcareProvider', 3);--#!
-INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
-	VALUES (uuid_generate_v1(), ('FA5E70A4-A46E-4665-8A20-94D4D7B86FC8'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Performer]=>UserEntity', 3);--#!
 
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES (uuid_generate_v1(), ('79F6136C-1465-45E8-917E-E7832BC8E3B2'), null, ('9de2a846-ddf2-4ebc-902e-84508c5089ea'), '*=[PrimaryPerformer]=>Person', 3);--#!
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES (uuid_generate_v1(), ('79F6136C-1465-45E8-917E-E7832BC8E3B2'), null, ('6b04fed8-c164-469c-910b-f824c2bda4f0'), '*=[PrimaryPerformer]=>HealthcareProvider', 3);--#!
-INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
-	VALUES (uuid_generate_v1(), ('79F6136C-1465-45E8-917E-E7832BC8E3B2'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[PrimaryPerformer]=>UserEntity', 3);--#!
 	
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES (uuid_generate_v1(), ('99E77288-CB09-4050-A8CF-385513F32F0A'), ('932a3c7e-ad77-450a-8a1f-030fc2855450'), ('d39073be-0f8f-440e-b8c8-7034cc138a95'), 'SubstanceAdministration=[Product]=>Material', 3);--#!
@@ -181,8 +163,6 @@ INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_
 	VALUES (uuid_generate_v1(), ('353F9255-765E-4336-8007-1D61AB09AAD6'), null, ('9de2a846-ddf2-4ebc-902e-84508c5089ea'), '*=[ReferredBy]=>Person', 3);--#!
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES (uuid_generate_v1(), ('353F9255-765E-4336-8007-1D61AB09AAD6'), null, ('6b04fed8-c164-469c-910b-f824c2bda4f0'), '*=[ReferredBy]=>HealthcareProvider', 3);--#!
-INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
-	VALUES (uuid_generate_v1(), ('353F9255-765E-4336-8007-1D61AB09AAD6'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[ReferredBy]=>UserEntity', 3);--#!
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES (uuid_generate_v1(), ('353F9255-765E-4336-8007-1D61AB09AAD6'), null, ('7c08bd55-4d42-49cd-92f8-6388d6c4183f'), '*=[ReferredBy]=>Organization', 3);--#!
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
@@ -214,8 +194,6 @@ INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES (uuid_generate_v1(), ('53C694B8-27D8-43DD-95A4-BB318431D17C'), null, ('6b04fed8-c164-469c-910b-f824c2bda4f0'), '*=[Receiver]=>HealthcareProvider', 3);--#!
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
-	VALUES (uuid_generate_v1(), ('53C694B8-27D8-43DD-95A4-BB318431D17C'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Receiver]=>UserEntity', 3);--#!
-INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES (uuid_generate_v1(), ('53C694B8-27D8-43DD-95A4-BB318431D17C'), null, ('bacd9c6f-3fa9-481e-9636-37457962804d'), '*=[Receiver]=>Patient', 3);--#!
 
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
@@ -226,16 +204,12 @@ INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES (uuid_generate_v1(), ('DE3F7527-E3C9-45EF-8574-00CA4495F767'), null, ('6b04fed8-c164-469c-910b-f824c2bda4f0'), '*=[Transcriber]=>HealthcareProvider', 3);--#!
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
-	VALUES (uuid_generate_v1(), ('DE3F7527-E3C9-45EF-8574-00CA4495F767'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Transcriber]=>UserEntity', 3);--#!
-INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES (uuid_generate_v1(), ('DE3F7527-E3C9-45EF-8574-00CA4495F767'), null, ('bacd9c6f-3fa9-481e-9636-37457962804d'), '*=[Transcriber]=>Patient', 3);--#!
 	
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES (uuid_generate_v1(), ('F9DC5787-DD4D-42C6-A082-AC7D11956FDA'), null, ('9de2a846-ddf2-4ebc-902e-84508c5089ea'), '*=[Verifier]=>Person', 3);--#!
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES (uuid_generate_v1(), ('F9DC5787-DD4D-42C6-A082-AC7D11956FDA'), null, ('6b04fed8-c164-469c-910b-f824c2bda4f0'), '*=[Verifier]=>HealthcareProvider', 3);--#!
-INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
-	VALUES (uuid_generate_v1(), ('F9DC5787-DD4D-42C6-A082-AC7D11956FDA'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Verifier]=>UserEntity', 3);--#!
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES (uuid_generate_v1(), ('F9DC5787-DD4D-42C6-A082-AC7D11956FDA'), null, ('bacd9c6f-3fa9-481e-9636-37457962804d'), '*=[Verifier]=>Patient', 3);--#!
 	
@@ -244,8 +218,6 @@ INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_
 	VALUES (uuid_generate_v1(), ('0B82357F-5AE0-4543-AB8E-A33E9B315BAB'), null, ('9de2a846-ddf2-4ebc-902e-84508c5089ea'), '*=[Witness]=>Person', 3);--#!
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES (uuid_generate_v1(), ('0B82357F-5AE0-4543-AB8E-A33E9B315BAB'), null, ('6b04fed8-c164-469c-910b-f824c2bda4f0'), '*=[Witness]=>HealthcareProvider', 3);--#!
-INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
-	VALUES (uuid_generate_v1(), ('0B82357F-5AE0-4543-AB8E-A33E9B315BAB'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Witness]=>UserEntity', 3);--#!
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES (uuid_generate_v1(), ('0B82357F-5AE0-4543-AB8E-A33E9B315BAB'), null, ('bacd9c6f-3fa9-481e-9636-37457962804d'), '*=[Witness]=>Patient', 3);--#!
 		
@@ -273,25 +245,6 @@ INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_
 		AND obslt_utc IS NULL;--#!
 
 
-		
--- DOCUMENT HAS COMPONENT DOCUMENT SECTION
-INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
-	VALUES(uuid_generate_v1(), ('78B9540F-438B-4B6F-8D83-AAF4979DBC64'), ('7a6944f7-8937-4e98-ae0d-452b1d8124f4'), ('e86ea735-f243-41f4-bf33-aa78eb2e8466'), 'Document=[HasComponent]=>DocumentSection', 2);--#!
-
--- DOCUMENT DOCUMENTS ANY ACT
-INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
-	VALUES (uuid_generate_v1(), ('0F4BA634-5107-4EAB-9658-25BE293CD831'), ('7a6944f7-8937-4e98-ae0d-452b1d8124f4'), null, 'Document=[Documents]=>*', 2);--#!
--- DOCUMENT SECTION DOCUMENTS ANY ACT
-INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
-	VALUES(uuid_generate_v1(), ('0F4BA634-5107-4EAB-9658-25BE293CD831'), ('e86ea735-f243-41f4-bf33-aa78eb2e8466'), NULL, 'DocumentSection=[Documents]=>*', 2);--#!
-
--- DOCUMENT SECTION IS DERIVED FROM 
-INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
-	VALUES(uuid_generate_v1(), ('81B6A0F8-B86A-495F-9D5D-8A4073FDD882'), ('e86ea735-f243-41f4-bf33-aa78eb2e8466'), NULL, 'DocumentSection=[IsDerivedFrom]=>*', 2);--#!
-
--- DOCUMENT SECTION IS EXCERPT OF ANY
-INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
-	VALUES(uuid_generate_v1(), ('FFC6E905-161D-4C0B-8CDE-A04E9E9D0CD5'), ('e86ea735-f243-41f4-bf33-aa78eb2e8466'), NULL, 'DocumentSection=[IsExcerptOf]=>*', 2);--#!
 
 	
 -- ANY FULFILLS ANY OF SAME CLASS
@@ -344,10 +297,6 @@ INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
 	VALUES(uuid_generate_v1(), ('55DA61A2-7B86-47F3-9B0B-BA47DC99C950'), NULL, NULL, '*=[HasReason]=>*', 2);--#!
 
--- CARE PLAN HAS COMPONENT ANY
-INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
-	VALUES(uuid_generate_v1(), ('78B9540F-438B-4B6F-8D83-AAF4979DBC64'), ('042232b9-a694-42e0-9708-f387393a6c80'), null, 'CarePlan=[HasComponent]=>*', 2);--#!
-
 
 -- OBSERVATION HAS COMPONENT OBSERVATION
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
@@ -356,10 +305,6 @@ INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_
 -- OBSERVATION HAS REFERENCE VALUE OBSERVATION
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
 	VALUES(uuid_generate_v1(), ('99488A1D-6D97-4013-8C91-DED6AD3B8E89'), ('28d022c6-8a8b-47c4-9e6a-2bc67308739e'), ('28d022c6-8a8b-47c4-9e6a-2bc67308739e'), 'Observation=[HasReferenceValues]=>Observation', 2);--#!
-
--- LIST HAS COMPONENT ANY
-INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
-	VALUES(uuid_generate_v1(), ('78B9540F-438B-4B6F-8D83-AAF4979DBC64'), ('b0323489-9a09-411a-bb55-ff283830ea1a'), NULL, 'List=[HasComponent]=>*', 2);--#!
 
 -- BATTERY HAS COMPONENT ANY
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 

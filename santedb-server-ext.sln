@@ -27,7 +27,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.Core.Security.Tfa.T
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.Messaging.AMI", "SanteDB.Messaging.AMI\SanteDB.Messaging.AMI.csproj", "{D882323C-2BC9-4A1D-B70F-D833CF2E91A1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.Messaging.HDSI.Test", "SanteDB.Messaging.HDSI.Test\SanteDB.Messaging.HDSI.Test.csproj", "{B25778DB-97DA-4BA1-BF77-72838658B148}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.Messaging.Test", "SanteDB.Messaging.HDSI.Test\SanteDB.Messaging.Test.csproj", "{B25778DB-97DA-4BA1-BF77-72838658B148}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.Persistence.Auditing.ADO", "SanteDB.Persistence.Auditing.ADO\SanteDB.Persistence.Auditing.ADO.csproj", "{45EA67A6-48F6-4906-84EC-5C13C80C9CC4}"
 EndProject

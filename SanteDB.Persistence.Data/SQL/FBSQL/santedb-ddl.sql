@@ -2,7 +2,7 @@
  * <feature scope="SanteDB.Persistence.Data" id="0-001" name="Core Schema" invariantName="FirebirdSQL">
  *	<summary>Install Schema</summary>
  *	<remarks>Installs the core SanteDB schema including tables, views, and sequences needed for execution</remarks>
- *	<isInstalled>SELECT COUNT(1) > 0 FROM SEC_USR_TBL</isInstalled>
+ *	<isInstalled mustSucceed="true">select true from rdb$database where exists (select 1 from rdb$relations where rdb$relation_name = 'SEC_USR_TBL');</isInstalled>
  *	<url>https://help.santesuite.org/ops/santedb/rim</url>
  * </feature>
  */
