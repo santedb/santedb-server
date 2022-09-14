@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Assigning Authorities">
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Core Assigning Authorities">
   <update insertIfNotExists="true">
     <IdentityDomain xmlns="http://santedb.org/model">
       <id>ce5990db-2e2a-467d-a376-2a7b53481e84</id>

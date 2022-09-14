@@ -19,7 +19,6 @@
  * Date: 2022-5-30
  */
 using SanteDB.Core.Configuration;
-using SanteDB.Server.Core.Persistence;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Privacy;
 using SanteDB.Core.Services;
@@ -35,6 +34,7 @@ using SanteDB.Core.Notifications;
 using SanteDB.Core.Applets.Services.Impl;
 using SanteDB.Core.Services.Impl.Repository;
 using SanteDB.Rest.Common;
+using SanteDB.Core.Data.Initialization;
 
 namespace SanteDB.Server.Core.Configuration.Features
 {
@@ -50,6 +50,7 @@ namespace SanteDB.Server.Core.Configuration.Features
         {
             typeof(SanteDB.Core.Security.DefaultPolicyEnforcementService),
             typeof(DefaultOperatingSystemInfoService),
+            typeof(DataInitializationService),
             typeof(DefaultThreadPoolService),
             typeof(DefaultNetworkInformationService),
             typeof(RestServiceFactory),

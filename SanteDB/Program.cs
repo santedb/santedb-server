@@ -234,6 +234,7 @@ namespace SanteDB
                             catch { }
                         }
                     }
+                    Environment.Exit(0);
                 }
                 else
                 {

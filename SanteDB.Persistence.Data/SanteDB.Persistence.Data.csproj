@@ -138,6 +138,8 @@
     <None Remove="SQL\Updates\20211128-FBSQL.sql" />
     <None Remove="SQL\Updates\20211201-FBSQL.sql" />
     <None Remove="SQL\Updates\20211201-PSQL.sql" />
+    <None Remove="SQL\Updates\20211217-FBSQL.sql" />
+    <None Remove="SQL\Updates\20211217-PSQL.sql" />
     <None Remove="SQL\Updates\20211218-FBSQL.sql" />
     <None Remove="SQL\Updates\20211218-PSQL.sql" />
     <None Remove="SQL\Updates\20211229-FBSQL.sql" />
@@ -170,6 +172,8 @@
     <EmbeddedResource Include="SQL\Updates\20211128-FBSQL.sql" />
     <EmbeddedResource Include="SQL\Updates\20211201-FBSQL.sql" />
     <EmbeddedResource Include="SQL\Updates\20211201-PSQL.sql" />
+    <EmbeddedResource Include="SQL\Updates\20211217-FBSQL.sql" />
+    <EmbeddedResource Include="SQL\Updates\20211217-PSQL.sql" />
     <EmbeddedResource Include="SQL\Updates\20211218-FBSQL.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>

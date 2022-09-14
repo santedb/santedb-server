@@ -42,6 +42,44 @@ namespace SanteDB.Persistence.Data.Services.Persistence.DataTypes
         {
         }
 
+        /// <inheritdoc/>
+        protected override void DoDeleteReferencesInternal(DataContext context, Guid key)
+        {
+            base.DoDeleteReferencesInternal(context, key);
+            context.DeleteAll<DbConceptSetConceptAssociation>(o => o.SourceKey == key);
+        }
+
+        /// <inheritdoc/>
+        protected override ConceptSet DoInsertModel(DataContext context, ConceptSet data)
+        {
+            var retVal = base.DoInsertModel(context, data);
+
+            if(data.ConceptsXml?.Any() == true)
+            {
+                retVal.ConceptsXml = base.UpdateInternalAssociations(context, retVal.Key.Value, data.ConceptsXml.Select(o => new DbConceptSetConceptAssociation()
+                {
+                    ConceptKey = o,
+                    SourceKey = retVal.Key.Value
+                })).Select(o => o.ConceptKey).ToList();
+            }
+            return retVal;
+        }
+
+        /// <inheritdoc/>
+        protected override ConceptSet DoUpdateModel(DataContext context, ConceptSet data)
+        {
+            var retVal = base.DoUpdateModel(context, data);
+            if (data.ConceptsXml?.Any() == true)
+            {
+                retVal.ConceptsXml = base.UpdateInternalAssociations(context, retVal.Key.Value, data.ConceptsXml.Select(o => new DbConceptSetConceptAssociation()
+                {
+                    ConceptKey = o,
+                    SourceKey = retVal.Key.Value
+                }), o=> o.SourceKey == data.Key).Select(o => o.ConceptKey).ToList();
+            }
+            return retVal;
+        }
+
         /// <summary>
         /// Perform the conversion of this concept set to a relationship model
         /// </summary>

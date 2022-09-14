@@ -4,18 +4,25 @@
  *	<isInstalled>select ck_patch('20220414-01') from RDB$DATABASE</isInstalled>
  * </feature>
  */
+-- OPTIONAL
 ALTER TABLE ent_vrsn_tbl ADD head BOOLEAN DEFAULT FALSE NOT NULL;--#!
+-- OPTIONAL
 ALTER TABLE cd_vrsn_tbl ADD head BOOLEAN DEFAULT FALSE NOT NULL;--#!
+-- OPTIONAL
 ALTER TABLE act_vrsn_tbl ADD head BOOLEAN DEFAULT FALSE NOT NULL;--#!
 
 UPDATE ent_vrsn_tbl SET head = TRUE WHERE obslt_utc IS NULL;--#!
 UPDATE cd_vrsn_tbl SET head = TRUE WHERE obslt_utc IS NULL;--#!
 UPDATE act_vrsn_tbl SET head = TRUE WHERE obslt_utc IS NULL;--#!
 
+-- OPTIONAL
 CREATE UNIQUE INDEX ent_vrsn_head_uq_idx ON ent_vrsn_tbl COMPUTED BY (CASE WHEN HEAD THEN ENT_ID END);--#!
+-- OPTIONAL
 CREATE UNIQUE INDEX act_vrsn_head_uq_idx ON act_vrsn_tbl COMPUTED BY (CASE WHEN HEAD THEN ACT_ID END);--#!
+-- OPTIONAL
 CREATE UNIQUE INDEX cd_vrsn_head_uq_idx ON cd_vrsn_tbl COMPUTED BY (CASE WHEN HEAD THEN CD_ID END);--#!
 
+-- OPTIONAL
 CREATE TABLE pat_enc_arg_tbl (
 	arg_id UUID NOT NULL,
 	act_id UUID NOT NULL,
@@ -33,19 +40,24 @@ CREATE TABLE pat_enc_arg_tbl (
 	CONSTRAINT ck_pat_enc_arg_time CHECK (CASE WHEN start_utc IS NOT NULL AND stop_utc IS NOT NULL THEN start_utc < stop_utc ELSE true END)
 );--#!
 
+-- OPTIONAL
 ALTER TABLE PAT_ENC_TBL ADD adm_src_cd_id UUID;--#!
+-- OPTIONAL
 ALTER TABLE PAT_ENC_TBL ADD CONSTRAINT fk_pat_enc_adm_src_cd_id FOREIGN KEY (adm_src_cd_id) REFERENCES cd_tbl(cd_id);--#!
+-- OPTIONAL
 ALTER TABLE QTY_OBS_TBL ALTER COLUMN QTY TYPE NUMERIC(15,5);--#!
+-- OPTIONAL
 ALTER TABLE QTY_OBS_TBL DROP QTY_PRC; --#!
 
 -- VALIDATION OF ENTITY RELATIONSHIPS
+-- OPTIONAL
 CREATE TABLE rel_vrfy_systbl (
 	rel_vrfy_id UUID NOT NULL,
 	rel_typ_cd_id UUID NOT NULL, -- THE TYPE OF RELATIONSHIP
 	src_cls_cd_id UUID, -- THE CLASS CODE OF THE SOURCE ENTITY
 	trg_cls_cd_id UUID, -- THE CLASS CODE OF THE TARGET ENTITY
 	err_desc VARCHAR(128) NOT NULL, -- THE ERROR CONDITION
-	rel_cls INTEGER NOT NULL CHECK (rel_cls IN (1,2,3)),
+	rel_cls INTEGER DEFAULT 1 NOT NULL CHECK (rel_cls IN (1,2,3)),
 	CONSTRAINT pk_rel_vrfy_systbl PRIMARY KEY (rel_vrfy_id),
 	CONSTRAINT fk_rel_vrfy_rel_typ_cd FOREIGN KEY (rel_typ_cd_id) REFERENCES cd_tbl(cd_id),
 	CONSTRAINT fk_rel_vrfy_src_cls_cd FOREIGN KEY (src_cls_cd_id) REFERENCES cd_tbl(cd_id),
@@ -53,27 +65,35 @@ CREATE TABLE rel_vrfy_systbl (
 );
 --#!
 
+-- OPTIONAL
 INSERT INTO rel_vrfy_systbl 
 SELECT 
 	ent_rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, 1 AS rel_cs
 FROM 
 	ent_rel_vrfy_cdtbl;
 	--#!
+-- OPTIONAL
 DROP INDEX ent_rel_vrfy_src_trg_unq;--#!
-DROP TRIGGER TG_ENT_REL_VRFY_CDTBL_SEQ;--#!
-DROP TRIGGER TG_VRFY_ENT_REL;--#!
+-- OPTIONAL
+DROP TRIGGER  TG_ENT_REL_VRFY_CDTBL_SEQ;--#!
+-- OPTIONAL
+DROP TRIGGER  TG_VRFY_ENT_REL;--#!
+-- OPTIONAL
 DROP TABLE ENT_REL_VRFY_CDTBL;--#!
 
-CREATE TRIGGER TG_REL_VRFY_CDTBL_SEQ FOR rel_vrfy_systbl ACTIVE BEFORE INSERT POSITION 0 AS BEGIN
+-- OPTIONAL
+CREATE OR ALTER TRIGGER TG_REL_VRFY_CDTBL_SEQ FOR rel_vrfy_systbl ACTIVE BEFORE INSERT POSITION 0 AS BEGIN
 	NEW.rel_vrfy_id = gen_uuid();
 END;
 --#!
 
+-- OPTIONAL
 CREATE UNIQUE INDEX rel_vrfy_src_trg_unq ON rel_vrfy_systbl(rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id);
 --#!
 
 
 -- TRIGGER FUNCTION WHICH VERIFIES ENTITY RELATIONSHIP
+-- OPTIONAL
 CREATE TRIGGER TG_ENT_VRFY_REL FOR ENT_REL_TBL BEFORE INSERT OR UPDATE POSITION 0 AS 
 BEGIN
 	IF (NEW.obslt_vrsn_seq_id IS NULL AND NOT EXISTS(SELECT 1 
@@ -89,6 +109,7 @@ BEGIN
 END;
 --#!
 -- TRIGGER FUNCTION WHICH VERIFIES ACT PARTICIPATION
+-- OPTIONAL
 CREATE TRIGGER TG_ACT_VRFY_REL FOR ACT_REL_TBL BEFORE INSERT OR UPDATE POSITION 0 AS 
 BEGIN
 	IF (NEW.obslt_vrsn_seq_id IS NULL AND NOT EXISTS(SELECT 1 
@@ -104,6 +125,7 @@ BEGIN
 END;
 --#!
 -- TRIGGER FUNCTION WHICH VERIFIES ENTITY RELATIONSHIP
+-- OPTIONAL
 CREATE TRIGGER TG_ACT_VRFY_PTCPT FOR ACT_PTCPT_TBL BEFORE INSERT OR UPDATE POSITION 0 AS 
 BEGIN
 	IF (NEW.obslt_vrsn_seq_id IS NULL AND NOT EXISTS(SELECT 1 
