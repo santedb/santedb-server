@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS ft_ent_systbl
 	CONSTRAINT fk_ft_ent_ent_id FOREIGN KEY (ent_id) REFERENCES ent_tbl(ent_id)
 );
 
-CREATE INDEX ft_ent_ftidx ON ft_ent_systbl USING GIN (terms);
+CREATE INDEX IF NOT EXISTS ft_ent_ftidx ON ft_ent_systbl USING GIN (terms);
 
 CREATE OR REPLACE FUNCTION rfrsh_fti() 
 RETURNS void
@@ -94,12 +94,12 @@ $$ LANGUAGE plpgsql;
 
 SELECT rfrsh_fti();
 
-CREATE INDEX psn_dob_idx ON psn_tbl (dob);
-CREATE INDEX psn_gndr_idx ON psn_tbl (gndr_cd_id);
+CREATE INDEX IF NOT EXISTS psn_dob_idx ON psn_tbl (dob);
+CREATE INDEX IF NOT EXISTS psn_gndr_idx ON psn_tbl (gndr_cd_id);
 DROP INDEX IF EXISTS ent_name_cmp_val_tbl;
 DROP INDEX IF EXISTS ent_addr_cmp_val_gin_idx;
-CREATE INDEX ent_name_cmp_val_gin_idx ON ent_name_cmp_tbl USING GIN (val gin_trgm_ops);
-CREATE INDEX ent_name_cmp_val_soundex_idx ON ent_name_cmp_tbl (SOUNDEX(val));
+CREATE INDEX IF NOT EXISTS ent_name_cmp_val_gin_idx ON ent_name_cmp_tbl USING GIN (val gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS ent_name_cmp_val_soundex_idx ON ent_name_cmp_tbl (SOUNDEX(val));
 DROP INDEX IF EXISTS en_addr_cmp_val_val_idx;
-CREATE INDEX ent_addr_cmp_val_gin_idx ON ent_addr_cmp_tbl USING GIN (val gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS ent_addr_cmp_val_gin_idx ON ent_addr_cmp_tbl USING GIN (val gin_trgm_ops);
 SELECT REG_PATCH('20220112-02');

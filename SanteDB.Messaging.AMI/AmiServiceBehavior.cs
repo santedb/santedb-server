@@ -56,7 +56,7 @@ namespace SanteDB.Messaging.AMI.Wcf
     /// Administration Management Interface (AMI)
     /// </summary>
     /// <remarks>Represents the SanteDB Server implementation of the Administrative Management Interface (AMI) contract</remarks>
-    public class AmiServiceBehavior : AmiServiceBehaviorBase
+    public class AmiServiceBehavior : AmiServiceBehavior
     {
         /// <summary>
         /// Get resource handler

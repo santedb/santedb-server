@@ -121,9 +121,9 @@ namespace SanteDB.Tools.Debug.Configuration.Features
             this.m_configuration.Options.Add(SanteboxServiceEnabledSetting, () => ConfigurationOptionType.Boolean);
             this.m_configuration.Values.Add(SanteboxServiceEnabledSetting, configuration.GetSection<ApplicationServiceContextConfigurationSection>().ServiceProviders.Any(t => t.Type == typeof(DataSandboxService)));
             this.m_configuration.Options.Add(SanteboxServiceSetting, () => ConfigurationOptionType.Object);
-            this.m_configuration.Values.Add(SanteboxServiceSetting, configuration.GetSection<RestConfigurationSection>().Services.FirstOrDefault(o => o.Name == "HDSI_Sandbox") ?? new RestServiceConfiguration()
+            this.m_configuration.Values.Add(SanteboxServiceSetting, configuration.GetSection<RestConfigurationSection>().Services.FirstOrDefault(o => o.ConfigurationName == "HDSI_Sandbox") ?? new RestServiceConfiguration()
             {
-                Name = "HDSI_Sandbox",
+                ConfigurationName = DataSandboxService.ConfigurationName,
                 ServiceType = typeof(DataSandboxTool),
                 Endpoints = new List<RestEndpointConfiguration>() {
                 new RestEndpointConfiguration()

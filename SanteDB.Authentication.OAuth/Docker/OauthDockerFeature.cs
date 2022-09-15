@@ -110,7 +110,7 @@ namespace SanteDB.Authentication.OAuth2.Docker
             {
                 oauthRestConfiguration = new RestServiceConfiguration()
                 {
-                    Name = "OAuth2",
+                    ConfigurationName = OAuthMessageHandler.ConfigurationName,
                     Endpoints = new List<RestEndpointConfiguration>()
                     {
                         new RestEndpointConfiguration()

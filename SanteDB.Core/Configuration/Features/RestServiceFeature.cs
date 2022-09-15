@@ -406,7 +406,7 @@ namespace SanteDB.Server.Core.Configuration.Features
         {
             var restSection = configuration.GetSection<SanteDB.Rest.Common.Configuration.RestConfigurationSection>();
             return restSection != null &&
-                restSection.Services.Any(o => o.Name == this.m_restServiceConfiguration.Name);
+                restSection.Services.Any(o => o.ConfigurationName == this.m_restServiceConfiguration.ConfigurationName);
         }
     }
 
@@ -645,7 +645,7 @@ namespace SanteDB.Server.Core.Configuration.Features
             var restSection = configuration.GetSection<SanteDB.Rest.Common.Configuration.RestConfigurationSection>();
             if (restSection != null)
             {
-                restSection.Services.RemoveAll(o => o.Name == this.m_restServiceConfiguration.Name);
+                restSection.Services.RemoveAll(o => o.ConfigurationName == this.m_restServiceConfiguration.ConfigurationName);
             }
             return true;
         }

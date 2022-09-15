@@ -49,6 +49,11 @@ namespace SanteDB.Tools.Debug
         private RestService m_webHost;
 
         /// <summary>
+        /// Configuration name
+        /// </summary>
+        internal const string ConfigurationName = "HDSI_Sandbox";
+
+        /// <summary>
         /// Returns true if the service is running
         /// </summary>
         public bool IsRunning
@@ -85,7 +90,7 @@ namespace SanteDB.Tools.Debug
             {
                 this.m_traceSource.TraceInfo("Starting Query Builder Service...");
 
-                this.m_webHost = ApplicationServiceContext.Current.GetService<IRestServiceFactory>().CreateService(typeof(DataSandboxTool));
+                this.m_webHost = ApplicationServiceContext.Current.GetService<IRestServiceFactory>().CreateService(ConfigurationName);
                 this.m_webHost.Start();
                 this.Started?.Invoke(this, EventArgs.Empty);
             };

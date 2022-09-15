@@ -88,7 +88,7 @@
       <add type="SanteDB.Messaging.FHIR.FhirMessageHandler, SanteDB.Messaging.FHIR" />
       <add type="SanteDB.Rest.HDSI.HdsiMessageHandler, SanteDB.Rest.HDSI" />
       <add type="SanteDB.Messaging.HL7.HL7MessageHandler, SanteDB.Messaging.HL7" />
-      <add type="SanteDB.Messaging.AMI.AmiMessageHandler, SanteDB.Messaging.AMI" />
+      <add type="SanteDB.Rest.AMI.AmiMessageHandler, SanteDB.Rest.AMI" />
       <add type="SanteDB.Messaging.Metadata.MetadataMessageHandler, SanteDB.Messaging.Metadata" />
       <add type="SanteDB.Core.Services.Impl.SimplePatchService, SanteDB.Core.Api" />
       <add type="SanteDB.Core.Applets.Services.Impl.FileSystemAppletManagerService, SanteDB.Core.Applets" />

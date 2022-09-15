@@ -46,6 +46,12 @@ namespace SanteDB.Authentication.OAuth2
     [ExcludeFromCodeCoverage]
     public class OAuthMessageHandler : IDaemonService, IApiEndpointProvider
     {
+
+        /// <summary>
+        /// Configuration name of the rest service
+        /// </summary>
+        public const string ConfigurationName = "OAuth2";
+
         /// <summary>
         /// Gets the service name
         /// </summary>
@@ -143,7 +149,7 @@ namespace SanteDB.Authentication.OAuth2
             {
                 this.Starting?.Invoke(this, EventArgs.Empty);
 
-                this.m_serviceHost = ApplicationServiceContext.Current.GetService<IRestServiceFactory>().CreateService(typeof(OAuthTokenBehavior));
+                this.m_serviceHost = ApplicationServiceContext.Current.GetService<IRestServiceFactory>().CreateService(ConfigurationName);
                 this.m_serviceHost.AddServiceBehavior(new OAuthErrorBehavior());
                 // Start the webhost
                 this.m_serviceHost.Start();

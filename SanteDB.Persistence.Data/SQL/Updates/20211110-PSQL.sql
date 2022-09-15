@@ -7,26 +7,29 @@
 
 CREATE EXTENSION IF NOT EXISTS pg_trgm ;--#!
 CREATE EXTENSION IF NOT EXISTS fuzzystrmatch;--#!
- alter table ent_name_cmp_tbl add column val VARCHAR(256);--#!
-alter table ent_addr_cmp_tbl add column val VARCHAR(256);--#!
+ alter table ent_name_cmp_tbl add column if not exists val VARCHAR(256);--#!
+alter table ent_addr_cmp_tbl add column if not exists val VARCHAR(256);--#!
 
+-- INFO: Migrating Names 
+update ent_name_cmp_tbl set val = phon_val_tbl.val from phon_val_tbl where phon_val_tbl.val_seq_id  = ent_name_cmp_tbl.val_seq_id and ent_name_cmp_tbl.val is null;--#!
+-- INFO: Migrating Addresses
+update ent_addr_cmp_tbl set val = ent_addr_cmp_val_tbl.val  from ent_addr_cmp_val_tbl where ent_addr_cmp_val_tbl.val_seq_id  = ent_addr_cmp_tbl.val_seq_id and ent_addr_cmp_tbl.val is null;--#!
 
-update ent_name_cmp_tbl set val = phon_val_tbl.val from phon_val_tbl where phon_val_tbl.val_seq_id  = ent_name_cmp_tbl.val_seq_id ;--#!
-update ent_addr_cmp_tbl set val = ent_addr_cmp_val_tbl.val from ent_addr_cmp_val_tbl where ent_addr_cmp_val_tbl.val_seq_id  = ent_addr_cmp_tbl.val_seq_id ;--#!
-
-alter table ent_name_cmp_tbl drop column val_seq_id;
-alter table ent_addr_cmp_tbl drop column val_seq_id;
+-- INFO: Dropping redundant columns
+alter table ent_name_cmp_tbl drop column if exists val_seq_id;
+alter table ent_addr_cmp_tbl drop column if exists val_seq_id;
 
 alter table ent_name_cmp_tbl alter column val set not null;
 alter table ent_addr_cmp_tbl alter column val set not null;
 
 
-drop table phon_val_tbl;
-drop table ent_addr_cmp_val_tbl ;
-alter table ent_name_cmp_tbl rename cmp_seq to seq_id;
+drop table if exists phon_val_tbl;
+drop table if exists ent_addr_cmp_val_tbl ;
+alter table ent_name_cmp_tbl rename if exists cmp_seq to seq_id;
 alter sequence ent_addr_cmp_val_seq rename to ent_addr_cmp_seq;
 alter table ent_addr_cmp_tbl add seq_id bigint not null default nextval('ent_addr_cmp_seq');
 
+-- INFO: Indexing Columns
 CREATE INDEX ENT_NAME_CMP_VAL_IDX ON ENT_NAME_CMP_TBL USING GIN (VAL gin_trgm_ops); --#
 CREATE INDEX ENT_ADDR_CMP_VAL_IDX ON ENT_ADDR_CMP_TBL USING GIN (VAL gin_trgm_ops); --#
 CREATE INDEX ENT_NAME_CMP_SDX_IDX ON ENT_NAME_CMP_TBL(SOUNDEX(VAL)); --#!
