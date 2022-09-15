@@ -158,18 +158,6 @@ namespace SanteDB.Persistence.Data.Services
         }
 
         /// <summary>
-        /// Extracts and validates the session token
-        /// </summary>
-        private bool ExtractValidateSessionKey(byte[] sessionToken, out Guid sessionKey)
-        {
-            byte[] sessionId = new byte[16], signature = new byte[sessionToken.Length - 16];
-            Array.Copy(sessionToken, sessionId, 16);
-            Array.Copy(sessionToken, 16, signature, 0, signature.Length);
-            sessionKey = new Guid(sessionId);
-            return this.m_dataSigningService.Verify(sessionId, signature);
-        }
-
-        /// <summary>
         /// Abandons the specified session
         /// </summary>
         public void Abandon(ISession session)
@@ -179,11 +167,7 @@ namespace SanteDB.Persistence.Data.Services
                 throw new ArgumentNullException(nameof(session), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
-            // Validate tamper check
-            if (!this.ExtractValidateSessionKey(session.Id, out Guid sessionId))
-            {
-                throw new SecuritySessionException(SessionExceptionType.SignatureFailure, this.m_localizationService.GetString(ErrorMessageStrings.SESSION_TAMPER), null);
-            }
+            var sessionId = new Guid(session.Id);
 
             using (var context = this.m_configuration.Provider.GetWriteConnection())
             {
@@ -457,11 +441,7 @@ namespace SanteDB.Persistence.Data.Services
                 throw new ArgumentNullException(nameof(refreshToken), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
-            // Validate tamper check
-            if (!this.ExtractValidateSessionKey(refreshToken, out Guid refreshTokenId))
-            {
-                throw new SecuritySessionException(SessionExceptionType.SignatureFailure, this.m_localizationService.GetString(ErrorMessageStrings.SESSION_TAMPER), null);
-            }
+            var refreshTokenId = new Guid(refreshToken);
 
             using (var context = this.m_configuration.Provider.GetWriteConnection())
             {
@@ -527,19 +507,16 @@ namespace SanteDB.Persistence.Data.Services
         /// <summary>
         /// Get the specified session
         /// </summary>
-        public ISession Get(byte[] sessionToken, bool allowExpired = false)
+        public ISession Get(byte[] sessionId, bool allowExpired = false)
         {
-            if (sessionToken == null)
+            if (sessionId == null)
             {
-                throw new ArgumentNullException(nameof(sessionToken), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
+                throw new ArgumentNullException(nameof(sessionId), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
-            if (!this.ExtractValidateSessionKey(sessionToken, out Guid sessionId))
-            {
-                throw new SecuritySessionException(SessionExceptionType.SignatureFailure, this.m_localizationService.GetString(ErrorMessageStrings.SESSION_TAMPER), null);
-            }
+            var sessionguid = new Guid(sessionId);
 
-            var sessionInfo = this.m_adhocCacheService?.Get<AdoSecuritySession>(this.CreateCacheKey(sessionId));
+            var sessionInfo = this.m_adhocCacheService?.Get<AdoSecuritySession>(this.CreateCacheKey(sessionguid));
             if (sessionInfo != null)
             {
                 return new AdoSecuritySession(sessionInfo);
@@ -552,14 +529,14 @@ namespace SanteDB.Persistence.Data.Services
                     {
                         context.Open();
 
-                        var dbSession = context.SingleOrDefault<DbSession>(o => o.Key == sessionId);
+                        var dbSession = context.SingleOrDefault<DbSession>(o => o.Key == sessionguid);
                         if (dbSession == null || !allowExpired && dbSession.NotAfter < DateTimeOffset.Now)
                         {
                             return null;
                         }
                         else
                         {
-                            return new AdoSecuritySession(sessionToken, null, dbSession, context.Query<DbSessionClaim>(o => o.SessionKey == dbSession.Key));
+                            return new AdoSecuritySession(sessionId, null, dbSession, context.Query<DbSessionClaim>(o => o.SessionKey == dbSession.Key));
                         }
                     }
                     catch (Exception e)
@@ -586,12 +563,7 @@ namespace SanteDB.Persistence.Data.Services
                 throw new ArgumentNullException(nameof(session), this.m_localizationService.GetString(ErrorMessageStrings.ARGUMENT_NULL));
             }
 
-            // Validate tamper check
-            if (!this.ExtractValidateSessionKey(session.Id, out Guid sessionId))
-            {
-                throw new SecuritySessionException(SessionExceptionType.SignatureFailure, this.m_localizationService.GetString(ErrorMessageStrings.SESSION_TAMPER), null);
-            }
-
+            var sessionId = new Guid(session.Id);
 
             adoSession = this.m_adhocCacheService?.Get<AdoSecuritySession>(this.CreateCacheKey(sessionId));
             var identities = this.m_adhocCacheService?.Get<IIdentity[]>($"{this.CreateCacheKey(sessionId)}.idt");
