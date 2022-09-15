@@ -407,9 +407,9 @@ namespace SanteDB.Persistence.Data.Services
 
                         tx.Commit();
 
-                        var signedToken = dbSession.Key.ToByteArray().Concat(m_dataSigningService.SignData(dbSession.Key.ToByteArray())).ToArray();
-                        var signedRefresh = refreshToken.ToByteArray().Concat(m_dataSigningService.SignData(refreshToken.ToByteArray())).ToArray();
-                        var session = new AdoSecuritySession(signedToken, signedRefresh, dbSession, dbClaims);
+                        //var signedToken = dbSession.Key.ToByteArray().Concat(m_dataSigningService.SignData(dbSession.Key.ToByteArray())).ToArray();
+                        //var signedRefresh = refreshToken.ToByteArray().Concat(m_dataSigningService.SignData(refreshToken.ToByteArray())).ToArray();
+                        var session = new AdoSecuritySession(dbSession.Key.ToByteArray(), refreshToken.ToByteArray(), dbSession, dbClaims);
 
                         this.m_adhocCacheService?.Add(this.CreateCacheKey(session.Key), session, dbSession.RefreshExpiration.Subtract(DateTimeOffset.Now));
 
@@ -481,9 +481,9 @@ namespace SanteDB.Persistence.Data.Services
 
                         tx.Commit();
 
-                        var signedToken = dbSession.Key.ToByteArray().Concat(m_dataSigningService.SignData(dbSession.Key.ToByteArray())).ToArray();
-                        var signedRefresh = refreshTokenId.ToByteArray().Concat(m_dataSigningService.SignData(refreshTokenId.ToByteArray())).ToArray();
-                        var session = new AdoSecuritySession(signedToken, signedRefresh, dbSession, dbClaims);
+                        //var signedToken = dbSession.Key.ToByteArray().Concat(m_dataSigningService.SignData(dbSession.Key.ToByteArray())).ToArray();
+                        //var signedRefresh = refreshTokenId.ToByteArray().Concat(m_dataSigningService.SignData(refreshTokenId.ToByteArray())).ToArray();
+                        var session = new AdoSecuritySession(dbSession.Key.ToByteArray(), refreshTokenId.ToByteArray(), dbSession, dbClaims);
                         this.Extended?.Invoke(this, new SessionEstablishedEventArgs(null, session, true, false,
                             session.FindFirst(SanteDBClaimTypes.PurposeOfUse).Value,
                             session.Find(SanteDBClaimTypes.SanteDBScopeClaim).Select(o => o.Value).ToArray()));

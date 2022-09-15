@@ -81,13 +81,22 @@ namespace SanteDB.Authentication.OAuth2.Rest
         private readonly Tracer m_traceSource = new Tracer(OAuthConstants.TraceSourceName);
 
         // Policy Enforcement service
-        private IPolicyEnforcementService m_policyEnforcementService;
+        readonly IPolicyEnforcementService m_policyEnforcementService;
 
         // OAuth configuration
-        private OAuthConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<OAuthConfigurationSection>();
+        readonly OAuthConfigurationSection m_configuration;
 
         // Master configuration
-        private SanteDB.Core.Security.Configuration.SecurityConfigurationSection m_masterConfig = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<SanteDB.Core.Security.Configuration.SecurityConfigurationSection>();
+        readonly SanteDB.Core.Security.Configuration.SecurityConfigurationSection m_masterConfig;
+
+        // Localization information
+        readonly ILocalizationService m_LocalizationService;
+
+        // Resolve and encode session tokens.
+        readonly ISessionTokenResolverService m_SessionResolver;
+
+        // Establish, Abandon and Extend sessions.
+        readonly ISessionProviderService m_SessionProvider;
 
         // XHTML
         private const string XS_HTML = "http://www.w3.org/1999/xhtml";
@@ -97,7 +106,13 @@ namespace SanteDB.Authentication.OAuth2.Rest
         /// </summary>
         public OAuthTokenBehavior()
         {
-            this.m_policyEnforcementService = ApplicationServiceContext.Current.GetService<IPolicyEnforcementService>();
+            m_policyEnforcementService = ApplicationServiceContext.Current.GetService<IPolicyEnforcementService>();
+            var configurationManager = ApplicationServiceContext.Current.GetService<IConfigurationManager>();
+            m_configuration = configurationManager.GetSection<OAuthConfigurationSection>();
+            m_masterConfig = configurationManager.GetSection<SanteDB.Core.Security.Configuration.SecurityConfigurationSection>();
+            m_LocalizationService = ApplicationServiceContext.Current.GetService<ILocalizationService>();
+            m_SessionResolver = ApplicationServiceContext.Current.GetService<ISessionTokenResolverService>();
+            m_SessionProvider = ApplicationServiceContext.Current.GetService<ISessionProviderService>();
         }
 
         /// <summary>
@@ -130,9 +145,9 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 if (clientPrincipal == null || clientPrincipal == Core.Security.AuthenticationContext.AnonymousPrincipal ||
                     !(clientPrincipal.Identity is IApplicationIdentity))
                 {
-                    String client_identity = tokenRequest["client_id"],
+                    string client_identity = tokenRequest["client_id"],
                         client_secret = tokenRequest["client_secret"];
-                    if (String.IsNullOrEmpty(client_identity) || String.IsNullOrEmpty(client_secret))
+                    if (string.IsNullOrEmpty(client_identity) || string.IsNullOrEmpty(client_secret))
                         return this.CreateErrorCondition(OAuthErrorType.invalid_client, "Missing client credentials");
 
                     try
@@ -238,11 +253,9 @@ namespace SanteDB.Authentication.OAuth2.Rest
 
                     case OAuthConstants.GrantNameRefresh:
                         var refreshToken = tokenRequest["refresh_token"];
-                        var secret = Enumerable.Range(0, refreshToken.Length)
-                                    .Where(x => x % 2 == 0)
-                                    .Select(x => Convert.ToByte(refreshToken.Substring(x, 2), 16))
-                                    .ToArray();
-                        principal = (identityProvider as ISessionIdentityProviderService).Authenticate(ApplicationServiceContext.Current.GetService<ISessionProviderService>().Extend(secret));
+
+                        //GetSessionFromRefreshToken is internally calling extend for us right now.
+                        principal = (identityProvider as ISessionIdentityProviderService).Authenticate(m_SessionResolver.GetSessionFromRefreshToken(refreshToken));
                         break;
 
                     case OAuthConstants.GrantNameAuthorizationCode:
@@ -359,12 +372,12 @@ namespace SanteDB.Authentication.OAuth2.Rest
         /// <summary>
         /// Hydrate the JWT token
         /// </summary>
-        private JwtSecurityToken HydrateToken(ISession session)
+        private JwtSecurityToken HydrateToken(ISession session, IClaimsPrincipal claimsPrincipal)
         {
             this.m_traceSource.TraceInfo("Will create new ClaimsPrincipal based on existing principal");
 
             // System claims
-            List<IClaim> claims = session.Claims.ToList();
+            List<IClaim> claims = claimsPrincipal.Claims.ToList();
 
             // Add JTI
             claims.Add(new SanteDBClaim("jti", BitConverter.ToString(session.Id).Replace("-", "")));
@@ -372,7 +385,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
             claims.RemoveAll(o => String.IsNullOrEmpty(o.Value));
             claims.Add(new SanteDBClaim("exp", session.NotAfter.ToUnixTimeSeconds().ToString()));
             claims.RemoveAll(o => String.IsNullOrEmpty(o.Value));
-            claims.Add(new SanteDBClaim("sub", session.Claims.First(o => o.Type == SanteDBClaimTypes.Sid).Value)); // Subject is the first security identifier
+            claims.Add(new SanteDBClaim("sub", claims.First(o => o.Type == SanteDBClaimTypes.Sid).Value)); // Subject is the first security identifier
             claims.RemoveAll(o => o.Type == SanteDBClaimTypes.Sid);
             // Creates signing credentials for the specified application key
             var appid = claims.Find(o => o.Type == SanteDBClaimTypes.SanteDBApplicationIdentifierClaim).Value;
@@ -418,33 +431,41 @@ namespace SanteDB.Authentication.OAuth2.Rest
         /// </summary>
         private OAuthTokenResponse EstablishSession(IPrincipal oizPrincipal, IPrincipal clientPrincipal, IPrincipal devicePrincipal, String scope, IEnumerable<IClaim> additionalClaims)
         {
-            var claimsPrincipal = oizPrincipal as IClaimsPrincipal;
+            SanteDBClaimsPrincipal claimsPrincipal = null;
+
+            if (oizPrincipal is IClaimsPrincipal oizcp)
+            {
+                claimsPrincipal = new SanteDBClaimsPrincipal(oizcp.Identities);
+            }
+            else
+            {
+                claimsPrincipal = new SanteDBClaimsPrincipal(oizPrincipal.Identity);
+            }
             if (clientPrincipal is IClaimsPrincipal && !claimsPrincipal.Identities.OfType<IApplicationIdentity>().Any(o => o.Name == clientPrincipal.Identity.Name))
                 claimsPrincipal.AddIdentity(clientPrincipal.Identity as IClaimsIdentity);
             if (devicePrincipal is IClaimsPrincipal && !claimsPrincipal.Identities.OfType<IDeviceIdentity>().Any(o => o.Name == devicePrincipal.Identity.Name))
                 claimsPrincipal.AddIdentity(devicePrincipal.Identity as IClaimsIdentity);
 
-            String remoteIp =
+            string remoteIp =
                 RestOperationContext.Current.IncomingRequest.Headers["X-Forwarded-For"] ??
                 RestOperationContext.Current.IncomingRequest.RemoteEndPoint.Address.ToString();
 
             // Establish the session
-            ISessionProviderService isp = ApplicationServiceContext.Current.GetService<ISessionProviderService>();
             var scopeList = scope == "*" || String.IsNullOrEmpty(scope) ? null : scope.Split(' ');
             string purposeOfUse = additionalClaims?.FirstOrDefault(o => o.Type == SanteDBClaimTypes.PurposeOfUse)?.Value;
             bool isOverride = additionalClaims?.Any(o => o.Type == SanteDBClaimTypes.SanteDBOverrideClaim) == true || scopeList?.Any(o => o == PermissionPolicyIdentifiers.OverridePolicyPermission) == true;
 
-            var session = isp.Establish(new SanteDBClaimsPrincipal(claimsPrincipal.Identities), remoteIp, isOverride, purposeOfUse, scopeList, additionalClaims.FirstOrDefault(o => o.Type == SanteDBClaimTypes.Language)?.Value);
+            var session = m_SessionProvider.Establish(claimsPrincipal, remoteIp, isOverride, purposeOfUse, scopeList, additionalClaims.FirstOrDefault(o => o.Type == SanteDBClaimTypes.Language)?.Value);
 
             string refreshToken = null, sessionId = null;
             if (session != null)
             {
-                sessionId = BitConverter.ToString(session.Id).Replace("-", "");
-                refreshToken = BitConverter.ToString(session.RefreshToken).Replace("-", "");
+                sessionId = m_SessionResolver.GetEncodedIdToken(session);
+                refreshToken = m_SessionResolver.GetEncodedRefreshToken(session);
             }
             if (scope == PermissionPolicyIdentifiers.LoginPasswordOnly)
                 refreshToken = String.Empty;
-            var jwt = this.HydrateToken(session);
+            var jwt = this.HydrateToken(session, claimsPrincipal); //TODO: Rewrite
 
             JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
             RestOperationContext.Current.OutgoingResponse.ContentType = "application/json";
@@ -506,7 +527,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 {
                     DateTime notBefore = principal.FindFirst(SanteDBClaimTypes.AuthenticationInstant).AsDateTime(), notAfter = principal.FindFirst(SanteDBClaimTypes.Expiration).AsDateTime();
 
-                    var jwt = this.HydrateToken(RestOperationContext.Current.Data[SanteDB.Rest.Common.Security.TokenAuthorizationAccessBehavior.RestPropertyNameSession] as ISession);
+                    var jwt = this.HydrateToken(RestOperationContext.Current.Data[SanteDB.Rest.Common.Security.TokenAuthorizationAccessBehavior.RestPropertyNameSession] as ISession, principal);
                     return new OAuthTokenResponse()
                     {
                         AccessToken = RestOperationContext.Current.IncomingRequest.Headers["Authorization"].Split(' ')[1],
@@ -838,7 +859,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
         {
 
             var configuration = this.m_masterConfig.Signatures.FirstOrDefault(o => o.KeyName == keyName || o.KeyName == "default");
-                return null;
+            return null;
 
             // No specific configuration for the key name is found?
             SigningCredentials retVal = null;
@@ -894,7 +915,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                     throw new SecurityException("No Such Session");
                 else
                 {
-                    var jwt = this.HydrateToken(RestOperationContext.Current.Data[SanteDB.Rest.Common.Security.TokenAuthorizationAccessBehavior.RestPropertyNameSession] as ISession);
+                    var jwt = this.HydrateToken(RestOperationContext.Current.Data[SanteDB.Rest.Common.Security.TokenAuthorizationAccessBehavior.RestPropertyNameSession] as ISession, principal);
                     return new MemoryStream(Encoding.UTF8.GetBytes(jwt.Payload.SerializeToJson()));
                 }
             }
