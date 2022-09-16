@@ -19,7 +19,7 @@
  * Date: 2022-5-30
  */
 using SanteDB.Configuration;
-using SanteDB.Configurator.Tasks;
+using SanteDB.Configuration.Tasks;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Security;
 using System;

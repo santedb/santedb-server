@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2022-5-30
  */
+using SanteDB.Rest.Common.Configuration.Interop;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -29,14 +30,14 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SanteDB.Server.Core.Configuration.Utils
+namespace SanteDB.Util
 {
     /// <summary>
     /// HTTP SSL Tool
     /// </summary>
     /// <remarks>Class from http://www.pinvoke.net/default.aspx/httpapi/HttpSetServiceConfiguration.html</remarks>
 #pragma warning disable CS1591
-    public class HttpSslTool
+    public class HttpSslTool : ISslCertificateBinder
     {
 
         #region PInvoke
@@ -138,6 +139,11 @@ namespace SanteDB.Server.Core.Configuration.Utils
         private static int NOERROR = 0;
         private static int ERROR_ALREADY_EXISTS = 183;
 
+        /// <summary>
+        /// Platform
+        /// </summary>
+        public PlatformID Platform => PlatformID.Win32NT;
+
         #endregion
 
         #region Public methods
@@ -183,7 +189,7 @@ namespace SanteDB.Server.Core.Configuration.Utils
         /// <summary>
         /// Remove a certificate binding
         /// </summary>
-        public static void RemoveCertificate(IPAddress ipAddress, int port, byte[] hash, StoreName store, StoreLocation location)
+        public void UnbindCertificate(IPAddress ipAddress, int port, byte[] hash, StoreName store, StoreLocation location)
         {
             uint retVal = (uint)NOERROR; // NOERROR = 0
             HTTPAPI_VERSION httpApiVersion = new HTTPAPI_VERSION(1, 0);
@@ -211,7 +217,7 @@ namespace SanteDB.Server.Core.Configuration.Utils
         /// <summary>
         /// Set certificate binding
         /// </summary>
-        public static void BindCertificate(IPAddress ipAddress, int port, byte[] hash, StoreName store, StoreLocation location)
+        public void BindCertificate(IPAddress ipAddress, int port, byte[] hash, StoreName store, StoreLocation location)
         {
             uint retVal = (uint)NOERROR; // NOERROR = 0
             HTTPAPI_VERSION httpApiVersion = new HTTPAPI_VERSION(1, 0);
@@ -246,6 +252,7 @@ namespace SanteDB.Server.Core.Configuration.Utils
                 throw new Win32Exception(Convert.ToInt32(retVal));
             }
         }
+
 
         #endregion
 

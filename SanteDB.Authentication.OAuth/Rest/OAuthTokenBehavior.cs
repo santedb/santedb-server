@@ -62,8 +62,6 @@ using SanteDB.Core.Security.Principal;
 using SanteDB.Core.Interop;
 using System.Xml;
 using SanteDB.Core.Exceptions;
-using SanteDB.Server.Core.Configuration;
-using SanteDB.Server.Core;
 using SanteDB.Core.Security.Configuration;
 using SanteDB.Rest.Common.Security;
 

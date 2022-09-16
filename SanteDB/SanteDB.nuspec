@@ -16,9 +16,8 @@
     <tags>cdr santedb server</tags>
     <dependencies>
       <dependency id="AtnaApi" version="1.1.4.0" />
-      <dependency id="SanteDB.Server.Plugin" version="$VersionNumber$" />
-      <dependency id="SanteDB.Server.Plugin.Data" version="$VersionNumber$" />
-      <dependency id="SanteDB.Server.Plugin.Data" version="$VersionNumber$" />
+      <dependency id="SanteDB.Persistence.Data" version="$VersionNumber$" />
+      <dependency id="SanteDB.Configuration" version="$VersionNumber$" />
       <dependency id="SanteDB.Server.Messaging.OAuth2" version="$VersionNumber$" />
       <dependency id="SanteDB.BusinessRules.JavaScript" version="$VersionNumber$" />
       <dependency id="SanteDB.Messaging.Metadata" version="$VersionNumber$" />

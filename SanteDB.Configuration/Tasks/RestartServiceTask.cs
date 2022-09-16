@@ -21,7 +21,6 @@
 using SanteDB.Configuration;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Services;
-using SanteDB.Server.Core.Configuration.Tasks;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -32,7 +31,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace SanteDB.Configurator.Tasks
+namespace SanteDB.Configuration.Tasks
 {
     /// <summary>
     /// Represents a task that restarts the SanteDB configured service

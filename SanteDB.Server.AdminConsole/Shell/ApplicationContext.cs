@@ -148,7 +148,7 @@ namespace SanteDB.Server.AdminConsole.Shell
         /// <summary>
         /// Start the application context
         /// </summary>
-        public bool Start()
+        public void Start()
         {
             ApplicationServiceContext.Current = this;
             this.m_tracer.TraceInfo("Starting mini-context");
@@ -247,7 +247,6 @@ namespace SanteDB.Server.AdminConsole.Shell
                 // Attempt to get server time from clinical interface which should challenge
                 var data = this.GetRestClient(ServiceEndpointType.HealthDataService)?.Get("/time");
 
-                return true;
             }
             catch (Exception ex)
             {
@@ -256,7 +255,7 @@ namespace SanteDB.Server.AdminConsole.Shell
 #else
                 this.m_tracer.TraceError("Cannot start services: {0}", ex);
 #endif
-                return false;
+                throw;
             }
         }
 

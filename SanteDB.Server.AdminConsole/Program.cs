@@ -57,10 +57,8 @@ namespace SanteDB.Server.AdminConsole
                         Tracer.AddWriter(new Shell.ConsoleTraceWriter("Error", new Dictionary<String, EventLevel>()), EventLevel.Error);
 
                     ApplicationContext.Initialize(options);
-                    if (ApplicationContext.Current.Start())
-                    {
-                        new InteractiveShell().Exec();
-                    }
+                    ApplicationContext.Current.Start();
+                    new InteractiveShell().Exec();
                 }
                 catch (Exception e)
                 {

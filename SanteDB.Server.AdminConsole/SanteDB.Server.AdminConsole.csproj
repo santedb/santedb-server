@@ -142,10 +142,6 @@
       <Project>{65ef51c6-5cb8-43b8-ae65-4a68f0b44ad2}</Project>
       <Name>SanteDB.Core.Model.AMI</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Core\SanteDB.Server.Core.csproj">
-      <Project>{db9bc05e-45f1-4f96-a161-f36bdecaf566}</Project>
-      <Name>SanteDB.Server.Core</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SanteDB.Server.AdminConsole.Api\SanteDB.Server.AdminConsole.Api.csproj">
       <Project>{450e9519-c573-4f07-addd-8d0c74b975ff}</Project>
       <Name>SanteDB.Server.AdminConsole.Api</Name>

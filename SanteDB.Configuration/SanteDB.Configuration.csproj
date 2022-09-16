@@ -87,6 +87,10 @@
     <Compile Include="Features\IEnhancedConfigurationFeature.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServiceTool.cs" />
+    <Compile Include="Tasks\CoreServerFeatures.cs" />
+    <Compile Include="Tasks\RestartServiceTask.cs" />
+    <Compile Include="Tasks\SaveConfigurationTask.cs" />
+    <Compile Include="Tasks\WindowsServiceFeature.cs" />
   </ItemGroup>
   <Choose>
     <When Condition="$(SolutionName.Contains('-ext'))">
@@ -123,8 +127,21 @@
     <None Include="..\SanteDB.licenseheader">
       <Link>SanteDB.licenseheader</Link>
     </None>
+    <None Include="SanteDB.Configuration.nuspec" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\restsrvr\RestSrvr\RestSrvr.csproj">
+      <Project>{16EF1840-0361-439D-806C-92D0411122EB}</Project>
+      <Name>RestSrvr</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\santedb-applets\SanteDB.Core.Applets\SanteDB.Core.Applets.csproj">
+      <Project>{39E61451-F4FE-493D-B754-5F06EB284AAC}</Project>
+      <Name>SanteDB.Core.Applets</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\santedb-bis\SanteDB.BI\SanteDB.BI.csproj">
+      <Project>{030666AA-FC71-449E-9DFC-270F1C23C5DA}</Project>
+      <Name>SanteDB.BI</Name>
+    </ProjectReference>
     <ProjectReference Include="..\santedb-orm\SanteDB.OrmLite\SanteDB.OrmLite.csproj">
       <Project>{407C87E6-A1F3-45E6-B883-A8176B350817}</Project>
       <Name>SanteDB.OrmLite</Name>
