@@ -70,7 +70,7 @@ namespace SanteDB.Persistence.Data.Security
         /// </summary>
         public void AddIdentity(IIdentity identity)
         {
-            throw new NotSupportedException();
+            throw new NotSupportedException("You cannot add an identity to an existing session. Create a new session and then call Authenticate on the ISessionIdentityProviderService.");
         }
 
         /// <summary>

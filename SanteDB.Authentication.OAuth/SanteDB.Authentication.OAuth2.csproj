@@ -43,7 +43,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="4.0.4.403061554" />
+    <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="6.23.1" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -129,10 +129,6 @@
     <ProjectReference Include="..\SanteDB.Core\SanteDB.Server.Core.csproj">
       <Project>{db9bc05e-45f1-4f96-a161-f36bdecaf566}</Project>
       <Name>SanteDB.Server.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\santedb-i18n\SanteDB.Core.i18n\SanteDB.Core.i18n.csproj">
-      <Project>{CA7B81DC-B789-4AF6-A079-EC84259C101A}</Project>
-      <Name>SanteDB.Core.i18n</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
