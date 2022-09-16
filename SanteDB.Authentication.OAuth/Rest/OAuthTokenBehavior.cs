@@ -255,7 +255,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                         var refreshToken = tokenRequest["refresh_token"];
 
                         //GetSessionFromRefreshToken is internally calling extend for us right now.
-                        principal = (identityProvider as ISessionIdentityProviderService).Authenticate(m_SessionResolver.GetSessionFromRefreshToken(refreshToken));
+                        principal = (m_SessionProvider as ISessionIdentityProviderService).Authenticate(m_SessionResolver.GetSessionFromRefreshToken(refreshToken));
                         break;
 
                     case OAuthConstants.GrantNameAuthorizationCode:
