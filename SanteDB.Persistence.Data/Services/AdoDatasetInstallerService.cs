@@ -143,7 +143,7 @@ namespace SanteDB.Persistence.Data.Services
                         }
 
                         // Insert the post install trigger
-                        if (dataset.SqlExec != null)
+                        if (dataset.SqlExec?.Any() == true)
                         {
                             this.m_tracer.TraceInfo("Executing post-install triggers for {0}...", dataset.Id);
                             foreach(var itm in dataset.SqlExec.Where(o=>o.InvariantName == this.m_configuration.Provider.Invariant))

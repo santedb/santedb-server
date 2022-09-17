@@ -23,12 +23,12 @@
     <add type="SanteDB.Rest.Common.Configuration.RestConfigurationSection, SanteDB.Rest.Common" />
   </sections>
   <section xsi:type="RestConfigurationSection">
-    <service name="META">
+    <service name="META" implementationType="SanteDB.Messaging.Metadata.Rest.MetadataServiceBehavior, SanteDB.Messaging.Metadata">
       <endpoint address="http://0.0.0.0:8080/api-docs" contract="SanteDB.Messaging.Metadata.Rest.IMetadataServiceContract, SanteDB.Messaging.Metadata">
         <add type="SanteDB.Rest.Common.Behavior.MessageCompressionEndpointBehavior, SanteDB.Rest.Common"/>
       </endpoint>c
     </service>
-    <service name="HDSI">
+    <service name="HDSI" implementationType="SanteDB.Rest.HDSI.HdsiServiceBehavior, SanteDB.Rest.HDSI">
       <behaviors>
         <add type="SanteDB.Rest.Common.Security.TokenAuthorizationAccessBehavior, SanteDB.Rest.Common"/>
       </behaviors>
@@ -40,7 +40,7 @@
         </behaviors>
       </endpoint>
     </service>
-    <service name="BIS">
+    <service name="BIS" implementationType="SanteDB.Rest.BIS.BisServiceBehavior, SanteDB.Rest.BIS">
       <behaviors>
         <add type="SanteDB.Rest.Common.Security.TokenAuthorizationAccessBehavior, SanteDB.Rest.Common"/>
       </behaviors>
@@ -51,7 +51,7 @@
         </behaviors>
       </endpoint>
     </service>
-    <service name="AMI">
+    <service name="AMI" implementationType="SanteDB.Rest.AMI.AmiServiceBehavior, SanteDB.Rest.AMI">
       <behaviors>
         <add type="SanteDB.Rest.Common.Security.TokenAuthorizationAccessBehavior, SanteDB.Rest.Common"/>
       </behaviors>
@@ -65,7 +65,7 @@
     </service>
 
 
-    <service name="FHIR">
+    <service name="FHIR" implementationType="SanteDB.Messaging.FHIR.Rest.FhirServiceBehavior, SanteDB.Messaging.FHIR">
       <behaviors>
         <add type="SanteDB.Rest.Common.Security.TokenAuthorizationAccessBehavior, SanteDB.Rest.Common"/>
       </behaviors>
@@ -97,7 +97,7 @@
         </behaviors>
       </endpoint>
     </service>
-    <service name="OAuth2">
+    <service name="OAuth2" implementationType="SanteDB.Authentication.OAuth2.Rest.OAuthTokenBehavior, SanteDB.Authentication.OAuth2" >
       <endpoint address="http://0.0.0.0:8080/auth" contract="SanteDB.Authentication.OAuth2.Rest.IOAuthTokenContract, SanteDB.Authentication.OAuth2"/>
     </service>
   </section>

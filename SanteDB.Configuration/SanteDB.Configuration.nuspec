@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
   <metadata>
-    <id>SanteDB.Configuration</id>
+    <id>SanteDB.iCDR.Configuration</id>
     <version>$VersionNumber$</version>
-    <title>SanteDB Server Plugin Configuration</title>
+    <title>SanteDB Configuration Tool Library</title>
     <authors>SanteDB Community</authors>
     <owners>santedb.org</owners>
     <licenseUrl>https://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
@@ -21,7 +21,6 @@
       <dependency id="SanteDB.Core.Model" version="$VersionNumber$"/>
       <dependency id="SanteDB.OrmLite" version="$VersionNumber$"/>
     </dependencies>
-   
   </metadata>
-  
+
 </package>

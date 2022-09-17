@@ -25,7 +25,7 @@ alter table ent_addr_cmp_tbl alter column val set not null;
 
 drop table if exists phon_val_tbl;
 drop table if exists ent_addr_cmp_val_tbl ;
-alter table ent_name_cmp_tbl rename if exists cmp_seq to seq_id;
+alter table ent_name_cmp_tbl rename cmp_seq to seq_id;
 alter sequence ent_addr_cmp_val_seq rename to ent_addr_cmp_seq;
 alter table ent_addr_cmp_tbl add seq_id bigint not null default nextval('ent_addr_cmp_seq');
 

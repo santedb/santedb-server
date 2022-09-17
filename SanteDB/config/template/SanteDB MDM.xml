@@ -63,7 +63,6 @@
       <add type="SanteDB.Core.Applets.Services.Impl.AppletLocalizationService, SanteDB.Core.Applets" />
       <add type="SanteDB.Core.Services.Impl.CachedResourceCheckoutService, SanteDB.Core.Api" />
       <add type="SanteDB.Core.Security.DefaultPolicyEnforcementService, SanteDB.Core.Api" />
-      <add type="SanteDB.Server.Core.Services.Impl.FileConfigurationService, SanteDB.Server.Core" />
       <add type="SanteDB.Core.Jobs.DefaultJobManagerService, SanteDB.Core.Api" />
       <add type="SanteDB.Core.Services.Impl.FileSystemDispatcherQueueService, SanteDB.Core.Api" />
       <add type="SanteDB.Persistence.Data.Services.AdoApplicationIdentityProvider,SanteDB.Persistence.Data" />

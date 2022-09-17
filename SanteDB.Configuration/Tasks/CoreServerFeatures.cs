@@ -35,6 +35,7 @@ using SanteDB.Core.Data.Initialization;
 using RestSrvr;
 using SanteDB.BI.Services.Impl;
 using SanteDB.Core.Applets.Services.Impl;
+using SanteDB.Rest.Common;
 
 namespace SanteDB.Configuration.Tasks
 {
@@ -53,7 +54,7 @@ namespace SanteDB.Configuration.Tasks
             typeof(DataInitializationService),
             typeof(DefaultThreadPoolService),
             typeof(DefaultNetworkInformationService),
-            typeof(IRestServiceFactory),
+            typeof(RestServiceFactory),
             typeof(LocalRepositoryFactory),
             typeof(ExemptablePolicyFilterService),
             typeof(LocalMailMessageService),

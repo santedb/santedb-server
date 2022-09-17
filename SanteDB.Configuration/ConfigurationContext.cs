@@ -39,12 +39,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-using SanteDB.Core;
-using SanteDB.Core.Configuration;
-using SanteDB.Core.Configuration.Data;
-using SanteDB.Core.Diagnostics;
-using SanteDB.OrmLite.Configuration;
-using SanteDB.OrmLite.Providers;
 
 namespace SanteDB.Configuration
 {
@@ -110,19 +104,7 @@ namespace SanteDB.Configuration
         /// </summary>
         public void InitializeFeatures()
         {
-            this.Features.AddRange(AppDomain.CurrentDomain.GetAssemblies()
-                .Where(o => !o.IsDynamic)
-                .SelectMany(a =>
-                {
-                    try
-                    {
-                        return a.ExportedTypes;
-                    }
-                    catch
-                    {
-                        return new List<Type>();
-                    }
-                })
+            this.Features.AddRange(AppDomain.CurrentDomain.GetAllTypes()
                 .Where(t => typeof(IFeature).IsAssignableFrom(t) && !t.ContainsGenericParameters && !t.IsAbstract && !t.IsInterface)
                 .Select(i =>
                 {
@@ -133,14 +115,16 @@ namespace SanteDB.Configuration
                         {
                             return null;
                         }
-
-                        return feature;
+                        return feature ;
                     }
                     catch (Exception e)
                     {
                         return null;
                     }
-                })
+                }).Union(AppDomain.CurrentDomain.GetAllTypes()
+                    .Where(o=>typeof(IFeatureFactory).IsAssignableFrom(o) && !o.IsInterface && !o.IsAbstract)
+                    .Select(o=>Activator.CreateInstance(o) as IFeatureFactory)
+                    .SelectMany(o=>o.GetFeatures()))
                 .OfType<IFeature>());
         }
 
