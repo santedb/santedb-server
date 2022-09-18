@@ -3,11 +3,12 @@
  *	<summary>Upgrades an OpenIZ 1.1.0.0 database SanteDB</summary>
  *	<remarks>This update will perform the necessary steps to upgrade an existing OpenIZ database to SanteDB</remarks>
  *	<canInstall>SELECT COUNT(distinct usr_id) > 0 FROM SEC_USR_TBL;</canInstall>
- *  <isInstalled mustSucceed="true">SELECT COUNT(*) > 0 FROM SEC_PROV_TBL;</isInstalled>
+ *  <isInstalled mustSucceed="true">SELECT to_regclass('public.sec_prov_tbl') IS NOT NULL;</isInstalled>
  * </feature>
  */
- 
- INSERT INTO sec_rol_pol_assoc_tbl (rol_id, pol_id, pol_act) values ('f6d2ba1d-5bb5-41e3-b7fb-2ec32418b2e1', '5fb731bf-4e59-4863-80bd-51757d58ea3b', 2);
+
+-- INFO: Migrating security tables... 
+ INSERT INTO sec_rol_pol_assoc_tbl (rol_id, pol_id, pol_act) values ('f6d2ba1d-5bb5-41e3-b7fb-2ec32418b2e1', '5fb731bf-4e59-4863-80bd-51757d58ea3b', 2) ON CONFLICT DO NOTHING;
 
 -- SECURITY PROVENANCE TABLE
 -- THIS TABLE IS USED TO RECORD THE PROVENANCE OF AN OBJECT AT THE TIME OF CREATION / UPDATION / ETC.
@@ -480,6 +481,7 @@ BEGIN
 END
 $$ LANGUAGE PLPGSQL;	
 
+-- INFO: Migrating Act and Entity data tables
 --#!
 ALTER TABLE ENT_VRSN_TBL ADD CRT_ACT_ID UUID;
 ALTER TABLE ENT_VRSN_TBL ADD CONSTRAINT FK_ENT_VRSN_CRT_ACT FOREIGN KEY (CRT_ACT_ID) REFERENCES ACT_TBL(ACT_ID);
@@ -491,3 +493,72 @@ ALTER TABLE ASGN_AUT_TBL DROP CONSTRAINT fk_asgn_aut_dev_id;
 DELETE FROM asgn_aut_tbl WHERE aut_name = 'Test';
 ALTER TABLE ASGN_AUT_TBL ADD CONSTRAINT FK_ASGN_AUT_APP_ID FOREIGN KEY (APP_ID) REFERENCES SEC_APP_TBL(APP_ID);
 --#!
+
+-- INFO: Unpartition Entity Relationships...
+SELECT * INTO ent_rel_np_tbl FROM ent_rel_tbl;
+
+CREATE TRIGGER ent_rel_tbl_vrfy BEFORE
+INSERT
+    OR
+UPDATE
+    ON
+    public.ent_rel_np_tbl FOR EACH ROW EXECUTE PROCEDURE trg_vrfy_ent_rel_tbl();
+
+ALTER TABLE ent_rel_np_tbl ADD CONSTRAINT pl_ent_rel_tbl PRIMARY KEY (ent_rel_id);
+ALTER TABLE ent_rel_np_tbl ADD CONSTRAINT fk_ent_rel_rel_typ_cd_id FOREIGN KEY (rel_typ_cd_id) REFERENCES public.cd_tbl(cd_id);
+ALTER TABLE ent_rel_np_tbl ADD CONSTRAINT fk_ent_rel_src_ent_id FOREIGN KEY (src_ent_id) REFERENCES public.ent_tbl(ent_id);
+ALTER TABLE ent_rel_np_tbl ADD CONSTRAINT fk_ent_rel_trg_ent_id FOREIGN KEY (trg_ent_id) REFERENCES public.ent_tbl(ent_id);
+DROP TABLE IF EXISTS ent_rel_tbl ;
+ALTER TABLE ent_rel_np_tbl RENAME TO ent_rel_tbl;
+--#!
+-- INFO:     Re-apply index
+CREATE INDEX ent_rel_src_ent_idx ON ent_rel_tbl (src_ent_id);
+
+--#!
+-- INFO: Unpartition Act Participations
+SELECT * INTO act_ptcpt_np_tbl FROM act_ptcpt_tbl;
+
+ALTER TABLE act_ptcpt_np_tbl ADD CONSTRAINT pk_act_ptcpt_tbl PRIMARY KEY (act_ptcpt_id);
+ALTER TABLE act_ptcpt_np_tbl ADD CONSTRAINT fk_act_ptcpt_act_id FOREIGN KEY (act_id) REFERENCES public.act_tbl(act_id);
+ALTER TABLE act_ptcpt_np_tbl ADD CONSTRAINT fk_act_ptcpt_ent_id FOREIGN KEY (ent_id) REFERENCES public.ent_tbl(ent_id);
+
+DROP TABLE IF EXISTS act_ptcpt_tbl;
+ALTER TABLE act_ptcpt_np_tbl RENAME TO act_ptcpt_tbl;
+--#!
+-- INFO:     Re-apply index
+CREATE INDEX act_ptcpt_act_idx ON act_ptcpt_tbl (act_id);
+--#!
+INSERT INTO CD_SET_MEM_ASSOC_TBL (set_id, cd_id) VALUES ('ba44f451-f979-4e11-9db4-aad8e2e88ce5', 'e537599d-8e57-4030-ba0a-62e96d708acb') ON CONFLICT DO NOTHING ;
+INSERT INTO CD_SET_MEM_ASSOC_TBL (set_id, cd_id) VALUES ('ba44f451-f979-4e11-9db4-aad8e2e88ce5', '4d854aa0-83ef-419b-a249-2e94a3301b59') ON CONFLICT DO NOTHING ;
+INSERT INTO CD_SET_MEM_ASSOC_TBL (set_id, cd_id) VALUES ('ba44f451-f979-4e11-9db4-aad8e2e88ce5', '7933dc59-1c83-4902-b9b8-b88e4b148516') ON CONFLICT DO NOTHING ;
+
+-- OPTIONAL
+SELECT REG_PATCH('20170721-01');--#!
+-- OPTIONAL
+SELECT REG_PATCH('20170725-01');--#!
+-- OPTIONAL
+SELECT REG_PATCH('20170803-01');--#!
+-- OPTIONAL
+SELECT REG_PATCH('20170804-01');--#!
+-- OPTIONAL
+SELECT REG_PATCH('20170913-01');--#!
+-- OPTIONAL
+SELECT REG_PATCH('20171003-01');--#!
+-- OPTIONAL
+SELECT REG_PATCH('20171011-01');--#!
+-- OPTIONAL
+SELECT REG_PATCH('20171016-01');--#!
+-- OPTIONAL
+SELECT REG_PATCH('20171023-01');--#!
+-- OPTIONAL
+SELECT REG_PATCH('20171030-01');--#!
+-- OPTIONAL
+SELECT REG_PATCH('20171108-01');--#!
+-- OPTIONAL
+SELECT REG_PATCH('20180126-01');--#!
+-- OPTIONAL
+SELECT REG_PATCH('20180131-01');--#!
+-- OPTIONAL
+SELECT REG_PATCH('20180211-01');--#!
+-- OPTIONAL
+

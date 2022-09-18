@@ -9,16 +9,16 @@
 BEGIN TRANSACTION ;
 
 -- ASSIGNED ENTITY
-INSERT INTO ENT_REL_VRFY_CDTBL (src_cls_cd_id, rel_typ_cd_id, trg_cls_cd_id, err_desc) VALUES ('1373ff04-a6ef-420a-b1d0-4a07465fe8e8', '455f1772-f580-47e8-86bd-b5ce25d351f9', 'FF34DFA7-C6D3-4F8B-BC9F-14BCDC13BA6C', 'Device=[DedicatedServiceDeliveryLocation]=>ServiceDeliveryLocation'); 
-INSERT INTO ENT_REL_VRFY_CDTBL (src_cls_cd_id, rel_typ_cd_id, trg_cls_cd_id, err_desc) VALUES ('1373ff04-a6ef-420a-b1d0-4a07465fe8e8', '77b7a04b-c065-4faf-8ec0-2cdad4ae372b', '9de2a846-ddf2-4ebc-902e-84508c5089ea', 'Device=[AssignedEntity]=>Person'); 
-INSERT INTO ENT_REL_VRFY_CDTBL (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES ('f3ef7e48-d8b7-4030-b431-aff7e0e1cb76','9de2a846-ddf2-4ebc-902e-84508c5089ea','79DD4F75-68E8-4722-A7F5-8BC2E08F5CD6', 'Person ==[Birthplace]==> CityOrTown');
-INSERT INTO ENT_REL_VRFY_CDTBL (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES ('f3ef7e48-d8b7-4030-b431-aff7e0e1cb76','9de2a846-ddf2-4ebc-902e-84508c5089ea','48B2FFB3-07DB-47BA-AD73-FC8FB8502471', 'Person ==[Birthplace]==> Country');
-INSERT INTO ENT_REL_VRFY_CDTBL (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES ('f3ef7e48-d8b7-4030-b431-aff7e0e1cb76','9de2a846-ddf2-4ebc-902e-84508c5089ea','D9489D56-DDAC-4596-B5C6-8F41D73D8DC5', 'Person ==[Birthplace]==> CountyOrParish');
-INSERT INTO ENT_REL_VRFY_CDTBL (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES ('f3ef7e48-d8b7-4030-b431-aff7e0e1cb76','9de2a846-ddf2-4ebc-902e-84508c5089ea','8CF4B0B0-84E5-4122-85FE-6AFA8240C218', 'Person ==[Birthplace]==> State');
-INSERT INTO ENT_REL_VRFY_CDTBL (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES ('f3ef7e48-d8b7-4030-b431-aff7e0e1cb76','bacd9c6f-3fa9-481e-9636-37457962804d','79DD4F75-68E8-4722-A7F5-8BC2E08F5CD6', 'Patient ==[Birthplace]==> CityOrTown');
-INSERT INTO ENT_REL_VRFY_CDTBL (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES ('f3ef7e48-d8b7-4030-b431-aff7e0e1cb76','bacd9c6f-3fa9-481e-9636-37457962804d','48B2FFB3-07DB-47BA-AD73-FC8FB8502471', 'Patient ==[Birthplace]==> Country');
-INSERT INTO ENT_REL_VRFY_CDTBL (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES ('f3ef7e48-d8b7-4030-b431-aff7e0e1cb76','bacd9c6f-3fa9-481e-9636-37457962804d','D9489D56-DDAC-4596-B5C6-8F41D73D8DC5', 'Patient ==[Birthplace]==> CountyOrParish');
-INSERT INTO ENT_REL_VRFY_CDTBL (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES ('f3ef7e48-d8b7-4030-b431-aff7e0e1cb76','bacd9c6f-3fa9-481e-9636-37457962804d','8CF4B0B0-84E5-4122-85FE-6AFA8240C218', 'Patient ==[Birthplace]==> State');
+INSERT INTO ENT_REL_VRFY_CDTBL (src_cls_cd_id, rel_typ_cd_id, trg_cls_cd_id, err_desc) VALUES ('1373ff04-a6ef-420a-b1d0-4a07465fe8e8', '455f1772-f580-47e8-86bd-b5ce25d351f9', 'FF34DFA7-C6D3-4F8B-BC9F-14BCDC13BA6C', 'Device=[DedicatedServiceDeliveryLocation]=>ServiceDeliveryLocation') ON CONFLICT DO NOTHING; 
+INSERT INTO ENT_REL_VRFY_CDTBL (src_cls_cd_id, rel_typ_cd_id, trg_cls_cd_id, err_desc) VALUES ('1373ff04-a6ef-420a-b1d0-4a07465fe8e8', '77b7a04b-c065-4faf-8ec0-2cdad4ae372b', '9de2a846-ddf2-4ebc-902e-84508c5089ea', 'Device=[AssignedEntity]=>Person') ON CONFLICT DO NOTHING; 
+INSERT INTO ENT_REL_VRFY_CDTBL (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES ('f3ef7e48-d8b7-4030-b431-aff7e0e1cb76','9de2a846-ddf2-4ebc-902e-84508c5089ea','79DD4F75-68E8-4722-A7F5-8BC2E08F5CD6', 'Person ==[Birthplace]==> CityOrTown') ON CONFLICT DO NOTHING;
+INSERT INTO ENT_REL_VRFY_CDTBL (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES ('f3ef7e48-d8b7-4030-b431-aff7e0e1cb76','9de2a846-ddf2-4ebc-902e-84508c5089ea','48B2FFB3-07DB-47BA-AD73-FC8FB8502471', 'Person ==[Birthplace]==> Country') ON CONFLICT DO NOTHING;
+INSERT INTO ENT_REL_VRFY_CDTBL (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES ('f3ef7e48-d8b7-4030-b431-aff7e0e1cb76','9de2a846-ddf2-4ebc-902e-84508c5089ea','D9489D56-DDAC-4596-B5C6-8F41D73D8DC5', 'Person ==[Birthplace]==> CountyOrParish') ON CONFLICT DO NOTHING;
+INSERT INTO ENT_REL_VRFY_CDTBL (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES ('f3ef7e48-d8b7-4030-b431-aff7e0e1cb76','9de2a846-ddf2-4ebc-902e-84508c5089ea','8CF4B0B0-84E5-4122-85FE-6AFA8240C218', 'Person ==[Birthplace]==> State') ON CONFLICT DO NOTHING;
+INSERT INTO ENT_REL_VRFY_CDTBL (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES ('f3ef7e48-d8b7-4030-b431-aff7e0e1cb76','bacd9c6f-3fa9-481e-9636-37457962804d','79DD4F75-68E8-4722-A7F5-8BC2E08F5CD6', 'Patient ==[Birthplace]==> CityOrTown') ON CONFLICT DO NOTHING;
+INSERT INTO ENT_REL_VRFY_CDTBL (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES ('f3ef7e48-d8b7-4030-b431-aff7e0e1cb76','bacd9c6f-3fa9-481e-9636-37457962804d','48B2FFB3-07DB-47BA-AD73-FC8FB8502471', 'Patient ==[Birthplace]==> Country') ON CONFLICT DO NOTHING;
+INSERT INTO ENT_REL_VRFY_CDTBL (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES ('f3ef7e48-d8b7-4030-b431-aff7e0e1cb76','bacd9c6f-3fa9-481e-9636-37457962804d','D9489D56-DDAC-4596-B5C6-8F41D73D8DC5', 'Patient ==[Birthplace]==> CountyOrParish') ON CONFLICT DO NOTHING;
+INSERT INTO ENT_REL_VRFY_CDTBL (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES ('f3ef7e48-d8b7-4030-b431-aff7e0e1cb76','bacd9c6f-3fa9-481e-9636-37457962804d','8CF4B0B0-84E5-4122-85FE-6AFA8240C218', 'Patient ==[Birthplace]==> State') ON CONFLICT DO NOTHING;
 
 
 ALTER TABLE ASGN_AUT_TBL ADD POL_ID UUID;
@@ -27,7 +27,7 @@ ALTER TABLE ASGN_AUT_TBL ADD UPD_PROV_ID UUID;
 ALTER TABLE ASGN_AUT_TBL ADD CONSTRAINT CK_ASGN_AUT_UPD CHECK (UPD_UTC IS NULL OR UPD_UTC IS NOT NULL AND UPD_PROV_ID IS NOT NULL);
 ALTER TABLE SEC_USR_CLM_TBL ADD EXP_UTC TIMESTAMPTZ;
 
-CREATE TABLE SEC_CHL_TBL (
+CREATE TABLE IF NOT EXISTS SEC_CHL_TBL (
 	CHL_ID UUID NOT NULL DEFAULT uuid_generate_v1(),
 	CHL_TXT VARCHAR(128) NOT NULL,
 	CRT_UTC TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, -- THE TIME THAT THE CHALLENGE WAS CREATED
@@ -43,7 +43,7 @@ CREATE TABLE SEC_CHL_TBL (
     CONSTRAINT CK_SEC_CHL_OBSLT_USR CHECK (OBSLT_PROV_ID IS NOT NULL AND OBSLT_UTC IS NOT NULL OR OBSLT_PROV_ID IS NULL AND OBSLT_UTC IS NULL),
     CONSTRAINT CK_SEC_CHL_UPD_USR CHECK (UPD_PROV_ID IS NOT NULL AND UPD_UTC IS NOT NULL OR UPD_PROV_ID IS NULL AND UPD_UTC IS NULL)
 );
-CREATE TABLE SEC_USR_CHL_ASSOC_TBL (
+CREATE TABLE IF NOT EXISTS SEC_USR_CHL_ASSOC_TBL (
 	CHL_ID UUID NOT NULL,
 	USR_ID UUID NOT NULL,
 	CHL_RSP VARCHAR(128) NOT NULL,
@@ -55,9 +55,9 @@ CREATE TABLE SEC_USR_CHL_ASSOC_TBL (
 ALTER TABLE SEC_USR_TBL ADD PWD_EXP_UTC DATE;
 ALTER TABLE SEC_USR_TBL ADD TFA_MECH UUID;
 
-INSERT INTO sec_chl_tbl (chl_txt, crt_prov_id) VALUES ('security.challenge.text1', 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8');
-INSERT INTO sec_chl_tbl (chl_txt, crt_prov_id) VALUES ('security.challenge.text2', 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8');
-INSERT INTO sec_chl_tbl (chl_txt, crt_prov_id) VALUES ('security.challenge.text3', 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8');
+INSERT INTO sec_chl_tbl (chl_txt, crt_prov_id) VALUES ('security.challenge.text1', 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8') ON CONFLICT DO NOTHING;
+INSERT INTO sec_chl_tbl (chl_txt, crt_prov_id) VALUES ('security.challenge.text2', 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8') ON CONFLICT DO NOTHING;
+INSERT INTO sec_chl_tbl (chl_txt, crt_prov_id) VALUES ('security.challenge.text3', 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8') ON CONFLICT DO NOTHING;
 
 DROP FUNCTION AUTH_USR(text, text, int);
 
@@ -127,9 +127,9 @@ BEGIN
 END	
 $$ LANGUAGE PLPGSQL;
 
-INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES ('e15b96ab-646c-4c00-9a58-ea09eee67dad', '1.3.6.1.4.1.33349.3.1.5.9.2.1.0.1', 'Login for Password Reassignment', 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8');
-INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES ('e15b96ab-646c-4c00-9a58-ea09eee67dae', '1.3.6.1.4.1.33349.3.1.5.9.2.600', 'Special Security Elevation', 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8');
-INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID, IS_ELEV) VALUES ('e15b96ab-646c-4c00-9a58-ea09eee67daf', '1.3.6.1.4.1.33349.3.1.5.9.2.600.1', 'Change Security Challenge Question', 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8', true);
+INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES ('e15b96ab-646c-4c00-9a58-ea09eee67dad', '1.3.6.1.4.1.33349.3.1.5.9.2.1.0.1', 'Login for Password Reassignment', 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8') ON CONFLICT DO NOTHING;
+INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID) VALUES ('e15b96ab-646c-4c00-9a58-ea09eee67dae', '1.3.6.1.4.1.33349.3.1.5.9.2.600', 'Special Security Elevation', 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8') ON CONFLICT DO NOTHING;
+INSERT INTO SEC_POL_TBL (POL_ID, OID, POL_NAME, CRT_PROV_ID, IS_ELEV) VALUES ('e15b96ab-646c-4c00-9a58-ea09eee67daf', '1.3.6.1.4.1.33349.3.1.5.9.2.600.1', 'Change Security Challenge Question', 'fadca076-3690-4a6e-af9e-f1cd68e8c7e8', true) ON CONFLICT DO NOTHING;
 
 INSERT INTO SEC_ROL_POL_ASSOC_TBL (POL_ID, ROL_ID, POL_ACT)
 	SELECT 'e15b96ab-646c-4c00-9a58-ea09eee67dae', ROL_ID, 1
