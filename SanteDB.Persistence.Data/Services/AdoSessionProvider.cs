@@ -207,7 +207,7 @@ namespace SanteDB.Persistence.Data.Services
         }
 
         /// <summary>
-        /// Authenticate (create a princpal) based off a session
+        /// Authenticate (create a principal) based off a session
         /// </summary>
         public IPrincipal Authenticate(ISession session)
         {

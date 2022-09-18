@@ -28,7 +28,6 @@ using SanteDB.Core.Security.Services;
 using SanteDB.Core.Security.Tfa.Twilio.Configuration;
 using SanteDB.Core.Security.Tfa.Twilio.Resources;
 using SanteDB.Core.Services;
-using SanteDB.Server.Core.Services;
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;

@@ -82,6 +82,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConsoleParameters.cs" />
+    <Compile Include="ServerApplicationContext.cs" />
+    <Compile Include="Util\HttpSslTool.cs" />
     <None Include="applets\santedb.admin.sln.pak">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -553,6 +555,10 @@
       <Project>{1b690052-ed2e-4389-838d-9b9fb188f541}</Project>
       <Name>SanteDB.Messaging.Metadata</Name>
     </ProjectReference>
+    <ProjectReference Include="..\santedb-restsvc\SanteDB.Rest.WWW\SanteDB.Rest.WWW.csproj">
+      <Project>{09b39a55-466f-4678-a644-fdada2ac5b6a}</Project>
+      <Name>SanteDB.Rest.WWW</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SanteDB.Authentication.OAuth\SanteDB.Authentication.OAuth2.csproj">
       <Project>{a3975c6f-4fdb-43be-81ab-3357b86173f1}</Project>
       <Name>SanteDB.Authentication.OAuth2</Name>
@@ -564,10 +570,6 @@
     <ProjectReference Include="..\SanteDB.Core.Security.Tfa.Twilio\SanteDB.Core.Security.Tfa.Twilio.csproj">
       <Project>{5a60d6e2-72dd-478a-91a6-e928208ca1ba}</Project>
       <Name>SanteDB.Core.Security.Tfa.Twilio</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Core\SanteDB.Server.Core.csproj">
-      <Project>{db9bc05e-45f1-4f96-a161-f36bdecaf566}</Project>
-      <Name>SanteDB.Server.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\SanteDB.Messaging.Atna\SanteDB.Messaging.Atna.csproj">
       <Project>{976e1627-b0da-4237-977d-9b3020b60dc1}</Project>
@@ -593,16 +595,14 @@
       <Project>{03052730-be5d-4212-9b71-316c685dd245}</Project>
       <Name>SanteDB.Persistence.PubSub.ADO</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Server\SanteDB.Server.csproj">
-      <Project>{1d145e2a-c31e-467c-9f4a-6811e1604b67}</Project>
-      <Name>SanteDB.Server</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SanteDB.Tools.Debug\SanteDB.Tools.Debug.csproj">
       <Project>{223d4d87-6819-4f38-ae69-a82e249e1879}</Project>
       <Name>SanteDB.Tools.Debug</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Services\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Choose>
     <When Condition="$(SolutionName.Contains('-linux'))">

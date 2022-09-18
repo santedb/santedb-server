@@ -4,9 +4,9 @@
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(VersionNumber)' == ''">
-    <VersionNumber>3.0-debug</VersionNumber>
+    <VersionNumber>2.4.0-debug</VersionNumber>
   </PropertyGroup>
-
+  
   <PropertyGroup>
     <PackageId>SanteDB.Core.TestFramework</PackageId>
     <Title>SanteDB.Core.TestFramework</Title>
@@ -19,69 +19,50 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <IncludeSymbols>true</IncludeSymbols>
-    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+        <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <Product>SanteDB</Product>
+	    <Product>SanteDB</Product>
     <Copyright>Copyright (C) 2015-2022 SanteSuite Contributors (See: NOTICES)</Copyright>
     <Company>SanteSuite Contributors</Company>
     <PackageIconUrl>http://santesuite.org/assets/img/logo.png</PackageIconUrl>
     <PackageProjectUrl>http://santesuite.org</PackageProjectUrl>
     <AssemblyName>SanteDB.Core.TestFramework</AssemblyName>
   </PropertyGroup>
-
-
+  
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+ 
+  <ItemGroup>
+    <Compile Include="DataTest.cs" />
+    <Compile Include="TestApplicationContext.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestConfigurationService.cs" />
+    <Compile Include="TestLocalizationService.cs" />
+  </ItemGroup>
   <ItemGroup>
     <None Include="..\SanteDB.licenseheader">
       <Link>SanteDB.licenseheader</Link>
     </None>
-    <Content Include="SanteDB.Core.TestFramework.targets" />
+    <None Include="SanteDB.Core.TestFramework.targets" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="TestConfig.xml" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="..\Solution Items\santedb_test.fdb">
-      <PackagePath>build</PackagePath>
-      <Pack>true</Pack>
-    </Content>
-    <Content Include=".\bin\$(Configuration)\fbclient.dll">
-      <Pack>true</Pack>
-      <PackagePath>build</PackagePath>
-    </Content>
-    <Content Include=".\bin\$(Configuration)\firebird.conf">
-      <Pack>true</Pack>
-      <PackagePath>build</PackagePath>
-    </Content>
-    <Content Include=".\bin\$(Configuration)\firebird.msg">
-      <Pack>true</Pack>
-      <PackagePath>build</PackagePath>
-    </Content>
-    <Content Include=".\bin\$(Configuration)\ib_util.dll">
-      <Pack>true</Pack>
-      <PackagePath>build</PackagePath>
-    </Content>
-    <Content Include=".\bin\$(Configuration)\icudt52.dll">
-      <Pack>true</Pack>
-      <PackagePath>build</PackagePath>
-    </Content>
-    <Content Include=".\bin\$(Configuration)\icudt52l.dat">
-      <Pack>true</Pack>
-      <PackagePath>build</PackagePath>
-    </Content>
-    <Content Include=".\bin\$(Configuration)\icuin52.dll">
-      <Pack>true</Pack>
-      <PackagePath>build</PackagePath>
-    </Content>
-    <Content Include=".\bin\$(Configuration)\icuuc52.dll">
-      <Pack>true</Pack>
-      <PackagePath>build</PackagePath>
-    </Content>
-    <Content Include=".\bin\$(Configuration)\plugins\engine12.dll">
-      <Pack>true</Pack>
-      <PackagePath>build\plugins</PackagePath>
-    </Content>
-    
-</ItemGroup>
   <Choose>
     <When Condition="$(SolutionName.Contains('-ext'))">
       <ItemGroup>
@@ -103,19 +84,25 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="9.0.2" />
-    <PackageReference Include="NUnit" Version="3.13.2" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\SanteDB.Persistence.Data\SanteDB.Persistence.Data.csproj">
       <Project>{0cec131c-dfa0-43c3-9612-3f7d36086633}</Project>
       <Name>SanteDB.Persistence.Data</Name>
     </ProjectReference>
   </ItemGroup>
-
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent" Condition="$(SolutionName.Contains('-ext')) and '$(NoFirebird)' == ''">
-    <Exec Command="&quot;$(SolutionDir)\Solution Items\FirebirdSQL-3.0.3-Embedded.bat&quot; &quot;$(SolutionDir)\Solution Items&quot; &quot;$(TargetDir)&quot;" />
-    <Copy SourceFiles="$(SolutionDir)\Solution Items\santedb_test.fdb" DestinationFolder="$(TargetDir)" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent Condition="'$(NoFirebird)' == ''">"$(SolutionDir)\Solution Items\FirebirdSQL-3.0.3-Embedded.bat" "$(SolutionDir)\Solution Items" "$(TargetDir)"</PreBuildEvent>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="MSBuildTasks" Version="1.5.0.235">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+  <Target Name="BeforeBuild" Condition="!$(VersionNumber.EndsWith('-debug'))">
+    <AssemblyInfo CodeLanguage="CS" OutputFile="$(MSBuildProjectDirectory)\Properties\Version.cs" AssemblyVersion="$(VersionNumber)" AssemblyFileVersion="$(VersionNumber)" />
   </Target>
-
+  <ItemGroup>
+    <Compile Include="Properties\Version.cs" />
+  </ItemGroup>
 </Project>

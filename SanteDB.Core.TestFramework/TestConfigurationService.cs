@@ -77,7 +77,7 @@ namespace SanteDB.Core.TestFramework
         /// </summary>
         public string GetAppSetting(string key)
         {
-            return ConfigurationManager.AppSettings[key];
+            return this.Configuration.GetSection<ApplicationServiceContextConfigurationSection>().AppSettings.FirstOrDefault(o=>o.Key == key)?.Value;
         }
 
         /// <summary>
@@ -93,14 +93,6 @@ namespace SanteDB.Core.TestFramework
             }
             catch { }
 
-            if (retVal == null)
-            {
-                var cs = ConfigurationManager.ConnectionStrings[key];
-                if (cs != null)
-                {
-                    return new ConnectionString(cs.ProviderName, cs.ConnectionString);
-                }
-            }
             return retVal;
         }
 

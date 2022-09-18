@@ -18,8 +18,9 @@
  * User: fyfej
  * Date: 2022-5-30
  */
-using SanteDB.Server;
-using SanteDB.Server.Core.Services.Impl;
+using MohawkCollege.Util.Console.Parameters;
+using SanteDB.Core;
+using SanteDB.Core.Services.Impl;
 using System.ServiceProcess;
 
 namespace SanteDB
@@ -46,9 +47,15 @@ namespace SanteDB
 		/// <param name="args">Data passed by the start command.</param>
 		protected override void OnStart(string[] args)
 		{
-			ExitCode = ServiceUtil.Start(typeof(Program).GUID, new FileConfigurationService(null));
-			if (ExitCode != 0)
+			var parms = new ParameterParser<ConsoleParameters>().Parse(args);
+			try
+			{
+				ServiceUtil.Start(typeof(Program).GUID, new ServerApplicationContext(parms.ConfigFile));
+			}
+			catch
+			{
 				Stop();
+			}
 		}
 
 		/// <summary>

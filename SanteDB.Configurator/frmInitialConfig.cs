@@ -21,7 +21,6 @@
 using SanteDB.Configuration;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Configuration.Data;
-using SanteDB.Server.Core.Configuration.Tasks;
 using SanteDB.OrmLite.Configuration;
 using System;
 using System.Collections.Generic;
@@ -38,6 +37,7 @@ using SanteDB.Core.Interfaces;
 using SanteDB.Core;
 using System.IO;
 using System.Reflection;
+using SanteDB.Configuration.Tasks;
 
 namespace SanteDB.Configurator
 {
