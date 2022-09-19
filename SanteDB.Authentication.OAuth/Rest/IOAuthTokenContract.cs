@@ -46,7 +46,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
         /// </summary>
         [RestInvoke(UriTemplate = "oauth2_token", Method = "POST")]
         [return: MessageFormat(MessageFormatType.Json)]
-        object Token(NameValueCollection tokenRequest);
+        object Token(NameValueCollection formFields);
         
         /// <summary>
         /// Get the session from the authenticated bearer or JWT token
@@ -59,8 +59,8 @@ namespace SanteDB.Authentication.OAuth2.Rest
         /// Gets the user information related to the current session (very similar to the session parameter only this is not an OAUTH response format)
         /// </summary>
         [Get("userinfo")]
-
-        Stream UserInfo();
+        [return: MessageFormat(MessageFormatType.Json)]
+        object UserInfo();
 
         /// <summary>
         /// Post to the authorization handler

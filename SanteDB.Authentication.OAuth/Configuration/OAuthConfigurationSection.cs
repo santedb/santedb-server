@@ -58,7 +58,7 @@ namespace SanteDB.Authentication.OAuth2.Configuration
         public List<String> AllowedClientClaims { get; set; }
         
         /// <summary>
-        /// Issuer name
+        /// Issuer name. This corresponds to the iss claim in any issued tokens.
         /// </summary>
         [XmlAttribute("issuerName"), ConfigurationRequired]
         public String IssuerName { get; set; }

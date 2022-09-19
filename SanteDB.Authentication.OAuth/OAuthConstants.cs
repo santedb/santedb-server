@@ -77,7 +77,7 @@ namespace SanteDB.Authentication.OAuth2
         /// <summary>
         /// TFA header name
         /// </summary>
-        public const string TfaHeaderName = "X-SanteDB-TfaSecret";
+        public const string Header_TfaSecret = "X-SanteDB-TfaSecret";
 
         /// <summary>
         /// Gets the client credential policy
@@ -103,5 +103,16 @@ namespace SanteDB.Authentication.OAuth2
         /// Code token policy
         /// </summary>
         public const string OAuthResetFlowPolicy = OAuthLoginPolicy + ".4";
+
+        public const string FormField_GrantType = "grant_type";
+        public const string FormField_Scope = "scope";
+        public const string FormField_ClientId = "client_id";
+        public const string FormField_ClientSecret = "client_secret";
+        public const string FormField_RefreshToken = "refresh_token";
+        public const string FormField_AuhthorizationCode = "code";
+        public const string FormField_Username = "username";
+        public const string FormField_Password = "password";
+
+        public const string Header_XDeviceAuthorization = "X-Device-Authorization";
     }
 }

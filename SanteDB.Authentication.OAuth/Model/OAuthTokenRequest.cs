@@ -18,8 +18,13 @@
  * User: fyfej
  * Date: 2022-5-30
  */
+using Microsoft.SqlServer.Server;
+using SanteDB.Core.Security.Claims;
+using SanteDB.Core.Security.Principal;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Security.Principal;
 
 namespace SanteDB.Authentication.OAuth2.Model
 {
@@ -30,24 +35,43 @@ namespace SanteDB.Authentication.OAuth2.Model
     public class OAuthTokenRequest
     {
         ///<summary>Grant type</summary> 
-        public String Grant_Type { get; set; }
+        public string GrantType { get; set; }
         ///<summary>Scope of the grant</summary>
-        public String Scope { get; set; }
-        ///<summary>User name</summary>
-        public String UserName { get; set; }
-        ///<summary>Password</summary>
-        public String Password { get; set; }
-        ///<summary>Auth code from authorization service</summary>
-        public String Code { get; set; }
-        ///<summary>Red</summary>
-        public String Redirect_Uri { get; set; }
+        public List<string> Scopes { get; set; }
+        ///<summary>User name when the grant type is password</summary>
+        public string UserName { get; set; }
+        ///<summary>Password when the grant type is password.</summary>
+        public string Password { get; set; }
         /// <summary>
-        /// Refreshing token
+        /// A secret code used as a second factor in an authentication flow.
         /// </summary>
-        public String Refresh_Token { get; set; }
+        [Obsolete("Use of this is discouraged.")]
+        public string TfaSecret { get; set; }
+        ///<summary>Auth code when grant type is Authorization code.</summary>
+        public string Code { get; set; }
+        /// <summary>
+        /// Refreshing token when grant type is refresh_token
+        /// </summary>
+        public string RefreshToken{ get; set; }
         /// <summary>
         /// Assertion
         /// </summary>
-        public String Assertion { get; set; }
+        public string Assertion { get; set; }
+
+        /// <summary>
+        /// The client id of the application. Valid when grant type is client credentials, and others that support multiple
+        /// </summary>
+        public string ClientId { get; set; }
+        public string ClientSecret { get; set; }
+
+        public string XDeviceAuthorizationHeader { get; set; }
+
+        public IDeviceIdentity DeviceIdentity { get; set; }
+        public IClaimsPrincipal DevicePrincipal { get; set; }
+        public IApplicationIdentity ApplicationIdentity { get; set; }
+        public IClaimsPrincipal ApplicationPrincipal { get; set; }
+        public IIdentity UserIdentity { get; set; }
+        public IClaimsPrincipal UserPrincipal { get; set; }
+        public List<IClaim> AdditionalClaims { get; set; }
     }
 }

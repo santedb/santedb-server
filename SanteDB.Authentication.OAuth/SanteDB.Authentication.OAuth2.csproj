@@ -62,6 +62,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AuthorizationHeader.cs" />
     <Compile Include="Configuration\OAuthConfigurationSection.cs" />
     <None Include="data\000-OAuthPolicies.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

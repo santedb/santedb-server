@@ -346,7 +346,7 @@ namespace SanteDB.Persistence.Data.Services
                             (purpose?.Equals(PurposeOfUseKeys.SecurityAdmin.ToString(), StringComparison.OrdinalIgnoreCase) == true ||
                             claimsPrincipal.FindFirst(SanteDBClaimTypes.PurposeOfUse)?.Value.Equals(PurposeOfUseKeys.SecurityAdmin.ToString(), StringComparison.OrdinalIgnoreCase) == true))
                         {
-                            expiration = DateTimeOffset.Now.AddSeconds(120);
+                            expiration = DateTimeOffset.Now.AddSeconds(120); //TODO: Need to set this somewhere as a configuration setting. This means they have ~2 minutes to click on a password reset.
                         }
 
                         // Create sessoin data

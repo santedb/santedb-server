@@ -40,7 +40,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.IdentityModel.Tokens;
+using Microsoft.IdentityModel.JsonWebTokens;
 using System.IO;
 using System.Linq;
 using System.Security;
@@ -61,11 +61,10 @@ using SanteDB.Core.Applets;
 using SanteDB.Core.Security.Principal;
 using SanteDB.Core.Interop;
 using System.Xml;
-using SanteDB.Core.Exceptions;
-using SanteDB.Server.Core.Configuration;
-using SanteDB.Server.Core;
 using SanteDB.Core.Security.Configuration;
 using SanteDB.Rest.Common.Security;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 
 namespace SanteDB.Authentication.OAuth2.Rest
 {
@@ -77,26 +76,60 @@ namespace SanteDB.Authentication.OAuth2.Rest
     [ExcludeFromCodeCoverage]
     public class OAuthTokenBehavior : IOAuthTokenContract
     {
-        // Trace source name
-        private readonly Tracer m_traceSource = new Tracer(OAuthConstants.TraceSourceName);
+        /// <summary>
+        /// Trace Source
+        /// </summary>
+        protected readonly Tracer m_traceSource = new Tracer(OAuthConstants.TraceSourceName);
 
-        // Policy Enforcement service
-        readonly IPolicyEnforcementService m_policyEnforcementService;
+        /// <summary>
+        /// Policy Enforcement Service.
+        /// </summary>
+        protected readonly IPolicyEnforcementService m_policyEnforcementService;
 
-        // OAuth configuration
-        readonly OAuthConfigurationSection m_configuration;
+        /// <summary>
+        /// Configuration for OAuth provider.
+        /// </summary>
+        protected readonly OAuthConfigurationSection m_configuration;
 
-        // Master configuration
-        readonly SanteDB.Core.Security.Configuration.SecurityConfigurationSection m_masterConfig;
+        /// <summary>
+        /// Master secuirity configuration.
+        /// </summary>
+        protected readonly SanteDB.Core.Security.Configuration.SecurityConfigurationSection m_masterConfig;
 
-        // Localization information
-        readonly ILocalizationService m_LocalizationService;
+        /// <summary>
+        /// Localization service.
+        /// </summary>
+        protected readonly ILocalizationService m_LocalizationService;
 
-        // Resolve and encode session tokens.
-        readonly ISessionTokenResolverService m_SessionResolver;
+        /// <summary>
+        /// Session resolver
+        /// </summary>
+        protected readonly ISessionTokenResolverService m_SessionResolver;
 
-        // Establish, Abandon and Extend sessions.
-        readonly ISessionProviderService m_SessionProvider;
+        /// <summary>
+        /// Session Provider
+        /// </summary>
+        protected readonly ISessionProviderService m_SessionProvider;
+        /// <summary>
+        /// Session Identity Provider that can authenticate and return a principal for a given session.
+        /// </summary>
+        protected readonly ISessionIdentityProviderService m_SessionIdentityProvider;
+        /// <summary>
+        /// User identity provider. 
+        /// </summary>
+        protected readonly IIdentityProviderService m_IdentityProvider;
+        /// <summary>
+        /// Application identity provider.
+        /// </summary>
+        protected readonly IApplicationIdentityProviderService m_AppIdentityProvider;
+        /// <summary>
+        /// Device identity provider.
+        /// </summary>
+        protected readonly IDeviceIdentityProviderService m_DeviceIdentityProvider;
+        /// <summary>
+        /// JWT Handler to create JWTs with.
+        /// </summary>
+        protected readonly JsonWebTokenHandler m_JwtHandler;
 
         // XHTML
         private const string XS_HTML = "http://www.w3.org/1999/xhtml";
@@ -110,218 +143,521 @@ namespace SanteDB.Authentication.OAuth2.Rest
             var configurationManager = ApplicationServiceContext.Current.GetService<IConfigurationManager>();
             m_configuration = configurationManager.GetSection<OAuthConfigurationSection>();
             m_masterConfig = configurationManager.GetSection<SanteDB.Core.Security.Configuration.SecurityConfigurationSection>();
-            m_LocalizationService = ApplicationServiceContext.Current.GetService<ILocalizationService>();
-            m_SessionResolver = ApplicationServiceContext.Current.GetService<ISessionTokenResolverService>();
-            m_SessionProvider = ApplicationServiceContext.Current.GetService<ISessionProviderService>();
+            m_LocalizationService = ApplicationServiceContext.Current.GetService<ILocalizationService>() ?? throw new ApplicationException($"Cannot find instance of {nameof(ILocalizationService)} in {nameof(ApplicationServiceContext)}.");
+            m_SessionResolver = ApplicationServiceContext.Current.GetService<ISessionTokenResolverService>() ?? throw new ApplicationException($"Cannot find instance of {nameof(ISessionTokenResolverService)} in {nameof(ApplicationServiceContext)}.");
+            m_SessionProvider = ApplicationServiceContext.Current.GetService<ISessionProviderService>() ?? throw new ApplicationException($"Cannot find instance of {nameof(ISessionProviderService)} in {nameof(ApplicationServiceContext)}.");
+            m_IdentityProvider = ApplicationServiceContext.Current.GetService<IIdentityProviderService>() ?? throw new ApplicationException($"Cannot find instance of {nameof(IIdentityProviderService)} in {nameof(ApplicationServiceContext)}.");
+            m_AppIdentityProvider = ApplicationServiceContext.Current.GetService<IApplicationIdentityProviderService>() ?? throw new ApplicationException($"Cannot find instance of {nameof(IApplicationIdentityProviderService)} in {nameof(ApplicationServiceContext)}.");
+            m_DeviceIdentityProvider = ApplicationServiceContext.Current.GetService<IDeviceIdentityProviderService>() ?? throw new ApplicationException($"Cannot find instance of {nameof(IDeviceIdentityProviderService)} in {nameof(ApplicationServiceContext)}.");
+
+            //Optimization - try to resolve from the same session provider. 
+            m_SessionIdentityProvider = m_SessionProvider as ISessionIdentityProviderService;
+
+            //Fallback and resolve from DI.
+            if (null == m_SessionIdentityProvider)
+            {
+                m_SessionIdentityProvider = ApplicationServiceContext.Current.GetService<ISessionIdentityProviderService>() ?? throw new ApplicationException($"Cannot find instance of {nameof(ISessionIdentityProviderService)} in {nameof(ApplicationServiceContext)}.");
+            }
+
+            m_JwtHandler = new JsonWebTokenHandler();
+        }
+
+        /// <summary>
+        /// Try to resolve a device identity from a token request context.
+        /// </summary>
+        /// <param name="authContext"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        protected virtual bool TryGetDeviceIdentity(Core.Security.AuthenticationContext authContext, OAuthTokenRequest request)
+        {
+            if (null == request)
+            {
+                return false;
+            }
+
+            if (null != authContext?.Principal?.Identity && authContext.Principal.Identity is IDeviceIdentity deviceIdentity)
+            {
+                request.DeviceIdentity = deviceIdentity;
+                return true;
+            }
+            else if (!string.IsNullOrWhiteSpace(request.XDeviceAuthorizationHeader))
+            {
+                if (AuthorizationHeader.TryParse(request.XDeviceAuthorizationHeader, out var header))
+                {
+                    if (header.IsScheme(AuthorizationHeader.Schemes_Basic))
+                    {
+                        var basiccredentials = Encoding.UTF8.GetString(Convert.FromBase64String(header.Value)).Split(new[] { ":" }, 2, StringSplitOptions.RemoveEmptyEntries);
+
+                        if (basiccredentials.Length == 2)
+                        {
+                            m_traceSource.TraceVerbose($"Attempting to Authenticate with credentials in {OAuthConstants.Header_XDeviceAuthorization}.");
+
+                            var principal = m_DeviceIdentityProvider.Authenticate(basiccredentials[0], basiccredentials[1]);
+
+                            if (principal?.Identity is IDeviceIdentity devid)
+                            {
+                                request.DeviceIdentity = devid;
+                                request.DevicePrincipal = principal as IClaimsPrincipal;
+                                return true;
+                            }
+                            else if (null != principal)
+                            {
+                                m_traceSource.TraceWarning($"Device authentication successful but identity was not {nameof(IDeviceIdentity)}.");
+                            }
+                            else
+                            {
+                                m_traceSource.TraceInfo($"Unsuccessful device authentication.");
+                            }
+                        }
+                        else
+                        {
+                            m_traceSource.TraceVerbose($"Malformed basic credentials in {OAuthConstants.Header_XDeviceAuthorization} header.");
+                        }
+                    }
+                    else
+                    {
+                        m_traceSource.TraceVerbose($"Unsupported scheme {header.Scheme} in {OAuthConstants.Header_XDeviceAuthorization} header.");
+                    }
+                }
+                else
+                {
+                    m_traceSource.TraceVerbose($"Invalid {OAuthConstants.Header_XDeviceAuthorization} format. Expecting {{Scheme}} {{Value}}");
+                }
+            }
+
+            return false;
+
+        }
+
+        /// <summary>
+        /// Try to resolve an application identity from a token request context.
+        /// </summary>
+        /// <param name="authContext"></param>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        protected virtual bool TryGetApplicationIdentity(Core.Security.AuthenticationContext authContext, OAuthTokenRequest request)
+        {
+            if (null == request)
+            {
+                return false;
+            }
+
+            if (null != authContext?.Principal?.Identity && authContext.Principal.Identity is IApplicationIdentity applicationIdentity)
+            {
+                request.ApplicationIdentity = applicationIdentity;
+                return true;
+            }
+            else if (!string.IsNullOrWhiteSpace(request.ClientId) && !string.IsNullOrWhiteSpace(request.ClientSecret))
+            {
+                m_traceSource.TraceVerbose("Attempting to authenticate application.");
+                var principal = m_AppIdentityProvider.Authenticate(request.ClientId, request.ClientSecret);
+
+                if (null != principal && principal.Identity is IApplicationIdentity appidentity)
+                {
+                    request.ApplicationIdentity = appidentity;
+                    request.ApplicationPrincipal = principal as IClaimsPrincipal;
+                    return true;
+                }
+                else if (null != principal)
+                {
+                    m_traceSource.TraceWarning($"Application authentication successful but identity is not {nameof(IApplicationIdentity)}");
+                }
+                else
+                {
+                    m_traceSource.TraceInfo($"Application authentication unsuccessful. Client ID: {request.ClientId}");
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Handle a Token request with the refresh_token grant type.
+        /// </summary>
+        /// <param name="tokenRequest"></param>
+        /// <returns></returns>
+        protected virtual object ProcessRefreshTokenGrantRequest(OAuthTokenRequest tokenRequest)
+        {
+            if (string.IsNullOrEmpty(tokenRequest?.RefreshToken))
+            {
+                return this.CreateErrorCondition(OAuthErrorType.invalid_grant, "missing refresh token.");
+            }
+
+            var session = m_SessionResolver.ExtendSessionWithRefreshToken(tokenRequest.RefreshToken);
+
+            if (null == session)
+            {
+                return this.CreateErrorCondition(OAuthErrorType.invalid_grant, "invalid refresh token.");
+            }
+
+            return CreateTokenResponse(CreateTokenDescriptor(session), session, RestOperationContext.Current.OutgoingResponse);
+        }
+
+        /// <summary>
+        /// Handle a Token request with the password grant type.
+        /// </summary>
+        /// <param name="tokenRequest"></param>
+        /// <returns></returns>
+        protected virtual object ProcessPasswordGrantRequest(OAuthTokenRequest tokenRequest)
+        {
+            if (string.IsNullOrEmpty(tokenRequest?.UserName))
+            {
+                m_traceSource.TraceInfo("Missing username in Token request.");
+                return CreateErrorCondition(OAuthErrorType.invalid_request, "missing username in the request.");
+            }
+
+            m_policyEnforcementService.Demand(OAuthConstants.OAuthPasswordFlowPolicy, tokenRequest.ApplicationPrincipal);
+
+            if (null != tokenRequest.DevicePrincipal)
+            {
+                m_policyEnforcementService.Demand(OAuthConstants.OAuthPasswordFlowPolicy, tokenRequest.DevicePrincipal);
+            }
+
+            IPrincipal userprincipal = null;
+
+            if (!string.IsNullOrEmpty(tokenRequest.TfaSecret))
+            {
+                userprincipal = m_IdentityProvider.Authenticate(tokenRequest.UserName, tokenRequest.Password, tokenRequest.TfaSecret);
+            }
+            else
+            {
+                userprincipal = m_IdentityProvider.Authenticate(tokenRequest.UserName, tokenRequest.Password);
+            }
+
+            if (null == userprincipal)
+            {
+                m_traceSource.TraceInfo("Authentication failed in Token request.");
+                return CreateErrorCondition(OAuthErrorType.invalid_grant, "invalid password.");
+            }
+
+            var session = EstablishSession(userprincipal, tokenRequest.ApplicationPrincipal, tokenRequest.DevicePrincipal, tokenRequest.Scopes, tokenRequest.AdditionalClaims);
+
+            if (null == session)
+            {
+                m_traceSource.TraceWarning("Failed to establish session.");
+                return this.CreateErrorCondition(OAuthErrorType.unauthorized_client, "Unauthorized client.");
+            }
+
+            return CreateTokenResponse(CreateTokenDescriptor(session), session, RestOperationContext.Current.OutgoingResponse);
+        }
+
+        /// <summary>
+        /// Handle a token request with the client_redentials grant type.
+        /// </summary>
+        /// <param name="tokenRequest"></param>
+        /// <returns></returns>
+        protected virtual object ProcessClientCredentialsGrantRequest(OAuthTokenRequest tokenRequest)
+        {
+            if (string.IsNullOrEmpty(tokenRequest?.ClientId))
+            {
+                m_traceSource.TraceInfo("Missing client id in Token request.");
+                return this.CreateErrorCondition(OAuthErrorType.invalid_grant, "invalid client id");
+            }
+
+            if (null == tokenRequest.ApplicationPrincipal && !TryGetApplicationIdentity(AuthenticationContext.Current, tokenRequest)) //Try in case an override removed this.
+            {
+                m_traceSource.TraceInfo("Wrong or missing client secret in Token request.");
+                return this.CreateErrorCondition(OAuthErrorType.invalid_client, "invalid client secret");
+            }
+
+            m_policyEnforcementService?.Demand(OAuthConstants.OAuthClientCredentialFlowPolicy);
+
+            if (null != tokenRequest.DevicePrincipal)
+            {
+                m_policyEnforcementService.Demand(OAuthConstants.OAuthClientCredentialFlowPolicy, tokenRequest.DevicePrincipal);
+            }
+
+            if (null == tokenRequest.DevicePrincipal && m_configuration?.AllowClientOnlyGrant != true)
+            {
+                m_traceSource.TraceError("No device principal was authenticated and AllowClientOnlyGrant is not enabled.");
+                return this.CreateErrorCondition(OAuthErrorType.unauthorized_client, $"{OAuthConstants.GrantNameClientCredentials} grant type requires device authentication either using X509 or X-Device-Authorization or enabling the DeviceAuthorizationAccessBehavior in the configuration.");
+            }
+
+            var session = EstablishSession(tokenRequest.DevicePrincipal ?? tokenRequest.ApplicationPrincipal, tokenRequest.ApplicationPrincipal, tokenRequest.DevicePrincipal, tokenRequest.Scopes, tokenRequest.AdditionalClaims);
+
+            if (null == session)
+            {
+                m_traceSource.TraceWarning("Failed to establish session.");
+                return this.CreateErrorCondition(OAuthErrorType.unauthorized_client, "invalid client credentials");
+            }
+
+            return CreateTokenResponse(CreateTokenDescriptor(session), session, RestOperationContext.Current.OutgoingResponse);
+        }
+
+        protected virtual bool IsGrantTypePermitted(string grantType)
+        {
+            switch (grantType)
+            {
+                case OAuthConstants.GrantNameAuthorizationCode:
+                case OAuthConstants.GrantNameClientCredentials:
+                case OAuthConstants.GrantNamePassword:
+                case OAuthConstants.GrantNameRefresh:
+                case OAuthConstants.GrantNameReset:
+                    return true;
+                default:
+                    return false;
+            }
+
         }
 
         /// <summary>
         /// OAuth token request
         /// </summary>
-        public object Token(NameValueCollection tokenRequest)
+        public virtual object Token(NameValueCollection formFields)
         {
-            // Get the client application
-            IApplicationIdentityProviderService clientIdentityService = ApplicationServiceContext.Current.GetService<IApplicationIdentityProviderService>();
-            IIdentityProviderService identityProvider = ApplicationServiceContext.Current.GetService<IIdentityProviderService>();
+            if (null == formFields || formFields.Count == 0)
+            {
+                return this.CreateErrorCondition(OAuthErrorType.invalid_request, "request is empty.");
+            }
 
-            // Only password grants
-            if (tokenRequest["grant_type"] != OAuthConstants.GrantNamePassword &&
-                tokenRequest["grant_type"] != OAuthConstants.GrantNameRefresh &&
-                tokenRequest["grant_type"] != OAuthConstants.GrantNameAuthorizationCode &&
-                tokenRequest["grant_type"] != OAuthConstants.GrantNameClientCredentials &&
-                tokenRequest["grant_type"] != OAuthConstants.GrantNameReset)
-                return this.CreateErrorCondition(OAuthErrorType.unsupported_grant_type, "Only 'password', 'client_credentials' or 'refresh_token' grants supported");
+            var tokenrequestmodel = new Model.OAuthTokenRequest();
 
-            // Password grant needs well formed scope which defaults to * or all permissions
-            if (tokenRequest["scope"] == null)
-                tokenRequest.Add("scope", "*");
-            // Validate username and password
+            tokenrequestmodel.GrantType = formFields[OAuthConstants.FormField_GrantType];
+
+            if (!IsGrantTypePermitted(tokenrequestmodel.GrantType))
+            {
+                return this.CreateErrorCondition(OAuthErrorType.unsupported_grant_type, $"grant type {tokenrequestmodel.GrantType} is not supported.");
+            }
+
+            //Always try to load up a client id and secret for the request.
+            tokenrequestmodel.ClientId = formFields[OAuthConstants.FormField_ClientId];
+            tokenrequestmodel.ClientSecret = formFields[OAuthConstants.FormField_ClientSecret];
+
+            //HACK: Remove this when we figure out how to complete the refactor.
+            if (!string.IsNullOrEmpty(tokenrequestmodel.ClientSecret))
+            {
+                RestOperationContext.Current.Data.Add("symm_secret", tokenrequestmodel.ClientSecret);
+            }
+
+            tokenrequestmodel.XDeviceAuthorizationHeader = RestOperationContext.Current?.IncomingRequest?.Headers?[OAuthConstants.Header_XDeviceAuthorization];
+            tokenrequestmodel.TfaSecret = RestOperationContext.Current?.IncomingRequest?.Headers?[OAuthConstants.Header_TfaSecret];
+
+            var hasdeviceidentity = TryGetDeviceIdentity(AuthenticationContext.Current, tokenrequestmodel);
+            var hasappidentity = TryGetApplicationIdentity(AuthenticationContext.Current, tokenrequestmodel);
+
+            var clientClaims = SanteDBClaimsUtil.ExtractClaims(RestOperationContext.Current.IncomingRequest.Headers);
+            // Set the language claim?
+            if (!String.IsNullOrEmpty(formFields["ui_locales"]) &&
+                !clientClaims.Any(o => o.Type == SanteDBClaimTypes.Language))
+                clientClaims.Add(new SanteDBClaim(SanteDBClaimTypes.Language, formFields["ui_locales"]));
+
+            tokenrequestmodel.AdditionalClaims = clientClaims;
+
+
+            switch (tokenrequestmodel.GrantType)
+            {
+                case OAuthConstants.GrantNameRefresh:
+                    tokenrequestmodel.RefreshToken = formFields[OAuthConstants.FormField_RefreshToken];
+                    return ProcessRefreshTokenGrantRequest(tokenrequestmodel);
+                case OAuthConstants.GrantNameClientCredentials:
+                    return ProcessClientCredentialsGrantRequest(tokenrequestmodel);
+                case OAuthConstants.GrantNamePassword:
+                    tokenrequestmodel.UserName = formFields[OAuthConstants.FormField_Username];
+                    tokenrequestmodel.Password = formFields[OAuthConstants.FormField_Password];
+                    return ProcessPasswordGrantRequest(tokenrequestmodel);
+                default:
+                    return this.CreateErrorCondition(OAuthErrorType.unsupported_grant_type, $"grant type {tokenrequestmodel.GrantType} is not supported");
+            }
+
+
+            //// Only password grants
+            //if (tokenRequest["grant_type"] != OAuthConstants.GrantNamePassword &&
+            //    tokenRequest["grant_type"] != OAuthConstants.GrantNameRefresh &&
+            //    //tokenRequest["grant_type"] != OAuthConstants.GrantNameAuthorizationCode &&
+            //    tokenRequest["grant_type"] != OAuthConstants.GrantNameClientCredentials &&
+            //    tokenRequest["grant_type"] != OAuthConstants.GrantNameReset)
+            //    return this.CreateErrorCondition(OAuthErrorType.unsupported_grant_type, "Only 'password', 'client_credentials' or 'refresh_token' grants supported");
+
+            //// Password grant needs well formed scope which defaults to * or all permissions
+            //if (tokenRequest["scope"] == null)
+            //    tokenRequest.Add("scope", "*");
+            //// Validate username and password
 
             try
             {
-                // Client principal
-                IPrincipal clientPrincipal = Core.Security.AuthenticationContext.Current.Principal;
-                // Client is not present so look in body
-                if (clientPrincipal == null || clientPrincipal == Core.Security.AuthenticationContext.AnonymousPrincipal ||
-                    !(clientPrincipal.Identity is IApplicationIdentity))
-                {
-                    string client_identity = tokenRequest["client_id"],
-                        client_secret = tokenRequest["client_secret"];
-                    if (string.IsNullOrEmpty(client_identity) || string.IsNullOrEmpty(client_secret))
-                        return this.CreateErrorCondition(OAuthErrorType.invalid_client, "Missing client credentials");
+                //// Client principal
+                //IPrincipal clientPrincipal = Core.Security.AuthenticationContext.Current.Principal;
+                //// Client is not present so look in body
+                //if (clientPrincipal == null || clientPrincipal == Core.Security.AuthenticationContext.AnonymousPrincipal ||
+                //    !(clientPrincipal.Identity is IApplicationIdentity))
+                //{
+                //    string client_identity = tokenRequest["client_id"],
+                //        client_secret = tokenRequest["client_secret"];
+                //    if (string.IsNullOrEmpty(client_identity) || string.IsNullOrEmpty(client_secret))
+                //        return this.CreateErrorCondition(OAuthErrorType.invalid_client, "Missing client credentials");
 
-                    try
-                    {
-                        clientPrincipal = ApplicationServiceContext.Current.GetService<IApplicationIdentityProviderService>().Authenticate(client_identity, client_secret);
-                        RestOperationContext.Current.Data.Add("symm_secret", client_secret);
-                    }
-                    catch (Exception e)
-                    {
-                        this.m_traceSource.TraceError("Error authenticating client: {0}", e.Message);
-                        return this.CreateErrorCondition(OAuthErrorType.unauthorized_client, e.Message);
-                    }
-                }
-                else if (!clientPrincipal.Identity.IsAuthenticated)
-                    return this.CreateErrorCondition(OAuthErrorType.unauthorized_client, "Unauthorized Client");
+                //    try
+                //    {
+                //        clientPrincipal = ApplicationServiceContext.Current.GetService<IApplicationIdentityProviderService>().Authenticate(client_identity, client_secret);
+                //        RestOperationContext.Current.Data.Add("symm_secret", client_secret);
+                //    }
+                //    catch (Exception e)
+                //    {
+                //        this.m_traceSource.TraceError("Error authenticating client: {0}", e.Message);
+                //        return this.CreateErrorCondition(OAuthErrorType.unauthorized_client, e.Message);
+                //    }
+                //}
+                //else if (!clientPrincipal.Identity.IsAuthenticated)
+                //    return this.CreateErrorCondition(OAuthErrorType.unauthorized_client, "Unauthorized Client");
 
-                // Device principal?
-                IPrincipal devicePrincipal = null;
-                if (Core.Security.AuthenticationContext.Current.Principal.Identity is IDeviceIdentity)
-                    devicePrincipal = Core.Security.AuthenticationContext.Current.Principal;
-                else
-                {
-                    var authHead = RestOperationContext.Current.IncomingRequest.Headers["X-Device-Authorization"];
+                //// Device principal?
+                //IPrincipal devicePrincipal = null;
+                //if (Core.Security.AuthenticationContext.Current.Principal.Identity is IDeviceIdentity)
+                //    devicePrincipal = Core.Security.AuthenticationContext.Current.Principal;
+                //else
+                //{
+                //    var authHead = RestOperationContext.Current.IncomingRequest.Headers["X-Device-Authorization"];
 
-                    // TODO: X509 Authentication
-                    //if (RestOperationContext.Current.ServiceSecurityContext.AuthorizationContext.ClaimSets != null)
-                    //{
-                    //    var claimSet = OperationContext.Current.ServiceSecurityContext.AuthorizationContext.ClaimSets.OfType<System.IdentityModel.Claims.X509CertificateClaimSet>().FirstOrDefault();
-                    //    if (claimSet != null) // device authenticated with X509 PKI Cert
-                    //        devicePrincipal = ApplicationServiceContext.Current.GetService<IDeviceIdentityProviderService>().Authenticate(claimSet.X509Certificate);
-                    //}
-                    if (devicePrincipal == null && !String.IsNullOrEmpty(authHead)) // Device is authenticated using basic auth
-                    {
-                        if (!authHead.ToLower().StartsWith("basic "))
-                            throw new InvalidCastException("X-Device-Authorization must be BASIC scheme");
+                //    // TODO: X509 Authentication
+                //    //if (RestOperationContext.Current.ServiceSecurityContext.AuthorizationContext.ClaimSets != null)
+                //    //{
+                //    //    var claimSet = OperationContext.Current.ServiceSecurityContext.AuthorizationContext.ClaimSets.OfType<System.IdentityModel.Claims.X509CertificateClaimSet>().FirstOrDefault();
+                //    //    if (claimSet != null) // device authenticated with X509 PKI Cert
+                //    //        devicePrincipal = ApplicationServiceContext.Current.GetService<IDeviceIdentityProviderService>().Authenticate(claimSet.X509Certificate);
+                //    //}
+                //    if (devicePrincipal == null && !String.IsNullOrEmpty(authHead)) // Device is authenticated using basic auth
+                //    {
+                //        if (!authHead.ToLower().StartsWith("basic "))
+                //            throw new InvalidCastException("X-Device-Authorization must be BASIC scheme");
 
-                        var authParts = Encoding.UTF8.GetString(Convert.FromBase64String(authHead.Substring(6).Trim())).Split(':');
-                        devicePrincipal = ApplicationServiceContext.Current.GetService<IDeviceIdentityProviderService>().Authenticate(authParts[0], authParts[1]);
-                    }
-                }
+                //        var authParts = Encoding.UTF8.GetString(Convert.FromBase64String(authHead.Substring(6).Trim())).Split(':');
+                //        devicePrincipal = ApplicationServiceContext.Current.GetService<IDeviceIdentityProviderService>().Authenticate(authParts[0], authParts[1]);
+                //    }
+                //}
 
-                IPrincipal principal = null;
+                //IPrincipal principal = null;
 
-                var clientClaims = SanteDBClaimsUtil.ExtractClaims(RestOperationContext.Current.IncomingRequest.Headers);
-                // Set the language claim?
-                if (!String.IsNullOrEmpty(tokenRequest["ui_locales"]) &&
-                    !clientClaims.Any(o => o.Type == SanteDBClaimTypes.Language))
-                    clientClaims.Add(new SanteDBClaim(SanteDBClaimTypes.Language, tokenRequest["ui_locales"]));
+                //var clientClaims = SanteDBClaimsUtil.ExtractClaims(RestOperationContext.Current.IncomingRequest.Headers);
+                //// Set the language claim?
+                //if (!String.IsNullOrEmpty(formFields["ui_locales"]) &&
+                //    !clientClaims.Any(o => o.Type == SanteDBClaimTypes.Language))
+                //    clientClaims.Add(new SanteDBClaim(SanteDBClaimTypes.Language, formFields["ui_locales"]));
 
-                // perform auth
-                switch (tokenRequest["grant_type"])
-                {
-                    case OAuthConstants.GrantNameReset: // password reset grant (special token which only allows a session to reset their password)
+                //// perform auth
+                //switch (formFields["grant_type"])
+                //{
+                //    case OAuthConstants.GrantNameReset: // password reset grant (special token which only allows a session to reset their password)
 
-                        tokenRequest["scope"] = PermissionPolicyIdentifiers.LoginPasswordOnly;
+                //        formFields["scope"] = PermissionPolicyIdentifiers.LoginPasswordOnly;
 
-                        // Password grants allowed for this application? Becuase this grant is only for password grants
-                        this.m_policyEnforcementService.Demand(OAuth2.OAuthConstants.OAuthResetFlowPolicy, clientPrincipal);
-                        if (devicePrincipal != null)
-                            this.m_policyEnforcementService.Demand(OAuth2.OAuthConstants.OAuthResetFlowPolicy, devicePrincipal);
+                //        // Password grants allowed for this application? Becuase this grant is only for password grants
+                //        this.m_policyEnforcementService.Demand(OAuth2.OAuthConstants.OAuthResetFlowPolicy, clientPrincipal);
+                //        if (devicePrincipal != null)
+                //            this.m_policyEnforcementService.Demand(OAuth2.OAuthConstants.OAuthResetFlowPolicy, devicePrincipal);
 
-                        // Validate
-                        if (String.IsNullOrWhiteSpace(tokenRequest["username"]) || String.IsNullOrWhiteSpace(tokenRequest["challenge"]) || String.IsNullOrWhiteSpace(tokenRequest["response"]))
-                            return this.CreateErrorCondition(OAuthErrorType.invalid_request, "Invalid client grant message");
+                //        // Validate
+                //        if (String.IsNullOrWhiteSpace(formFields["username"]) || String.IsNullOrWhiteSpace(formFields["challenge"]) || String.IsNullOrWhiteSpace(formFields["response"]))
+                //            return this.CreateErrorCondition(OAuthErrorType.invalid_request, "Invalid client grant message");
 
-                        // Authenticate the user
-                        var tfa = RestOperationContext.Current.IncomingRequest.Headers[OAuthConstants.TfaHeaderName];
-                        principal = ApplicationServiceContext.Current.GetService<ISecurityChallengeIdentityService>().Authenticate(tokenRequest["username"], Guid.Parse(tokenRequest["challenge"]), tokenRequest["response"], tfa);
-                        break;
+                //        // Authenticate the user
+                //        var tfa = RestOperationContext.Current.IncomingRequest.Headers[OAuthConstants.Header_TfaSecret];
+                //        principal = ApplicationServiceContext.Current.GetService<ISecurityChallengeIdentityService>().Authenticate(formFields["username"], Guid.Parse(formFields["challenge"]), formFields["response"], tfa);
+                //        break;
 
-                    case OAuthConstants.GrantNameClientCredentials:
-                        this.m_policyEnforcementService.Demand(OAuth2.OAuthConstants.OAuthClientCredentialFlowPolicy, clientPrincipal);
-                        if (devicePrincipal != null)
-                            this.m_policyEnforcementService.Demand(OAuth2.OAuthConstants.OAuthPasswordFlowPolicy, devicePrincipal);
+                //    case OAuthConstants.GrantNameClientCredentials:
+                //        this.m_policyEnforcementService.Demand(OAuth2.OAuthConstants.OAuthClientCredentialFlowPolicy, clientPrincipal);
+                //        if (devicePrincipal != null)
+                //            this.m_policyEnforcementService.Demand(OAuth2.OAuthConstants.OAuthPasswordFlowPolicy, devicePrincipal);
 
-                        if (devicePrincipal == null && !this.m_configuration.AllowClientOnlyGrant)
-                            throw new SecurityException("client_credentials grant requires device authentication either using X509 or X-Device-Authorization or enabling the DeviceAuthorizationAccessBehavior");
-                        else if (devicePrincipal == null)
-                            this.m_traceSource.TraceWarning("No device credential could be established, configuration allows for client only grant. Recommend disabling this in production environment");
-                        else
-                            this.m_policyEnforcementService.Demand(PermissionPolicyIdentifiers.LoginAsService, devicePrincipal);
+                //        if (devicePrincipal == null && !this.m_configuration.AllowClientOnlyGrant)
+                //            throw new SecurityException("client_credentials grant requires device authentication either using X509 or X-Device-Authorization or enabling the DeviceAuthorizationAccessBehavior");
+                //        else if (devicePrincipal == null)
+                //            this.m_traceSource.TraceWarning("No device credential could be established, configuration allows for client only grant. Recommend disabling this in production environment");
+                //        else
+                //            this.m_policyEnforcementService.Demand(PermissionPolicyIdentifiers.LoginAsService, devicePrincipal);
 
-                        principal = devicePrincipal ?? clientPrincipal;
-                        // Demand "Login As Service" permission
-                        break;
+                //        principal = devicePrincipal ?? clientPrincipal;
+                //        // Demand "Login As Service" permission
+                //        break;
 
-                    case OAuthConstants.GrantNamePassword:
+                //    case OAuthConstants.GrantNamePassword:
 
-                        // Password grants allowed for this application?
-                        this.m_policyEnforcementService.Demand(OAuth2.OAuthConstants.OAuthPasswordFlowPolicy, clientPrincipal);
-                        if (devicePrincipal != null)
-                            this.m_policyEnforcementService.Demand(OAuth2.OAuthConstants.OAuthPasswordFlowPolicy, devicePrincipal);
+                //        // Password grants allowed for this application?
+                //        this.m_policyEnforcementService.Demand(OAuth2.OAuthConstants.OAuthPasswordFlowPolicy, clientPrincipal);
+                //        if (devicePrincipal != null)
+                //            this.m_policyEnforcementService.Demand(OAuth2.OAuthConstants.OAuthPasswordFlowPolicy, devicePrincipal);
 
-                        // Validate
-                        if (String.IsNullOrWhiteSpace(tokenRequest["username"]) && String.IsNullOrWhiteSpace(tokenRequest["refresh_token"]))
-                            return this.CreateErrorCondition(OAuthErrorType.invalid_request, "Invalid client grant message");
+                //        // Validate
+                //        if (String.IsNullOrWhiteSpace(formFields["username"]) && String.IsNullOrWhiteSpace(formFields["refresh_token"]))
+                //            return this.CreateErrorCondition(OAuthErrorType.invalid_request, "Invalid client grant message");
 
-                        if (RestOperationContext.Current.IncomingRequest.Headers[OAuthConstants.TfaHeaderName] != null)
-                            principal = identityProvider.Authenticate(tokenRequest["username"], tokenRequest["password"], RestOperationContext.Current.IncomingRequest.Headers[OAuthConstants.TfaHeaderName]);
-                        else
-                            principal = identityProvider.Authenticate(tokenRequest["username"], tokenRequest["password"]);
-                        break;
+                //        if (RestOperationContext.Current.IncomingRequest.Headers[OAuthConstants.Header_TfaSecret] != null)
+                //            principal = m_IdentityProvider.Authenticate(formFields["username"], formFields["password"], RestOperationContext.Current.IncomingRequest.Headers[OAuthConstants.Header_TfaSecret]);
+                //        else
+                //            principal = m_IdentityProvider.Authenticate(formFields["username"], formFields["password"]);
+                //        break;
 
-                    case OAuthConstants.GrantNameRefresh:
-                        var refreshToken = tokenRequest["refresh_token"];
+                //    case OAuthConstants.GrantNameRefresh:
+                //        var refreshToken = formFields["refresh_token"];
 
-                        //GetSessionFromRefreshToken is internally calling extend for us right now.
-                        principal = (m_SessionProvider as ISessionIdentityProviderService).Authenticate(m_SessionResolver.GetSessionFromRefreshToken(refreshToken));
-                        break;
+                //        //GetSessionFromRefreshToken is internally calling extend for us right now.
+                //        principal = (m_SessionProvider as ISessionIdentityProviderService).Authenticate(m_SessionResolver.ExtendSessionWithRefreshToken(refreshToken));
+                //        break;
 
-                    case OAuthConstants.GrantNameAuthorizationCode:
+                //    case OAuthConstants.GrantNameAuthorizationCode:
 
-                        // First, ensure the authenticated application has permission to use this grant
-                        this.m_policyEnforcementService.Demand(OAuthConstants.OAuthCodeFlowPolicy, clientPrincipal);
-                        if (devicePrincipal != null)
-                            this.m_policyEnforcementService.Demand(OAuth2.OAuthConstants.OAuthPasswordFlowPolicy, devicePrincipal);
+                //        // First, ensure the authenticated application has permission to use this grant
+                //        this.m_policyEnforcementService.Demand(OAuthConstants.OAuthCodeFlowPolicy, clientPrincipal);
+                //        if (devicePrincipal != null)
+                //            this.m_policyEnforcementService.Demand(OAuth2.OAuthConstants.OAuthPasswordFlowPolicy, devicePrincipal);
 
-                        // We want to decode the token and verify ..
-                        var token = Enumerable.Range(0, tokenRequest["code"].Length)
-                                    .Where(x => x % 2 == 0)
-                                    .Select(x => Convert.ToByte(tokenRequest["code"].Substring(x, 2), 16))
-                                    .ToArray();
+                //        // We want to decode the token and verify ..
+                //        var token = Enumerable.Range(0, formFields["code"].Length)
+                //                    .Where(x => x % 2 == 0)
+                //                    .Select(x => Convert.ToByte(formFields["code"].Substring(x, 2), 16))
+                //                    .ToArray();
 
-                        // First we extract the token information
-                        var sid = new Guid(Enumerable.Range(0, 32).Where(x => x % 2 == 0).Select(o => token[o]).ToArray());
-                        var sec = new Guid(token.Take(16).ToArray());
-                        var aid = new Guid(Enumerable.Range(32, 32).Where(x => x % 2 == 0).Select(o => token[o]).ToArray());
-                        var scopeLength = BitConverter.ToInt32(token, 64);
-                        var scopeData = Enumerable.Range(68, scopeLength * 2).Where(x => x % 2 == 0).Select(o => token[o]).ToArray();
-                        var claimLength = BitConverter.ToInt32(token, 68 + scopeLength * 2);
-                        var claimData = Enumerable.Range(72 + scopeLength * 2, claimLength * 2).Where(x => x % 2 == 0).Select(o => token[o]).ToArray();
-                        var dsig = token.Skip(72 + 2 * (scopeLength + claimLength)).Take(32).ToArray();
-                        var expiry = new DateTime(BitConverter.ToInt64(token, 104 + 2 * (scopeLength + claimLength)));
+                //        // First we extract the token information
+                //        var sid = new Guid(Enumerable.Range(0, 32).Where(x => x % 2 == 0).Select(o => token[o]).ToArray());
+                //        var sec = new Guid(token.Take(16).ToArray());
+                //        var aid = new Guid(Enumerable.Range(32, 32).Where(x => x % 2 == 0).Select(o => token[o]).ToArray());
+                //        var scopeLength = BitConverter.ToInt32(token, 64);
+                //        var scopeData = Enumerable.Range(68, scopeLength * 2).Where(x => x % 2 == 0).Select(o => token[o]).ToArray();
+                //        var claimLength = BitConverter.ToInt32(token, 68 + scopeLength * 2);
+                //        var claimData = Enumerable.Range(72 + scopeLength * 2, claimLength * 2).Where(x => x % 2 == 0).Select(o => token[o]).ToArray();
+                //        var dsig = token.Skip(72 + 2 * (scopeLength + claimLength)).Take(32).ToArray();
+                //        var expiry = new DateTime(BitConverter.ToInt64(token, 104 + 2 * (scopeLength + claimLength)));
 
-                        // Verify
-                        if (!ApplicationServiceContext.Current.GetService<IDataSigningService>().Verify(token.Take(token.Length - 40).ToArray(), dsig))
-                            throw new SecurityTokenValidationException("Authorization code failed signature verification");
+                //        // Verify
+                //        if (!ApplicationServiceContext.Current.GetService<IDataSigningService>().Verify(token.Take(token.Length - 40).ToArray(), dsig))
+                //            throw new SecurityTokenValidationException("Authorization code failed signature verification");
 
-                        // Expiry?
-                        if (expiry < DateTime.Now)
-                            throw new SecurityTokenExpiredException("Authorization code is expired");
+                //        // Expiry?
+                //        if (expiry < DateTime.Now)
+                //            throw new SecurityTokenExpiredException("Authorization code is expired");
 
-                        // Verify the application is the same purported by the client
-                        if (aid.ToString() != (clientPrincipal.Identity as IClaimsIdentity).FindFirst(SanteDBClaimTypes.Sid).Value)
-                            throw new SecurityTokenValidationException("Authorization code was not issued to this client");
+                //        // Verify the application is the same purported by the client
+                //        if (aid.ToString() != (clientPrincipal.Identity as IClaimsIdentity).FindFirst(SanteDBClaimTypes.Sid).Value)
+                //            throw new SecurityTokenValidationException("Authorization code was not issued to this client");
 
-                        // Fetch the principal information
-                        principal = identityProvider.Authenticate(identityProvider.GetIdentity(sid).Name, null, sec.ToString());
+                //        // Fetch the principal information
+                //        principal = m_IdentityProvider.Authenticate(m_IdentityProvider.GetIdentity(sid).Name, null, sec.ToString());
 
-                        // Add scopes
-                        int li = 0, idx;
-                        string scopes = "";
-                        if (scopeData.Length > 0)
-                        {
-                            do
-                            {
-                                idx = Array.IndexOf(scopeData, (byte)0, li);
-                                if (idx > 0) scopes += Encoding.UTF8.GetString(scopeData, li, idx - li) + " ";
-                                li += idx + 1;
-                            } while (idx > -1);
-                            tokenRequest["scope"] = scopes.Substring(0, scopes.Length - 1);
-                        }
-                        // TODO: Claims
+                //        // Add scopes
+                //        int li = 0, idx;
+                //        string scopes = "";
+                //        if (scopeData.Length > 0)
+                //        {
+                //            do
+                //            {
+                //                idx = Array.IndexOf(scopeData, (byte)0, li);
+                //                if (idx > 0) scopes += Encoding.UTF8.GetString(scopeData, li, idx - li) + " ";
+                //                li += idx + 1;
+                //            } while (idx > -1);
+                //            formFields["scope"] = scopes.Substring(0, scopes.Length - 1);
+                //        }
+                //        // TODO: Claims
 
-                        break;
+                //        break;
 
-                    default:
-                        throw new InvalidOperationException("Invalid grant type");
-                }
+                //    default:
+                //        throw new InvalidOperationException("Invalid grant type");
+                //}
 
-                if (principal == null)
-                    return this.CreateErrorCondition(OAuthErrorType.invalid_grant, "Invalid username or password");
-                else
-                    return this.EstablishSession(principal, clientPrincipal, devicePrincipal, tokenRequest["scope"], this.ValidateClaims(principal, clientClaims.ToArray()));
+                //if (principal == null)
+                //    return this.CreateErrorCondition(OAuthErrorType.invalid_grant, "Invalid username or password");
+                //else
+                //    return this.EstablishSession(principal, clientPrincipal, devicePrincipal, tokenRequest["scope"], this.ValidateClaims(principal, clientClaims.ToArray()));
             }
             catch (AuthenticationException e)
             {
@@ -370,127 +706,186 @@ namespace SanteDB.Authentication.OAuth2.Rest
         }
 
         /// <summary>
-        /// Hydrate the JWT token
+        /// Create a descriptor that can be serialized into a JWT or other token format.
         /// </summary>
-        private JwtSecurityToken HydrateToken(ISession session, IClaimsPrincipal claimsPrincipal)
+        protected virtual SecurityTokenDescriptor CreateTokenDescriptor(ISession session)
         {
-            this.m_traceSource.TraceInfo("Will create new ClaimsPrincipal based on existing principal");
+            var descriptor = new SecurityTokenDescriptor();
+
+            var claimsPrincipal = m_SessionIdentityProvider.Authenticate(session) as IClaimsPrincipal;
 
             // System claims
-            List<IClaim> claims = claimsPrincipal.Claims.ToList();
+            var claims = new Dictionary<string, object>();
+
+            foreach (var claim in claimsPrincipal.Claims)
+            {
+                if (null != claim?.Value)
+                {
+                    if (claims.ContainsKey(claim.Type))
+                    {
+                        var val = claims[claim.Type];
+
+                        if (val is string originalstr && claim.Value != originalstr)
+                        {
+                            claims[claim.Type] = new List<string> { originalstr, claim.Value };
+                        }
+                        else if (val is List<string> lst && !lst.Contains(claim.Value))
+                        {
+                            lst.Add(claim.Value);
+                        }
+                        else
+                        {
+                            m_traceSource.TraceWarning($"Claim harmonization error: existing claims type is {val.GetType().Name} which is unrecognized.");
+                        }
+                    }
+                    else
+                    {
+                        claims.Add(claim.Type, claim.Value);
+                    }
+                }
+            }
+
+
+
+            descriptor.Claims = claims;
 
             // Add JTI
-            claims.Add(new SanteDBClaim("jti", BitConverter.ToString(session.Id).Replace("-", "")));
-            claims.Add(new SanteDBClaim("iat", session.NotBefore.ToUnixTimeSeconds().ToString()));
-            claims.RemoveAll(o => String.IsNullOrEmpty(o.Value));
-            claims.Add(new SanteDBClaim("exp", session.NotAfter.ToUnixTimeSeconds().ToString()));
-            claims.RemoveAll(o => String.IsNullOrEmpty(o.Value));
-            claims.Add(new SanteDBClaim("sub", claims.First(o => o.Type == SanteDBClaimTypes.Sid).Value)); // Subject is the first security identifier
-            claims.RemoveAll(o => o.Type == SanteDBClaimTypes.Sid);
+            descriptor.Claims.Add("jti", m_SessionResolver.GetEncodedIdToken(session));
+
+            descriptor.NotBefore = session.NotBefore.UtcDateTime;
+            descriptor.Expires = session.NotAfter.UtcDateTime;
+            descriptor.IssuedAt = descriptor.NotBefore;
+            descriptor.Claims.Add("sub", claimsPrincipal?.Claims?.FirstOrDefault(c => c.Type == SanteDBClaimTypes.Sid)?.Value);
+            descriptor.Claims.Remove(SanteDBClaimTypes.Sid);
+
             // Creates signing credentials for the specified application key
-            var appid = claims.Find(o => o.Type == SanteDBClaimTypes.SanteDBApplicationIdentifierClaim).Value;
+            var appid = claimsPrincipal?.Claims?.FirstOrDefault(o => o.Type == SanteDBClaimTypes.SanteDBApplicationIdentifierClaim)?.Value;
+            descriptor.Audience = appid; //Audience should be the client id of the app.
+
+            descriptor.Issuer = m_configuration.IssuerName;
 
             // Signing credentials for the application
             // TODO: Expose this as a configuration option - which key to use other than default
-            var signingCredentials = CreateSigningCredentials($"SA.{appid}");
-
-            // Was there a signing credentials provided for this application? If so, then create for default
-            if (signingCredentials == null)
-                signingCredentials = CreateSigningCredentials(this.m_configuration.JwtSigningKey); // attempt to get default
+            descriptor.SigningCredentials = CreateSigningCredentials($"SA.{appid}", m_configuration.JwtSigningKey, "default");
 
             // Is the default an HMAC256 key?
-            if ((signingCredentials == null ||
-                signingCredentials.SignatureAlgorithm == "http://www.w3.org/2001/04/xmldsig-more#hmac-sha256") &&
-                RestOperationContext.Current.Data.TryGetValue("symm_secret", out object clientSecret)) // OPENID States we should use the application client secret to sign the result , we can only do this if we actually have a symm_secret set
+            if ((null == descriptor.SigningCredentials ||
+                descriptor.SigningCredentials.Algorithm == SecurityAlgorithms.HmacSha256Signature) &&
+                RestOperationContext.Current.Data.TryGetValue("symm_secret", out object clientsecret)) // OPENID States we should use the application client secret to sign the result , we can only do this if we actually have a symm_secret set
             {
-                var secret = Encoding.UTF8.GetBytes(clientSecret.ToString());
+                var secret = (clientsecret is byte[]) ? (byte[])clientsecret : Encoding.UTF8.GetBytes(clientsecret.ToString());
                 while (secret.Length < 16)
                     secret = secret.Concat(secret).ToArray();
-                signingCredentials = new SigningCredentials(
-                        new InMemorySymmetricSecurityKey((byte[])secret),
-                        "http://www.w3.org/2001/04/xmldsig-more#hmac-sha256",
-                        "http://www.w3.org/2001/04/xmlenc#sha256",
-                        new SecurityKeyIdentifier(new NamedKeySecurityKeyIdentifierClause("name", appid))
-                    );
+                descriptor.SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(secret) { KeyId = appid }, SecurityAlgorithms.HmacSha256Signature);
             }
 
-            // Generate security token
-            var jwt = new JwtSecurityToken(
-                signingCredentials: signingCredentials,
-                claims: claims.Select(o => new System.Security.Claims.Claim(o.Type, o.Value)),
-                issuer: this.m_configuration.IssuerName,
-                notBefore: session.NotBefore.LocalDateTime,
-                expires: session.NotAfter.LocalDateTime
-           );
+            if (null == descriptor.SigningCredentials)
+            {
+                throw new ApplicationException("No signing key found in configuration");
+            }
 
-            return jwt;
+            return descriptor;
+        }
+
+        /// <summary>
+        /// Create a token response.
+        /// </summary>
+        /// <param name="token">The token descriptor that was generated by <see cref="CreateTokenDescriptor(ISession, IClaimsPrincipal)"/>.</param>
+        /// <param name="session">A session instance to use for the <see cref="OAuthTokenResponse.RefreshToken"/> and <see cref="OAuthTokenResponse.AccessToken"/> if configured.</param>
+        /// <returns></returns>
+        protected virtual OAuthTokenResponse CreateTokenResponse(SecurityTokenDescriptor token, ISession session, HttpListenerResponse httpResponse)
+        {
+            var response = new OAuthTokenResponse();
+
+            if (null != httpResponse)
+            {
+                httpResponse.ContentType = "application/json";
+            }
+
+            response.IdentityToken = m_JwtHandler.CreateToken(token);
+            response.ExpiresIn = unchecked((int)Math.Floor(session.NotAfter.Subtract(DateTimeOffset.UtcNow).TotalMilliseconds));
+            response.TokenType = m_configuration.TokenType;
+
+            if (null != session.RefreshToken)
+            {
+                response.RefreshToken = m_SessionResolver.GetEncodedRefreshToken(session);
+            }
+
+            if (m_configuration.TokenType == OAuthConstants.BearerTokenType) //TODO: Bad name for this; both a JWT and signed session id will be used with a Bearer Authentication header.
+            {
+                response.AccessToken = m_SessionResolver.GetEncodedIdToken(session);
+            }
+            else
+            {
+                response.AccessToken = response.IdentityToken;
+            }
+
+            return response;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="remoteIp"></param>
+        /// <returns></returns>
+        protected virtual bool TryGetRemoteIp(HttpListenerRequest request, out string remoteIp)
+        {
+            if (null == request)
+            {
+                remoteIp = null;
+                return false;
+            }
+
+            var xforwardedfor = request.Headers["X-Forwarded-For"];
+
+            if (!string.IsNullOrEmpty(xforwardedfor))
+            {
+                //We need to split this value up. Successive proxies are supposed to append themselves to the end of this value (https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For). 
+                var values = xforwardedfor.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+
+                var val = values.FirstOrDefault()?.Trim();
+
+                remoteIp = val;
+
+            }
+            else
+            {
+                remoteIp = request.RemoteEndPoint?.Address?.ToString();
+            }
+            return !string.IsNullOrEmpty(remoteIp);
         }
 
         /// <summary>
         /// Create a token response
         /// </summary>
-        private OAuthTokenResponse EstablishSession(IPrincipal oizPrincipal, IPrincipal clientPrincipal, IPrincipal devicePrincipal, String scope, IEnumerable<IClaim> additionalClaims)
+        protected virtual ISession EstablishSession(IPrincipal primaryPrincipal, IPrincipal clientPrincipal, IPrincipal devicePrincipal, List<string> scopes, IEnumerable<IClaim> additionalClaims)
         {
             SanteDBClaimsPrincipal claimsPrincipal = null;
 
-            if (oizPrincipal is IClaimsPrincipal oizcp)
+            if (primaryPrincipal is IClaimsPrincipal oizcp)
             {
                 claimsPrincipal = new SanteDBClaimsPrincipal(oizcp.Identities);
             }
             else
             {
-                claimsPrincipal = new SanteDBClaimsPrincipal(oizPrincipal.Identity);
+                claimsPrincipal = new SanteDBClaimsPrincipal(primaryPrincipal.Identity);
             }
             if (clientPrincipal is IClaimsPrincipal && !claimsPrincipal.Identities.OfType<IApplicationIdentity>().Any(o => o.Name == clientPrincipal.Identity.Name))
                 claimsPrincipal.AddIdentity(clientPrincipal.Identity as IClaimsIdentity);
             if (devicePrincipal is IClaimsPrincipal && !claimsPrincipal.Identities.OfType<IDeviceIdentity>().Any(o => o.Name == devicePrincipal.Identity.Name))
                 claimsPrincipal.AddIdentity(devicePrincipal.Identity as IClaimsIdentity);
 
-            string remoteIp =
-                RestOperationContext.Current.IncomingRequest.Headers["X-Forwarded-For"] ??
-                RestOperationContext.Current.IncomingRequest.RemoteEndPoint.Address.ToString();
+            _ = TryGetRemoteIp(RestOperationContext.Current.IncomingRequest, out var remoteIp);
 
             // Establish the session
-            var scopeList = scope == "*" || String.IsNullOrEmpty(scope) ? null : scope.Split(' ');
+
             string purposeOfUse = additionalClaims?.FirstOrDefault(o => o.Type == SanteDBClaimTypes.PurposeOfUse)?.Value;
-            bool isOverride = additionalClaims?.Any(o => o.Type == SanteDBClaimTypes.SanteDBOverrideClaim) == true || scopeList?.Any(o => o == PermissionPolicyIdentifiers.OverridePolicyPermission) == true;
 
-            var session = m_SessionProvider.Establish(claimsPrincipal, remoteIp, isOverride, purposeOfUse, scopeList, additionalClaims.FirstOrDefault(o => o.Type == SanteDBClaimTypes.Language)?.Value);
+            bool isOverride = additionalClaims?.Any(o => o.Type == SanteDBClaimTypes.SanteDBOverrideClaim) == true || scopes?.Any(o => o == PermissionPolicyIdentifiers.OverridePolicyPermission) == true;
 
-            string refreshToken = null, sessionId = null;
-            if (session != null)
-            {
-                sessionId = m_SessionResolver.GetEncodedIdToken(session);
-                refreshToken = m_SessionResolver.GetEncodedRefreshToken(session);
-            }
-            if (scope == PermissionPolicyIdentifiers.LoginPasswordOnly)
-                refreshToken = String.Empty;
-            var jwt = this.HydrateToken(session, claimsPrincipal); //TODO: Rewrite
+            return m_SessionProvider.Establish(claimsPrincipal, remoteIp, isOverride, purposeOfUse, scopes?.ToArray(), additionalClaims.FirstOrDefault(o => o.Type == SanteDBClaimTypes.Language)?.Value);
 
-            JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
-            RestOperationContext.Current.OutgoingResponse.ContentType = "application/json";
-
-            OAuthTokenResponse response = null;
-            if (this.m_configuration.TokenType == OAuthConstants.BearerTokenType &&
-                session != null)
-                response = new OAuthTokenResponse()
-                {
-                    TokenType = OAuthConstants.BearerTokenType,
-                    AccessToken = sessionId,
-                    IdentityToken = handler.WriteToken(jwt),
-                    ExpiresIn = (int)(session.NotAfter.Subtract(DateTimeOffset.Now)).TotalMilliseconds,
-                    RefreshToken = refreshToken // TODO: Need to write a SessionProvider for this so we can keep track of refresh tokens 
-                };
-            else
-                response = new OAuthTokenResponse()
-                {
-                    TokenType = OAuthConstants.JwtTokenType,
-                    AccessToken = handler.WriteToken(jwt),
-                    ExpiresIn = (int)(session.NotAfter.Subtract(DateTimeOffset.Now)).TotalMilliseconds,
-                    RefreshToken = refreshToken // TODO: Need to write a SessionProvider for this so we can keep track of refresh tokens 
-                };
-
-            return response;
         }
 
         /// <summary>
@@ -512,39 +907,21 @@ namespace SanteDB.Authentication.OAuth2.Rest
         /// </summary>
         public object Session()
         {
-            new SanteDB.Rest.Common.Security.TokenAuthorizationAccessBehavior().Apply(new RestRequestMessage(RestOperationContext.Current.IncomingRequest)); ;
-            var principal = Core.Security.AuthenticationContext.Current.Principal as IClaimsPrincipal;
+            new SanteDB.Rest.Common.Security.TokenAuthorizationAccessBehavior().Apply(new RestRequestMessage(RestOperationContext.Current.IncomingRequest));
 
-            if (principal != null)
+            if (RestOperationContext.Current.Data.TryGetValue(TokenAuthorizationAccessBehavior.RestPropertyNameSession, out var sessobj))
             {
-                if (principal.Identity.Name == Core.Security.AuthenticationContext.AnonymousPrincipal.Identity.Name)
-                    return new OAuthError()
-                    {
-                        Error = OAuthErrorType.invalid_request,
-                        ErrorDescription = "No Such Session"
-                    };
-                else
+                if (sessobj is ISession session)
                 {
-                    DateTime notBefore = principal.FindFirst(SanteDBClaimTypes.AuthenticationInstant).AsDateTime(), notAfter = principal.FindFirst(SanteDBClaimTypes.Expiration).AsDateTime();
-
-                    var jwt = this.HydrateToken(RestOperationContext.Current.Data[SanteDB.Rest.Common.Security.TokenAuthorizationAccessBehavior.RestPropertyNameSession] as ISession, principal);
-                    return new OAuthTokenResponse()
-                    {
-                        AccessToken = RestOperationContext.Current.IncomingRequest.Headers["Authorization"].Split(' ')[1],
-                        IdentityToken = new JwtSecurityTokenHandler().WriteToken(jwt),
-                        ExpiresIn = (int)(notAfter).Subtract(DateTime.Now).TotalMilliseconds,
-                        TokenType = this.m_configuration.TokenType
-                    };
+                    return CreateTokenResponse(CreateTokenDescriptor(session), session, RestOperationContext.Current.OutgoingResponse);
                 }
             }
-            else
+
+            return new OAuthError()
             {
-                return new OAuthError()
-                {
-                    Error = OAuthErrorType.invalid_request,
-                    ErrorDescription = "No Such Session"
-                };
-            }
+                Error = OAuthErrorType.invalid_request,
+                ErrorDescription = "No Such Session"
+            };
         }
 
         /// <summary>
@@ -553,6 +930,8 @@ namespace SanteDB.Authentication.OAuth2.Rest
         /// <param name="authorization">Authorization post results</param>
         public Stream SelfPost(String content, NameValueCollection authorization)
         {
+            return Stream.Null;
+            /*
             // Generate an authorization code for this user and redirect to their redirect URL
             var redirectUrl = RestOperationContext.Current.IncomingRequest.QueryString["redirect_uri"] ?? authorization["redirect_uri"];
             var client_id = RestOperationContext.Current.IncomingRequest.QueryString["client_id"] ?? authorization["client_id"];
@@ -674,6 +1053,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
             {
                 AuditUtil.SendAudit(audit);
             }
+            */
         }
 
         /// <summary>
@@ -854,15 +1234,30 @@ namespace SanteDB.Authentication.OAuth2.Rest
         /// <summary>
         /// Create signing credentials
         /// </summary>
-        /// <param name="keyName">The name of the key to use in the configuration, or null to use a default key</param>
-        private SigningCredentials CreateSigningCredentials(string keyName)
+        /// <param name="keyNames">One or more key names to search (in-order) for a signature for.</param>
+        private SigningCredentials CreateSigningCredentials(params string[] keyNames)
         {
+            if (null == keyNames || keyNames.Length == 0)
+            {
+                throw new ArgumentNullException(nameof(keyNames), "Key names are required.");
+            }
 
-            var configuration = this.m_masterConfig.Signatures.FirstOrDefault(o => o.KeyName == keyName || o.KeyName == "default");
-            return null;
+            SecuritySignatureConfiguration configuration = null;
 
-            // No specific configuration for the key name is found?
-            SigningCredentials retVal = null;
+            foreach (var keyname in keyNames)
+            {
+                configuration = m_masterConfig.Signatures.FirstOrDefault(s => s.KeyName == keyname);
+
+                if (null != configuration)
+                {
+                    break;
+                }
+            }
+
+            if (null == configuration) //No configuration provided, return a null credential back.
+            {
+                return null;
+            }
 
             // Signing credentials
             switch (configuration.Algorithm)
@@ -874,53 +1269,69 @@ namespace SanteDB.Authentication.OAuth2.Rest
                         throw new SecurityException("Cannot find certificate to sign data!");
 
                     // Signature algorithm
-                    string signingAlgorithm = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256",
-                        digestAlgorithm = "http://www.w3.org/2001/04/xmlenc#sha256";
+                    string signingAlgorithm = SecurityAlgorithms.RsaSha256Signature;
                     if (configuration.Algorithm == SignatureAlgorithm.RS512)
                     {
-                        signingAlgorithm = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha512";
-                        digestAlgorithm = "http://www.w3.org/2001/04/xmlenc#sha512";
+                        signingAlgorithm = SecurityAlgorithms.RsaSha512Signature;
                     }
-                    retVal = new X509SigningCredentials(cert, new SecurityKeyIdentifier(new NamedKeySecurityKeyIdentifierClause("name", configuration.KeyName ?? "0")), signingAlgorithm, digestAlgorithm);
-                    break;
+                    return new X509SigningCredentials(cert, signingAlgorithm);
                 case SignatureAlgorithm.HS256:
                     byte[] secret = configuration.GetSecret().ToArray();
-                    while (secret.Length < 16)
+                    while (secret.Length < 16) //TODO: Why are we doing this?
                         secret = secret.Concat(secret).ToArray();
-                    retVal = new SigningCredentials(
-                        new InMemorySymmetricSecurityKey(secret),
-                        "http://www.w3.org/2001/04/xmldsig-more#hmac-sha256",
-                        "http://www.w3.org/2001/04/xmlenc#sha256",
-                        new SecurityKeyIdentifier(new NamedKeySecurityKeyIdentifierClause("name", configuration.KeyName ?? "0"))
-                    );
-                    break;
+
+                    var key = new SymmetricSecurityKey(secret);
+
+                    if (!string.IsNullOrEmpty(configuration.KeyName))
+                    {
+                        key.KeyId = configuration.KeyName;
+                    }
+                    else
+                    {
+                        key.KeyId = "0"; //Predefined default KID
+                    }
+
+
+                    return new SigningCredentials(new SymmetricSecurityKey(secret), SecurityAlgorithms.HmacSha256Signature);
                 default:
                     throw new SecurityException("Invalid signing configuration");
             }
-            return retVal;
         }
 
 
         /// <summary>
         /// Get the specified session information
         /// </summary>
-        public Stream UserInfo()
+        public object UserInfo()
         {
-            new SanteDB.Rest.Common.Security.TokenAuthorizationAccessBehavior().Apply(new RestRequestMessage(RestOperationContext.Current.IncomingRequest)); ;
-            var principal = Core.Security.AuthenticationContext.Current.Principal as IClaimsPrincipal;
+            new SanteDB.Rest.Common.Security.TokenAuthorizationAccessBehavior().Apply(new RestRequestMessage(RestOperationContext.Current.IncomingRequest));
 
-            if (principal != null)
+            if (RestOperationContext.Current.Data.TryGetValue(TokenAuthorizationAccessBehavior.RestPropertyNameSession, out var sessobj))
             {
-                if (principal.Identity.Name == Core.Security.AuthenticationContext.AnonymousPrincipal.Identity.Name)
-                    throw new SecurityException("No Such Session");
-                else
+                if (sessobj is ISession session)
                 {
-                    var jwt = this.HydrateToken(RestOperationContext.Current.Data[SanteDB.Rest.Common.Security.TokenAuthorizationAccessBehavior.RestPropertyNameSession] as ISession, principal);
-                    return new MemoryStream(Encoding.UTF8.GetBytes(jwt.Payload.SerializeToJson()));
+                    var principal = m_SessionIdentityProvider.Authenticate(session) as IClaimsPrincipal;
+                    RestOperationContext.Current.OutgoingResponse.ContentType = "application/json";
+                    var claims = new Dictionary<string, object>();
+
+                    foreach (var claim in principal.Claims)
+                    {
+                        if (null != claim?.Value && !claims.ContainsKey(claim.Type))
+                        {
+                            claims.Add(claim.Type, claim.Value);
+                        }
+                    }
+
+                    return claims;
                 }
             }
-            else
-                throw new SecurityException("No Such Session");
+
+            RestOperationContext.Current.OutgoingResponse.ContentType = "application/json";
+            return new OAuthError()
+            {
+                Error = OAuthErrorType.invalid_request,
+                ErrorDescription = "No Such Session"
+            };
         }
     }
 }
