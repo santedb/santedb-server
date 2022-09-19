@@ -81,5 +81,12 @@ namespace SanteDB.Authentication.OAuth2.Rest
         [RestInvoke(Method = "PING", UriTemplate = "/")]
         void Ping();
 
+        /// <summary>
+        /// Get the keys associated with this instance.
+        /// </summary>
+        /// <returns></returns>
+        [Get("jwks")]
+        object JsonWebKeySet();
+
     }
 }

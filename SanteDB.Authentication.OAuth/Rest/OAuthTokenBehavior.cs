@@ -1333,5 +1333,72 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 ErrorDescription = "No Such Session"
             };
         }
+
+        /// <summary>
+        /// Gets the keys associated with this service.
+        /// </summary>
+        /// <returns></returns>
+        public object JsonWebKeySet()
+        {
+            var keyset = new Microsoft.IdentityModel.Tokens.JsonWebKeySet();
+
+            keyset.SkipUnresolvedJsonWebKeys = true;
+
+            foreach(var signkey in m_masterConfig.Signatures)
+            {
+                if (null == signkey)
+                {
+                    continue;
+                }
+
+                switch (signkey.Algorithm)
+                {
+                    case SignatureAlgorithm.RS256:
+                    case SignatureAlgorithm.RS512:
+
+                        if (null == signkey.Certificate)
+                        {
+                            continue;
+                        }
+
+                        var x509key = new X509SecurityKey(signkey.Certificate);
+
+                        keyset.Keys.Add(JsonWebKeyConverter.ConvertFromX509SecurityKey(x509key));
+
+                        break;
+                    case SignatureAlgorithm.HS256:
+
+                        var secret = signkey.GetSecret().ToArray();
+
+                        if (null == secret)
+                        {
+                            continue;
+                        }
+
+                        
+                        while (secret.Length < 16) //TODO: Why are we doing this?
+                            secret = secret.Concat(secret).ToArray();
+                        var hmackey = new SymmetricSecurityKey(secret);
+
+                        if (!string.IsNullOrEmpty(signkey.KeyName))
+                        {
+                            hmackey.KeyId = signkey.KeyName;
+                        }
+                        else
+                        {
+                            hmackey.KeyId = "0"; //Predefined default KID
+                        }
+
+                        keyset.Keys.Add(JsonWebKeyConverter.ConvertFromSymmetricSecurityKey(hmackey));
+
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+
+            return keyset;
+        }
     }
 }
