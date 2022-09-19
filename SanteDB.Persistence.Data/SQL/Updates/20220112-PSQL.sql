@@ -5,6 +5,7 @@
  * </feature>
  */
  CREATE EXTENSION IF NOT EXISTS fuzzystrmatch;
+ DROP TABLE IF EXISTS ft_ent_systbl;
 CREATE TABLE IF NOT EXISTS ft_ent_systbl 
 (
 	ent_id UUID NOT NULL DEFAULT uuid_generate_v1(),
@@ -92,8 +93,12 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+--#! 
+-- INFO: Building fulltext index...
 SELECT rfrsh_fti();
 
+--#!
+-- INFO: Adding indexes...
 CREATE INDEX IF NOT EXISTS psn_dob_idx ON psn_tbl (dob);
 CREATE INDEX IF NOT EXISTS psn_gndr_idx ON psn_tbl (gndr_cd_id);
 DROP INDEX IF EXISTS ent_name_cmp_val_tbl;

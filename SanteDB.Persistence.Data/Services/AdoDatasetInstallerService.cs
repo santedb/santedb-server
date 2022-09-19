@@ -71,14 +71,14 @@ namespace SanteDB.Persistence.Data.Services
         /// </summary>
         public IEnumerable<string> GetInstalled()
         {
-            using(var context = this.m_configuration.Provider.GetReadonlyConnection())
+            using (var context = this.m_configuration.Provider.GetReadonlyConnection())
             {
                 try
                 {
                     context.Open();
                     return context.Query<DbPatch>(o => true).Select(o => o.PatchId);
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     throw new DataPersistenceException(String.Empty, e);
                 }
@@ -92,12 +92,12 @@ namespace SanteDB.Persistence.Data.Services
         /// <returns>True if installation succeeded</returns>
         public bool Install(Dataset dataset)
         {
-            if(dataset == null)
+            if (dataset == null)
             {
                 throw new ArgumentNullException(nameof(dataset), ErrorMessages.ARGUMENT_NULL);
             }
 
-            using(var context = this.m_configuration.Provider.GetWriteConnection())
+            using (var context = this.m_configuration.Provider.GetWriteConnection())
             {
                 try
                 {
@@ -105,13 +105,13 @@ namespace SanteDB.Persistence.Data.Services
                     var patchId = MD5.Create().ComputeHash(Encoding.UTF8.GetBytes(dataset.Id)).HexEncode();
 
                     // Check if dataset is installed
-                    if (context.Any<DbPatch>(o=>o.PatchId == patchId))
+                    if (context.Any<DbPatch>(o => o.PatchId == patchId))
                     {
                         this.m_tracer.TraceWarning("Skipping {0} because it is already installed", dataset.Id);
                         return false;
                     }
 
-                    using(var tx = context.BeginTransaction())
+                    using (var tx = context.BeginTransaction())
                     {
                         context.ContextId = context.EstablishProvenance(AuthenticationContext.Current.Principal, null);
 
@@ -123,32 +123,47 @@ namespace SanteDB.Persistence.Data.Services
 
                             itm.Element.Key = itm.Element.Key ?? Guid.NewGuid();
 
-                            switch(itm)
+                            try
                             {
-                                case DataInsert di:
-                                    if (di.SkipIfExists && persistenceService.Exists(context, itm.Element.Key.Value))
-                                        continue;
-                                    persistenceService.Insert(context, di.Element);
-                                    break;
-                                case DataUpdate du:
-                                    if (du.InsertIfNotExists && !persistenceService.Exists(context, itm.Element.Key.Value))
-                                        persistenceService.Insert(context, itm.Element);
-                                    else
-                                        persistenceService.Update(context, itm.Element);
-                                    break;
-                                case DataDelete dd:
-                                    persistenceService.Delete(context, dd.Element.Key.Value, DataPersistenceControlContext.Current?.DeleteMode ?? this.m_configuration.DeleteStrategy);
-                                    break;
+                                switch (itm)
+                                {
+                                    case DataInsert di:
+                                        if (di.SkipIfExists && persistenceService.Exists(context, itm.Element.Key.Value))
+                                            continue;
+                                        persistenceService.Insert(context, di.Element);
+                                        break;
+                                    case DataUpdate du:
+                                        if (du.InsertIfNotExists && !persistenceService.Exists(context, itm.Element.Key.Value))
+                                            persistenceService.Insert(context, itm.Element);
+                                        else
+                                            persistenceService.Update(context, itm.Element);
+                                        break;
+                                    case DataDelete dd:
+                                        persistenceService.Delete(context, dd.Element.Key.Value, DataPersistenceControlContext.Current?.DeleteMode ?? this.m_configuration.DeleteStrategy);
+                                        break;
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                if (itm.IgnoreErrors)
+                                {
+                                    this.m_tracer.TraceWarning("Error applying dataset - ignore errors is enabled - {0}", e.Message);
+                                    return false;
+                                }
+                                else
+                                {
+                                    throw;
+                                }
                             }
                         }
 
                         // Insert the post install trigger
-                        if (dataset.SqlExec != null)
+                        if (dataset.SqlExec?.Any() == true)
                         {
                             this.m_tracer.TraceInfo("Executing post-install triggers for {0}...", dataset.Id);
-                            foreach(var itm in dataset.SqlExec.Where(o=>o.InvariantName == this.m_configuration.Provider.Invariant))
+                            foreach (var itm in dataset.SqlExec.Where(o => o.InvariantName == this.m_configuration.Provider.Invariant))
                             {
-                                context.ExecuteNonQuery(context.CreateSqlStatement(  itm.QueryText));
+                                context.ExecuteNonQuery(context.CreateSqlStatement(itm.QueryText));
                             }
                         }
                         context.Insert(new DbPatch() { ApplyDate = DateTimeOffset.Now, PatchId = patchId, Description = dataset.Id });

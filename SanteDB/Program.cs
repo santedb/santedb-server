@@ -26,8 +26,7 @@ using SanteDB.Core.Configuration;
 using SanteDB.Core.Model;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
-using SanteDB.Server;
-using SanteDB.Server.Core.Services.Impl;
+using SanteDB.Core.Services.Impl;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -188,7 +187,21 @@ namespace SanteDB
                     Console.WriteLine("SanteDB (SanteDB) {0} ({1})", entryAsm.GetName().Version, entryAsm.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion);
                     Console.WriteLine("{0}", entryAsm.GetCustomAttribute<AssemblyCopyrightAttribute>().Copyright);
                     Console.WriteLine("Complete Copyright information available at http://SanteDB.codeplex.com/wikipage?title=Contributions");
-                    ServiceUtil.Start(typeof(Program).GUID, new FileConfigurationService(parameters.ConfigFile));
+
+                    // Detect platform
+                    if (System.Environment.OSVersion.Platform != PlatformID.Win32NT)
+                        Console.WriteLine("Not running on WindowsNT, some features may not function correctly");
+                    else try
+                        {
+                            if (!EventLog.SourceExists("SanteDB Host Process"))
+                                EventLog.CreateEventSource("SanteDB Host Process", "santedb");
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine("WARN: Error creating EventLog source. Not running as admin? {0}", e);
+                        }
+
+                    ServiceUtil.Start(typeof(Program).GUID, new ServerApplicationContext(parameters.ConfigFile));
                     if (!parameters.StartupTest)
                     {
                         // Did the service start properly?

@@ -29,14 +29,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SanteDB.Core.PubSub.Broker;
-using SanteDB.BI.Services.Impl;
 using SanteDB.Core.Notifications;
-using SanteDB.Core.Applets.Services.Impl;
 using SanteDB.Core.Services.Impl.Repository;
-using SanteDB.Rest.Common;
 using SanteDB.Core.Data.Initialization;
+using RestSrvr;
+using SanteDB.BI.Services.Impl;
+using SanteDB.Core.Applets.Services.Impl;
+using SanteDB.Rest.Common;
 
-namespace SanteDB.Server.Core.Configuration.Features
+namespace SanteDB.Configuration.Tasks
 {
     /// <summary>
     /// Represents a feature for core server implementation

@@ -30,7 +30,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SanteDB.Configurator.Tasks
+namespace SanteDB.Configuration.Tasks
 {
     /// <summary>
     /// Represents a configuration task

@@ -32,7 +32,7 @@ using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Services;
 using ServiceTools;
 
-namespace SanteDB.Server.Core.Configuration.Tasks
+namespace SanteDB.Configuration.Tasks
 {
     /// <summary>
     /// Represents a feature which is a windows service installer
@@ -198,9 +198,9 @@ namespace SanteDB.Server.Core.Configuration.Tasks
                 try
                 {
                     this.ProgressChanged?.Invoke(this, new SanteDB.Core.Services.ProgressChangedEventArgs(0.0f, $"Installing Windows Service {this.m_options.ServiceName}..."));
-                    if (!ServiceInstaller.ServiceIsInstalled(this.m_options.ServiceName))
+                    if (!ServiceTools.ServiceInstaller.ServiceIsInstalled(this.m_options.ServiceName))
                     {
-                        ServiceInstaller.Install(this.m_options.ServiceName, "SanteDB Host Process",
+                        ServiceTools.ServiceInstaller.Install(this.m_options.ServiceName, "SanteDB Host Process",
                             Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "santedb.exe"),
                             this.m_options.User,
                             this.m_options.Password,
@@ -222,10 +222,10 @@ namespace SanteDB.Server.Core.Configuration.Tasks
             /// </summary>
             public bool Rollback(SanteDBConfiguration configuration)
             {
-                if (ServiceInstaller.ServiceIsInstalled(this.m_options.ServiceName))
+                if (ServiceTools.ServiceInstaller.ServiceIsInstalled(this.m_options.ServiceName))
                 {
-                    ServiceInstaller.StopService(this.m_options.ServiceName);
-                    ServiceInstaller.Uninstall(this.m_options.ServiceName);
+                    ServiceTools.ServiceInstaller.StopService(this.m_options.ServiceName);
+                    ServiceTools.ServiceInstaller.Uninstall(this.m_options.ServiceName);
                     configuration.GetSection<ApplicationServiceContextConfigurationSection>().AppSettings.RemoveAll(o => o.Key == "w32instance.name");
                 }
                 return true;
@@ -239,7 +239,7 @@ namespace SanteDB.Server.Core.Configuration.Tasks
                 WindowsIdentity identity = WindowsIdentity.GetCurrent();
                 WindowsPrincipal principal = new WindowsPrincipal(identity);
                 if (Environment.OSVersion.Platform == PlatformID.Win32NT)
-                    return !ServiceInstaller.ServiceIsInstalled(this.m_options.ServiceName);
+                    return !ServiceTools.ServiceInstaller.ServiceIsInstalled(this.m_options.ServiceName);
                 return false;
             }
         }
@@ -294,10 +294,10 @@ namespace SanteDB.Server.Core.Configuration.Tasks
                 try
                 {
                     this.ProgressChanged?.Invoke(this, new SanteDB.Core.Services.ProgressChangedEventArgs(0.0f, $"Removing Windows Service {this.m_options.ServiceName}..."));
-                    if (ServiceInstaller.ServiceIsInstalled(this.m_options.ServiceName))
+                    if (ServiceTools.ServiceInstaller.ServiceIsInstalled(this.m_options.ServiceName))
                     {
-                        ServiceInstaller.StopService(this.m_options.ServiceName);
-                        ServiceInstaller.Uninstall(this.m_options.ServiceName);
+                        ServiceTools.ServiceInstaller.StopService(this.m_options.ServiceName);
+                        ServiceTools.ServiceInstaller.Uninstall(this.m_options.ServiceName);
                         configuration.GetSection<ApplicationServiceContextConfigurationSection>().AppSettings.RemoveAll(o => o.Key == "w32instance.name");
                     }
                     this.ProgressChanged?.Invoke(this, new SanteDB.Core.Services.ProgressChangedEventArgs(1.0f, null));
@@ -321,7 +321,7 @@ namespace SanteDB.Server.Core.Configuration.Tasks
             /// <summary>
             /// Verify state
             /// </summary>
-            public bool VerifyState(SanteDBConfiguration configuration) => ServiceInstaller.ServiceIsInstalled(this.m_options.ServiceName);
+            public bool VerifyState(SanteDBConfiguration configuration) => ServiceTools.ServiceInstaller.ServiceIsInstalled(this.m_options.ServiceName);
         }
     }
 }

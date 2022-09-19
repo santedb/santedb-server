@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup Condition="'$(VersionNumber)' == ''">
-    <VersionNumber>2.4.0-debug</VersionNumber>
+    <VersionNumber>3.0-debug</VersionNumber>
   </PropertyGroup>
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -82,6 +82,7 @@
     <None Remove="SQL\PSQL\santedb-drop.sql" />
     <None Remove="SQL\PSQL\santedb-fn.sql" />
     <None Remove="SQL\PSQL\santedb-init.sql" />
+    <None Remove="SQL\Updates\00OIZ-PSQL.sql" />
     <None Remove="SQL\Updates\20170721-PSQL.sql" />
     <None Remove="SQL\Updates\20170725-PSQL.sql" />
     <None Remove="SQL\Updates\20170803-PSQL.sql" />
@@ -156,6 +157,9 @@
   
   <ItemGroup>
     <EmbeddedResource Include="Map\ModelMap.xml" />
+    <EmbeddedResource Include="SQL\Updates\00OIZ-PSQL.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="SQL\Updates\20200320-PSQL.sql" />
     <EmbeddedResource Include="SQL\Updates\20201029-PSQL.sql" />
     <EmbeddedResource Include="SQL\Updates\20201128-FBSQL.sql">
@@ -347,12 +351,6 @@
     <EmbeddedResource Include="SQL\Updates\20211229-FBSQL.sql" />
     <EmbeddedResource Include="SQL\Updates\20220414-PSQL.sql" />
     <EmbeddedResource Include="SQL\Updates\20211229-PSQL.sql" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <None Update="SQL\Updates\00OIZ-PSQL.sql">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   
   <ItemGroup>

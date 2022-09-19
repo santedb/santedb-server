@@ -25,7 +25,6 @@ using SanteDB.Core.Exceptions;
 using SanteDB.Core.Security.Configuration;
 using SanteDB.Docker.Core;
 using SanteDB.Rest.Common.Configuration;
-using SanteDB.Server.Core.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;

@@ -9,7 +9,7 @@
       <url>http://santedb.org/valueset/PlaceTypeConcept</url>
     </ConceptSet>
   </update>
-  <insert updateIfExists="true">
+  <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>fa3041e3-42cc-41de-a9bc-35ec8530b691</id>
       <creationTime>0001-01-01T00:00:00.0000000+00:00</creationTime>
@@ -30,8 +30,8 @@
       </name>
       <conceptSet>C65719EC-0795-47EC-8AAF-DCB867C5CA56</conceptSet>
     </Concept>
-  </insert>
-  <insert updateIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>fa487084-5c69-4f08-b9ee-92955b09305d</id>
       <creationTime>0001-01-01T00:00:00.0000000+00:00</creationTime>
@@ -52,8 +52,8 @@
       </name>
       <conceptSet>C65719EC-0795-47EC-8AAF-DCB867C5CA56</conceptSet>
     </Concept>
-  </insert>
-  <insert updateIfExists="true">
+  </update>
+    <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>fa587084-5c69-4f08-b9ee-92955b09305d</id>
       <creationTime>0001-01-01T00:00:00.0000000+00:00</creationTime>
@@ -74,8 +74,8 @@
       </name>
       <conceptSet>C65719EC-0795-47EC-8AAF-DCB867C5CA56</conceptSet>
     </Concept>
-  </insert>
-  <insert updateIfExists="true">
+  </update>
+    <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>fa687084-5c69-4f08-b9ee-92955b09305d</id>
       <creationTime>0001-01-01T00:00:00.0000000+00:00</creationTime>
@@ -96,8 +96,8 @@
       </name>
       <conceptSet>C65719EC-0795-47EC-8AAF-DCB867C5CA56</conceptSet>
     </Concept>
-  </insert>
-  <insert updateIfExists="true">
+  </update>
+    <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>fa787084-5c69-4f08-b9ee-92955b09305d</id>
       <creationTime>0001-01-01T00:00:00.0000000+00:00</creationTime>
@@ -118,8 +118,8 @@
       </name>
       <conceptSet>C65719EC-0795-47EC-8AAF-DCB867C5CA56</conceptSet>
     </Concept>
-  </insert>
-  <insert updateIfExists="true">
+  </update>
+    <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>fa887084-5c69-4f08-b9ee-92955b09305d</id>
       <creationTime>0001-01-01T00:00:00.0000000+00:00</creationTime>
@@ -140,8 +140,8 @@
       </name>
       <conceptSet>C65719EC-0795-47EC-8AAF-DCB867C5CA56</conceptSet>
     </Concept>
-  </insert>
-  <update insertIfNotExists="true">
+  </update>
+    <update insertIfNotExists="true">
     <ConceptSet xmlns="http://santedb.org/model">
       <id>91DEC343-1324-4FA4-8CEA-4A1D0439908A</id>
       <name>Place Entity Class Code Concepts</name>
