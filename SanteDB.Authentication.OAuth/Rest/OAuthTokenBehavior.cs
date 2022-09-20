@@ -285,6 +285,10 @@ namespace SanteDB.Authentication.OAuth2.Rest
 
             var session = m_SessionResolver.ExtendSessionWithRefreshToken(tokenRequest.RefreshToken);
 
+            var principal = m_SessionIdentityProvider.Authenticate(session);
+
+            AuditUtil.AuditSessionStart(session, principal, true);
+
             if (null == session)
             {
                 return this.CreateErrorCondition(OAuthErrorType.invalid_grant, "invalid refresh token.");
@@ -884,8 +888,11 @@ namespace SanteDB.Authentication.OAuth2.Rest
 
             bool isOverride = additionalClaims?.Any(o => o.Type == SanteDBClaimTypes.SanteDBOverrideClaim) == true || scopes?.Any(o => o == PermissionPolicyIdentifiers.OverridePolicyPermission) == true;
 
-            return m_SessionProvider.Establish(claimsPrincipal, remoteIp, isOverride, purposeOfUse, scopes?.ToArray(), additionalClaims.FirstOrDefault(o => o.Type == SanteDBClaimTypes.Language)?.Value);
+            var session =  m_SessionProvider.Establish(claimsPrincipal, remoteIp, isOverride, purposeOfUse, scopes?.ToArray(), additionalClaims.FirstOrDefault(o => o.Type == SanteDBClaimTypes.Language)?.Value);
 
+            AuditUtil.AuditSessionStart(session, claimsPrincipal, true);
+
+            return session;
         }
 
         /// <summary>
@@ -1216,7 +1223,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 retVal.TokenEndpoint = $"{boundHostPort}/oauth2_token";
                 retVal.AuthorizationEndpoint = $"{boundHostPort}/authorize/";
                 retVal.UserInfoEndpoint = $"{boundHostPort}/userinfo";
-                retVal.GrantTypesSupported = new List<string>() { "client_credentials", "password", "authorization_code" };
+                retVal.GrantTypesSupported = new List<string>() { "client_credentials", "password"/*, "authorization_code"*/ };
                 retVal.IdTokenSigning = securityConfiguration.Signatures.Select(o => o.Algorithm).Distinct().Select(o => o.ToString()).ToList();
                 retVal.ResponseTypesSupported = new List<string>() { "code" };
                 retVal.ScopesSupported = ApplicationServiceContext.Current.GetService<IPolicyInformationService>().GetPolicies().Select(o => o.Oid).ToList();
@@ -1338,7 +1345,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
         /// Gets the keys associated with this service.
         /// </summary>
         /// <returns></returns>
-        public object JsonWebKeySet()
+        public virtual object JsonWebKeySet()
         {
             var keyset = new Microsoft.IdentityModel.Tokens.JsonWebKeySet();
 
@@ -1398,7 +1405,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
             }
 
 
-            return keyset;
+            return new Model.Jwks.KeySet(keyset);
         }
     }
 }

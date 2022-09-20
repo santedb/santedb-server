@@ -68,6 +68,8 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <Compile Include="Docker\OauthDockerFeature.cs" />
+    <Compile Include="Model\Jwks\Key.cs" />
+    <Compile Include="Model\Jwks\KeySet.cs" />
     <Compile Include="Model\OAuthError.cs" />
     <Compile Include="Model\OAuthTokenRequest.cs" />
     <Compile Include="Model\OAuthTokenResponse.cs" />
