@@ -44,7 +44,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
         /// <summary>
         /// Token request
         /// </summary>
-        [RestInvoke(UriTemplate = "oauth2_token", Method = "POST")]
+        [Post("oauth2_token")]
         [return: MessageFormat(MessageFormatType.Json)]
         object Token(NameValueCollection formFields);
         

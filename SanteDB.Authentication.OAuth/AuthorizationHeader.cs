@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace SanteDB.Authentication.OAuth2
 {
+    /// <summary>
+    /// Parses an Authorization style header value, that is a Header of the form {Scheme} {Value}.
+    /// </summary>
     internal class AuthorizationHeader : IEquatable<AuthorizationHeader>, IEquatable<string>
     {
         public AuthorizationHeader()
@@ -20,9 +23,20 @@ namespace SanteDB.Authentication.OAuth2
             Value = value;
         }
 
+        /// <summary>
+        /// Gets or sets the scheme of the Authorization Header.
+        /// </summary>
         public string Scheme { get; set; }
+        /// <summary>
+        /// Gets or sets the value of the Authorization Header.
+        /// </summary>
         public string Value { get; set; }
 
+        /// <summary>
+        /// Checks if this instance matches the provided scheme.
+        /// </summary>
+        /// <param name="scheme">The scheme to check against.</param>
+        /// <returns>True of the scheme matches (case insensitive). False otherwise.</returns>
         public bool IsScheme(string scheme) => Scheme.Equals(scheme, StringComparison.InvariantCultureIgnoreCase);
 
         public override string ToString()
@@ -62,6 +76,12 @@ namespace SanteDB.Authentication.OAuth2
             }
         }
 
+        /// <summary>
+        /// Attempts to parse a string into an <see cref="AuthorizationHeader"/> object.
+        /// </summary>
+        /// <param name="s">The string to parse.</param>
+        /// <param name="header">Out; the <see cref="AuthorizationHeader"/> object as the result of the parse operation if successful.</param>
+        /// <returns>True if the string was parsed successfully.</returns>
         public static bool TryParse(string s, out AuthorizationHeader header)
         {
             if (string.IsNullOrWhiteSpace(s))
@@ -124,9 +144,9 @@ namespace SanteDB.Authentication.OAuth2
             }
         }
 
-        public static readonly string Schemes_Basic = "basic";
-        public static readonly string Schemes_Bearer = "bearer";
-        public static readonly string Schemes_Digest = "digest";
+        public static readonly string Scheme_Basic = "basic";
+        public static readonly string Scheme_Bearer = "bearer";
+        public static readonly string Scheme_Digest = "digest";
 
     }
 }

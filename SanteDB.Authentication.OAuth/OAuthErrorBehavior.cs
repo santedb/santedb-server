@@ -67,7 +67,7 @@ namespace SanteDB.Authentication.OAuth2
             // Error
             OAuthError err = new OAuthError()
             {
-                Error = OAuthErrorType.invalid_request,
+                Error = OAuthErrorType.unspecified_error,
                 ErrorDescription = error.Message
             };
 
