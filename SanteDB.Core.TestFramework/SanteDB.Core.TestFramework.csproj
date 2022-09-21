@@ -40,17 +40,17 @@
   </ItemGroup>
   <Import Project="SanteDB.Core.TestFramework.targets" />
   <ItemGroup>
-    <None Include="SanteDB.Core.TestFramework.targets" Pack="true" PackagePath="build"/>
-    <None Include="..\Solution Items\santedb_test.fdb" Pack="true" PackagePath="build"/>
-    <None Include=".\bin\$(Configuration)\fbclient.dll" Pack="true" PackagePath="build"/>
-    <None Include=".\bin\$(Configuration)\firebird.conf" Pack="true" PackagePath="build"/>
-    <None Include=".\bin\$(Configuration)\firebird.msg" Pack="true"  PackagePath="build"/>
-    <None Include=".\bin\$(Configuration)\ib_util.dll" Pack="true"  PackagePath="build"/>
-    <None Include=".\bin\$(Configuration)\icudt52.dll" Pack="true" PackagePath="build"/>
-    <None Include=".\bin\$(Configuration)\icudt52l.dat" Pack="true" PackagePath="build"/>
-    <None Include=".\bin\$(Configuration)\icuin52.dll" Pack="true" PackagePath="build"/>
+    <None Include="SanteDB.Core.TestFramework.targets" Pack="true" PackagePath="build" />
+    <None Include="..\Solution Items\santedb_test.fdb" Pack="true" PackagePath="build" />
+    <None Include=".\bin\$(Configuration)\fbclient.dll" Pack="true" PackagePath="build" />
+    <None Include=".\bin\$(Configuration)\firebird.conf" Pack="true" PackagePath="build" />
+    <None Include=".\bin\$(Configuration)\firebird.msg" Pack="true" PackagePath="build" />
+    <None Include=".\bin\$(Configuration)\ib_util.dll" Pack="true" PackagePath="build" />
+    <None Include=".\bin\$(Configuration)\icudt52.dll" Pack="true" PackagePath="build" />
+    <None Include=".\bin\$(Configuration)\icudt52l.dat" Pack="true" PackagePath="build" />
+    <None Include=".\bin\$(Configuration)\icuin52.dll" Pack="true" PackagePath="build" />
     <None Include=".\bin\$(Configuration)\icuuc52.dll" Pack="true" PackagePath="build" />
-    <None Include=".\bin\$(Configuration)\plugins\engine12.dll" Pack="true" PackagePath="build\plugins"/>
+    <None Include=".\bin\$(Configuration)\plugins\engine12.dll" Pack="true" PackagePath="build\plugins" />
 
   </ItemGroup>
   <Choose>
@@ -75,7 +75,7 @@
   </Choose>
   <ItemGroup>
     <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="9.0.2" />
-    <PackageReference Include="NUnit" Version="3.13.2" />
+    <PackageReference Include="NUnit" Version="3.13.3" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
   </ItemGroup>
   <ItemGroup>
