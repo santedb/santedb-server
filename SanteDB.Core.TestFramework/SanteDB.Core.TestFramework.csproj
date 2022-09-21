@@ -34,54 +34,25 @@
     <None Include="..\SanteDB.licenseheader">
       <Link>SanteDB.licenseheader</Link>
     </None>
-    <Content Include="SanteDB.Core.TestFramework.targets" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="TestConfig.xml" />
   </ItemGroup>
+  <Import Project="SanteDB.Core.TestFramework.targets" />
   <ItemGroup>
-    <Content Include="..\Solution Items\santedb_test.fdb">
-      <PackagePath>build</PackagePath>
-      <Pack>true</Pack>
-    </Content>
-    <Content Include=".\bin\$(Configuration)\fbclient.dll">
-      <Pack>true</Pack>
-      <PackagePath>build</PackagePath>
-    </Content>
-    <Content Include=".\bin\$(Configuration)\firebird.conf">
-      <Pack>true</Pack>
-      <PackagePath>build</PackagePath>
-    </Content>
-    <Content Include=".\bin\$(Configuration)\firebird.msg">
-      <Pack>true</Pack>
-      <PackagePath>build</PackagePath>
-    </Content>
-    <Content Include=".\bin\$(Configuration)\ib_util.dll">
-      <Pack>true</Pack>
-      <PackagePath>build</PackagePath>
-    </Content>
-    <Content Include=".\bin\$(Configuration)\icudt52.dll">
-      <Pack>true</Pack>
-      <PackagePath>build</PackagePath>
-    </Content>
-    <Content Include=".\bin\$(Configuration)\icudt52l.dat">
-      <Pack>true</Pack>
-      <PackagePath>build</PackagePath>
-    </Content>
-    <Content Include=".\bin\$(Configuration)\icuin52.dll">
-      <Pack>true</Pack>
-      <PackagePath>build</PackagePath>
-    </Content>
-    <Content Include=".\bin\$(Configuration)\icuuc52.dll">
-      <Pack>true</Pack>
-      <PackagePath>build</PackagePath>
-    </Content>
-    <Content Include=".\bin\$(Configuration)\plugins\engine12.dll">
-      <Pack>true</Pack>
-      <PackagePath>build\plugins</PackagePath>
-    </Content>
-    
-</ItemGroup>
+    <None Include="SanteDB.Core.TestFramework.targets" Pack="true" PackagePath="build"/>
+    <None Include="..\Solution Items\santedb_test.fdb" Pack="true" PackagePath="build"/>
+    <None Include=".\bin\$(Configuration)\fbclient.dll" Pack="true" PackagePath="build"/>
+    <None Include=".\bin\$(Configuration)\firebird.conf" Pack="true" PackagePath="build"/>
+    <None Include=".\bin\$(Configuration)\firebird.msg" Pack="true"  PackagePath="build"/>
+    <None Include=".\bin\$(Configuration)\ib_util.dll" Pack="true"  PackagePath="build"/>
+    <None Include=".\bin\$(Configuration)\icudt52.dll" Pack="true" PackagePath="build"/>
+    <None Include=".\bin\$(Configuration)\icudt52l.dat" Pack="true" PackagePath="build"/>
+    <None Include=".\bin\$(Configuration)\icuin52.dll" Pack="true" PackagePath="build"/>
+    <None Include=".\bin\$(Configuration)\icuuc52.dll" Pack="true" PackagePath="build" />
+    <None Include=".\bin\$(Configuration)\plugins\engine12.dll" Pack="true" PackagePath="build\plugins"/>
+
+  </ItemGroup>
   <Choose>
     <When Condition="$(SolutionName.Contains('-ext'))">
       <ItemGroup>
@@ -105,6 +76,7 @@
   <ItemGroup>
     <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="9.0.2" />
     <PackageReference Include="NUnit" Version="3.13.2" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SanteDB.Persistence.Data\SanteDB.Persistence.Data.csproj">
