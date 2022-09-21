@@ -13,6 +13,8 @@ SELECT ENT_NAME_CMP_TBL.*, PHON_VAL_TBL.VAL  INTO ENT_NAME_CMP_UPD_TBL FROM ENT_
 DROP TABLE PHON_VAL_TBL CASCADE;
 DROP TABLE ENT_NAME_CMP_TBL;
 ALTER TABLE ENT_NAME_CMP_UPD_TBL RENAME TO ENT_NAME_CMP_TBL;
+--#!
+-- INFO:	 Re-applying keys and indexes...
 ALTER TABLE ent_name_cmp_tbl ADD CONSTRAINT pk_ent_name_cmp_tbl PRIMARY KEY (cmp_id);
 CREATE INDEX ent_name_cmp_name_id_idx ON ent_name_cmp_tbl USING btree (name_id);
 ALTER TABLE ent_name_cmp_tbl ADD CONSTRAINT fk_ent_name_cmp_name_id FOREIGN KEY (name_id) REFERENCES ent_name_tbl(name_id);
@@ -34,7 +36,8 @@ SELECT ENT_ADDR_CMP_TBL.*, ENT_ADDR_CMP_VAL_TBL.VAL  INTO ENT_ADDR_CMP_UPD_TBL F
 DROP TABLE ENT_ADDR_CMP_VAL_TBL CASCADE;
 DROP TABLE ENT_ADDR_CMP_TBL;
 ALTER TABLE ENT_ADDR_CMP_UPD_TBL RENAME TO ENT_ADDR_CMP_TBL;
-
+--#!
+-- INFO:	Re-Applying keys and indexes....
 CREATE INDEX ent_addr_cmp_addr_id_idx ON ent_addr_cmp_tbl USING btree (addr_id);
 ALTER TABLE ent_addr_cmp_tbl ADD CONSTRAINT pk_ent_addr_cmp_tbl PRIMARY KEY (cmp_id);
 ALTER TABLE ent_addr_cmp_tbl ADD CONSTRAINT fk_ent_addr_cmp_name_id FOREIGN KEY (addr_id) REFERENCES ent_addr_tbl(addr_id);
@@ -45,7 +48,7 @@ alter table ent_addr_cmp_tbl alter column val set not null;
 alter sequence ent_addr_cmp_val_seq rename to ent_addr_cmp_seq;
 alter table ent_addr_cmp_tbl add seq_id bigint not null default nextval('ent_addr_cmp_seq');
 --#!
--- INFO: Indexing Columns
+-- INFO: Adding GIN and Fuzzy Indexes on Columns
 CREATE INDEX ENT_NAME_CMP_VAL_IDX ON ENT_NAME_CMP_TBL USING GIN (VAL gin_trgm_ops); --#
 CREATE INDEX ENT_ADDR_CMP_VAL_IDX ON ENT_ADDR_CMP_TBL USING GIN (VAL gin_trgm_ops); --#
 CREATE INDEX ENT_NAME_CMP_SDX_IDX ON ENT_NAME_CMP_TBL(SOUNDEX(VAL)); --#!
