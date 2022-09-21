@@ -20,7 +20,7 @@
       <dependency id="SanteDB.Rest.Common" version="$VersionNumber$" />
     </dependencies>
     <references>
-      <group targetFramework="net47">
+      <group targetFramework="net48">
         <reference file="SanteDB.Server.AdminConsole.Api.dll"/>
         <reference file="MohawkCollege.Util.Console.Parameters.dll"/>
       </group>
@@ -28,10 +28,10 @@
     
   </metadata>
   <files>
-    <file src="..\bin\$configuration$\MohawkCollege.Util.Console.Parameters.dll" target="lib\net47" />
+    <file src="..\bin\$configuration$\MohawkCollege.Util.Console.Parameters.dll" target="lib\net48" />
     <file src="..\bin\$configuration$\sdbac.exe" target="build\" />
     <file src="..\bin\$configuration$\sdbac.exe.config" target="build\" />
-    <file src="..\bin\$configuration$\SanteDB.Server.AdminConsole.Api.dll" target="lib\net47" />
+    <file src="..\bin\$configuration$\SanteDB.Server.AdminConsole.Api.dll" target="lib\net48" />
     <file src="SanteDB.Server.AdminConsole.Api.targets" target="build\" />
 
   </files>

@@ -32,13 +32,13 @@
       <dependency id="SanteDB.Docker.Core" version="$VersionNumber$"/>
     </dependencies>
     <references>
-      <group targetFramework="net47">
+      <group targetFramework="net48">
         <reference file="MohawkCollege.Util.Console.Parameters.dll"/>
       </group>
     </references>
   </metadata>
   <files>
-    <file src="..\bin\$configuration$\MohawkCollege.Util.Console.Parameters.dll" target="lib\net47" />
+    <file src="..\bin\$configuration$\MohawkCollege.Util.Console.Parameters.dll" target="lib\net48" />
     <file src="..\bin\$configuration$\SanteDB.exe" target="build\" />
     <file src="..\bin\$configuration$\SanteDB.Caching.Memory.dll" target="build\" />
     <file src="..\bin\$configuration$\SanteDB.Persistence.Diagnostics.Email.dll" target="build\" />

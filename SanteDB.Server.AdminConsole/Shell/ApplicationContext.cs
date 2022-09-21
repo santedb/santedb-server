@@ -87,7 +87,7 @@ namespace SanteDB.Server.AdminConsole.Shell
         /// </summary>
         public static void Initialize(Parameters.ConsoleParameters configuration)
         {
-            ApplicationServiceContext.Current = ApplicationContext.Current = new ApplicationContext(configuration);
+            ServiceUtil.Start(Guid.Empty, new ApplicationContext(configuration));
         }
 
         /// <summary>
@@ -150,7 +150,6 @@ namespace SanteDB.Server.AdminConsole.Shell
         /// </summary>
         public void Start()
         {
-            ApplicationServiceContext.Current = this;
             this.m_tracer.TraceInfo("Starting mini-context");
 
             String scheme = this.m_configuration.UseTls ? "https" : "http",

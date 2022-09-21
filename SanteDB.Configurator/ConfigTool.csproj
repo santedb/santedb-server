@@ -215,9 +215,5 @@
       <Project>{032abf00-6c76-47c7-9eca-a840915a17ea}</Project>
       <Name>SanteDB.Configuration</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Persistence.Data\SanteDB.Persistence.Data.csproj">
-      <Project>{ad152185-7ec6-428d-91a9-f79b83f6f406}</Project>
-      <Name>SanteDB.Persistence.Data</Name>
-    </ProjectReference>
   </ItemGroup>
 </Project>

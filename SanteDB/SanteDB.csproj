@@ -21,7 +21,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SanteDB</RootNamespace>
     <AssemblyName>SanteDB</AssemblyName>
-    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetFrameworkProfile />
@@ -37,7 +37,7 @@
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <ApplicationVersion>3.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -583,14 +583,6 @@
       <Project>{976e1627-b0da-4237-977d-9b3020b60dc1}</Project>
       <Name>SanteDB.Messaging.Atna</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Persistence.Auditing.ADO\SanteDB.Persistence.Auditing.ADO.csproj">
-      <Project>{45ea67a6-48f6-4906-84ec-5c13c80c9cc4}</Project>
-      <Name>SanteDB.Persistence.Auditing.ADO</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Persistence.Data\SanteDB.Persistence.Data.csproj">
-      <Project>{ad152185-7ec6-428d-91a9-f79b83f6f406}</Project>
-      <Name>SanteDB.Persistence.Data</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SanteDB.Persistence.Diagnostics.Email\SanteDB.Persistence.Diagnostics.Email.csproj">
       <Project>{2a5cea66-8bb3-4567-bdfa-9c174fc215f7}</Project>
       <Name>SanteDB.Persistence.Diagnostics.Email</Name>
@@ -598,10 +590,6 @@
     <ProjectReference Include="..\SanteDB.Persistence.Diagnostics.Jira\SanteDB.Persistence.Diagnostics.Jira.csproj">
       <Project>{18a9f102-023e-4e17-8a70-a91365e1510d}</Project>
       <Name>SanteDB.Persistence.Diagnostics.Jira</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Persistence.PubSub.ADO\SanteDB.Persistence.PubSub.ADO.csproj">
-      <Project>{03052730-be5d-4212-9b71-316c685dd245}</Project>
-      <Name>SanteDB.Persistence.PubSub.ADO</Name>
     </ProjectReference>
     <ProjectReference Include="..\SanteDB.Tools.Debug\SanteDB.Tools.Debug.csproj">
       <Project>{223d4d87-6819-4f38-ae69-a82e249e1879}</Project>
@@ -612,15 +600,6 @@
     <Folder Include="Services\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Choose>
-    <When Condition="$(SolutionName.Contains('-linux'))">
-    </When>
-    <Otherwise>
-      <PropertyGroup>
-        <PreBuildEvent Condition="'$(NoFirebird)' == ''">"$(SolutionDir)\Solution Items\FirebirdSQL-3.0.3-Embedded.bat" "$(SolutionDir)\Solution Items" "$(TargetDir)"</PreBuildEvent>
-      </PropertyGroup>
-    </Otherwise>
-  </Choose>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
@@ -628,6 +607,12 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <ItemGroup>
+    <Content Include="$(SolutionDir)\santedb-api\Solution Items\**\*.*" Exclude="$(SolutionDir)\santedb-api\Solution Items\*.zip">
+      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   <Target Name="BeforeBuild" Condition="!$(VersionNumber.EndsWith('-debug'))">
     <AssemblyInfo CodeLanguage="CS" OutputFile="$(MSBuildProjectDirectory)\Properties\Version.cs" AssemblyVersion="$(VersionNumber)" AssemblyFileVersion="$(VersionNumber)" />
   </Target>
