@@ -165,11 +165,11 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="SanteDB.Core.Api" Version="1.80.0.0" />
-        <PackageReference Include="SanteDB.Core.Applets" Version="1.80.0.0" />
-        <PackageReference Include="SanteDB.Core.Model" Version="1.80.0.0" />
-        <PackageReference Include="SanteDB.BusinessRules.JavaScript" Version="1.80.0.0" />
-        <PackageReference Include="SanteDB.BI" Version="1.80.0.0" />
+        <PackageReference Include="SanteDB.Core.Api" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Core.Applets" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Core.Model" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.BusinessRules.JavaScript" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.BI" Version="$(VersionNumber)" />
       </ItemGroup>
     </Otherwise>
   </Choose>

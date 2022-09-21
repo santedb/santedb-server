@@ -22,11 +22,11 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="SanteDB.Core.Api" Version="2.1.3.0" />
-        <PackageReference Include="SanteDB.Core.Model" Version="2.1.3.0" />
-        <PackageReference Include="SanteDB.OrmLite" Version="2.1.3.0" />
-        <PackageReference Include="SanteDB.BI" Version="2.1.3.0" />
-		<PackageReference Include="SanteDB.Docker.Core" Version="2.1.3.0" />
+        <PackageReference Include="SanteDB.Core.Api" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Core.Model" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.OrmLite" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.BI" Version="$(VersionNumber)" />
+		<PackageReference Include="SanteDB.Docker.Core" Version="$(VersionNumber)" />
       </ItemGroup>
     </Otherwise>
   </Choose>

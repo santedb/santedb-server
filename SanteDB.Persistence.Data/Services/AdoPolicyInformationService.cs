@@ -130,6 +130,18 @@ namespace SanteDB.Persistence.Data.Services
                                     }));
                                     break;
                                 }
+                            case IApplicationIdentity iaid:
+                                {
+                                    var sid = context.Query<DbSecurityApplication>(o => o.PublicId.ToLowerInvariant() == iaid.Name.ToLowerInvariant()).Select(o=>o.Key).First();
+                                    context.DeleteAll<DbSecurityApplicationPolicy>(o => policies.Contains(o.PolicyKey) && o.SourceKey == sid && policies.Contains(o.PolicyKey));
+                                    context.InsertAll(policies.Select(o => new DbSecurityApplicationPolicy()
+                                    {
+                                        GrantType = (int)rule,
+                                        SourceKey = sid,
+                                        PolicyKey = o
+                                    }));
+                                    break;
+                                }
                             case SecurityApplication sa:
                                 {
                                     context.DeleteAll<DbSecurityApplicationPolicy>(o => policies.Contains(o.PolicyKey) && o.SourceKey == sa.Key && policies.Contains(o.PolicyKey));
@@ -137,6 +149,18 @@ namespace SanteDB.Persistence.Data.Services
                                     {
                                         GrantType = (int)rule,
                                         SourceKey = sa.Key.Value,
+                                        PolicyKey = o
+                                    }));
+                                    break;
+                                }
+                            case IDeviceIdentity idid:
+                                {
+                                    var sid = context.Query<DbSecurityDevice>(o => o.PublicId.ToLowerInvariant() == idid.Name.ToLowerInvariant()).Select(o => o.Key).First();
+                                    context.DeleteAll<DbSecurityDevicePolicy>(o => policies.Contains(o.PolicyKey) && o.SourceKey == sid && policies.Contains(o.PolicyKey));
+                                    context.InsertAll(policies.Select(o => new DbSecurityDevicePolicy()
+                                    {
+                                        GrantType = (int)rule,
+                                        SourceKey = sid,
                                         PolicyKey = o
                                     }));
                                     break;
