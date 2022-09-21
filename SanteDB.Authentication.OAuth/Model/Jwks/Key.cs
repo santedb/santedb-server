@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace SanteDB.Authentication.OAuth2.Model.Jwks
 {
+    /// <summary>
+    /// Serialization class for the jwks endpoint. This hides all the internal details from the Key.
+    /// </summary>
     internal class Key
     {
         [JsonProperty("alg")]

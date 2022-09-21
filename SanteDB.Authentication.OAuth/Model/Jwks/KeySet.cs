@@ -11,6 +11,9 @@ using System.Threading.Tasks;
 
 namespace SanteDB.Authentication.OAuth2.Model.Jwks
 {
+    /// <summary>
+    /// Internal serialization class to hide internal members from the <see cref="Microsoft.IdentityModel.Tokens.JsonWebKeySet"/>.
+    /// </summary>
     internal class KeySet
     {
         [JsonIgnore]
