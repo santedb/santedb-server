@@ -62,8 +62,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Abstractions\ITokenRequestHandler.cs" />
     <Compile Include="AuthorizationHeader.cs" />
     <Compile Include="Configuration\OAuthConfigurationSection.cs" />
+    <Compile Include="TokenRequestHandlers\DefaultClientCredentialsTokenRequestHandler.cs" />
+    <Compile Include="TokenRequestHandlers\DefaultPasswordTokenRequestHandler.cs" />
+    <Compile Include="TokenRequestHandlers\DefaultRefreshTokenRequestHandler.cs" />
     <None Include="data\000-OAuthPolicies.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -71,7 +75,7 @@
     <Compile Include="Model\Jwks\Key.cs" />
     <Compile Include="Model\Jwks\KeySet.cs" />
     <Compile Include="Model\OAuthError.cs" />
-    <Compile Include="Model\OAuthTokenRequest.cs" />
+    <Compile Include="Model\OAuthTokenRequestContext.cs" />
     <Compile Include="Model\OAuthTokenResponse.cs" />
     <Compile Include="Model\OpenIdConfiguration.cs" />
     <Compile Include="OAuthConstants.cs" />

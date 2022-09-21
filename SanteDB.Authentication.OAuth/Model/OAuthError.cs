@@ -52,7 +52,11 @@ namespace SanteDB.Authentication.OAuth2.Model
         /// <summary>
         /// The scope value is invalid
         /// </summary>
-        invalid_scope
+        invalid_scope,
+        /// <summary>
+        /// The type of error was not specified by a handler.
+        /// </summary>
+        unspecified_error,
     }
 
     /// <summary>

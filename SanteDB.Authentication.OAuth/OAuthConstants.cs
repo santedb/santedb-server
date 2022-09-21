@@ -114,5 +114,7 @@ namespace SanteDB.Authentication.OAuth2
         public const string FormField_Password = "password";
 
         public const string Header_XDeviceAuthorization = "X-Device-Authorization";
+
+        public const string DataKey_SymmetricSecret = "symm_secret";
     }
 }
