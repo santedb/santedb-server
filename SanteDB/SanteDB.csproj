@@ -607,12 +607,7 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <ItemGroup>
-    <Content Include="$(SolutionDir)\santedb-api\Solution Items\**\*.*" Exclude="$(SolutionDir)\santedb-api\Solution Items\*.zip">
-      <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
+  <Import Project="$(SolutionDir)\santedb-api\SanteDB.Core.TestFramework\SanteDB.Core.TestFramework.targets" />
   <Target Name="BeforeBuild" Condition="!$(VersionNumber.EndsWith('-debug'))">
     <AssemblyInfo CodeLanguage="CS" OutputFile="$(MSBuildProjectDirectory)\Properties\Version.cs" AssemblyVersion="$(VersionNumber)" AssemblyFileVersion="$(VersionNumber)" />
   </Target>
