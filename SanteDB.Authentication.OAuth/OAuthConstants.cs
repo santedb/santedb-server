@@ -104,17 +104,45 @@ namespace SanteDB.Authentication.OAuth2
         /// </summary>
         public const string OAuthResetFlowPolicy = OAuthLoginPolicy + ".4";
 
+        /// <summary>
+        /// In a token request, this is the grant type field key
+        /// </summary>
         public const string FormField_GrantType = "grant_type";
+        /// <summary>
+        /// In a token request, this is the scope field key
+        /// </summary>
         public const string FormField_Scope = "scope";
+        /// <summary>
+        /// In a token request, this is the client id field key
+        /// </summary>
         public const string FormField_ClientId = "client_id";
+        /// <summary>
+        /// In a token request, this is the client secret field key
+        /// </summary>
         public const string FormField_ClientSecret = "client_secret";
+        /// <summary>
+        /// In a token request, this is the refresh token field key
+        /// </summary>
         public const string FormField_RefreshToken = "refresh_token";
-        public const string FormField_AuhthorizationCode = "code";
+        /// <summary>
+        /// In a token request, this is the authorization code field key
+        /// </summary>
+        public const string FormField_AuthorizationCode = "code";
+        /// <summary>
+        /// In a token request, this is the username field key
+        /// </summary>
         public const string FormField_Username = "username";
+        /// <summary>
+        /// In a token request, this is the password field key
+        /// </summary>
         public const string FormField_Password = "password";
 
         public const string Header_XDeviceAuthorization = "X-Device-Authorization";
 
         public const string DataKey_SymmetricSecret = "symm_secret";
+
+        public const string ResponseMode_Query = "query";
+        public const string ResponseMode_Fragment = "fragment";
+        public const string ResponseMode_FormPost = "form_post";
     }
 }
