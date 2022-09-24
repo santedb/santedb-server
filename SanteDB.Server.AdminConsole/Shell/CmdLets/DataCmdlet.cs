@@ -143,8 +143,8 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
                 }
             }
 
-            Int32.TryParse(parms.Offset ?? "0", out int offset);
-            Int32.TryParse(parms.Count ?? "25", out int count);
+            Int32.TryParse(parms.Offset , out int offset);
+            Int32.TryParse(parms.Count , out int count);
 
             if (parms.Display == null)
                 parms.Display = new System.Collections.Specialized.StringCollection() { "id", "ToString" };
@@ -167,7 +167,7 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
                 Console.WriteLine("Result: {0} .. {1} of {2}", result.Offset, result.Item.Count, result.TotalResults);
                 var displayCols = parms.Display.OfType<String>().Select(o =>
                 {
-                    return (Expression<Func<IdentifiedData, Object>>)(col => o == "ToString" ? col.ToString() : QueryExpressionParser.BuildPropertySelector(type, o, true).Compile().DynamicInvoke(col));
+                    return (Expression<Func<IdentifiedData, Object>>)(col => o == "ToString" ? col.ToString() : QueryExpressionParser.BuildPropertySelector(type, o, true, null).Compile().DynamicInvoke(col));
                 }).ToArray();
 
                 DisplayUtil.TablePrint<IdentifiedData>(result.Item, parms.Display.OfType<String>().ToArray(), parms.Display.OfType<String>().Select(o => 40).ToArray(), displayCols);

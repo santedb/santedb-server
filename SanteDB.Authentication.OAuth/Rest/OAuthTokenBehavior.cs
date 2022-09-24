@@ -355,7 +355,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
             _ = TryGetDeviceIdentity(context);
             _ = TryGetApplicationIdentity(context);
 
-            var clientClaims = SanteDBClaimsUtil.ExtractClaims(context.IncomingRequest.Headers);
+            var clientClaims = context.IncomingRequest.Headers.ExtractClientClaims();
             // Set the language claim?
             if (!String.IsNullOrEmpty(formFields["ui_locales"]) &&
                 !clientClaims.Any(o => o.Type == SanteDBClaimTypes.Language))
@@ -647,7 +647,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 else
                 {
                     // Validate the claim
-                    var handler = SanteDBClaimsUtil.GetHandler(itm.Type);
+                    var handler = itm.GetHandler();
                     if (handler == null || handler.Validate(userPrincipal, itm.Value))
                         retVal.Add(itm);
                     else
