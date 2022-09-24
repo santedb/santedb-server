@@ -5,6 +5,9 @@
     <VersionNumber>2.4.0-debug</VersionNumber>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="MimeTypesMap">
+      <Version>1.0.8</Version>
+    </PackageReference>
     <PackageReference Include="MSBuildTasks" Version="1.5.0.235">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
@@ -63,8 +66,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Abstractions\ITokenRequestHandler.cs" />
+    <Compile Include="AppletAssetProvider.cs" />
     <Compile Include="AuthorizationHeader.cs" />
     <Compile Include="Configuration\OAuthConfigurationSection.cs" />
+    <Compile Include="IAssetProvider.cs" />
+    <Compile Include="LocalFolderAssetProvider.cs" />
+    <Compile Include="Model\AuthorizationCode.cs" />
+    <Compile Include="Model\OAuthAuthorizeRequestContext.cs" />
+    <Compile Include="Model\OAuthRequestContextBase.cs" />
+    <Compile Include="TokenRequestHandlers\DefaultAuthorizationCodeTokenRequestHandler.cs" />
     <Compile Include="TokenRequestHandlers\DefaultClientCredentialsTokenRequestHandler.cs" />
     <Compile Include="TokenRequestHandlers\DefaultPasswordTokenRequestHandler.cs" />
     <Compile Include="TokenRequestHandlers\DefaultRefreshTokenRequestHandler.cs" />

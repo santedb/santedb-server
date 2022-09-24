@@ -57,6 +57,14 @@ namespace SanteDB.Authentication.OAuth2.Model
         /// The type of error was not specified by a handler.
         /// </summary>
         unspecified_error,
+        /// <summary>
+        /// The response type requested is not supported by this service.
+        /// </summary>
+        unsupported_response_type,
+        /// <summary>
+        /// The response mode request is not supported by this service.
+        /// </summary>
+        unsupported_response_mode
     }
 
     /// <summary>
@@ -78,5 +86,11 @@ namespace SanteDB.Authentication.OAuth2.Model
         /// </summary>
         [JsonProperty("error_description")]
         public String ErrorDescription { get; set; }
+
+        /// <summary>
+        /// Gets or sets the state that the client provided in the request.
+        /// </summary>
+        [JsonProperty("state")]
+        public string State { get; set; }
     }
 }

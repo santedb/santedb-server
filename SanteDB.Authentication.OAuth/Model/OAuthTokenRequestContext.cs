@@ -26,8 +26,10 @@ using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Principal;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
+using System.Runtime.Remoting.Contexts;
 using System.Security.Principal;
 
 namespace SanteDB.Authentication.OAuth2.Model
@@ -36,63 +38,47 @@ namespace SanteDB.Authentication.OAuth2.Model
     /// Context class for a token request that is processed by an <see cref="Abstractions.ITokenRequestHandler"/> and handled as part of a flow.
     /// </summary>
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage] // Serialization class
-    public class OAuthTokenRequestContext
+    public class OAuthTokenRequestContext : OAuthRequestContextBase
     {
+
+        public OAuthTokenRequestContext(RestOperationContext operationContext) : base(operationContext)
+        {
+
+        }
+
+        public OAuthTokenRequestContext(RestOperationContext operationContext, NameValueCollection formFields)
+            : base(operationContext, formFields)
+        {
+
+        }
+
+
+        #region Form Field Values
         ///<summary>Grant type</summary> 
-        public string GrantType { get; set; }
-        ///<summary>Scope of the grant</summary>
-        public List<string> Scopes { get; set; }
+        public string GrantType => FormFields?[OAuthConstants.FormField_GrantType]?.Trim()?.ToLowerInvariant();
         ///<summary>User name when the grant type is password</summary>
-        public string UserName { get; set; }
+        public string UserName => FormFields?[OAuthConstants.FormField_Username];
         ///<summary>Password when the grant type is password.</summary>
-        public string Password { get; set; }
-        /// <summary>
-        /// A secret code used as a second factor in an authentication flow.
-        /// </summary>
-        [Obsolete("Use of this is discouraged.")]
-        public string TfaSecret { get; set; }
-        ///<summary>Auth code when grant type is Authorization code.</summary>
-        public string Code { get; set; }
-        /// <summary>
-        /// Refreshing token when grant type is refresh_token
-        /// </summary>
-        public string RefreshToken{ get; set; }
+        public string Password => FormFields?[OAuthConstants.FormField_Password];
         /// <summary>
         /// The client id of the application. Valid when grant type is client credentials, and others that support multiple
         /// </summary>
-        public string ClientId { get; set; }
+        public override string ClientId => FormFields?[OAuthConstants.FormField_ClientId];
         /// <summary>
         /// The client secret of the application. 
         /// </summary>
-        public string ClientSecret { get; set; }
+        public override string ClientSecret => FormFields?[OAuthConstants.FormField_ClientSecret];
         /// <summary>
-        /// The X-Device-Authorization header value if present. This is a custom header in SanteDb as part of a proxy configuration.
+        /// Refreshing token when grant type is refresh_token
         /// </summary>
-        public string XDeviceAuthorizationHeader { get; set; }
-        /// <summary>
-        /// The authenticated device identity.
-        /// </summary>
-        public IDeviceIdentity DeviceIdentity { get; set; }
-        /// <summary>
-        /// The authenticated device principal.
-        /// </summary>
-        public IClaimsPrincipal DevicePrincipal { get; set; }
-        /// <summary>
-        /// The authenticated application identity.
-        /// </summary>
-        public IApplicationIdentity ApplicationIdentity { get; set; }
-        /// <summary>
-        /// The authenticated application principal.
-        /// </summary>
-        public IClaimsPrincipal ApplicationPrincipal { get; set; }
-        /// <summary>
-        /// The authenticated user identity.
-        /// </summary>
-        public IIdentity UserIdentity { get; set; }
-        /// <summary>
-        /// The authenticated user principal.
-        /// </summary>
-        public IClaimsPrincipal UserPrincipal { get; set; }
+        public string RefreshToken => FormFields?[OAuthConstants.FormField_RefreshToken];
+        ///<summary>Auth code when grant type is Authorization code.</summary>
+        public string AuthorizationCode => FormFields?[OAuthConstants.FormField_AuthorizationCode]; 
+        #endregion
+
+        ///<summary>Scope of the grant</summary>
+        public List<string> Scopes { get; set; }
+        
         /// <summary>
         /// Any additional claims that were part of the request. Handlers are free to ignore these additional claims when they do not make sense as part of their request.
         /// </summary>
@@ -101,34 +87,8 @@ namespace SanteDB.Authentication.OAuth2.Model
         /// The session that is established as part of this request. Typically, an <see cref="Abstractions.ITokenRequestHandler"/> will set this during processing.
         /// </summary>
         public ISession Session { get; set; }
-        /// <summary>
-        /// When a request fails, this should contain the type of error that was encountered.
-        /// </summary>
-        public OAuthErrorType? ErrorType { get; set; }
-        /// <summary>
-        /// The rest context that this token request is part of.
-        /// </summary>
-        public RestOperationContext RestContext { get; set; }
-        /// <summary>
-        /// Shortcut for <c>RestContext.IncomingRequest</c>.
-        /// </summary>
-        public HttpListenerRequest IncomingRequest => RestContext?.IncomingRequest;
-        /// <summary>
-        /// Shortcut for <c>RestContext.OutgoingRequest</c>.
-        /// </summary>
-        public HttpListenerResponse OutgoingResponse => RestContext?.OutgoingResponse;
-        /// <summary>
-        /// Gets or sets the authentication context at the time the handler is processing a request.
-        /// </summary>
-        public AuthenticationContext AuthenticationContext { get; set; }
-        /// <summary>
-        /// When a request fails, this should contain a textual description that will be returned in the response.
-        /// </summary>
-        public string ErrorMessage { get; set; }
+        
 
-        /// <summary>
-        /// The config section that is applicable during processing of the request.
-        /// </summary>
-        public OAuthConfigurationSection Configuration { get; set; }
+        
     }
 }

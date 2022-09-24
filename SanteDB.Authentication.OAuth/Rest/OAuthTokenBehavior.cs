@@ -65,6 +65,8 @@ using SanteDB.Core.Security.Configuration;
 using SanteDB.Rest.Common.Security;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
+using SanteDB.Core.Model.Serialization;
+using System.Reflection.Metadata.Ecma335;
 
 namespace SanteDB.Authentication.OAuth2.Rest
 {
@@ -123,14 +125,26 @@ namespace SanteDB.Authentication.OAuth2.Rest
         /// </summary>
         protected readonly IDeviceIdentityProviderService m_DeviceIdentityProvider;
         /// <summary>
+        /// User identity provider.
+        /// </summary>
+        protected readonly IIdentityProviderService m_IdentityProvider;
+        /// <summary>
         /// JWT Handler to create JWTs with.
         /// </summary>
         protected readonly JsonWebTokenHandler m_JwtHandler;
+
+        protected readonly IAppletSolutionManagerService _AppletSolutionManager;
+        private IAssetProvider _AssetProvider;
+
+        protected readonly IDataSigningService _SigningService;
+
 
         // XHTML
         private const string XS_HTML = "http://www.w3.org/1999/xhtml";
 
         protected readonly Dictionary<string, Abstractions.ITokenRequestHandler> _TokenRequestHandlers;
+        private readonly Dictionary<string, Func<OAuthAuthorizeRequestContext, object>> _AuthorizeResponseModeHandlers;
+
 
         /// <summary>
         /// Policy enforcement service
@@ -146,6 +160,8 @@ namespace SanteDB.Authentication.OAuth2.Rest
             m_SessionProvider = ApplicationServiceContext.Current.GetService<ISessionProviderService>() ?? throw new ApplicationException($"Cannot find instance of {nameof(ISessionProviderService)} in {nameof(ApplicationServiceContext)}.");
             m_AppIdentityProvider = ApplicationServiceContext.Current.GetService<IApplicationIdentityProviderService>() ?? throw new ApplicationException($"Cannot find instance of {nameof(IApplicationIdentityProviderService)} in {nameof(ApplicationServiceContext)}.");
             m_DeviceIdentityProvider = ApplicationServiceContext.Current.GetService<IDeviceIdentityProviderService>() ?? throw new ApplicationException($"Cannot find instance of {nameof(IDeviceIdentityProviderService)} in {nameof(ApplicationServiceContext)}.");
+            m_IdentityProvider = ApplicationServiceContext.Current.GetService<IIdentityProviderService>() ?? throw new ApplicationException($"Cannot find instance of {nameof(IIdentityProviderService)} in {nameof(ApplicationServiceContext)}.");
+            _SigningService = ApplicationServiceContext.Current.GetService<IDataSigningService>() ?? throw new ApplicationException($"Cannot find instance of {nameof(IDataSigningService)} in {nameof(ApplicationServiceContext)}.");
 
             //Optimization - try to resolve from the same session provider. 
             m_SessionIdentityProvider = m_SessionProvider as ISessionIdentityProviderService;
@@ -185,6 +201,38 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 }
             }
 
+
+            _AppletSolutionManager = ApplicationServiceContext.Current.GetService<IAppletSolutionManagerService>();
+
+            ApplicationServiceContext.Current.Started += Application_Started;
+
+            _AuthorizeResponseModeHandlers = new Dictionary<string, Func<OAuthAuthorizeRequestContext, object>>();
+            _AuthorizeResponseModeHandlers.Add(OAuthConstants.ResponseMode_Query, RenderQueryResponseMode);
+            _AuthorizeResponseModeHandlers.Add(OAuthConstants.ResponseMode_Fragment, RenderFragmentResponseMode);
+            _AuthorizeResponseModeHandlers.Add(OAuthConstants.ResponseMode_FormPost, RenderFormPostResponseMode);
+
+
+        }
+
+        private void Application_Started(object sender, EventArgs e)
+        {
+            //We have to wait for stage 2 otherwise we cannot guarantee that the applets will be loaded.
+            if (!string.IsNullOrEmpty(m_configuration.LoginAssetPath))
+            {
+                _AssetProvider = new LocalFolderAssetProvider(m_configuration.LoginAssetPath);
+            }
+            else if (!string.IsNullOrEmpty(m_configuration.LoginAssetSolution))
+            {
+                var applets = _AppletSolutionManager.GetApplets(m_configuration.LoginAssetSolution);
+
+                _AssetProvider = new AppletAssetProvider(applets);
+            }
+            else
+            {
+                var applets = _AppletSolutionManager.GetApplets("santedb.core.sln");
+
+                _AssetProvider = new AppletAssetProvider(applets);
+            }
         }
 
         /// <summary>
@@ -192,7 +240,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
         /// </summary>
         /// <param name="context">The context for the request.</param>
         /// <returns></returns>
-        protected virtual bool TryGetDeviceIdentity(OAuthTokenRequestContext context)
+        protected virtual bool TryGetDeviceIdentity(OAuthRequestContextBase context)
         {
             if (null == context)
             {
@@ -201,7 +249,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
 
             if (null != context.AuthenticationContext?.Principal?.Identity && context.AuthenticationContext.Principal.Identity is IDeviceIdentity deviceIdentity)
             {
-                context.DeviceIdentity = deviceIdentity;
+                context.DeviceIdentity = deviceIdentity as IClaimsIdentity;
                 return true;
             }
             else if (!string.IsNullOrWhiteSpace(context.XDeviceAuthorizationHeader))
@@ -220,7 +268,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
 
                             if (principal?.Identity is IDeviceIdentity devid)
                             {
-                                context.DeviceIdentity = devid;
+                                context.DeviceIdentity = devid as IClaimsIdentity;
                                 context.DevicePrincipal = principal as IClaimsPrincipal;
                                 return true;
                             }
@@ -258,7 +306,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
         /// </summary>
         /// <param name="context">The context for the request.</param>
         /// <returns></returns>
-        protected virtual bool TryGetApplicationIdentity(OAuthTokenRequestContext context)
+        protected virtual bool TryGetApplicationIdentity(OAuthRequestContextBase context)
         {
             if (null == context)
             {
@@ -267,7 +315,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
 
             if (null != context.AuthenticationContext?.Principal?.Identity && context.AuthenticationContext.Principal.Identity is IApplicationIdentity applicationIdentity)
             {
-                context.ApplicationIdentity = applicationIdentity;
+                context.ApplicationIdentity = applicationIdentity as IClaimsIdentity;
                 return true;
             }
             else if (!string.IsNullOrWhiteSpace(context.ClientId) && !string.IsNullOrWhiteSpace(context.ClientSecret))
@@ -277,7 +325,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
 
                 if (null != principal && principal.Identity is IApplicationIdentity appidentity)
                 {
-                    context.ApplicationIdentity = appidentity;
+                    context.ApplicationIdentity = appidentity as IClaimsIdentity;
                     context.ApplicationPrincipal = principal as IClaimsPrincipal;
                     return true;
                 }
@@ -294,7 +342,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
             return false;
         }
 
-        protected virtual bool IsGrantTypePermitted(string grantType)
+        protected bool IsGrantTypePermitted(string grantType)
         {
             if (string.IsNullOrEmpty(grantType))
             {
@@ -314,43 +362,25 @@ namespace SanteDB.Authentication.OAuth2.Rest
             if (null == formFields || formFields.Count == 0)
             {
                 m_traceSource.TraceVerbose("Empty request received. Returning error.");
-                return this.CreateErrorCondition(OAuthErrorType.invalid_request, "request is empty.");
+                return this.CreateErrorResponse(OAuthErrorType.invalid_request, "request is empty.");
             }
 
-            var context = new Model.OAuthTokenRequestContext();
-
+            var context = new Model.OAuthTokenRequestContext(RestOperationContext.Current, formFields);
             context.AuthenticationContext = AuthenticationContext.Current;
-            context.RestContext = RestOperationContext.Current;
             context.Configuration = m_configuration;
-
-            context.GrantType = formFields[OAuthConstants.FormField_GrantType]?.Trim()?.ToLowerInvariant();
 
             if (!IsGrantTypePermitted(context.GrantType))
             {
                 m_traceSource.TraceInfo("Request has unsupported grant type {0}", context.GrantType);
-                return this.CreateErrorCondition(OAuthErrorType.unsupported_grant_type, $"unsupported grant type {context.GrantType}");
+                return this.CreateErrorResponse(OAuthErrorType.unsupported_grant_type, $"unsupported grant type {context.GrantType}");
             }
-
-            //Client ID and secret for client_credentials and others that support app authn.
-            context.ClientId = formFields[OAuthConstants.FormField_ClientId];
-            context.ClientSecret = formFields[OAuthConstants.FormField_ClientSecret];
-
-            //Username and password for password grant
-            context.UserName = formFields[OAuthConstants.FormField_Username];
-            context.Password = formFields[OAuthConstants.FormField_Password];
-
-            //Refresh token for refresh_token grant
-            context.RefreshToken = formFields[OAuthConstants.FormField_RefreshToken];
 
             //HACK: Remove this when we figure out how to complete the refactor.
             if (!string.IsNullOrEmpty(context.ClientSecret))
             {
                 m_traceSource.TraceVerbose("Adding symmetric key override from client secret in request.");
-                context.RestContext.Data.Add(OAuthConstants.DataKey_SymmetricSecret, context.ClientSecret);
+                context.OperationContext.Data.Add(OAuthConstants.DataKey_SymmetricSecret, context.ClientSecret);
             }
-
-            context.XDeviceAuthorizationHeader = context.IncomingRequest?.Headers?[OAuthConstants.Header_XDeviceAuthorization];
-            context.TfaSecret = context.IncomingRequest?.Headers?[OAuthConstants.Header_TfaSecret];
 
             _ = TryGetDeviceIdentity(context);
             _ = TryGetApplicationIdentity(context);
@@ -368,265 +398,109 @@ namespace SanteDB.Authentication.OAuth2.Rest
             if (null == handler) //How did this happen?
             {
                 m_traceSource.TraceWarning("Found null handler for grant type {0}.", context.GrantType);
-                return this.CreateErrorCondition(OAuthErrorType.unsupported_grant_type, $"unsupported grant type {context.GrantType}");
+                return this.CreateErrorResponse(OAuthErrorType.unsupported_grant_type, $"unsupported grant type {context.GrantType}");
             }
 
-            m_traceSource.TraceVerbose("Executing token handler.");
-            bool success = handler.HandleRequest(context);
-
-            if (!success)
+            m_traceSource.TraceVerbose("Executing token request handler.");
+            try
             {
-                m_traceSource.TraceVerbose("Handler returned error. Type: {1}, Message: {2}", context.ErrorType ?? OAuthErrorType.unspecified_error, context.ErrorMessage);
-                return this.CreateErrorCondition(context.ErrorType ?? OAuthErrorType.unspecified_error, context.ErrorMessage ?? "unspecified error");
-            }
+                bool success = handler.HandleRequest(context);
 
-            if (null == context.Session) //If the session is null, the handler is delegating session initialization back to us.
-            {
-                m_traceSource.TraceVerbose($"Establishing session in {nameof(OAuthTokenBehavior)}. This is expected when the handler does not initialize the session.");
-                context.Session = EstablishSession(context.UserPrincipal ?? context.ApplicationPrincipal, context.ApplicationPrincipal, context.DevicePrincipal, context.Scopes, context.AdditionalClaims);
-
-                AuditUtil.AuditSessionStart(context.Session, context.UserPrincipal ?? context.ApplicationPrincipal, context.Session != null);
-
-                if (null == context.Session)
+                if (!success)
                 {
-                    m_traceSource.TraceInfo("Error establishing session and handler indicated success.");
-                    return CreateErrorCondition(OAuthErrorType.unspecified_error, "error establishing session");
+                    m_traceSource.TraceVerbose("Handler returned error. Type: {1}, Message: {2}", context.ErrorType ?? OAuthErrorType.unspecified_error, context.ErrorMessage);
+                    return this.CreateErrorResponse(context.ErrorType ?? OAuthErrorType.unspecified_error, context.ErrorMessage ?? "unspecified error");
                 }
+
+                if (null == context.Session) //If the session is null, the handler is delegating session initialization back to us.
+                {
+                    m_traceSource.TraceVerbose($"Establishing session in {nameof(OAuthTokenBehavior)}. This is expected when the handler does not initialize the session.");
+                    context.Session = EstablishSession(context.UserPrincipal ?? context.ApplicationPrincipal, context.ApplicationPrincipal, context.DevicePrincipal, context.Scopes, context.AdditionalClaims);
+
+                    AuditUtil.AuditSessionStart(context.Session, context.UserPrincipal ?? context.ApplicationPrincipal, context.Session != null);
+
+                    if (null == context.Session)
+                    {
+                        m_traceSource.TraceInfo("Error establishing session and handler indicated success.");
+                        return CreateErrorResponse(OAuthErrorType.unspecified_error, "error establishing session");
+                    }
+                }
+
+                m_traceSource.TraceInfo("Token request complete, creating response.");
+                return CreateTokenResponse(CreateTokenDescriptor(context.Session), context.Session, context.OutgoingResponse);
+            }
+            catch (Exception ex) when (!(ex is StackOverflowException || ex is OutOfMemoryException))
+            {
+                m_traceSource.TraceError("Unhandled exception from token request handler: {0}", ex.ToString());
+                return CreateErrorResponse(OAuthErrorType.unspecified_error, ex.Message);
             }
 
-            m_traceSource.TraceInfo("Token request complete, creating response.");
-            return CreateTokenResponse(CreateTokenDescriptor(context.Session), context.Session, context.OutgoingResponse);
 
-            //switch (context.GrantType)
-            //{
-            //    case OAuthConstants.GrantNameRefresh:
-            //        context.RefreshToken = formFields[OAuthConstants.FormField_RefreshToken];
-            //        return ProcessRefreshTokenGrantRequest(context);
-            //    case OAuthConstants.GrantNameClientCredentials:
-            //        return ProcessClientCredentialsGrantRequest(context);
-            //    case OAuthConstants.GrantNamePassword:
-            //        context.UserName = formFields[OAuthConstants.FormField_Username];
-            //        context.Password = formFields[OAuthConstants.FormField_Password];
-            //        return ProcessPasswordGrantRequest(context);
+            //    case OAuthConstants.GrantNameAuthorizationCode:
+
+            //        // First, ensure the authenticated application has permission to use this grant
+            //        this.m_policyEnforcementService.Demand(OAuthConstants.OAuthCodeFlowPolicy, clientPrincipal);
+            //        if (devicePrincipal != null)
+            //            this.m_policyEnforcementService.Demand(OAuth2.OAuthConstants.OAuthPasswordFlowPolicy, devicePrincipal);
+
+            //        // We want to decode the token and verify ..
+            //        var token = Enumerable.Range(0, formFields["code"].Length)
+            //                    .Where(x => x % 2 == 0)
+            //                    .Select(x => Convert.ToByte(formFields["code"].Substring(x, 2), 16))
+            //                    .ToArray();
+
+            //        // First we extract the token information
+            //        var sid = new Guid(Enumerable.Range(0, 32).Where(x => x % 2 == 0).Select(o => token[o]).ToArray());
+            //        var sec = new Guid(token.Take(16).ToArray());
+            //        var aid = new Guid(Enumerable.Range(32, 32).Where(x => x % 2 == 0).Select(o => token[o]).ToArray());
+            //        var scopeLength = BitConverter.ToInt32(token, 64);
+            //        var scopeData = Enumerable.Range(68, scopeLength * 2).Where(x => x % 2 == 0).Select(o => token[o]).ToArray();
+            //        var claimLength = BitConverter.ToInt32(token, 68 + scopeLength * 2);
+            //        var claimData = Enumerable.Range(72 + scopeLength * 2, claimLength * 2).Where(x => x % 2 == 0).Select(o => token[o]).ToArray();
+            //        var dsig = token.Skip(72 + 2 * (scopeLength + claimLength)).Take(32).ToArray();
+            //        var expiry = new DateTime(BitConverter.ToInt64(token, 104 + 2 * (scopeLength + claimLength)));
+
+            //        // Verify
+            //        if (!ApplicationServiceContext.Current.GetService<IDataSigningService>().Verify(token.Take(token.Length - 40).ToArray(), dsig))
+            //            throw new SecurityTokenValidationException("Authorization code failed signature verification");
+
+            //        // Expiry?
+            //        if (expiry < DateTime.Now)
+            //            throw new SecurityTokenExpiredException("Authorization code is expired");
+
+            //        // Verify the application is the same purported by the client
+            //        if (aid.ToString() != (clientPrincipal.Identity as IClaimsIdentity).FindFirst(SanteDBClaimTypes.Sid).Value)
+            //            throw new SecurityTokenValidationException("Authorization code was not issued to this client");
+
+            //        // Fetch the principal information
+            //        principal = m_IdentityProvider.Authenticate(m_IdentityProvider.GetIdentity(sid).Name, null, sec.ToString());
+
+            //        // Add scopes
+            //        int li = 0, idx;
+            //        string scopes = "";
+            //        if (scopeData.Length > 0)
+            //        {
+            //            do
+            //            {
+            //                idx = Array.IndexOf(scopeData, (byte)0, li);
+            //                if (idx > 0) scopes += Encoding.UTF8.GetString(scopeData, li, idx - li) + " ";
+            //                li += idx + 1;
+            //            } while (idx > -1);
+            //            formFields["scope"] = scopes.Substring(0, scopes.Length - 1);
+            //        }
+            //        // TODO: Claims
+
+            //        break;
+
             //    default:
-            //        return this.CreateErrorCondition(OAuthErrorType.unsupported_grant_type, $"grant type {context.GrantType} is not supported");
+            //        throw new InvalidOperationException("Invalid grant type");
             //}
 
+            //if (principal == null)
+            //    return this.CreateErrorCondition(OAuthErrorType.invalid_grant, "Invalid username or password");
+            //else
+            //    return this.EstablishSession(principal, clientPrincipal, devicePrincipal, tokenRequest["scope"], this.ValidateClaims(principal, clientClaims.ToArray()));
 
-            //// Only password grants
-            //if (tokenRequest["grant_type"] != OAuthConstants.GrantNamePassword &&
-            //    tokenRequest["grant_type"] != OAuthConstants.GrantNameRefresh &&
-            //    //tokenRequest["grant_type"] != OAuthConstants.GrantNameAuthorizationCode &&
-            //    tokenRequest["grant_type"] != OAuthConstants.GrantNameClientCredentials &&
-            //    tokenRequest["grant_type"] != OAuthConstants.GrantNameReset)
-            //    return this.CreateErrorCondition(OAuthErrorType.unsupported_grant_type, "Only 'password', 'client_credentials' or 'refresh_token' grants supported");
-
-            //// Password grant needs well formed scope which defaults to * or all permissions
-            //if (tokenRequest["scope"] == null)
-            //    tokenRequest.Add("scope", "*");
-            //// Validate username and password
-
-            //try
-            //{
-                //// Client principal
-                //IPrincipal clientPrincipal = Core.Security.AuthenticationContext.Current.Principal;
-                //// Client is not present so look in body
-                //if (clientPrincipal == null || clientPrincipal == Core.Security.AuthenticationContext.AnonymousPrincipal ||
-                //    !(clientPrincipal.Identity is IApplicationIdentity))
-                //{
-                //    string client_identity = tokenRequest["client_id"],
-                //        client_secret = tokenRequest["client_secret"];
-                //    if (string.IsNullOrEmpty(client_identity) || string.IsNullOrEmpty(client_secret))
-                //        return this.CreateErrorCondition(OAuthErrorType.invalid_client, "Missing client credentials");
-
-                //    try
-                //    {
-                //        clientPrincipal = ApplicationServiceContext.Current.GetService<IApplicationIdentityProviderService>().Authenticate(client_identity, client_secret);
-                //        RestOperationContext.Current.Data.Add("symm_secret", client_secret);
-                //    }
-                //    catch (Exception e)
-                //    {
-                //        this.m_traceSource.TraceError("Error authenticating client: {0}", e.Message);
-                //        return this.CreateErrorCondition(OAuthErrorType.unauthorized_client, e.Message);
-                //    }
-                //}
-                //else if (!clientPrincipal.Identity.IsAuthenticated)
-                //    return this.CreateErrorCondition(OAuthErrorType.unauthorized_client, "Unauthorized Client");
-
-                //// Device principal?
-                //IPrincipal devicePrincipal = null;
-                //if (Core.Security.AuthenticationContext.Current.Principal.Identity is IDeviceIdentity)
-                //    devicePrincipal = Core.Security.AuthenticationContext.Current.Principal;
-                //else
-                //{
-                //    var authHead = RestOperationContext.Current.IncomingRequest.Headers["X-Device-Authorization"];
-
-                //    // TODO: X509 Authentication
-                //    //if (RestOperationContext.Current.ServiceSecurityContext.AuthorizationContext.ClaimSets != null)
-                //    //{
-                //    //    var claimSet = OperationContext.Current.ServiceSecurityContext.AuthorizationContext.ClaimSets.OfType<System.IdentityModel.Claims.X509CertificateClaimSet>().FirstOrDefault();
-                //    //    if (claimSet != null) // device authenticated with X509 PKI Cert
-                //    //        devicePrincipal = ApplicationServiceContext.Current.GetService<IDeviceIdentityProviderService>().Authenticate(claimSet.X509Certificate);
-                //    //}
-                //    if (devicePrincipal == null && !String.IsNullOrEmpty(authHead)) // Device is authenticated using basic auth
-                //    {
-                //        if (!authHead.ToLower().StartsWith("basic "))
-                //            throw new InvalidCastException("X-Device-Authorization must be BASIC scheme");
-
-                //        var authParts = Encoding.UTF8.GetString(Convert.FromBase64String(authHead.Substring(6).Trim())).Split(':');
-                //        devicePrincipal = ApplicationServiceContext.Current.GetService<IDeviceIdentityProviderService>().Authenticate(authParts[0], authParts[1]);
-                //    }
-                //}
-
-                //IPrincipal principal = null;
-
-                //var clientClaims = SanteDBClaimsUtil.ExtractClaims(RestOperationContext.Current.IncomingRequest.Headers);
-                //// Set the language claim?
-                //if (!String.IsNullOrEmpty(formFields["ui_locales"]) &&
-                //    !clientClaims.Any(o => o.Type == SanteDBClaimTypes.Language))
-                //    clientClaims.Add(new SanteDBClaim(SanteDBClaimTypes.Language, formFields["ui_locales"]));
-
-                //// perform auth
-                //switch (formFields["grant_type"])
-                //{
-                //    case OAuthConstants.GrantNameReset: // password reset grant (special token which only allows a session to reset their password)
-
-                //        formFields["scope"] = PermissionPolicyIdentifiers.LoginPasswordOnly;
-
-                //        // Password grants allowed for this application? Becuase this grant is only for password grants
-                //        this.m_policyEnforcementService.Demand(OAuth2.OAuthConstants.OAuthResetFlowPolicy, clientPrincipal);
-                //        if (devicePrincipal != null)
-                //            this.m_policyEnforcementService.Demand(OAuth2.OAuthConstants.OAuthResetFlowPolicy, devicePrincipal);
-
-                //        // Validate
-                //        if (String.IsNullOrWhiteSpace(formFields["username"]) || String.IsNullOrWhiteSpace(formFields["challenge"]) || String.IsNullOrWhiteSpace(formFields["response"]))
-                //            return this.CreateErrorCondition(OAuthErrorType.invalid_request, "Invalid client grant message");
-
-                //        // Authenticate the user
-                //        var tfa = RestOperationContext.Current.IncomingRequest.Headers[OAuthConstants.Header_TfaSecret];
-                //        principal = ApplicationServiceContext.Current.GetService<ISecurityChallengeIdentityService>().Authenticate(formFields["username"], Guid.Parse(formFields["challenge"]), formFields["response"], tfa);
-                //        break;
-
-                //    case OAuthConstants.GrantNameClientCredentials:
-                //        this.m_policyEnforcementService.Demand(OAuth2.OAuthConstants.OAuthClientCredentialFlowPolicy, clientPrincipal);
-                //        if (devicePrincipal != null)
-                //            this.m_policyEnforcementService.Demand(OAuth2.OAuthConstants.OAuthPasswordFlowPolicy, devicePrincipal);
-
-                //        if (devicePrincipal == null && !this.m_configuration.AllowClientOnlyGrant)
-                //            throw new SecurityException("client_credentials grant requires device authentication either using X509 or X-Device-Authorization or enabling the DeviceAuthorizationAccessBehavior");
-                //        else if (devicePrincipal == null)
-                //            this.m_traceSource.TraceWarning("No device credential could be established, configuration allows for client only grant. Recommend disabling this in production environment");
-                //        else
-                //            this.m_policyEnforcementService.Demand(PermissionPolicyIdentifiers.LoginAsService, devicePrincipal);
-
-                //        principal = devicePrincipal ?? clientPrincipal;
-                //        // Demand "Login As Service" permission
-                //        break;
-
-                //    case OAuthConstants.GrantNamePassword:
-
-                //        // Password grants allowed for this application?
-                //        this.m_policyEnforcementService.Demand(OAuth2.OAuthConstants.OAuthPasswordFlowPolicy, clientPrincipal);
-                //        if (devicePrincipal != null)
-                //            this.m_policyEnforcementService.Demand(OAuth2.OAuthConstants.OAuthPasswordFlowPolicy, devicePrincipal);
-
-                //        // Validate
-                //        if (String.IsNullOrWhiteSpace(formFields["username"]) && String.IsNullOrWhiteSpace(formFields["refresh_token"]))
-                //            return this.CreateErrorCondition(OAuthErrorType.invalid_request, "Invalid client grant message");
-
-                //        if (RestOperationContext.Current.IncomingRequest.Headers[OAuthConstants.Header_TfaSecret] != null)
-                //            principal = m_IdentityProvider.Authenticate(formFields["username"], formFields["password"], RestOperationContext.Current.IncomingRequest.Headers[OAuthConstants.Header_TfaSecret]);
-                //        else
-                //            principal = m_IdentityProvider.Authenticate(formFields["username"], formFields["password"]);
-                //        break;
-
-                //    case OAuthConstants.GrantNameRefresh:
-                //        var refreshToken = formFields["refresh_token"];
-
-                //        //GetSessionFromRefreshToken is internally calling extend for us right now.
-                //        principal = (m_SessionProvider as ISessionIdentityProviderService).Authenticate(m_SessionResolver.ExtendSessionWithRefreshToken(refreshToken));
-                //        break;
-
-                //    case OAuthConstants.GrantNameAuthorizationCode:
-
-                //        // First, ensure the authenticated application has permission to use this grant
-                //        this.m_policyEnforcementService.Demand(OAuthConstants.OAuthCodeFlowPolicy, clientPrincipal);
-                //        if (devicePrincipal != null)
-                //            this.m_policyEnforcementService.Demand(OAuth2.OAuthConstants.OAuthPasswordFlowPolicy, devicePrincipal);
-
-                //        // We want to decode the token and verify ..
-                //        var token = Enumerable.Range(0, formFields["code"].Length)
-                //                    .Where(x => x % 2 == 0)
-                //                    .Select(x => Convert.ToByte(formFields["code"].Substring(x, 2), 16))
-                //                    .ToArray();
-
-                //        // First we extract the token information
-                //        var sid = new Guid(Enumerable.Range(0, 32).Where(x => x % 2 == 0).Select(o => token[o]).ToArray());
-                //        var sec = new Guid(token.Take(16).ToArray());
-                //        var aid = new Guid(Enumerable.Range(32, 32).Where(x => x % 2 == 0).Select(o => token[o]).ToArray());
-                //        var scopeLength = BitConverter.ToInt32(token, 64);
-                //        var scopeData = Enumerable.Range(68, scopeLength * 2).Where(x => x % 2 == 0).Select(o => token[o]).ToArray();
-                //        var claimLength = BitConverter.ToInt32(token, 68 + scopeLength * 2);
-                //        var claimData = Enumerable.Range(72 + scopeLength * 2, claimLength * 2).Where(x => x % 2 == 0).Select(o => token[o]).ToArray();
-                //        var dsig = token.Skip(72 + 2 * (scopeLength + claimLength)).Take(32).ToArray();
-                //        var expiry = new DateTime(BitConverter.ToInt64(token, 104 + 2 * (scopeLength + claimLength)));
-
-                //        // Verify
-                //        if (!ApplicationServiceContext.Current.GetService<IDataSigningService>().Verify(token.Take(token.Length - 40).ToArray(), dsig))
-                //            throw new SecurityTokenValidationException("Authorization code failed signature verification");
-
-                //        // Expiry?
-                //        if (expiry < DateTime.Now)
-                //            throw new SecurityTokenExpiredException("Authorization code is expired");
-
-                //        // Verify the application is the same purported by the client
-                //        if (aid.ToString() != (clientPrincipal.Identity as IClaimsIdentity).FindFirst(SanteDBClaimTypes.Sid).Value)
-                //            throw new SecurityTokenValidationException("Authorization code was not issued to this client");
-
-                //        // Fetch the principal information
-                //        principal = m_IdentityProvider.Authenticate(m_IdentityProvider.GetIdentity(sid).Name, null, sec.ToString());
-
-                //        // Add scopes
-                //        int li = 0, idx;
-                //        string scopes = "";
-                //        if (scopeData.Length > 0)
-                //        {
-                //            do
-                //            {
-                //                idx = Array.IndexOf(scopeData, (byte)0, li);
-                //                if (idx > 0) scopes += Encoding.UTF8.GetString(scopeData, li, idx - li) + " ";
-                //                li += idx + 1;
-                //            } while (idx > -1);
-                //            formFields["scope"] = scopes.Substring(0, scopes.Length - 1);
-                //        }
-                //        // TODO: Claims
-
-                //        break;
-
-                //    default:
-                //        throw new InvalidOperationException("Invalid grant type");
-                //}
-
-                //if (principal == null)
-                //    return this.CreateErrorCondition(OAuthErrorType.invalid_grant, "Invalid username or password");
-                //else
-                //    return this.EstablishSession(principal, clientPrincipal, devicePrincipal, tokenRequest["scope"], this.ValidateClaims(principal, clientClaims.ToArray()));
-            //}
-            //catch (AuthenticationException e)
-            //{
-            //    this.m_traceSource.TraceEvent(EventLevel.Error, "Error generating token: {0}", e);
-            //    return this.CreateErrorCondition(OAuthErrorType.invalid_grant, e.Message);
-            //}
-            //catch (SecurityException e)
-            //{
-            //    this.m_traceSource.TraceEvent(EventLevel.Error, "Error generating token: {0}", e);
-            //    return this.CreateErrorCondition(OAuthErrorType.invalid_grant, e.Message);
-            //}
-            //catch (Exception e)
-            //{
-            //    this.m_traceSource.TraceEvent(EventLevel.Error, "Error generating token: {0}", e);
-            //    return this.CreateErrorCondition(OAuthErrorType.invalid_request, e.Message);
-            //}
         }
 
         /// <summary>
@@ -704,7 +578,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 }
             }
 
-            
+
 
             descriptor.Claims = claims;
 
@@ -853,14 +727,15 @@ namespace SanteDB.Authentication.OAuth2.Rest
         /// <summary>
         /// Create error condition
         /// </summary>
-        private OAuthError CreateErrorCondition(OAuthErrorType errorType, String message)
+        private OAuthError CreateErrorResponse(OAuthErrorType errorType, String message, string state = null)
         {
             this.m_traceSource.TraceEvent(EventLevel.Error, message);
             RestOperationContext.Current.OutgoingResponse.StatusCode = (int)System.Net.HttpStatusCode.BadRequest;
             return new OAuthError()
             {
                 Error = errorType,
-                ErrorDescription = message
+                ErrorDescription = message,
+                State = state
             };
         }
 
@@ -886,7 +761,170 @@ namespace SanteDB.Authentication.OAuth2.Rest
             };
         }
 
+        private string CreateAuthorizationCode(OAuthAuthorizeRequestContext context)
+        {
+            var authcode = new AuthorizationCode();
+            authcode.iat = DateTimeOffset.UtcNow;
+            authcode.scp = context.Scope;
+            authcode.usr = context.UserPrincipal.GetClaimValue(SanteDBClaimTypes.Sid);
+            authcode.app = context.ApplicationIdentity?.Claims?.FirstOrDefault(c => c.Type == SanteDBClaimTypes.Sid)?.Value;
+            authcode.dev = context.DeviceIdentity?.Claims?.FirstOrDefault(c => c.Type == SanteDBClaimTypes.Sid)?.Value;
+            authcode.nonce = context.Nonce;
+
+            var codejson = JsonConvert.SerializeObject(authcode);
+            var plaintext = Encoding.UTF8.GetBytes(codejson);
+            var code = $"{Base64UrlEncoder.Encode(plaintext)}.{Base64UrlEncoder.Encode(_SigningService.SignData(plaintext))}";
+
+            return code;
+        }
+
         /// <summary>
+        /// HTTP GET Authorization Endpoint.
+        /// </summary>
+        /// <returns></returns>
+        public object Authorize()
+        {
+            var context = new OAuthAuthorizeRequestContext(RestOperationContext.Current);
+            context.AuthenticationContext = AuthenticationContext.Current;
+            context.Configuration = m_configuration;
+
+            return AuthorizeInternal(context);
+        }
+
+        private object AuthorizeInternal(OAuthAuthorizeRequestContext context)
+        {
+            if (!IsAuthorizeRequestValid(context, out var error))
+            {
+                return error ?? CreateErrorResponse(OAuthErrorType.unspecified_error, "invalid request", context.State);
+            }
+            
+            _ = TryGetDeviceIdentity(context);
+
+            if (null != context.DevicePrincipal)
+            {
+                m_policyEnforcementService.Demand(OAuthConstants.OAuthCodeFlowPolicy, context.DevicePrincipal);
+            }
+
+            context.ApplicationIdentity = m_AppIdentityProvider.GetIdentity(context.ClientId) as IClaimsIdentity;
+
+            if (null == context.ApplicationIdentity || context.ApplicationIdentity.Claims.FirstOrDefault(c=>c.Type == SanteDBClaimTypes.Sid)?.Value == AuthenticationContext.SystemApplicationSid)
+            {
+                error = CreateErrorResponse(OAuthErrorType.invalid_client, $"unrecognized client: {context.ClientId}", context.State);
+                return false;
+            }
+
+            if (!string.IsNullOrEmpty(context.Username))
+            {
+                try
+                {
+                    context.UserPrincipal = m_IdentityProvider.Authenticate(context.Username, context.Password) as IClaimsPrincipal;
+                    context.UserIdentity = context.UserPrincipal?.Identities?.FirstOrDefault();
+
+                    if (null != context.UserPrincipal)
+                    {
+                        context.Code = CreateAuthorizationCode(context);
+
+                        var responsehandler = _AuthorizeResponseModeHandlers[context.ResponseMode];
+
+                        return responsehandler(context);
+                    }
+                }
+                catch (AuthenticationException aex)
+                {
+                    m_traceSource.TraceInfo("Authentication exception in oauth authorize. {0}", aex.ToString());
+                    context.ErrorMessage = aex.Message;
+                }
+                catch (Exception ex) when (!(ex is StackOverflowException || ex is OutOfMemoryException))
+                {
+                    if (ex.InnerException is AuthenticationException aex)
+                    {
+                        m_traceSource.TraceInfo("Authentication exception in oauth authorize. {0}", aex.ToString());
+                        context.ErrorMessage = aex.Message;
+                    }
+                    else
+                    {
+                        m_traceSource.TraceWarning("Exception in oauth authorize. {0}", ex.ToString());
+                        context.ErrorMessage = ex.Message;
+                    }
+                }
+            }
+
+
+            return RenderInternal(null, context);
+        }
+
+        /// <summary>
+        /// Validate an <see cref="OAuthAuthorizeRequestContext"/> context contains a valid request.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="error"></param>
+        /// <returns></returns>
+        private bool IsAuthorizeRequestValid(OAuthAuthorizeRequestContext context, out OAuthError error)
+        {
+            if (null == context)
+            {
+                error = CreateErrorResponse(OAuthErrorType.invalid_request, "empty request", null);
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(context.ClientId))
+            {
+                error = CreateErrorResponse(OAuthErrorType.invalid_request, "missing client_id", context.State);
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(context.ResponseType))
+            {
+                error = CreateErrorResponse(OAuthErrorType.invalid_request, "missing response_type", context.State);
+                return false;
+            }
+
+            if (context.ResponseType != "code")
+            {
+                error = CreateErrorResponse(OAuthErrorType.unsupported_response_type, $"response_type '{context.ResponseType}' not supported", context.State);
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(context.ResponseMode))
+            {
+                switch (context.ResponseType)
+                {
+                    case "code":
+                        context.ResponseMode = "query";
+                        break;
+                    case "token":
+                        context.ResponseMode = "fragment";
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            if (!_AuthorizeResponseModeHandlers.ContainsKey(context.ResponseMode))
+            {
+                error = CreateErrorResponse(OAuthErrorType.unsupported_response_mode, $"response_mode '{context.ResponseMode}' is not supported", context.State);
+                return false;
+            }
+
+            error = null;
+            return true;
+        }
+
+        /// <summary>
+        /// HTTP POST Authorization endpoint.
+        /// </summary>
+        /// <param name="formFields"></param>
+        /// <returns></returns>
+        public object Authorize_Post(NameValueCollection formFields)
+        {
+            var context = new OAuthAuthorizeRequestContext(RestOperationContext.Current, formFields);
+            context.AuthenticationContext = AuthenticationContext.Current;
+            context.Configuration = m_configuration;
+
+            return AuthorizeInternal(context);
+        }
+
+        /*/// <summary>
         /// Post the authorization code to the application
         /// </summary>
         /// <param name="authorization">Authorization post results</param>
@@ -1015,39 +1053,61 @@ namespace SanteDB.Authentication.OAuth2.Rest
             {
                 AuditUtil.SendAudit(audit);
             }
-            */
+            
+        }*/
+
+
+        private Stream RenderQueryResponseMode(OAuthAuthorizeRequestContext context)
+        {
+            context.OutgoingResponse.StatusCode = 302;
+            context.OutgoingResponse.StatusDescription = "FOUND";
+            context.OutgoingResponse.RedirectLocation = $"{context.RedirectUri}?code={context.Code}&state={context.State}";
+            return null;
+        }
+
+        private Stream RenderFragmentResponseMode(OAuthAuthorizeRequestContext context)
+        {
+            context.OutgoingResponse.StatusCode = 302;
+            context.OutgoingResponse.StatusDescription = "FOUND";
+            context.OutgoingResponse.RedirectLocation = $"{context.RedirectUri}#code={context.Code}&state={context.State}";
+            return null;
         }
 
         /// <summary>
         /// Render a redirect oauth post
         /// </summary>
-        private Stream RenderOAuthAutoPost(string redirectUri, string formData)
+        private Stream RenderFormPostResponseMode(OAuthAuthorizeRequestContext context)
         {
+            var responsedata = new Dictionary<string, string>();
+            responsedata.Add("state", context.State);
+            responsedata.Add("code", context.Code);
+
             var ms = new MemoryStream();
             RestOperationContext.Current.OutgoingResponse.ContentType = "text/html";
             using (var xw = XmlWriter.Create(ms, new XmlWriterSettings() { CloseOutput = false, OmitXmlDeclaration = true }))
             {
                 xw.WriteDocType("html", "-//W3C//DTD XHTML 1.0 Transitional//EN", "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd", null);
                 xw.WriteStartElement("html", XS_HTML);
+                xw.WriteStartElement("head");
+                xw.WriteStartElement("title");
+                xw.WriteString("Submit This Form");
+                xw.WriteEndElement(); // title
+                xw.WriteEndElement(); // head
 
                 xw.WriteStartElement("body", XS_HTML);
                 xw.WriteAttributeString("onload", "javascript:document.forms[0].submit()");
 
                 xw.WriteStartElement("form", XS_HTML);
                 xw.WriteAttributeString("method", "POST");
-                xw.WriteAttributeString("action", redirectUri);
+                xw.WriteAttributeString("action", context.RedirectUri);
 
                 // Emit data
-                foreach (var itm in formData.Split('&'))
+                foreach (var itm in responsedata)
                 {
-                    var data = itm.Split('=');
                     xw.WriteStartElement("input");
                     xw.WriteAttributeString("type", "hidden");
-                    xw.WriteAttributeString("name", data[0]);
-
-                    if (data.Length > 2)
-                        data[1] = String.Join("=", data.Skip(1).ToArray());
-                    xw.WriteAttributeString("value", data[1]);
+                    xw.WriteAttributeString("name", itm.Key);
+                    xw.WriteAttributeString("value", itm.Value);
                     xw.WriteEndElement(); // input
                 }
                 xw.WriteStartElement("button", XS_HTML);
@@ -1070,35 +1130,37 @@ namespace SanteDB.Authentication.OAuth2.Rest
         /// <returns>A stream of the rendered login asset</returns>
         public Stream RenderAsset(string content)
         {
-            var client = RestOperationContext.Current.IncomingRequest.QueryString["client_id"];
-            var redirectUri = RestOperationContext.Current.IncomingRequest.QueryString["redirect_uri"];
-            var responseType = RestOperationContext.Current.IncomingRequest.QueryString["response_type"];
-            var responseMode = RestOperationContext.Current.IncomingRequest.QueryString["response_mode"];
-            var bindingParms = RestOperationContext.Current.IncomingRequest.QueryString.AllKeys.ToDictionary(o => o, o => String.Join(" ", RestOperationContext.Current.IncomingRequest.QueryString.GetValues(o)));
-            // Now time to resolve the asset
-            if (String.IsNullOrEmpty(content) || content == "index.html")
-            {
-                // Rule: scope, response_type and client_id and redirect_uri must be provided
-                if (String.IsNullOrEmpty(redirectUri) ||
-                    String.IsNullOrEmpty(client) ||
-                    RestOperationContext.Current.IncomingRequest.QueryString.GetValues("scope")?.SelectMany(s => s.Split(' ')).Contains("openid") != true)
-                    throw new InvalidOperationException("OpenID Violation: redirect_uri and client_id must be provided");
-                else
-                {
-                    var applicationId = ApplicationServiceContext.Current.GetService<IApplicationIdentityProviderService>().GetIdentity(client);
-                    if (applicationId == null)
-                        throw new SecurityException($"Client {client} is not registered with this provider");
+            //var client = RestOperationContext.Current.IncomingRequest.QueryString["client_id"];
+            //var redirectUri = RestOperationContext.Current.IncomingRequest.QueryString["redirect_uri"];
+            //var responseType = RestOperationContext.Current.IncomingRequest.QueryString["response_type"];
+            //var responseMode = RestOperationContext.Current.IncomingRequest.QueryString["response_mode"];
+            //var bindingParms = RestOperationContext.Current.IncomingRequest.QueryString.AllKeys.ToDictionary(o => o, o => String.Join(" ", RestOperationContext.Current.IncomingRequest.QueryString.GetValues(o)));
+            //// Now time to resolve the asset
+            //if (String.IsNullOrEmpty(content) || content == "index.html")
+            //{
+            //    // Rule: scope, response_type and client_id and redirect_uri must be provided
+            //    if (String.IsNullOrEmpty(redirectUri) ||
+            //        String.IsNullOrEmpty(client) ||
+            //        RestOperationContext.Current.IncomingRequest.QueryString.GetValues("scope")?.SelectMany(s => s.Split(' ')).Contains("openid") != true)
+            //        throw new InvalidOperationException("OpenID Violation: redirect_uri and client_id must be provided");
+            //    else
+            //    {
+            //        var applicationId = ApplicationServiceContext.Current.GetService<IApplicationIdentityProviderService>().GetIdentity(client);
+            //        if (applicationId == null)
+            //            throw new SecurityException($"Client {client} is not registered with this provider");
 
-                    if (ApplicationServiceContext.Current.GetService<IPolicyDecisionService>().GetPolicyOutcome(new SanteDBClaimsPrincipal(applicationId), OAuthConstants.OAuthCodeFlowPolicy) != PolicyGrantType.Grant)
-                        throw new SecurityException($"Client {client} is not allowed to execute this grant type");
+            //        if (ApplicationServiceContext.Current.GetService<IPolicyDecisionService>().GetPolicyOutcome(new SanteDBClaimsPrincipal(applicationId), OAuthConstants.OAuthCodeFlowPolicy) != PolicyGrantType.Grant)
+            //            throw new SecurityException($"Client {client} is not allowed to execute this grant type");
 
-                    // TODO: Get claim for application redirect URL
-                    var signature = ApplicationServiceContext.Current.GetService<IDataSigningService>().SignData(Encoding.UTF8.GetBytes(client + redirectUri));
-                    bindingParms.Add("dsig", BitConverter.ToString(signature));
-                }
-            }
-            bindingParms.Add("auth_error", "&nbsp;");
-            return this.RenderInternal(content, bindingParms);
+            //        // TODO: Get claim for application redirect URL
+            //        var signature = ApplicationServiceContext.Current.GetService<IDataSigningService>().SignData(Encoding.UTF8.GetBytes(client + redirectUri));
+            //        bindingParms.Add("dsig", BitConverter.ToString(signature));
+            //    }
+            //}
+            //bindingParms.Add("auth_error", "&nbsp;");
+
+            var context = new OAuthAuthorizeRequestContext(RestOperationContext.Current);
+            return this.RenderInternal(content, context);
         }
 
         /// <summary>
@@ -1107,40 +1169,60 @@ namespace SanteDB.Authentication.OAuth2.Rest
         /// <param name="assetPath"></param>
         /// <param name="bindingParms"></param>
         /// <returns></returns>
-        private Stream RenderInternal(String assetPath, IDictionary<String, String> bindingParms)
+        private Stream RenderInternal(String assetPath, Model.OAuthAuthorizeRequestContext context)
         {
-            // Get the asset object
-            var lander = RestOperationContext.Current.IncomingRequest.QueryString["lander"];
+            var locale = RestOperationContext.Current.IncomingRequest.QueryString["ui_locale"];
 
-            AppletManifest loginApplet = null;
-            ReadonlyAppletCollection loginAppletAssets = null;
-            var solutions = ApplicationServiceContext.Current.GetService<IAppletSolutionManagerService>().Solutions.Select(o => o.Meta.Id).ToList();
-            solutions.Add(String.Empty);
-            foreach (var sln in solutions)
+            Stream content = null;
+            string mimetype = null;
+
+            var bindingparameters = new Dictionary<string, string>();
+            bindingparameters.Add("client_id", context.ClientId);
+            bindingparameters.Add("redirect_uri", context.RedirectUri);
+            bindingparameters.Add("response_type", context.ResponseType);
+            bindingparameters.Add("response_mode", context.ResponseMode);
+            bindingparameters.Add("state", context.State);
+            bindingparameters.Add("scope", context.Scope);
+            bindingparameters.Add("nonce", context.Nonce);
+            bindingparameters.Add("login_hint", context.LoginHint);
+            bindingparameters.Add("username", context.FormFields?["username"]);
+            // bindingparameters.Add("password", context.FormFields?["password"]); //We don't send the password back on an invalid login.
+
+            bindingparameters.Add("error_message", context.ErrorMessage);
+
+            EventHandler handler = (s, e) =>
             {
-                loginApplet = ApplicationServiceContext.Current.GetService<IAppletSolutionManagerService>().GetApplets(sln).Where(o => o.Configuration?.AppSettings.Any(s => s.Name == "oauth2.login") == true && (lander == o.Info.Id || String.IsNullOrEmpty(lander))).FirstOrDefault();
-                if (loginApplet != null)
+                content?.Dispose();
+            };
+
+            RestOperationContext.Current.Disposed += handler;
+
+            try
+            {
+                (content, mimetype) = _AssetProvider.GetAsset(assetPath, locale, bindingparameters);
+
+                if (null != content)
                 {
-                    loginAppletAssets = ApplicationServiceContext.Current.GetService<IAppletSolutionManagerService>().GetApplets(sln);
-                    break;
+                    RestOperationContext.Current.OutgoingResponse.ContentType = mimetype;
+                    return content;
+                }
+                else
+                {
+                    RestOperationContext.Current.OutgoingResponse.StatusCode = 204;
+                    RestOperationContext.Current.OutgoingResponse.StatusDescription = "NO CONTENT";
+                    return Stream.Null;
                 }
             }
-            if (loginApplet == null)
-                throw new KeyNotFoundException("No asset has been configured as oauth2.login.asset");
-
-            var loginAssetPath = loginApplet.Configuration.AppSettings.FirstOrDefault(o => o.Name == "oauth2.login")?.Value;
-
-            if (String.IsNullOrEmpty(assetPath))
-                assetPath = "index.html";
-
-            var assetName = loginAssetPath + assetPath;
-
-            var asset = loginAppletAssets.ResolveAsset(assetName);
-            if (asset == null)
-                throw new KeyNotFoundException($"{assetName} not found");
-
-            RestOperationContext.Current.OutgoingResponse.ContentType = DefaultContentTypeMapper.GetContentType(Path.GetExtension(assetPath));
-            return new MemoryStream(loginAppletAssets.RenderAssetContent(asset, RestOperationContext.Current.IncomingRequest.QueryString["ui_locale"] ?? CultureInfo.CurrentUICulture.TwoLetterISOLanguageName, allowCache: false, bindingParameters: bindingParms));
+            catch (FileNotFoundException)
+            {
+                RestOperationContext.Current.OutgoingResponse.StatusCode = 404;
+                RestOperationContext.Current.OutgoingResponse.StatusDescription = "NOT FOUND";
+                return Stream.Null;
+            }
+            finally
+            {
+                RestOperationContext.Current.Disposed -= handler;
+            }
         }
 
         /// <summary>
@@ -1176,9 +1258,9 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 // Now get the settings
                 retVal.Issuer = this.m_configuration.IssuerName;
                 retVal.TokenEndpoint = $"{boundHostPort}/oauth2_token";
-                retVal.AuthorizationEndpoint = $"{boundHostPort}/authorize/";
+                retVal.AuthorizationEndpoint = $"{boundHostPort}/authorize";
                 retVal.UserInfoEndpoint = $"{boundHostPort}/userinfo";
-                retVal.GrantTypesSupported = new List<string>() { "client_credentials", "password"/*, "authorization_code"*/ };
+                retVal.GrantTypesSupported = _TokenRequestHandlers.Keys.ToList();
                 retVal.IdTokenSigning = securityConfiguration.Signatures.Select(o => o.Algorithm).Distinct().Select(o => o.ToString()).ToList();
                 retVal.ResponseTypesSupported = new List<string>() { "code" };
                 retVal.ScopesSupported = ApplicationServiceContext.Current.GetService<IPolicyInformationService>().GetPolicies().Select(o => o.Oid).ToList();
@@ -1313,6 +1395,8 @@ namespace SanteDB.Authentication.OAuth2.Rest
                     continue;
                 }
 
+                JsonWebKey jwk = null;
+
                 switch (signkey.Algorithm)
                 {
                     case SignatureAlgorithm.RS256:
@@ -1324,8 +1408,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                         }
 
                         var x509key = new X509SecurityKey(signkey.Certificate);
-
-                        keyset.Keys.Add(JsonWebKeyConverter.ConvertFromX509SecurityKey(x509key));
+                        jwk = JsonWebKeyConverter.ConvertFromX509SecurityKey(x509key);
 
                         break;
                     case SignatureAlgorithm.HS256:
@@ -1351,11 +1434,16 @@ namespace SanteDB.Authentication.OAuth2.Rest
                             hmackey.KeyId = "0"; //Predefined default KID
                         }
 
-                        keyset.Keys.Add(JsonWebKeyConverter.ConvertFromSymmetricSecurityKey(hmackey));
+                        jwk = JsonWebKeyConverter.ConvertFromSymmetricSecurityKey(hmackey);
 
                         break;
                     default:
                         break;
+                }
+
+                if (null != jwk && !keyset.Keys.Any(k=>k.KeyId == jwk?.KeyId))
+                {
+                    keyset.Keys.Add(jwk);
                 }
             }
 

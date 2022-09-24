@@ -74,7 +74,7 @@ namespace SanteDB.Authentication.OAuth2.Configuration
         /// </summary>
         [XmlElement("inetpub"), 
             Editor(typeof(FolderNameEditor), typeof(UITypeEditor))]
-        public String LoginAssetDir { get; set; }
+        public String LoginAssetPath { get; set; }
 
 
         /// <summary>
@@ -83,5 +83,11 @@ namespace SanteDB.Authentication.OAuth2.Configuration
         [XmlElement("allowNodelessClientAuth"), 
             Description("When enabled, allows clients to authenticate with client_credentials grant with no node authentication")]
         public bool AllowClientOnlyGrant { get; set; }
+
+        /// <summary>
+        /// Which applet should be used for login assets on this instance.
+        /// </summary>
+        [XmlElement("assetSolution"), DisplayName("Login Assets Solution"), Description("When set, this solution's applet assets will be used to construct any pages related to authorization by the OAuth service. The LoginAssetDir setting overrides this. LEAVE BLANK TO USE THE DEFAULT ASSETS PROVIDED BY SANTEDB.")]
+        public string LoginAssetSolution { get; set; }
     }
 }

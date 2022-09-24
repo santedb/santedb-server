@@ -42,7 +42,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
         OpenIdConfiguration GetDiscovery();
 
         /// <summary>
-        /// Token request
+        /// OAuth2 Token Endpoint. Issues access tokens and/or id tokens and accepts a grant from the resource owner.
         /// </summary>
         [Post("oauth2_token")]
         [return: MessageFormat(MessageFormatType.Json)]
@@ -63,17 +63,23 @@ namespace SanteDB.Authentication.OAuth2.Rest
         object UserInfo();
 
         /// <summary>
-        /// Post to the authorization handler
-        /// </summary>
-        [Post("/authorize/{*content}")]
-        Stream SelfPost(string content, NameValueCollection authorization);
-
-        /// <summary>
-        /// Gets the 
+        /// OAuth2 Authorization Endpoint.
         /// </summary>
         /// <returns></returns>
-        [Get("/authorize/{*content}")]
-        Stream RenderAsset(string content);
+        [Get("authorize")]
+        [return: MessageFormat (MessageFormatType.Json)]
+        object Authorize();
+
+        /// <summary>
+        /// OAuth2 Authorization Endpoint.
+        /// </summary>
+        /// <param name="formFields"></param>
+        /// <returns></returns>
+        [Post("authorize")]
+        [return: MessageFormat(MessageFormatType.Json)]
+        object Authorize_Post(NameValueCollection formFields);
+
+        
 
         /// <summary>
         /// Invoke a ping
@@ -86,7 +92,16 @@ namespace SanteDB.Authentication.OAuth2.Rest
         /// </summary>
         /// <returns></returns>
         [Get("jwks")]
+        [return: MessageFormat(MessageFormatType.Json)]
         object JsonWebKeySet();
+
+        /// <summary>
+        /// Gets the 
+        /// </summary>
+        /// <returns></returns>
+        [Get("/{*content}")]
+        [return: MessageFormat(MessageFormatType.Json)]
+        Stream RenderAsset(string content);
 
     }
 }
