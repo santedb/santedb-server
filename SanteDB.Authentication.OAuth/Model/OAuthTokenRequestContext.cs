@@ -18,7 +18,6 @@
  * User: fyfej
  * Date: 2022-5-30
  */
-using Microsoft.SqlServer.Server;
 using RestSrvr;
 using SanteDB.Authentication.OAuth2.Configuration;
 using SanteDB.Core.Security;
@@ -29,7 +28,6 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
-using System.Runtime.Remoting.Contexts;
 using System.Security.Principal;
 
 namespace SanteDB.Authentication.OAuth2.Model
