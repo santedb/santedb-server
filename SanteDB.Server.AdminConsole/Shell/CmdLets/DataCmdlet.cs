@@ -167,7 +167,7 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
                 Console.WriteLine("Result: {0} .. {1} of {2}", result.Offset, result.Item.Count, result.TotalResults);
                 var displayCols = parms.Display.OfType<String>().Select(o =>
                 {
-                    return (Expression<Func<IdentifiedData, Object>>)(col => o == "ToString" ? col.ToString() : QueryExpressionParser.BuildPropertySelector(type, o, true).Compile().DynamicInvoke(col));
+                    return (Expression<Func<IdentifiedData, Object>>)(col => o == "ToString" ? col.ToString() : QueryExpressionParser.BuildPropertySelector(type, o, true, null).Compile().DynamicInvoke(col));
                 }).ToArray();
 
                 DisplayUtil.TablePrint<IdentifiedData>(result.Item, parms.Display.OfType<String>().ToArray(), parms.Display.OfType<String>().Select(o => 40).ToArray(), displayCols);
