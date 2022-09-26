@@ -75,11 +75,6 @@ namespace SanteDB.Authentication.OAuth2
         public const string ConfigurationName = "santedb.authentication.oauth2";
 
         /// <summary>
-        /// TFA header name
-        /// </summary>
-        public const string Header_TfaSecret = "X-SanteDB-TfaSecret";
-
-        /// <summary>
         /// Gets the client credential policy
         /// </summary>
         public const string OAuthLoginPolicy = PermissionPolicyIdentifiers.LoginAsService + ".0";
@@ -137,7 +132,6 @@ namespace SanteDB.Authentication.OAuth2
         /// </summary>
         public const string FormField_Password = "password";
 
-        public const string Header_XDeviceAuthorization = "X-Device-Authorization";
 
         public const string DataKey_SymmetricSecret = "symm_secret";
 

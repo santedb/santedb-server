@@ -76,7 +76,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
     /// <remarks>An Access Control Service and Token Service implemented using OAUTH 2.0</remarks>
     [ServiceBehavior(Name = "OAuth2", InstanceMode = ServiceInstanceMode.Singleton)]
     [ExcludeFromCodeCoverage]
-    public class OAuthTokenBehavior : IOAuthTokenContract
+    public class OAuthServiceBehavior : IOAuthServiceContract
     {
         /// <summary>
         /// Trace Source
@@ -149,7 +149,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
         /// <summary>
         /// Policy enforcement service
         /// </summary>
-        public OAuthTokenBehavior()
+        public OAuthServiceBehavior()
         {
             m_policyEnforcementService = ApplicationServiceContext.Current.GetService<IPolicyEnforcementService>();
             var configurationManager = ApplicationServiceContext.Current.GetService<IConfigurationManager>();
@@ -262,7 +262,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
 
                         if (basiccredentials.Length == 2)
                         {
-                            m_traceSource.TraceVerbose($"Attempting to Authenticate with credentials in {OAuthConstants.Header_XDeviceAuthorization}.");
+                            m_traceSource.TraceVerbose($"Attempting to Authenticate with credentials in {ExtendedHttpHeaderNames.HttpDeviceCredentialHeaderName}.");
 
                             var principal = m_DeviceIdentityProvider.Authenticate(basiccredentials[0], basiccredentials[1]);
 
@@ -283,17 +283,17 @@ namespace SanteDB.Authentication.OAuth2.Rest
                         }
                         else
                         {
-                            m_traceSource.TraceVerbose($"Malformed basic credentials in {OAuthConstants.Header_XDeviceAuthorization} header.");
+                            m_traceSource.TraceVerbose($"Malformed basic credentials in {ExtendedHttpHeaderNames.HttpDeviceCredentialHeaderName} header.");
                         }
                     }
                     else
                     {
-                        m_traceSource.TraceVerbose($"Unsupported scheme {header.Scheme} in {OAuthConstants.Header_XDeviceAuthorization} header.");
+                        m_traceSource.TraceVerbose($"Unsupported scheme {header.Scheme} in {ExtendedHttpHeaderNames.HttpDeviceCredentialHeaderName} header.");
                     }
                 }
                 else
                 {
-                    m_traceSource.TraceVerbose($"Invalid {OAuthConstants.Header_XDeviceAuthorization} format. Expecting {{Scheme}} {{Value}}");
+                    m_traceSource.TraceVerbose($"Invalid {ExtendedHttpHeaderNames.HttpDeviceCredentialHeaderName} format. Expecting {{Scheme}} {{Value}}");
                 }
             }
 
@@ -414,7 +414,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
 
                 if (null == context.Session) //If the session is null, the handler is delegating session initialization back to us.
                 {
-                    m_traceSource.TraceVerbose($"Establishing session in {nameof(OAuthTokenBehavior)}. This is expected when the handler does not initialize the session.");
+                    m_traceSource.TraceVerbose($"Establishing session in {nameof(OAuthServiceBehavior)}. This is expected when the handler does not initialize the session.");
                     context.Session = EstablishSession(context.UserPrincipal ?? context.ApplicationPrincipal, context.ApplicationPrincipal, context.DevicePrincipal, context.Scopes, context.AdditionalClaims);
 
                     AuditUtil.AuditSessionStart(context.Session, context.UserPrincipal ?? context.ApplicationPrincipal, context.Session != null);

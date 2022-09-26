@@ -26,6 +26,7 @@ using SanteDB.Core.Interop;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Services;
+using SanteDB.Rest.Common;
 using SanteDB.Server.AdminConsole.Shell;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -133,7 +134,7 @@ namespace SanteDB.Server.AdminConsole.Security
                         restClient.Requesting += (o, p) =>
                         {
                             if (!String.IsNullOrEmpty(tfaSecret))
-                                p.AdditionalHeaders.Add("X-SanteDB-TfaSecret", tfaSecret);
+                                p.AdditionalHeaders.Add(ExtendedHttpHeaderNames.TfaSecret, tfaSecret);
                         };
 
                         OAuthTokenResponse response = restClient.Post<OAuthTokenRequest, OAuthTokenResponse>("oauth2_token", "application/x-www-form-urlencoded", request);

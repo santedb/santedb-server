@@ -104,7 +104,7 @@ namespace SanteDB.Authentication.OAuth2.Docker
                 throw new ConfigurationException("Error retrieving REST configuration", configuration);
             }
 
-            var oauthRestConfiguration = restConfiguration.Services.FirstOrDefault(o => o.ServiceType == typeof(IOAuthTokenContract));
+            var oauthRestConfiguration = restConfiguration.Services.FirstOrDefault(o => o.ServiceType == typeof(IOAuthServiceContract));
             if (oauthRestConfiguration == null) // add fhir rest config
             {
                 oauthRestConfiguration = new RestServiceConfiguration()
@@ -115,7 +115,7 @@ namespace SanteDB.Authentication.OAuth2.Docker
                         new RestEndpointConfiguration()
                         {
                             Address = "http://0.0.0.0:8080/auth",
-                            ContractXml = typeof(IOAuthTokenContract).AssemblyQualifiedName,
+                            ContractXml = typeof(IOAuthServiceContract).AssemblyQualifiedName,
                         }
                     }
                 };

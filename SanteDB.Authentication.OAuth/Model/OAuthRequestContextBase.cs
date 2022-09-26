@@ -3,6 +3,7 @@ using SanteDB.Authentication.OAuth2.Configuration;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Principal;
+using SanteDB.Rest.Common;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -44,11 +45,11 @@ namespace SanteDB.Authentication.OAuth2.Model
         /// A secret code used as a second factor in an authentication flow.
         /// </summary>
         [Obsolete("Use of this is discouraged.")]
-        public string TfaSecret => IncomingRequest?.Headers?[OAuthConstants.Header_TfaSecret];
+        public string TfaSecret => IncomingRequest?.Headers?[ExtendedHttpHeaderNames.TfaSecret];
         /// <summary>
         /// The X-Device-Authorization header value if present. This is a custom header in SanteDb as part of a proxy configuration.
         /// </summary>
-        public string XDeviceAuthorizationHeader => IncomingRequest?.Headers?[OAuthConstants.Header_XDeviceAuthorization];
+        public string XDeviceAuthorizationHeader => IncomingRequest?.Headers?[ExtendedHttpHeaderNames.HttpDeviceCredentialHeaderName];
         #endregion
 
         /// <summary>
