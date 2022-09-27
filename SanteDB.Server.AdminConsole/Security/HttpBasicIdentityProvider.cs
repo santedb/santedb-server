@@ -22,6 +22,7 @@ using SanteDB.Core.Security;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Services;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Security.Principal;
 
@@ -112,6 +113,11 @@ namespace SanteDB.Server.AdminConsole.Security
         /// Generate a TFA secret
         /// </summary>
         public string GenerateTfaSecret(string userName)
+        {
+            throw new NotSupportedException();
+        }
+
+        public IEnumerable<IClaim> GetClaims(string userName)
         {
             throw new NotSupportedException();
         }
