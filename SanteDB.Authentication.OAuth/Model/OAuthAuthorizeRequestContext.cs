@@ -23,35 +23,49 @@ namespace SanteDB.Authentication.OAuth2.Model
         {
         }
 
-        private string GetValue(string key) => null == FormFields ? IncomingRequest?.QueryString?[key] : FormFields[key];
+        private string GetValue(string key) => FormFields?[key] ?? IncomingRequest?.QueryString?[key];
 
 
-        public override string ClientId => GetValue("client_id");
-        public string LoginHint => GetValue("login_hint");
-        public string Nonce => GetValue("nonce");
-        public string Scope => GetValue("scope");
-        public string Prompt => GetValue("prompt");
-        public string State => GetValue("state");
-        public string ResponseType => GetValue("response_type");
+        public override string ClientId => GetValue(OAuthConstants.AuthorizeParameter_ClientId);
+        public string LoginHint => GetValue(OAuthConstants.AuthorizeParameter_LoginHint);
+        public string Nonce => GetValue(OAuthConstants.AuthorizeParameter_Nonce);
+        public string Scope => GetValue(OAuthConstants.AuthorizeParameter_Scope);
+        public string Prompt => GetValue(OAuthConstants.AuthorizeParameter_Prompt);
+        public string State => GetValue(OAuthConstants.AuthorizeParameter_State);
+
+
+        private string _ResponseType;
+        public string ResponseType
+        {
+            get => _ResponseType ?? GetValue(OAuthConstants.AuthorizeParameter_ResponseType);
+            set => _ResponseType = value;
+        }
 
         private string _ResponseMode;
         public string ResponseMode
         {
+            get => _ResponseMode ?? GetValue(OAuthConstants.AuthorizeParameter_ResponseMode);
+            set => _ResponseMode = value;
+        }
+        public string RedirectUri => GetValue(OAuthConstants.AuthorizeParameter_RedirectUri);
+
+        
+
+        public Guid ActivityId
+        {
             get
             {
-                return _ResponseMode ?? GetValue("response_mode");
-            }
-            set
-            {
-                _ResponseMode = value;
+                var val = OperationContext?.Data?["uuid"];
+
+                if (val is Guid g)
+                {
+                    return g;
+                }
+
+                return Guid.Empty;
             }
         }
-        public string RedirectUri => GetValue("redirect_uri");
 
-        public string Username => FormFields?["username"];
-        public string Password => FormFields?["password"];
-                
-        
         /// <summary>
         /// The code that was generated for the response.
         /// </summary>
