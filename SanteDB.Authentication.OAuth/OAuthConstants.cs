@@ -27,6 +27,9 @@ namespace SanteDB.Authentication.OAuth2
     /// </summary>
     public static class OAuthConstants
     {
+        public const string ResponseType_Code = "code";
+        public const string ResponseType_Token = "token";
+        public const string ResponseType_IdToken = "id_token";
 
         /// <summary>
         /// ACS trace source name
@@ -138,5 +141,15 @@ namespace SanteDB.Authentication.OAuth2
         public const string ResponseMode_Query = "query";
         public const string ResponseMode_Fragment = "fragment";
         public const string ResponseMode_FormPost = "form_post";
+
+        public const string AuthorizeParameter_ClientId = "client_id";
+        public const string AuthorizeParameter_LoginHint = "login_hint";
+        public const string AuthorizeParameter_Nonce = "nonce";
+        public const string AuthorizeParameter_Scope = "scope";
+        public const string AuthorizeParameter_Prompt = "prompt";
+        public const string AuthorizeParameter_State = "state";
+        public const string AuthorizeParameter_ResponseType = "response_type";
+        public const string AuthorizeParameter_ResponseMode = "response_mode";
+        public const string AuthorizeParameter_RedirectUri = "redirect_uri";
     }
 }
