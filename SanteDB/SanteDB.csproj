@@ -496,6 +496,10 @@
           <Project>{ece9b280-9647-4092-babf-eb2e25084670}</Project>
           <Name>SanteDB.Core.Model.ViewModelSerializers</Name>
         </ProjectReference>
+        <ProjectReference Include="..\santedb-data\SanteDB.Persistence.Data\SanteDB.Persistence.Data.csproj">
+          <Project>{81bd479f-5dbc-42e9-96c2-40380aac36bc}</Project>
+          <Name>SanteDB.Persistence.Data</Name>
+        </ProjectReference>
       </ItemGroup>
     </When>
     <Otherwise>
@@ -518,6 +522,7 @@
         <PackageReference Include="SanteDB.Rest.HDSI" Version="$(VersionNumber)" />
         <PackageReference Include="SanteDB.Core.Model.ViewModelSerializers" Version="$(VersionNumber)" />
         <PackageReference Include="SanteDB.Queue.Msmq" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Persistence.Data" Version="$(VersionNumber)" />
       </ItemGroup>
     </Otherwise>
   </Choose>
