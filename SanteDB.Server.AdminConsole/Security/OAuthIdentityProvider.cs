@@ -29,6 +29,7 @@ using SanteDB.Core.Security.Services;
 using SanteDB.Rest.Common;
 using SanteDB.Server.AdminConsole.Shell;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Security;
@@ -254,6 +255,11 @@ namespace SanteDB.Server.AdminConsole.Security
         }
 
         public Guid GetSid(string name)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<IClaim> GetClaims(string userName)
         {
             throw new NotImplementedException();
         }
