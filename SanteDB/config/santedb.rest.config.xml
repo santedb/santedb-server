@@ -97,8 +97,8 @@
         </behaviors>
       </endpoint>
     </service>
-    <service name="OAuth2" implementationType="SanteDB.Authentication.OAuth2.Rest.OAuthTokenBehavior, SanteDB.Authentication.OAuth2" >
-      <endpoint address="http://0.0.0.0:8080/auth" contract="SanteDB.Authentication.OAuth2.Rest.IOAuthTokenContract, SanteDB.Authentication.OAuth2"/>
+    <service name="OAuth2" implementationType="SanteDB.Authentication.OAuth2.Rest.OAuthServiceBehavior, SanteDB.Authentication.OAuth2" >
+      <endpoint address="http://0.0.0.0:8080/auth" contract="SanteDB.Authentication.OAuth2.Rest.IOAuthServiceContract, SanteDB.Authentication.OAuth2"/>
     </service>
   </section>
 </SanteDBConfiguration>

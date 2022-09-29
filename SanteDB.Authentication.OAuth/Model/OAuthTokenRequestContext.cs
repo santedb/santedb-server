@@ -18,7 +18,6 @@
  * User: fyfej
  * Date: 2022-5-30
  */
-using Microsoft.SqlServer.Server;
 using RestSrvr;
 using SanteDB.Authentication.OAuth2.Configuration;
 using SanteDB.Core.Security;
@@ -29,7 +28,6 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
-using System.Runtime.Remoting.Contexts;
 using System.Security.Principal;
 
 namespace SanteDB.Authentication.OAuth2.Model
@@ -56,10 +54,6 @@ namespace SanteDB.Authentication.OAuth2.Model
         #region Form Field Values
         ///<summary>Grant type</summary> 
         public string GrantType => FormFields?[OAuthConstants.FormField_GrantType]?.Trim()?.ToLowerInvariant();
-        ///<summary>User name when the grant type is password</summary>
-        public string UserName => FormFields?[OAuthConstants.FormField_Username];
-        ///<summary>Password when the grant type is password.</summary>
-        public string Password => FormFields?[OAuthConstants.FormField_Password];
         /// <summary>
         /// The client id of the application. Valid when grant type is client credentials, and others that support multiple
         /// </summary>
@@ -74,6 +68,10 @@ namespace SanteDB.Authentication.OAuth2.Model
         public string RefreshToken => FormFields?[OAuthConstants.FormField_RefreshToken];
         ///<summary>Auth code when grant type is Authorization code.</summary>
         public string AuthorizationCode => FormFields?[OAuthConstants.FormField_AuthorizationCode]; 
+
+        
+        public string CodeVerifier { get; set; }
+        public string CodeVerifierMethod { get; set; }
         #endregion
 
         ///<summary>Scope of the grant</summary>
@@ -83,12 +81,8 @@ namespace SanteDB.Authentication.OAuth2.Model
         /// Any additional claims that were part of the request. Handlers are free to ignore these additional claims when they do not make sense as part of their request.
         /// </summary>
         public List<IClaim> AdditionalClaims { get; set; }
-        /// <summary>
-        /// The session that is established as part of this request. Typically, an <see cref="Abstractions.ITokenRequestHandler"/> will set this during processing.
-        /// </summary>
-        public ISession Session { get; set; }
+        
         
 
-        
     }
 }

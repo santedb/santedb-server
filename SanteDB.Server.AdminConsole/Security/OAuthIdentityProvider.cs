@@ -26,8 +26,10 @@ using SanteDB.Core.Interop;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Services;
+using SanteDB.Rest.Common;
 using SanteDB.Server.AdminConsole.Shell;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Security;
@@ -133,7 +135,7 @@ namespace SanteDB.Server.AdminConsole.Security
                         restClient.Requesting += (o, p) =>
                         {
                             if (!String.IsNullOrEmpty(tfaSecret))
-                                p.AdditionalHeaders.Add("X-SanteDB-TfaSecret", tfaSecret);
+                                p.AdditionalHeaders.Add(ExtendedHttpHeaderNames.TfaSecret, tfaSecret);
                         };
 
                         OAuthTokenResponse response = restClient.Post<OAuthTokenRequest, OAuthTokenResponse>("oauth2_token", "application/x-www-form-urlencoded", request);
@@ -253,6 +255,11 @@ namespace SanteDB.Server.AdminConsole.Security
         }
 
         public Guid GetSid(string name)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<IClaim> GetClaims(string userName)
         {
             throw new NotImplementedException();
         }

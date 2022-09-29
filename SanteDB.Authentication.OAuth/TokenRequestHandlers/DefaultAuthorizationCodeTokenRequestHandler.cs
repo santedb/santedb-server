@@ -23,17 +23,17 @@ namespace SanteDB.Authentication.OAuth2.TokenRequestHandlers
         readonly IApplicationIdentityProviderService _ApplicationIdentityProvider;
         readonly IDeviceIdentityProviderService _DeviceIdentityProvider;
         readonly IIdentityProviderService _IdentityProvider;
-        readonly IDataSigningService _SigningService;
+        readonly ISymmetricCryptographicProvider _SymmetricProvider;
 
         readonly TimeSpan _AuthorizationCodeValidityPeriod = TimeSpan.FromMinutes(1);
 
-        public DefaultAuthorizationCodeTokenRequestHandler(IPolicyEnforcementService policyEnforcementService, IApplicationIdentityProviderService applicationIdentityProvider, IDeviceIdentityProviderService deviceIdentityProvider, IIdentityProviderService identityProvider, IDataSigningService signingService)
+        public DefaultAuthorizationCodeTokenRequestHandler(IPolicyEnforcementService policyEnforcementService, IApplicationIdentityProviderService applicationIdentityProvider, IDeviceIdentityProviderService deviceIdentityProvider, IIdentityProviderService identityProvider, ISymmetricCryptographicProvider symmetricProvider)
         {
             _PolicyEnforcementService = policyEnforcementService;
             _ApplicationIdentityProvider = applicationIdentityProvider;
             _DeviceIdentityProvider = deviceIdentityProvider;
             _IdentityProvider = identityProvider;
-            _SigningService = signingService;
+            _SymmetricProvider = symmetricProvider;
         }
 
         public IEnumerable<string> SupportedGrantTypes => new[] { OAuthConstants.GrantNameAuthorizationCode };
@@ -133,6 +133,8 @@ namespace SanteDB.Authentication.OAuth2.TokenRequestHandlers
             
             context.UserPrincipal = new SanteDBClaimsPrincipal(context.UserIdentity);
 
+            context.Nonce = authcode.nonce; //Pass the nonce back.
+
             context.Session = null; //Let the behaviour establish the session.
             return true;
             
@@ -145,24 +147,16 @@ namespace SanteDB.Authentication.OAuth2.TokenRequestHandlers
                 return null;
             }
 
-            var components = authorizationCode.Split(new[] { "." }, 2, StringSplitOptions.None);
+            try
+            {
+                var json = _SymmetricProvider.DecryptString(authorizationCode);
 
-            if (components.Length != 2)
+                return JsonConvert.DeserializeObject<AuthorizationCode>(json);
+            }
+            catch (FormatException)
             {
                 return null;
             }
-
-            var plaintext = Base64UrlEncoder.DecodeBytes(components[0]);
-            var signature = Base64UrlEncoder.DecodeBytes(components[1]);
-
-            if (!_SigningService.Verify(plaintext, signature))
-            {
-                return null;
-            }
-
-            var json = Encoding.UTF8.GetString(plaintext);
-
-            return JsonConvert.DeserializeObject<AuthorizationCode>(json);
         }
     }
 }

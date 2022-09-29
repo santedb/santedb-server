@@ -35,7 +35,7 @@ namespace SanteDB.Authentication.OAuth2.TokenRequestHandlers
         /// <inheritdoc />
         public bool HandleRequest(OAuthTokenRequestContext context)
         {
-            if (string.IsNullOrEmpty(context?.UserName))
+            if (string.IsNullOrEmpty(context?.Username))
             {
                 _Tracer.TraceInfo("Missing username in Token request.");
                 context.ErrorType = OAuthErrorType.invalid_request;
@@ -55,11 +55,11 @@ namespace SanteDB.Authentication.OAuth2.TokenRequestHandlers
             {
                 if (!string.IsNullOrEmpty(context.TfaSecret))
                 {
-                    context.UserPrincipal = _IdentityProvider.Authenticate(context.UserName, context.Password, context.TfaSecret) as IClaimsPrincipal;
+                    context.UserPrincipal = _IdentityProvider.Authenticate(context.Username, context.Password, context.TfaSecret) as IClaimsPrincipal;
                 }
                 else
                 {
-                    context.UserPrincipal = _IdentityProvider.Authenticate(context.UserName, context.Password) as IClaimsPrincipal;
+                    context.UserPrincipal = _IdentityProvider.Authenticate(context.Username, context.Password) as IClaimsPrincipal;
                 }
             }
             catch (AuthenticationException authnex)

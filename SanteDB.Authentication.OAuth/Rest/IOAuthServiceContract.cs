@@ -31,7 +31,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
     [ServiceContract(Name = "OAuth2")]
     [ServiceProduces("application/json")]
     [ServiceConsumes("application/x-www-form-urlencoded")]
-    public interface IOAuthTokenContract 
+    public interface IOAuthServiceContract 
     {
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
         /// </summary>
         [Get("/.well-known/openid-configuration")]
         [return: MessageFormat(MessageFormatType.Json)]
-        OpenIdConfiguration GetDiscovery();
+        OpenIdConfiguration Discovery();
 
         /// <summary>
         /// OAuth2 Token Endpoint. Issues access tokens and/or id tokens and accepts a grant from the resource owner.
@@ -67,6 +67,15 @@ namespace SanteDB.Authentication.OAuth2.Rest
         /// </summary>
         /// <returns></returns>
         [Get("authorize")]
+        [ServiceFault(400, typeof(OAuthError), "Request Parameters are invalid.")]
+        [UrlParameter(OAuthConstants.FormField_ClientId, typeof(string), "The client id of the client which will accept this authorization grant.", Required = true)]
+        [UrlParameter("redirect_uri", typeof(string), "The URI which responses should be redirected to. For response_mode of form_post, the action which the form post is sent.", Required = false)]
+        [UrlParameter("response_type", typeof(string), "The type of response expected from the authorization service. Default is (code).", Required = false)]
+        [UrlParameter("response_mode", typeof(string), "How the authorization server will return a response. Valid values are (query, fragment, form_post). Default is query for response_type code, and fragment for response_type id_token.", Required = false)]
+        [UrlParameter("scope", typeof(string), "Space separated list of scopes to be included in the authorization. Default is *", Required = false)]
+        [UrlParameter("login_hint", typeof(string), "When present, the authorization server will pre-populate the username with this value.", Required = false)]
+        [UrlParameter("state", typeof(string), "State value that is returned with the response from the authorization server.", Required = false)]
+        [UrlParameter("nonce", typeof(string), "Number ONCE that is returned when the authorization code is exchanged by the token service.", Required = false)]
         [return: MessageFormat (MessageFormatType.Json)]
         object Authorize();
 
@@ -76,6 +85,15 @@ namespace SanteDB.Authentication.OAuth2.Rest
         /// <param name="formFields"></param>
         /// <returns></returns>
         [Post("authorize")]
+        [ServiceFault(400, typeof(OAuthError), "Request Parameters are invalid.")]
+        [UrlParameter(OAuthConstants.FormField_ClientId, typeof(string), "The client id of the client which will accept this authorization grant.", Required = true)]
+        [UrlParameter("redirect_uri", typeof(string), "The URI which responses should be redirected to. For response_mode of form_post, the action which the form post is sent.", Required = false)]
+        [UrlParameter("response_type", typeof(string), "The type of response expected from the authorization service. Default is (code).", Required = false)]
+        [UrlParameter("response_mode", typeof(string), "How the authorization server will return a response. Valid values are (query, fragment, form_post). Default is query for response_type code, and fragment for response_type id_token.", Required = false)]
+        [UrlParameter("scope", typeof(string), "Space separated list of scopes to be included in the authorization. Default is *", Required = false)]
+        [UrlParameter("login_hint", typeof(string), "When present, the authorization server will pre-populate the username with this value.", Required = false)]
+        [UrlParameter("state", typeof(string), "State value that is returned with the response from the authorization server.", Required = false)]
+        [UrlParameter("nonce", typeof(string), "Number ONCE that is returned when the authorization code is exchanged by the token service.", Required = false)]
         [return: MessageFormat(MessageFormatType.Json)]
         object Authorize_Post(NameValueCollection formFields);
 
@@ -96,12 +114,12 @@ namespace SanteDB.Authentication.OAuth2.Rest
         object JsonWebKeySet();
 
         /// <summary>
-        /// Gets the 
+        /// Gets an asset that is used by the authorization service.
         /// </summary>
         /// <returns></returns>
-        [Get("/{*content}")]
+        [Get("/{*assetPath}")]
         [return: MessageFormat(MessageFormatType.Json)]
-        Stream RenderAsset(string content);
+        Stream Content(string assetPath);
 
     }
 }

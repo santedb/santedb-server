@@ -23,8 +23,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
-using System.Drawing.Design;
-using System.Windows.Forms.Design;
 using System.Xml.Serialization;
 
 namespace SanteDB.Authentication.OAuth2.Configuration
@@ -72,8 +70,7 @@ namespace SanteDB.Authentication.OAuth2.Configuration
         /// <summary>
         /// Login asset directory
         /// </summary>
-        [XmlElement("inetpub"), 
-            Editor(typeof(FolderNameEditor), typeof(UITypeEditor))]
+        [XmlElement("inetpub")]
         public String LoginAssetPath { get; set; }
 
 

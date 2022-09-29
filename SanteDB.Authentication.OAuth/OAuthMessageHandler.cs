@@ -39,7 +39,7 @@ namespace SanteDB.Authentication.OAuth2
     /// OAUTH requests
     /// </summary>
     /// <remarks>
-    /// <para>This service is responsible for starting and maintaining the <see cref="OAuthTokenBehavior"/> REST service which 
+    /// <para>This service is responsible for starting and maintaining the <see cref="OAuthServiceBehavior"/> REST service which 
     /// is responsible for supporting SanteDB's <see href="https://help.santesuite.org/developers/service-apis/openid-connect">OpenID Connect</see> interface</para>
     /// </remarks>
     [ServiceProvider("OAuth 2.0 Messaging Service")]
@@ -55,7 +55,7 @@ namespace SanteDB.Authentication.OAuth2
         /// <summary>
         /// Gets the service name
         /// </summary>
-        public string ServiceName => "OAuth 2.0 Token Service";
+        public string ServiceName => "OAuth 2.0 Messaging Service";
 
         // Trace source
         private readonly Tracer m_traceSource = new Tracer(OAuthConstants.TraceSourceName);
@@ -66,7 +66,7 @@ namespace SanteDB.Authentication.OAuth2
         /// <summary>
         /// Gets the contract type
         /// </summary>
-        public Type BehaviorType => typeof(OAuthTokenBehavior);
+        public Type BehaviorType => typeof(OAuthServiceBehavior);
 
         /// <summary>
         /// True if is running
