@@ -19,25 +19,19 @@
  * Date: 2022-5-30
  */
 using SanteDB.Configuration;
+using SanteDB.Configuration.Tasks;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Configuration.Data;
 using SanteDB.OrmLite.Configuration;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Data.Common;
 using System.Diagnostics.CodeAnalysis;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using SanteDB.Core.Interfaces;
-using SanteDB.Core;
 using System.IO;
+using System.Linq;
 using System.Reflection;
-using SanteDB.Configuration.Tasks;
+using System.Windows.Forms;
 
 namespace SanteDB.Configurator
 {
@@ -165,7 +159,9 @@ namespace SanteDB.Configurator
                     }
                     // Add configuration
                     foreach (var tsk in ftr.CreateInstallTasks().Where(o => o.VerifyState(ConfigurationContext.Current.Configuration)))
+                    {
                         ConfigurationContext.Current.ConfigurationTasks.Add(tsk);
+                    }
                 }
 
                 ConfigurationContext.Current.Apply(this);

@@ -35,7 +35,7 @@ namespace SanteDB.Persistence.Diagnostics.Jira.Model
         [JsonProperty("fields")]
         public JiraIssueFields Fields { get; set; }
 
-        
+
 
     }
 }

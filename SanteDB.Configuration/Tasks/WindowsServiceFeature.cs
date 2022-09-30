@@ -18,6 +18,9 @@
  * User: fyfej
  * Date: 2022-5-30
  */
+using SanteDB.Core.Configuration;
+using SanteDB.Core.Diagnostics;
+using ServiceTools;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -25,12 +28,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
-using SanteDB.Core.Configuration;
-using SanteDB.Core.Diagnostics;
-using SanteDB.Core.Services;
-using ServiceTools;
 
 namespace SanteDB.Configuration.Tasks
 {
@@ -239,7 +236,10 @@ namespace SanteDB.Configuration.Tasks
                 WindowsIdentity identity = WindowsIdentity.GetCurrent();
                 WindowsPrincipal principal = new WindowsPrincipal(identity);
                 if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+                {
                     return !ServiceTools.ServiceInstaller.ServiceIsInstalled(this.m_options.ServiceName);
+                }
+
                 return false;
             }
         }

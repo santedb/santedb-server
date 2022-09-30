@@ -35,7 +35,7 @@ namespace SanteDB.Server.AdminConsole.Attributes
         /// <summary>
         /// Administrative command attribute
         /// </summary>
-        public AdminCommandAttribute(String command, String description) 
+        public AdminCommandAttribute(String command, String description)
         {
             this.Description = description;
             this.Command = command;

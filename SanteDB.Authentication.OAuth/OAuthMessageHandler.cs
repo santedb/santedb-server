@@ -26,7 +26,6 @@ using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Interop;
 using SanteDB.Core.Services;
 using System;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Tracing;
 using System.Linq;
@@ -110,7 +109,9 @@ namespace SanteDB.Authentication.OAuth2
             {
                 var caps = ServiceEndpointCapabilities.None;
                 if (this.m_serviceHost.ServiceBehaviors.OfType<ClientAuthorizationAccessBehavior>().Any())
+                {
                     caps |= ServiceEndpointCapabilities.BasicAuth;
+                }
 
                 return caps;
             }
@@ -143,7 +144,9 @@ namespace SanteDB.Authentication.OAuth2
         {
             // Don't startup unless in SanteDB
             if (!Assembly.GetEntryAssembly().GetName().Name.StartsWith("SanteDB"))
+            {
                 return true;
+            }
 
             try
             {

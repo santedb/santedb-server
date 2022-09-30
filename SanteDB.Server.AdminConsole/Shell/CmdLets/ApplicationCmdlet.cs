@@ -19,11 +19,11 @@
  * Date: 2022-5-30
  */
 using MohawkCollege.Util.Console.Parameters;
+using SanteDB.Core.Interop;
 using SanteDB.Core.Model.AMI.Auth;
 using SanteDB.Core.Model.AMI.Collections;
 using SanteDB.Core.Model.Patch;
 using SanteDB.Core.Model.Security;
-using SanteDB.Core.Security;
 using SanteDB.Messaging.AMI.Client;
 using SanteDB.Server.AdminConsole.Attributes;
 using SanteDB.Server.AdminConsole.Util;
@@ -33,7 +33,6 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using SanteDB.Core.Interop;
 
 namespace SanteDB.Server.AdminConsole.Shell.CmdLets
 {
@@ -104,14 +103,21 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
             var policies = new List<SecurityPolicyInfo>();
 
             if (parms.GrantPolicies?.Count > 0)
+            {
                 policies = parms.GrantPolicies.OfType<String>().Select(o => m_client.GetPolicies(r => r.Oid == o).CollectionItem.FirstOrDefault()).OfType<SecurityPolicy>().Select(o => new SecurityPolicyInfo(o)).ToList();
+            }
+
             if (parms.DenyPolicies?.Count > 0)
+            {
                 policies = policies.Union(parms.DenyPolicies.OfType<String>().Select(o => m_client.GetPolicies(r => r.Oid == o).CollectionItem.FirstOrDefault()).OfType<SecurityPolicy>().Select(o => new SecurityPolicyInfo(o))).ToList();
+            }
 
             policies.ForEach(o => o.Grant = parms.GrantPolicies?.Contains(o.Oid) == true ? PolicyGrantType.Grant : PolicyGrantType.Deny);
 
             if (policies.Count != (parms.DenyPolicies?.Count ?? 0) + (parms.GrantPolicies?.Count ?? 0))
+            {
                 throw new InvalidOperationException("Could not find one or more policies");
+            }
 
             if (String.IsNullOrEmpty(parms.Secret))
             {
@@ -159,11 +165,17 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
             AmiCollection list = null;
             int tr = 0;
             if (parms.Active)
+            {
                 list = m_client.Query<SecurityApplication>(o => o.ObsoletionTime.HasValue, 0, 100, out tr);
+            }
             else if (parms.Locked)
+            {
                 list = m_client.Query<SecurityApplication>(o => o.Lockout.HasValue, 0, 100, out tr);
+            }
             else
+            {
                 list = m_client.Query<SecurityApplication>(o => o.ObsoletionTime == null, 0, 100, out tr);
+            }
 
             DisplayUtil.TablePrint(list.CollectionItem.OfType<SecurityApplicationInfo>(),
                 new String[] { "SID", "Name", "Last Auth.", "Lockout", "ILA", "A" },
@@ -185,13 +197,17 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
         internal static void ApplicationInfo(GenericApplicationParms parms)
         {
             if (parms.ApplictionId == null)
+            {
                 throw new InvalidOperationException("Must specify a application");
+            }
 
             foreach (var un in parms.ApplictionId)
             {
                 var device = m_client.GetApplications(o => o.Name == un).CollectionItem.FirstOrDefault() as SecurityApplicationInfo;
                 if (device == null)
+                {
                     throw new KeyNotFoundException($"Application {un} not found");
+                }
 
                 DisplayUtil.PrintPolicies(device,
                     new string[] { "Name", "SID", "Invalid Auth", "Lockout", "Last Auth", "Created", "Updated", "De-Activated" },
@@ -233,13 +249,17 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
         internal static void Delete(GenericApplicationParms parms)
         {
             if (parms.ApplictionId == null)
+            {
                 throw new InvalidOperationException("Must specify an application id");
+            }
 
             foreach (var un in parms.ApplictionId)
             {
                 var user = m_client.GetApplications(o => o.Name == un).CollectionItem.FirstOrDefault() as SecurityApplicationInfo;
                 if (user == null)
+                {
                     throw new KeyNotFoundException($"Application {un} not found");
+                }
 
                 m_client.DeleteApplication(user.Entity.Key.Value);
             }
@@ -254,13 +274,17 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
         internal static void UnDelete(GenericApplicationParms parms)
         {
             if (parms.ApplictionId == null)
+            {
                 throw new InvalidOperationException("Must specify an application");
+            }
 
             foreach (var un in parms.ApplictionId)
             {
                 var application = m_client.GetApplications(o => o.Name == un).CollectionItem.FirstOrDefault() as SecurityApplicationInfo;
                 if (application == null)
+                {
                     throw new KeyNotFoundException($"Application {un} not found");
+                }
 
                 var patch = new Patch()
                 {
@@ -284,18 +308,26 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
         internal static void Userlock(ApplicationLockParms parms)
         {
             if (parms.ApplictionId == null)
+            {
                 throw new InvalidOperationException("Must specify an application");
+            }
 
             foreach (var un in parms.ApplictionId)
             {
                 var application = m_client.GetApplications(o => o.Name == un).CollectionItem.FirstOrDefault() as SecurityApplicationInfo;
                 if (application == null)
+                {
                     throw new KeyNotFoundException($"Application {un} not found");
+                }
 
                 if (parms.Locked)
+                {
                     m_client.Client.Lock<SecurityApplicationInfo>($"SecurityApplication/{application.Key}");
+                }
                 else
+                {
                     m_client.Client.Unlock<SecurityApplicationInfo>($"SecurityApplication/{application.Key}");
+                }
             }
         }
 

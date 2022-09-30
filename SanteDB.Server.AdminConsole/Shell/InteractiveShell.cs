@@ -55,13 +55,20 @@ namespace SanteDB.Server.AdminConsole.Shell
         public InteractiveShell()
         {
             foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())
+            {
                 foreach (var t in asm.GetTypes().Where(o => o.GetCustomAttribute<AdminCommandletAttribute>() != null))
                 {
                     foreach (var me in t.GetRuntimeMethods().Where(o => o.GetCustomAttribute<AdminCommandAttribute>() != null))
+                    {
                         this.m_commandlets.Add(me.GetCustomAttribute<AdminCommandAttribute>(), me);
+                    }
+
                     if (t.GetRuntimeMethod("Init", new Type[0]) != null)
+                    {
                         t.GetRuntimeMethod("Init", new Type[0]).Invoke(null, null);
+                    }
                 }
+            }
         }
 
         /// <summary>
@@ -70,11 +77,18 @@ namespace SanteDB.Server.AdminConsole.Shell
         protected ConsoleColor GetResponseColor()
         {
             if (Console.BackgroundColor == ConsoleColor.Black)
+            {
                 return Console.ForegroundColor != ConsoleColor.Cyan ? ConsoleColor.Cyan : ConsoleColor.Magenta;
+            }
+
             if (Console.BackgroundColor == ConsoleColor.Blue)
+            {
                 return Console.ForegroundColor != ConsoleColor.White ? ConsoleColor.Yellow : ConsoleColor.White;
+            }
             else
+            {
                 return Console.ForegroundColor != ConsoleColor.Blue ? ConsoleColor.Blue : ConsoleColor.Red;
+            }
         }
 
         /// <summary>
@@ -102,7 +116,9 @@ namespace SanteDB.Server.AdminConsole.Shell
                 {
                     Console.WriteLine("\t\tREMOTE: {0}", svcFault.Result.Message);
                     foreach (var itm in svcFault.Result.Rules ?? new List<DetectedIssue>())
+                    {
                         Console.WriteLine("\t\tREMOTE: RULE: {0} {1}", itm.Priority.ToString(), itm.Text);
+                    }
                 }
                 i = i.InnerException;
             }
@@ -127,7 +143,10 @@ namespace SanteDB.Server.AdminConsole.Shell
                 var cmd = Console.ReadLine();
 
                 Console.ForegroundColor = this.GetResponseColor();
-                if (String.IsNullOrEmpty(cmd)) continue;
+                if (String.IsNullOrEmpty(cmd))
+                {
+                    continue;
+                }
 
                 var redir = cmd.Split('>');
                 cmd = redir[0];
@@ -138,11 +157,18 @@ namespace SanteDB.Server.AdminConsole.Shell
                 foreach (var tkn in tokens.Skip(1))
                 {
                     if (string.IsNullOrEmpty(tkn.Trim()))
+                    {
                         continue;
+                    }
+
                     if (tkn.StartsWith("'") && tkn.EndsWith("'"))
+                    {
                         tToken.Add(tkn.Substring(1, tkn.Length - 2));
+                    }
                     else if (tkn.StartsWith("'"))
+                    {
                         sstr = tkn.Substring(1);
+                    }
                     else if (sstr != String.Empty && tkn.EndsWith("'"))
                     {
                         sstr += " " + tkn.Substring(0, tkn.Length - 1);
@@ -150,26 +176,37 @@ namespace SanteDB.Server.AdminConsole.Shell
                         sstr = String.Empty;
                     }
                     else if (sstr != String.Empty)
+                    {
                         sstr += " " + tkn;
+                    }
                     else
+                    {
                         tToken.Add(tkn);
+                    }
                 }
                 tokens = tToken.ToArray();
 
                 // Set output
                 TextWriter tw = null, orig = Console.Out;
-                if (redir.Length > 1) {
+                if (redir.Length > 1)
+                {
                     if (redir.Length == 2)
+                    {
                         tw = File.CreateText(redir[1].Trim());
+                    }
                     else if (redir.Length == 3)
+                    {
                         tw = File.AppendText(redir[2].Trim());
+                    }
+
                     Console.SetOut(tw);
                 }
 
                 // Get tokens
-                MethodInfo cmdMi = null;
-                if (!this.m_commandlets.Keys.Any(o=>o.Command == tokens[0]))
+                if (!this.m_commandlets.Keys.Any(o => o.Command == tokens[0]))
+                {
                     Console.Error.WriteLine("ERR: Command {0} with {1} parms not found", tokens[0], tokens.Length - 1);
+                }
                 else
                 {
                     var parmValues = tokens.Length > 1 ? tokens.OfType<String>().Skip(1).ToArray() : new string[0];
@@ -179,8 +216,10 @@ namespace SanteDB.Server.AdminConsole.Shell
                         // Find the matches
                         var candidates = this.m_commandlets.Where(o => o.Key.Command == tokens[0]);
                         if (candidates.Count() == 1)
+                        {
                             candidates.First().Value.Invoke(this, this.CreateParameters(parmValues, candidates.First().Value.GetParameters()));
-                        else 
+                        }
+                        else
                         {
                             var candidate = candidates.FirstOrDefault(o => parmValues.Length == o.Value.GetParameters().Length);
                             candidate.Value?.Invoke(this, this.CreateParameters(parmValues, candidate.Value?.GetParameters()));
@@ -206,13 +245,18 @@ namespace SanteDB.Server.AdminConsole.Shell
         /// </summary>
         private object[] CreateParameters(string[] args, ParameterInfo[] argTypes)
         {
-            if (args == null) return null;
+            if (args == null)
+            {
+                return null;
+            }
 
             object[] argVals = new object[argTypes.Length];
-            for(int i = 0; i < argTypes.Length; i++)
+            for (int i = 0; i < argTypes.Length; i++)
             {
                 if (argTypes[i].ParameterType == typeof(String))
+                {
                     argVals[i] = args[i];
+                }
                 else
                 {
                     var ppt = typeof(ParameterParser<>).MakeGenericType(argTypes[i].ParameterType);
@@ -253,7 +297,11 @@ namespace SanteDB.Server.AdminConsole.Shell
             foreach (var mi in this.m_commandlets.OrderBy(o => o.Key.Command))
             {
                 var itm = mi.Value.GetCustomAttribute<AdminCommandAttribute>();
-                if (itm == null || String.IsNullOrEmpty(itm.Description)) continue;
+                if (itm == null || String.IsNullOrEmpty(itm.Description))
+                {
+                    continue;
+                }
+
                 if (!hlp.Contains(itm.Command))
                 {
                     hlp.Add(itm.Command);
@@ -271,28 +319,37 @@ namespace SanteDB.Server.AdminConsole.Shell
         public void Help([Description("The command for which help should be shown")] String cmd)
         {
 
-            var cmdlets = this.m_commandlets.Where(o=>o.Key.Command == cmd).Select(o=>o.Value);
-            foreach(var cmdlet in cmdlets)
+            var cmdlets = this.m_commandlets.Where(o => o.Key.Command == cmd).Select(o => o.Value);
+            foreach (var cmdlet in cmdlets)
             {
                 var itm = cmdlet.GetCustomAttribute<AdminCommandAttribute>();
-                if (itm == null || String.IsNullOrEmpty(itm.Description)) return;
+                if (itm == null || String.IsNullOrEmpty(itm.Description))
+                {
+                    return;
+                }
 
-                Console.WriteLine("{0} {1} - {2}", itm.Command, String.Join(" ", cmdlet.GetParameters().Select(o=>o.Name)), itm.Description);
+                Console.WriteLine("{0} {1} - {2}", itm.Command, String.Join(" ", cmdlet.GetParameters().Select(o => o.Name)), itm.Description);
 
                 var descr = cmdlet.GetCustomAttribute<DescriptionAttribute>();
                 if (descr != null)
+                {
                     Console.WriteLine("{0} + {1}", new String(' ', itm.Command.Length + 1), descr.Description);
+                }
 
-                foreach(var p in cmdlet.GetParameters())
+                foreach (var p in cmdlet.GetParameters())
                 {
                     if (p.ParameterType == typeof(String))
                     {
                         Console.Write("{0}{1} - ", new String(' ', itm.Command.Length + 1), p.Name);
                         descr = p.GetCustomAttribute<DescriptionAttribute>();
                         if (descr != null)
+                        {
                             Console.WriteLine("{0}", descr.Description);
+                        }
                         else
+                        {
                             Console.WriteLine();
+                        }
                     }
                     else
                     {

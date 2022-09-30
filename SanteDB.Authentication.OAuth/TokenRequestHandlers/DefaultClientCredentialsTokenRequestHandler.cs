@@ -1,14 +1,7 @@
-﻿using RestSrvr;
-using SanteDB.Authentication.OAuth2.Model;
+﻿using SanteDB.Authentication.OAuth2.Model;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Security.Services;
-using System;
 using System.Collections.Generic;
-using System.Configuration;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Authentication.OAuth2.TokenRequestHandlers
 {

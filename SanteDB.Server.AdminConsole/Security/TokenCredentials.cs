@@ -25,37 +25,41 @@ using System.Security.Principal;
 
 namespace SanteDB.Server.AdminConsole.Security
 {
-	/// <summary>
-	/// Represents a Credential which is a token credential
-	/// </summary>
-	[ExcludeFromCodeCoverage]
-	public class TokenCredentials : Credentials
-	{
-		/// <summary>
-		/// Initializes a new instance of the <see cref="SanteDB.Server.AdminConsole.Security.TokenCredentials"/> class.
-		/// </summary>
-		/// <param name="principal">Principal.</param>
-		public TokenCredentials (IPrincipal principal) : base (principal)
-		{
-			
-		}
+    /// <summary>
+    /// Represents a Credential which is a token credential
+    /// </summary>
+    [ExcludeFromCodeCoverage]
+    public class TokenCredentials : Credentials
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SanteDB.Server.AdminConsole.Security.TokenCredentials"/> class.
+        /// </summary>
+        /// <param name="principal">Principal.</param>
+        public TokenCredentials(IPrincipal principal) : base(principal)
+        {
 
-		#region implemented abstract members of Credentials
-		/// <summary>
-		/// Get HTTP header
-		/// </summary>
-		/// <returns>The http headers.</returns>
-		public override System.Collections.Generic.Dictionary<string, string> GetHttpHeaders ()
-		{
+        }
+
+        #region implemented abstract members of Credentials
+        /// <summary>
+        /// Get HTTP header
+        /// </summary>
+        /// <returns>The http headers.</returns>
+        public override System.Collections.Generic.Dictionary<string, string> GetHttpHeaders()
+        {
             if (this.Principal is TokenClaimsPrincipal)
+            {
                 return new System.Collections.Generic.Dictionary<string, string>() {
                     { "Authorization", String.Format ("Bearer {0}", this.Principal.ToString ()) }
                 };
+            }
             else
+            {
                 return new System.Collections.Generic.Dictionary<string, string>();
-		}
-		#endregion
-	}
+            }
+        }
+        #endregion
+    }
 
 
 }

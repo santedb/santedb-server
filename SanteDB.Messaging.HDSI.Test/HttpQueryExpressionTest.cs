@@ -18,17 +18,15 @@
  * User: fyfej
  * Date: 2022-5-30
  */
-using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using NUnit.Framework;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Model.Roles;
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 namespace SanteDB.Messaging.HDSI.Test
 {
@@ -40,7 +38,7 @@ namespace SanteDB.Messaging.HDSI.Test
     public class HttpQueryExpressionTest
     {
 
-      
+
         /// <summary>
         /// Test query by key
         /// </summary>
@@ -60,7 +58,7 @@ namespace SanteDB.Messaging.HDSI.Test
         public void TestWriteGuardByUuid()
         {
             Guid id = Guid.Empty;
-            var query = QueryExpressionBuilder.BuildQuery<Patient>(o => o.Relationships.Where(g=>g.RelationshipTypeKey == EntityRelationshipTypeKeys.Mother).Any(r=>r.TargetEntity.StatusConcept.Mnemonic == "ACTIVE"));
+            var query = QueryExpressionBuilder.BuildQuery<Patient>(o => o.Relationships.Where(g => g.RelationshipTypeKey == EntityRelationshipTypeKeys.Mother).Any(r => r.TargetEntity.StatusConcept.Mnemonic == "ACTIVE"));
             var expression = query.ToHttpString();
 
             Assert.AreEqual("relationship[29ff64e5-b564-411a-92c7-6818c02a9e48].target.statusConcept.mnemonic=ACTIVE", expression);
@@ -74,7 +72,7 @@ namespace SanteDB.Messaging.HDSI.Test
         {
             Guid id = Guid.Empty;
             var qstr = "classConcept.mnemonic=GenderCode&statusConcept.mnemonic=ACTIVE";
-            
+
             var query = QueryExpressionParser.BuildLinqExpression<Place>(qstr.ParseQueryString());
 
 
@@ -87,7 +85,7 @@ namespace SanteDB.Messaging.HDSI.Test
         public void TestChainedWriter()
         {
             Guid id = Guid.Empty;
-            var query = QueryExpressionBuilder.BuildQuery<Place>(o => o.ClassConcept.Mnemonic == "GenderCode" && o.StatusConcept.Mnemonic =="ACTIVE");
+            var query = QueryExpressionBuilder.BuildQuery<Place>(o => o.ClassConcept.Mnemonic == "GenderCode" && o.StatusConcept.Mnemonic == "ACTIVE");
             var expression = query.ToHttpString();
 
             Assert.AreEqual("classConcept.mnemonic=GenderCode&statusConcept.mnemonic=ACTIVE", expression);
@@ -101,7 +99,7 @@ namespace SanteDB.Messaging.HDSI.Test
         public void TestChainedWriter2()
         {
             Guid id = Guid.Empty;
-            var query = QueryExpressionBuilder.BuildQuery<Concept>(o => o.ConceptSets.Any(p=>p.Mnemonic == "GenderCode"));
+            var query = QueryExpressionBuilder.BuildQuery<Concept>(o => o.ConceptSets.Any(p => p.Mnemonic == "GenderCode"));
             var expression = query.ToHttpString();
 
             Assert.AreEqual("conceptSet.mnemonic=GenderCode", expression);
@@ -187,7 +185,7 @@ namespace SanteDB.Messaging.HDSI.Test
             Assert.AreEqual("dateOfBirth=%3C0001-01-01T00%3A00%3A00.0000000", expression);
 
         }
-       
+
 
         /// <summary>
         /// Test write of lookup greater than equal to
@@ -220,7 +218,7 @@ namespace SanteDB.Messaging.HDSI.Test
         [Test]
         public void TestWriteLookupAny()
         {
-            var query = QueryExpressionBuilder.BuildQuery<Patient>(o => o.Names.Any(p=>p.NameUse.Mnemonic == "Legal"));
+            var query = QueryExpressionBuilder.BuildQuery<Patient>(o => o.Names.Any(p => p.NameUse.Mnemonic == "Legal"));
             var expression = query.ToHttpString();
 
             Assert.AreEqual("name.use.mnemonic=Legal", expression);
@@ -232,7 +230,7 @@ namespace SanteDB.Messaging.HDSI.Test
         [Test]
         public void TestWriteLookupAnyAnd()
         {
-            var query = QueryExpressionBuilder.BuildQuery<Patient>(o => o.Names.Any(p => p.NameUse.Mnemonic == "Legal" && p.Component.Any(n=>n.Value == "Smith")));
+            var query = QueryExpressionBuilder.BuildQuery<Patient>(o => o.Names.Any(p => p.NameUse.Mnemonic == "Legal" && p.Component.Any(n => n.Value == "Smith")));
             var expression = query.ToHttpString();
 
             Assert.AreEqual("name.use.mnemonic=Legal&name.component.value=Smith", expression);

@@ -21,14 +21,12 @@
 using Newtonsoft.Json.Linq;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Claims;
-using SanteDB.Rest.Common.Security;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IdentityModel.Tokens;
 
 using System.Security.Cryptography.X509Certificates;
-using System.Security.Principal;
 using System.Text;
 
 namespace SanteDB.Server.AdminConsole.Security
@@ -38,7 +36,7 @@ namespace SanteDB.Server.AdminConsole.Security
     /// </summary>
     [ExcludeFromCodeCoverage]
     public class TokenClaimsPrincipal : SanteDBClaimsPrincipal
-	{
+    {
 
         // Claim map
         private readonly Dictionary<String, String> claimMap = new Dictionary<string, string>() {
@@ -57,7 +55,7 @@ namespace SanteDB.Server.AdminConsole.Security
 
         // Access token
         private String m_accessToken;
-        
+
         /// <summary>
         /// Gets the refresh token
         /// </summary>
@@ -71,12 +69,18 @@ namespace SanteDB.Server.AdminConsole.Security
         public TokenClaimsPrincipal(String accessToken, String idToken, String tokenType, String refreshToken) : base()
         {
             if (String.IsNullOrEmpty(idToken))
+            {
                 throw new ArgumentNullException(nameof(idToken));
+            }
             else if (String.IsNullOrEmpty(tokenType))
+            {
                 throw new ArgumentNullException(nameof(tokenType));
+            }
             else if (tokenType != "urn:ietf:params:oauth:token-type:jwt" &&
                 tokenType != "bearer")
+            {
                 throw new ArgumentOutOfRangeException(nameof(tokenType), "expected urn:ietf:params:oauth:token-type:jwt");
+            }
 
             // Token
             this.m_idToken = idToken;
@@ -85,7 +89,10 @@ namespace SanteDB.Server.AdminConsole.Security
             String[] tokenObjects = idToken.Split('.');
             // Correct each token to be proper B64 encoding
             for (int i = 0; i < tokenObjects.Length; i++)
+            {
                 tokenObjects[i] = tokenObjects[i].PadRight(tokenObjects[i].Length + (tokenObjects[i].Length % 4), '=').Replace("===", "=");
+            }
+
             JObject headers = JObject.Parse(Encoding.UTF8.GetString(Convert.FromBase64String(tokenObjects[0]))),
                 body = JObject.Parse(Encoding.UTF8.GetString(Convert.FromBase64String(tokenObjects[1])));
 
@@ -110,30 +117,40 @@ namespace SanteDB.Server.AdminConsole.Security
             {
                 String claimName = kf.Key;
                 if (!claimMap.TryGetValue(kf.Key, out claimName))
+                {
                     claims.AddRange(this.ProcessClaim(kf, kf.Key));
+                }
                 else
+                {
                     claims.AddRange(this.ProcessClaim(kf, claimName));
+                }
             }
 
             IClaim expiryClaim = claims.Find(o => o.Type == SanteDBClaimTypes.Expiration),
                 notBeforeClaim = claims.Find(o => o.Type == SanteDBClaimTypes.AuthenticationInstant);
 
             if (expiryClaim == null || notBeforeClaim == null)
+            {
                 throw new SecurityTokenException("Missing NBF or EXP claim");
+            }
             else
             {
                 DateTime expiry = expiryClaim.AsDateTime().ToLocalTime(),
                     notBefore = notBeforeClaim.AsDateTime().ToLocalTime();
 
                 if (expiry == null || expiry < DateTime.Now)
+                {
                     throw new SecurityTokenException("Token expired");
+                }
                 else if (notBefore == null || Math.Abs(notBefore.Subtract(DateTime.Now).TotalMinutes) > 3)
+                {
                     throw new SecurityTokenException("Token cannot yet be used (issued in the future)");
+                }
             }
             this.RefreshToken = refreshToken;
             this.AddIdentity(new SanteDBClaimsIdentity(body["unique_name"]?.Value<String>().ToLower() ?? body["sub"]?.Value<String>().ToLower(), true, "OAUTH", claims));
         }
-        
+
         /// <summary>
         /// Processes the claim.
         /// </summary>
@@ -143,10 +160,17 @@ namespace SanteDB.Server.AdminConsole.Security
         {
             List<IClaim> retVal = new List<IClaim>();
             if (jwtClaim.Value is JArray)
+            {
                 foreach (var val in jwtClaim.Value as JArray)
+                {
                     retVal.Add(new SanteDBClaim(claimType, (String)val));
+                }
+            }
             else
+            {
                 retVal.Add(new SanteDBClaim(claimType, jwtClaim.Value.ToString()));
+            }
+
             return retVal;
         }
 
@@ -160,6 +184,6 @@ namespace SanteDB.Server.AdminConsole.Security
             return this.m_accessToken;
         }
 
-	}
+    }
 }
 

@@ -18,12 +18,11 @@
  * User: fyfej
  * Date: 2022-5-30
  */
+using SanteDB.Core.Model.Query;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
-using SanteDB.Core.Model;
-using SanteDB.Core.Model.Query;
 
 namespace SanteDB.Messaging.HDSI.Test
 {
@@ -146,7 +145,9 @@ namespace SanteDB.Messaging.HDSI.Test
             Expression parmExpr = parms[0];
             if (parmExpr.Type.StripNullable() != typeof(DateTime) &&
                 parmExpr is ConstantExpression)
+            {
                 parmExpr = Expression.Constant(DateTime.Parse((parmExpr as ConstantExpression).Value.ToString()));
+            }
 
             return Expression.MakeBinary(comparison,
                 Expression.Call(this.ExtensionMethod, new Expression[] {

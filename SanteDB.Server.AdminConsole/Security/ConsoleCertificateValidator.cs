@@ -19,16 +19,13 @@
  * Date: 2022-5-30
  */
 using SanteDB.Core.Http;
-using SanteDB.Core.Http.Description;
-using SanteDB.Server.AdminConsole.Shell;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Security.Cryptography.X509Certificates;
 
 namespace SanteDB.Server.AdminConsole.Security
 {
- 
+
     /// <summary>
     /// Certificate validator
     /// </summary>
@@ -43,7 +40,11 @@ namespace SanteDB.Server.AdminConsole.Security
         /// </summary>
         public bool ValidateCertificate(object certificate, object chain)
         {
-            if (m_trustedCerts.Contains(certificate.ToString())) return true;
+            if (m_trustedCerts.Contains(certificate.ToString()))
+            {
+                return true;
+            }
+
             String response = String.Empty;
             try
             {
@@ -66,7 +67,9 @@ namespace SanteDB.Server.AdminConsole.Security
                 return true;
             }
             else
+            {
                 return response == "y";
+            }
         }
     }
 }

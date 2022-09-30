@@ -43,8 +43,8 @@ namespace SanteDB.Configuration.Editors
             if (provider != null)
             {
                 var instanceType = context.Instance.GetType();
-                var findStore = (StoreName) instanceType.GetProperty("StoreName").GetValue(context.Instance, null);
-                var findLocation = (StoreLocation) instanceType.GetProperty("StoreLocation").GetValue(context.Instance, null);
+                var findStore = (StoreName)instanceType.GetProperty("StoreName").GetValue(context.Instance, null);
+                var findLocation = (StoreLocation)instanceType.GetProperty("StoreLocation").GetValue(context.Instance, null);
                 var store = new X509Store(findStore, findLocation);
                 try
                 {

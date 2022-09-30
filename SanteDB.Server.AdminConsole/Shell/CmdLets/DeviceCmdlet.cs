@@ -19,11 +19,11 @@
  * Date: 2022-5-30
  */
 using MohawkCollege.Util.Console.Parameters;
+using SanteDB.Core.Interop;
 using SanteDB.Core.Model.AMI.Auth;
 using SanteDB.Core.Model.AMI.Collections;
 using SanteDB.Core.Model.Patch;
 using SanteDB.Core.Model.Security;
-using SanteDB.Core.Security;
 using SanteDB.Messaging.AMI.Client;
 using SanteDB.Server.AdminConsole.Attributes;
 using SanteDB.Server.AdminConsole.Util;
@@ -33,7 +33,6 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using SanteDB.Core.Interop;
 
 namespace SanteDB.Server.AdminConsole.Shell.CmdLets
 {
@@ -97,14 +96,21 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
             var policies = new List<SecurityPolicyInfo>();
 
             if (parms.GrantPolicies?.Count > 0)
+            {
                 policies = parms.GrantPolicies.OfType<String>().Select(o => m_client.GetPolicies(r => r.Oid == o).CollectionItem.FirstOrDefault()).OfType<SecurityPolicy>().Select(o => new SecurityPolicyInfo(o)).ToList();
+            }
+
             if (parms.DenyPolicies?.Count > 0)
+            {
                 policies = policies.Union(parms.DenyPolicies.OfType<String>().Select(o => m_client.GetPolicies(r => r.Oid == o).CollectionItem.FirstOrDefault()).OfType<SecurityPolicy>().Select(o => new SecurityPolicyInfo(o))).ToList();
+            }
 
             policies.ForEach(o => o.Grant = parms.GrantPolicies?.Contains(o.Oid) == true ? PolicyGrantType.Grant : PolicyGrantType.Deny);
 
             if (policies.Count != (parms.DenyPolicies?.Count ?? 0) + (parms.GrantPolicies?.Count ?? 0))
+            {
                 throw new InvalidOperationException("Could not find one or more policies");
+            }
 
             if (String.IsNullOrEmpty(parms.Secret))
             {
@@ -141,15 +147,22 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
                     var policies = new List<SecurityPolicyInfo>();
 
                     if (parms.GrantPolicies?.Count > 0)
+                    {
                         policies = parms.GrantPolicies.OfType<String>().Select(o => m_client.GetPolicies(r => r.Oid == o).CollectionItem.FirstOrDefault()).OfType<SecurityPolicy>().Select(o => new SecurityPolicyInfo(o)).ToList();
+                    }
+
                     if (parms.DenyPolicies?.Count > 0)
+                    {
                         policies = policies.Union(parms.DenyPolicies.OfType<String>().Select(o => m_client.GetPolicies(r => r.Oid == o).CollectionItem.FirstOrDefault()).OfType<SecurityPolicy>().Select(o => new SecurityPolicyInfo(o))).ToList();
+                    }
 
                     policies.ForEach(o => o.Grant = parms.GrantPolicies?.Contains(o.Oid) == true ? PolicyGrantType.Grant : PolicyGrantType.Deny);
 
                     // Altering policies?
                     if (policies.Count != (parms.DenyPolicies?.Count ?? 0) + (parms.GrantPolicies?.Count ?? 0))
+                    {
                         throw new InvalidOperationException("Could not find one or more policies");
+                    }
 
                     device.Policies = policies;
                 }
@@ -194,11 +207,17 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
             AmiCollection list = null;
             int tr = 0;
             if (parms.Active)
+            {
                 list = m_client.Query<SecurityDevice>(o => o.ObsoletionTime.HasValue, 0, 100, out tr);
+            }
             else if (parms.Locked)
+            {
                 list = m_client.Query<SecurityDevice>(o => o.Lockout.HasValue, 0, 100, out tr);
+            }
             else
+            {
                 list = m_client.Query<SecurityDevice>(o => o.ObsoletionTime == null, 0, 100, out tr);
+            }
 
             DisplayUtil.TablePrint(list.CollectionItem.OfType<SecurityDeviceInfo>(),
                 new String[] { "SID", "Name", "Last Auth.", "Lockout", "ILA", "A" },
@@ -220,13 +239,17 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
         internal static void DeviceInfo(GenericDeviceParms parms)
         {
             if (parms.DeviceId == null)
+            {
                 throw new InvalidOperationException("Must specify a device");
+            }
 
             foreach (var un in parms.DeviceId)
             {
                 var device = m_client.GetDevices(o => o.Name == un).CollectionItem.FirstOrDefault() as SecurityDeviceInfo;
                 if (device == null)
+                {
                     throw new KeyNotFoundException($"Device {un} not found");
+                }
 
                 DisplayUtil.PrintPolicies(device,
                     new string[] { "Name", "SID", "Invalid Auth", "Lockout", "Last Auth", "Created", "Updated", "De-Activated" },
@@ -268,13 +291,17 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
         internal static void Lock(GenericDeviceParms parms)
         {
             if (parms.DeviceId == null)
+            {
                 throw new InvalidOperationException("Must specify a device id");
+            }
 
             foreach (var un in parms.DeviceId)
             {
                 var user = m_client.GetDevices(o => o.Name == un).CollectionItem.FirstOrDefault() as SecurityDeviceInfo;
                 if (user == null)
+                {
                     throw new KeyNotFoundException($"Device {un} not found");
+                }
 
                 m_client.DeleteDevice(user.Entity.Key.Value);
             }
@@ -289,13 +316,17 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
         internal static void UnDelete(GenericDeviceParms parms)
         {
             if (parms.DeviceId == null)
+            {
                 throw new InvalidOperationException("Must specify a device");
+            }
 
             foreach (var un in parms.DeviceId)
             {
                 var device = m_client.GetDevices(o => o.Name == un).CollectionItem.FirstOrDefault() as SecurityDeviceInfo;
                 if (device == null)
+                {
                     throw new KeyNotFoundException($"Device {un} not found");
+                }
 
                 var patch = new Patch()
                 {
@@ -319,18 +350,26 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
         internal static void Lock(DeviceLockParms parms)
         {
             if (parms.DeviceId == null)
+            {
                 throw new InvalidOperationException("Must specify a device");
+            }
 
             foreach (var un in parms.DeviceId)
             {
                 var Device = m_client.GetDevices(o => o.Name == un).CollectionItem.FirstOrDefault() as SecurityDeviceInfo;
                 if (Device == null)
+                {
                     throw new KeyNotFoundException($"Device {un} not found");
+                }
 
                 if (parms.Locked)
+                {
                     m_client.Client.Lock<SecurityDeviceInfo>($"SecurityDevice/{Device.Key}");
+                }
                 else
+                {
                     m_client.Client.Unlock<SecurityDeviceInfo>($"SecurityDevice/{Device.Key}");
+                }
             }
         }
 

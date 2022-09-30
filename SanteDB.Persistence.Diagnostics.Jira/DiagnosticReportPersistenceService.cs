@@ -19,29 +19,26 @@
  * Date: 2022-5-30
  */
 using SanteDB.Core;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Event;
 using SanteDB.Core.Http;
 using SanteDB.Core.Model.AMI.Diagnostics;
 using SanteDB.Core.Model.Constants;
-using SanteDB.Core.Model.Entities;
+using SanteDB.Core.Model.Query;
+using SanteDB.Core.Model.Serialization;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using SanteDB.Persistence.Diagnostics.Jira.Configuration;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Security.Permissions;
 using System.Security.Principal;
 using System.Text;
 using System.Xml.Serialization;
-using SanteDB.Core.Model.Query;
-using SanteDB.Core.Diagnostics;
-using System.Diagnostics.Tracing;
-using SanteDB.Core.Model.Serialization;
-using SanteDB.Core.Security.Services;
 
 namespace SanteDB.Persistence.Diagnostics.Jira
 {

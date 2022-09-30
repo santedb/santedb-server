@@ -18,17 +18,13 @@
  * User: fyfej
  * Date: 2022-5-30
  */
-using SanteDB.Configuration;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Configuration.Features;
 using SanteDB.Core.Services;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Configuration.Tasks
 {
@@ -69,12 +65,17 @@ namespace SanteDB.Configuration.Tasks
         {
             // First we backup the configuration
             this.m_backupFile = $"{ConfigurationContext.Current.ConfigurationFile}_{DateTime.Now.ToString("yyyyMMddHHmmss")}.bak";
-            if(File.Exists(ConfigurationContext.Current.ConfigurationFile))
+            if (File.Exists(ConfigurationContext.Current.ConfigurationFile))
+            {
                 File.Copy(ConfigurationContext.Current.ConfigurationFile, this.m_backupFile, true);
+            }
 
             configuration.Includes = null;
             using (var fs = File.Create(ConfigurationContext.Current.ConfigurationFile))
+            {
                 configuration.Save(fs);
+            }
+
             this.ProgressChanged?.Invoke(this, new SanteDB.Core.Services.ProgressChangedEventArgs(1.0f, "Complete"));
 
             return true;
@@ -91,7 +92,9 @@ namespace SanteDB.Configuration.Tasks
                 return true;
             }
             else
+            {
                 return false;
+            }
         }
 
         /// <summary>

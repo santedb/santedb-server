@@ -27,7 +27,7 @@ namespace SanteDB.Persistence.Diagnostics.Jira.Model
     /// JIRA Authentication request
     /// </summary>
     [JsonObject]
-    public class JiraAuthenticationRequest 
+    public class JiraAuthenticationRequest
     {
         /// <summary>
         /// Authentication request

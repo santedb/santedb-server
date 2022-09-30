@@ -19,23 +19,19 @@
  * Date: 2022-9-7
  */
 using MohawkCollege.Util.Console.Parameters;
+using SanteDB.Core.Interop;
 using SanteDB.Core.Model.AMI.Auth;
 using SanteDB.Core.Model.DataTypes;
-using SanteDB.Core.Model.Security;
-using SanteDB.Core.Security;
 using SanteDB.Messaging.AMI.Client;
 using SanteDB.Messaging.HDSI.Client;
 using SanteDB.Server.AdminConsole.Attributes;
+using SanteDB.Server.AdminConsole.Util;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SanteDB.Core.Interop;
-using SanteDB.Server.AdminConsole.Util;
 
 namespace SanteDB.Server.AdminConsole.Shell.CmdLets
 {
@@ -155,13 +151,21 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
         {
             IEnumerable<IdentityDomain> auths = null;
             if (!String.IsNullOrEmpty(parms.Name))
+            {
                 auths = m_amiClient.GetAssigningAuthorities(o => o.Name.Contains(parms.Name)).CollectionItem.OfType<IdentityDomain>();
+            }
             else if (!String.IsNullOrEmpty(parms.Oid))
+            {
                 auths = m_amiClient.GetAssigningAuthorities(o => o.Oid == parms.Oid).CollectionItem.OfType<IdentityDomain>();
+            }
             else if (!String.IsNullOrEmpty(parms.Url))
+            {
                 auths = m_amiClient.GetAssigningAuthorities(o => o.Url == parms.Url).CollectionItem.OfType<IdentityDomain>();
+            }
             else
-                auths = m_amiClient.GetAssigningAuthorities(o=>o.CreationTime != null).CollectionItem.OfType<IdentityDomain>();
+            {
+                auths = m_amiClient.GetAssigningAuthorities(o => o.CreationTime != null).CollectionItem.OfType<IdentityDomain>();
+            }
 
             DisplayUtil.TablePrint(auths,
                 o => o.DomainName,
@@ -187,7 +191,9 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
             {
                 assigner = m_amiClient.GetApplications(o => o.Name == parms.Assigner).CollectionItem.FirstOrDefault() as SecurityApplicationInfo;
                 if (assigner == null)
+                {
                     throw new KeyNotFoundException("Assigner unknown");
+                }
             }
 
             // Scope
@@ -198,7 +204,10 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
                 {
                     var scp = m_hdsiClient.Query<Concept>(o => o.Mnemonic == s, 0, 1, false).Item.OfType<Concept>().FirstOrDefault();
                     if (scp == null)
+                    {
                         throw new KeyNotFoundException($"Scope {s} unknown");
+                    }
+
                     scope.Add(scp);
                 }
             }

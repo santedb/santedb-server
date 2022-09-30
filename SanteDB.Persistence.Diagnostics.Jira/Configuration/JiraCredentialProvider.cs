@@ -1,11 +1,7 @@
 ﻿using SanteDB.Core.Http;
 using SanteDB.Persistence.Diagnostics.Jira.Model;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Persistence.Diagnostics.Jira.Configuration
 {
@@ -31,7 +27,7 @@ namespace SanteDB.Persistence.Diagnostics.Jira.Configuration
 
             var result = context.Post<JiraAuthenticationRequest, JiraAuthenticationResponse>("auth/1/session", "application/json", new JiraAuthenticationRequest(userName, password));
             this.m_authentication = result;
-            return new  JiraCredentials(this.m_authentication);
+            return new JiraCredentials(this.m_authentication);
         }
 
         /// <summary>

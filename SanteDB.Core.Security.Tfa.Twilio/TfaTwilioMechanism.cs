@@ -20,19 +20,14 @@
  */
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.i18n;
-using SanteDB.Core.Model.Constants;
-using SanteDB.Core.Model.Entities;
-using SanteDB.Core.Model.Security;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Services;
 using SanteDB.Core.Security.Tfa.Twilio.Configuration;
 using SanteDB.Core.Security.Tfa.Twilio.Resources;
 using SanteDB.Core.Services;
 using System;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Tracing;
-using System.Linq;
 using System.Security.Principal;
 using TW = Twilio;
 
@@ -89,8 +84,11 @@ namespace SanteDB.Core.Security.Tfa.Twilio
         public String Send(IIdentity user)
         {
             if (user == null)
+            {
                 throw new ArgumentNullException(nameof(user));
-            else if (user is IClaimsIdentity icid) {
+            }
+            else if (user is IClaimsIdentity icid)
+            {
                 try
                 {
                     // Generate a TFA secret and add it as a claim on the user
@@ -102,7 +100,9 @@ namespace SanteDB.Core.Security.Tfa.Twilio
                     var response = client.SendMessage(this.m_configuration.From, toNumber, String.Format(Strings.default_body, secret));
 
                     if (response.RestException != null)
+                    {
                         throw new Exception(response.RestException.Message ?? "" + " " + (response.RestException.Code ?? "") + " " + (response.RestException.MoreInfo ?? "") + " " + (response.RestException.Status ?? ""));
+                    }
 
                     return $"Code sent to ******{toNumber.Substring(toNumber.Length - 4, 4)}";
                 }

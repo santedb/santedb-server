@@ -20,14 +20,7 @@
  */
 using SanteDB.Core.Configuration.Data;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics.CodeAnalysis;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace SanteDB.Configuration.Editors
@@ -71,7 +64,9 @@ namespace SanteDB.Configuration.Editors
         private void btnOk_Click(object sender, EventArgs e)
         {
             if (!this.ucConnection.Validate())
+            {
                 MessageBox.Show("Invalid Connection Settings");
+            }
             else
             {
                 this.DialogResult = DialogResult.OK;

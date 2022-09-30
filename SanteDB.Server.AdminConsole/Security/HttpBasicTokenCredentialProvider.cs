@@ -51,7 +51,10 @@ namespace SanteDB.Server.AdminConsole.Security
         public Credentials Authenticate(IRestClient context)
         {
             if (SanteDB.Server.AdminConsole.Shell.ApplicationContext.Current.Authenticate(new HttpBasicIdentityProvider(), context))
+            {
                 return this.GetCredentials(AuthenticationContext.Current.Principal);
+            }
+
             return null;
         }
 
@@ -61,9 +64,13 @@ namespace SanteDB.Server.AdminConsole.Security
         public Credentials GetCredentials(IPrincipal principal)
         {
             if (principal is IClaimsPrincipal)
+            {
                 return new HttpBasicCredentials(principal, (principal as IClaimsPrincipal)?.FindFirst("passwd")?.Value);
+            }
             else
+            {
                 throw new InvalidOperationException("Cannot create basic principal from non-claims principal");
+            }
         }
         #endregion
     }

@@ -64,17 +64,19 @@ namespace SanteDB.Configuration.Editors
 
                 if (list.SelectedItem != null)
                 {
-                    if(list.SelectedItem is ConnectionStringWrapper)
+                    if (list.SelectedItem is ConnectionStringWrapper)
+                    {
                         return (list.SelectedItem as ConnectionStringWrapper)?.Name;
+                    }
                     else
                     {
                         var newConnectionString = new frmConnectionString();
-                        if(newConnectionString.ShowDialog() == DialogResult.OK)
+                        if (newConnectionString.ShowDialog() == DialogResult.OK)
                         {
                             ConfigurationContext.Current.Configuration.GetSection<DataConfigurationSection>().ConnectionString.Add(newConnectionString.ConnectionString);
                             return newConnectionString.ConnectionString.Name;
                         }
-                    } 
+                    }
                 }
             }
             return value;

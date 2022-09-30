@@ -22,15 +22,12 @@ using SanteDB.Authentication.OAuth2.Configuration;
 using SanteDB.Authentication.OAuth2.Rest;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Exceptions;
-using SanteDB.Core.Security.Configuration;
 using SanteDB.Docker.Core;
 using SanteDB.Rest.Common.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Authentication.OAuth2.Docker
 {
@@ -92,7 +89,7 @@ namespace SanteDB.Authentication.OAuth2.Docker
         {
 
             var oauthConf = configuration.GetSection<OAuthConfigurationSection>();
-            if(oauthConf == null)
+            if (oauthConf == null)
             {
                 oauthConf = DockerFeatureUtils.LoadConfigurationResource<OAuthConfigurationSection>("SanteDB.Authentication.OAuth2.Docker.OauthFeature.xml");
                 configuration.AddSection(oauthConf);
@@ -122,9 +119,9 @@ namespace SanteDB.Authentication.OAuth2.Docker
                 restConfiguration.Services.Add(oauthRestConfiguration);
             }
 
-            if(settings.TryGetValue(ListenSetting, out string listenStr))
+            if (settings.TryGetValue(ListenSetting, out string listenStr))
             {
-                if(!Uri.TryCreate(listenStr, UriKind.Absolute, out Uri listenUri))
+                if (!Uri.TryCreate(listenStr, UriKind.Absolute, out Uri listenUri))
                 {
                     throw new ArgumentException($"{listenStr} is not a valid URI");
                 }
@@ -138,15 +135,15 @@ namespace SanteDB.Authentication.OAuth2.Docker
             }
 
             // Token type?
-            if(settings.TryGetValue(TokenTypeSetting, out String tokenType))
+            if (settings.TryGetValue(TokenTypeSetting, out String tokenType))
             {
                 oauthConf.TokenType = tokenType;
             }
 
             // Allow insecure authentication?
-            if(settings.TryGetValue(NodelessClientAuthSetting, out string insecureSetting))
+            if (settings.TryGetValue(NodelessClientAuthSetting, out string insecureSetting))
             {
-                if(!bool.TryParse(insecureSetting, out bool insecureBool))
+                if (!bool.TryParse(insecureSetting, out bool insecureBool))
                 {
                     throw new ArgumentOutOfRangeException($"{insecureSetting} is not a valid boolean value");
                 }
@@ -154,12 +151,12 @@ namespace SanteDB.Authentication.OAuth2.Docker
             }
 
             // Issuer (used for client claims auth and oauth)
-            if(settings.TryGetValue(IssuerIdSetting, out String issuer))
+            if (settings.TryGetValue(IssuerIdSetting, out String issuer))
             {
                 oauthConf.IssuerName = issuer;
             }
 
-            if(settings.TryGetValue(JwtSigningKey, out String jwtSinging))
+            if (settings.TryGetValue(JwtSigningKey, out String jwtSinging))
             {
                 oauthConf.JwtSigningKey = jwtSinging;
             }

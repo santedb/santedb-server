@@ -75,9 +75,13 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
 
             // Loaded assemblies
             Console.WriteLine("Assemblies:\r\nAssembly{0}Version    Information", new String(' ', 22));
-            foreach(var itm in diagReport.Assemblies)
+            foreach (var itm in diagReport.Assemblies)
             {
-                if (itm.Name == "Microsoft.GeneratedCode") continue;
+                if (itm.Name == "Microsoft.GeneratedCode")
+                {
+                    continue;
+                }
+
                 Console.WriteLine("{0}{1}{2}{3}{4}",
                     itm.Name.Length > 28 ? itm.Name.Substring(0, 28) : itm.Name,
                     itm.Name.Length > 28 ? "  " : new string(' ', 30 - itm.Name.Length),
@@ -92,14 +96,14 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
         /// </summary>
         [AdminCommand("server.threads", "Shows the server thread information")]
         [Description("This command will show the running threads in the connected IMS instance")]
-        public static void ServiceThreadInformation ()
+        public static void ServiceThreadInformation()
         {
             var diagReport = m_client.GetServerDiagnoticReport();
             DisplayUtil.TablePrint(diagReport.Threads,
                 new String[] { "Name", "CPU Time", "State", "Task" },
                 new int[] { 32, 10, 10, 32 },
                 o => o.Name,
-                o =>o.CpuTime,
+                o => o.CpuTime,
                 o => o.State,
                 o => o.TaskInfo
             );
@@ -118,7 +122,7 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
                 new String[] { "Service", "Classification", "Running" },
                 new int[] { 60, 20, 10 },
                 o => o.Description,
-                o=> o.Class,
+                o => o.Class,
                 o => o.IsRunning
             );
         }

@@ -38,7 +38,7 @@ namespace SanteDB.Server.AdminConsole.Shell
         public ConsoleTraceWriter(string filter, IDictionary<String, EventLevel> sources) : base((EventLevel)Enum.Parse(typeof(EventLevel), filter), null, sources)
         {
         }
-        
+
         /// <summary>
         /// Not needed for this context
         /// </summary>

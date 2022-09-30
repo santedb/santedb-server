@@ -18,55 +18,40 @@
  * User: fyfej
  * Date: 2022-5-30
  */
-using SanteDB.Core.Security.Services;
+using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using RestSrvr;
 using RestSrvr.Attributes;
 using RestSrvr.Message;
 using SanteDB.Authentication.OAuth2.Configuration;
 using SanteDB.Authentication.OAuth2.Model;
 using SanteDB.Core;
-using SanteDB.Core.Configuration;
+using SanteDB.Core.Applets.Services;
 using SanteDB.Core.Diagnostics;
-using SanteDB.Core.Model.Constants;
-using SanteDB.Core.Model.Security;
+using SanteDB.Core.Interop;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Audit;
 using SanteDB.Core.Security.Claims;
+using SanteDB.Core.Security.Configuration;
+using SanteDB.Core.Security.Principal;
+using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
+using SanteDB.Rest.Common;
+using SanteDB.Rest.Common.Security;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using Microsoft.IdentityModel.JsonWebTokens;
+using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Security;
 using System.Security.Authentication;
-
-using System.Security.Cryptography;
 using System.Security.Principal;
 using System.Text;
-using System.Diagnostics.Tracing;
-using SanteDB.Core.Applets.Services;
-using System.Globalization;
-using SanteDB.Core.Http;
-using SanteDB.Core.Model.Audit;
-using System.Net;
-using SanteDB.Rest.Common;
-using SanteDB.Core.Applets.Model;
-using SanteDB.Core.Applets;
-using SanteDB.Core.Security.Principal;
-using SanteDB.Core.Interop;
 using System.Xml;
-using SanteDB.Core.Security.Configuration;
-using SanteDB.Rest.Common.Security;
-using Microsoft.IdentityModel.Tokens;
-using System.Security.Claims;
-using SanteDB.Core.Model.Serialization;
-using System.Reflection.Metadata.Ecma335;
 
 namespace SanteDB.Authentication.OAuth2.Rest
 {
@@ -166,7 +151,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
             //Optimization - try to resolve from the same session provider. 
             m_SessionIdentityProvider = m_SessionProvider as ISessionIdentityProviderService;
 
-            
+
 
             //Fallback and resolve from DI.
             if (null == m_SessionIdentityProvider)
@@ -474,7 +459,10 @@ namespace SanteDB.Authentication.OAuth2.Rest
             {
                 var secret = (clientsecret is byte[]) ? (byte[])clientsecret : Encoding.UTF8.GetBytes(clientsecret.ToString());
                 while (secret.Length < 16)
+                {
                     secret = secret.Concat(secret).ToArray();
+                }
+
                 descriptor.SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(secret) { KeyId = appid }, SecurityAlgorithms.HmacSha256Signature);
             }
 
@@ -539,9 +527,14 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 claimsPrincipal = new SanteDBClaimsPrincipal(primaryPrincipal.Identity);
             }
             if (clientPrincipal is IClaimsPrincipal && !claimsPrincipal.Identities.OfType<IApplicationIdentity>().Any(o => o.Name == clientPrincipal.Identity.Name))
+            {
                 claimsPrincipal.AddIdentity(clientPrincipal.Identity as IClaimsIdentity);
+            }
+
             if (devicePrincipal is IClaimsPrincipal && !claimsPrincipal.Identities.OfType<IDeviceIdentity>().Any(o => o.Name == devicePrincipal.Identity.Name))
+            {
                 claimsPrincipal.AddIdentity(devicePrincipal.Identity as IClaimsIdentity);
+            }
 
             _ = TryGetRemoteIp(RestOperationContext.Current.IncomingRequest, out var remoteIp);
 
@@ -671,7 +664,9 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 case SignatureAlgorithm.RS512:
                     var cert = configuration.Certificate;
                     if (cert == null)
+                    {
                         throw new SecurityException("Cannot find certificate to sign data!");
+                    }
 
                     // Signature algorithm
                     string signingAlgorithm = SecurityAlgorithms.RsaSha256;
@@ -683,7 +678,9 @@ namespace SanteDB.Authentication.OAuth2.Rest
                 case SignatureAlgorithm.HS256:
                     byte[] secret = configuration.GetSecret().ToArray();
                     while (secret.Length < 16) //TODO: Why are we doing this?
+                    {
                         secret = secret.Concat(secret).ToArray();
+                    }
 
                     var key = new SymmetricSecurityKey(secret);
 
@@ -742,7 +739,9 @@ namespace SanteDB.Authentication.OAuth2.Rest
             // Set the language claim?
             if (!String.IsNullOrEmpty(formFields["ui_locales"]) &&
                 !clientClaims.Any(o => o.Type == SanteDBClaimTypes.Language))
+            {
                 clientClaims.Add(new SanteDBClaim(SanteDBClaimTypes.Language, formFields["ui_locales"]));
+            }
 
             context.AdditionalClaims = clientClaims;
 
@@ -925,7 +924,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
             {
                 return error ?? CreateErrorResponse(OAuthErrorType.unspecified_error, "invalid request", context.State);
             }
-            
+
             _ = TryGetDeviceIdentity(context);
 
             if (null != context.DevicePrincipal)
@@ -935,7 +934,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
 
             context.ApplicationIdentity = m_AppIdentityProvider.GetIdentity(context.ClientId) as IClaimsIdentity;
 
-            if (null == context.ApplicationIdentity || context.ApplicationIdentity.Claims.FirstOrDefault(c=>c.Type == SanteDBClaimTypes.Sid)?.Value == AuthenticationContext.SystemApplicationSid)
+            if (null == context.ApplicationIdentity || context.ApplicationIdentity.Claims.FirstOrDefault(c => c.Type == SanteDBClaimTypes.Sid)?.Value == AuthenticationContext.SystemApplicationSid)
             {
                 error = CreateErrorResponse(OAuthErrorType.invalid_client, $"unrecognized client: {context.ClientId}", context.State);
                 return false;
@@ -1066,7 +1065,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
         }
 
         /// <summary>
-        /// Render an authorization response in the form [redirect_uri]?code=XXX&state=YYY
+        /// Render an authorization response in the form [redirect_uri]?code=XXX&amp;state=YYY
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
@@ -1079,7 +1078,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
         }
 
         /// <summary>
-        /// Render an authorization response in the form [redirect_uri]#code=XXX&state=YYY
+        /// Render an authorization response in the form [redirect_uri]#code=XXX&amp;state=YYY
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
@@ -1297,7 +1296,10 @@ namespace SanteDB.Authentication.OAuth2.Rest
 
 
                         while (secret.Length < 16) //TODO: Why are we doing this?
+                        {
                             secret = secret.Concat(secret).ToArray();
+                        }
+
                         var hmackey = new SymmetricSecurityKey(secret);
 
                         if (!string.IsNullOrEmpty(signkey.KeyName))
@@ -1316,7 +1318,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                         break;
                 }
 
-                if (null != jwk && !keyset.Keys.Any(k=>k.KeyId == jwk?.KeyId))
+                if (null != jwk && !keyset.Keys.Any(k => k.KeyId == jwk?.KeyId))
                 {
                     keyset.Keys.Add(jwk);
                 }

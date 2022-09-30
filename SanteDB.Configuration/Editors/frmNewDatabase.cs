@@ -20,13 +20,8 @@
  */
 using SanteDB.Core.Configuration.Data;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics.CodeAnalysis;
-using System.Drawing;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 namespace SanteDB.Configuration.Editors
@@ -124,7 +119,7 @@ namespace SanteDB.Configuration.Editors
                 this.DialogResult = System.Windows.Forms.DialogResult.OK;
                 this.Close();
             }
-            catch(System.Reflection.TargetInvocationException ex)
+            catch (System.Reflection.TargetInvocationException ex)
             {
                 MessageBox.Show(String.Format("Create database failed, error was : {0}", ex.InnerException.Message), "Creation Error");
 

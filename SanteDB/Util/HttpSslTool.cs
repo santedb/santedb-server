@@ -20,15 +20,11 @@
  */
 using SanteDB.Rest.Common.Configuration.Interop;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Util
 {
@@ -240,7 +236,9 @@ namespace SanteDB.Util
                     retVal = HttpDeleteServiceConfiguration(IntPtr.Zero, HTTP_SERVICE_CONFIG_ID.HttpServiceConfigSSLCertInfo, pInputConfigInfo, Marshal.SizeOf(configSslSet), IntPtr.Zero);
 
                     if ((uint)NOERROR == retVal)
+                    {
                         retVal = HttpSetServiceConfiguration(IntPtr.Zero, HTTP_SERVICE_CONFIG_ID.HttpServiceConfigSSLCertInfo, pInputConfigInfo, Marshal.SizeOf(configSslSet), IntPtr.Zero);
+                    }
                 }
 
                 Marshal.FreeCoTaskMem(pInputConfigInfo);
