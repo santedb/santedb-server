@@ -27,13 +27,11 @@ using SanteDB.Core.Http;
 using SanteDB.Core.Model.Collection;
 using SanteDB.Core.Model.Serialization;
 using System;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Xml.Serialization;
 
 namespace SanteDB.Tools.Debug.Wcf
 {
@@ -76,7 +74,9 @@ namespace SanteDB.Tools.Debug.Wcf
             try
             {
                 if (string.IsNullOrWhiteSpace(content))
+                {
                     content = "index.html";
+                }
 
                 string filename = content.Contains("?")
                     ? content.Substring(0, content.IndexOf("?", StringComparison.Ordinal))

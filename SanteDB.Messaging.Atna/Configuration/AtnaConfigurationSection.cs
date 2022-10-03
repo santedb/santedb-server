@@ -24,7 +24,6 @@ using SanteDB.Core.Security.Configuration;
 using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
-using System.Net;
 using System.Xml.Serialization;
 
 namespace SanteDB.Messaging.Atna.Configuration
@@ -35,12 +34,24 @@ namespace SanteDB.Messaging.Atna.Configuration
     [XmlType(nameof(AtnaTransportType), Namespace = "http://santedb.org/configuration")]
     public enum AtnaTransportType
     {
+        /// <summary>
+        /// Send audits to the central repository using UDP
+        /// </summary>
         [XmlEnum("udp")]
         Udp,
+        /// <summary>
+        /// Send audits to the central repository using TCP
+        /// </summary>
         [XmlEnum("tcp")]
         Tcp,
+        /// <summary>
+        /// Send audits to the central repository using TLS + TCP
+        /// </summary>
         [XmlEnum("stcp")]
         Stcp,
+        /// <summary>
+        /// Send audits to the central repository via a file share
+        /// </summary>
         [XmlEnum("file")]
         File
     }
@@ -74,7 +85,7 @@ namespace SanteDB.Messaging.Atna.Configuration
             set
             {
                 this.m_transportType = value;
-                if(this.m_transportType == AtnaTransportType.Stcp)
+                if (this.m_transportType == AtnaTransportType.Stcp)
                 {
                     this.ClientCertificate = this.ClientCertificate ?? new X509ConfigurationElement();
                     this.ServerCertificate = this.ServerCertificate ?? new X509ConfigurationElement();

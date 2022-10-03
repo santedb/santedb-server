@@ -24,7 +24,6 @@ using RestSrvr.Message;
 using SanteDB.Authentication.OAuth2.Model;
 using SanteDB.Core.Diagnostics;
 using System;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Tracing;
 using System.IO;

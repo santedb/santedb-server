@@ -31,7 +31,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
     [ServiceContract(Name = "OAuth2")]
     [ServiceProduces("application/json")]
     [ServiceConsumes("application/x-www-form-urlencoded")]
-    public interface IOAuthServiceContract 
+    public interface IOAuthServiceContract
     {
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
         [Post("oauth2_token")]
         [return: MessageFormat(MessageFormatType.Json)]
         object Token(NameValueCollection formFields);
-        
+
         /// <summary>
         /// Get the session from the authenticated bearer or JWT token
         /// </summary>
@@ -76,7 +76,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
         [UrlParameter("login_hint", typeof(string), "When present, the authorization server will pre-populate the username with this value.", Required = false)]
         [UrlParameter("state", typeof(string), "State value that is returned with the response from the authorization server.", Required = false)]
         [UrlParameter("nonce", typeof(string), "Number ONCE that is returned when the authorization code is exchanged by the token service.", Required = false)]
-        [return: MessageFormat (MessageFormatType.Json)]
+        [return: MessageFormat(MessageFormatType.Json)]
         object Authorize();
 
         /// <summary>
@@ -97,7 +97,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
         [return: MessageFormat(MessageFormatType.Json)]
         object Authorize_Post(NameValueCollection formFields);
 
-        
+
 
         /// <summary>
         /// Invoke a ping

@@ -22,15 +22,8 @@ using SanteDB.Configuration;
 using SanteDB.Core.Configuration;
 using SanteDB.OrmLite.Migration;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace SanteDB.Configurator
@@ -48,7 +41,7 @@ namespace SanteDB.Configurator
         /// </summary>
         protected override void OnShown(EventArgs e)
         {
-            foreach(var itm in ConfigurationContext.Current.ConfigurationTasks)
+            foreach (var itm in ConfigurationContext.Current.ConfigurationTasks)
             {
                 if (!itm.Feature.Flags.HasFlag(FeatureFlags.SystemFeature))
                 {
@@ -76,7 +69,7 @@ namespace SanteDB.Configurator
             {
                 var task = lsvActions.SelectedItems[0].Tag as IConfigurationTask;
                 var dtask = task as IDescribedConfigurationTask;
-                var html = "<html><style type='text/css'>body { margin: 0px; padding: 2px; font-family: sans-serif } th, td { vertical-align: top; border-bottom: solid 1px #999 } </style>" + 
+                var html = "<html><style type='text/css'>body { margin: 0px; padding: 2px; font-family: sans-serif } th, td { vertical-align: top; border-bottom: solid 1px #999 } </style>" +
                     $"<body><table width='100%'><tr><th>Task:</th><td>{task.Name}</td></tr>" +
                     $"<tr><th>Feature:</th><td>{task.Feature.Name}</td></tr>" +
                     $"<tr><th>Description:</th><td>{task.Description}</td></tr>";
@@ -89,7 +82,9 @@ namespace SanteDB.Configurator
                 wbHelp.DocumentText = html;
             }
             else
+            {
                 wbHelp.DocumentText = "";
+            }
         }
 
         private void wbHelp_Navigating(object sender, WebBrowserNavigatingEventArgs e)
@@ -121,8 +116,10 @@ namespace SanteDB.Configurator
         private void lsvActions_ItemChecked(object sender, ItemCheckedEventArgs e)
         {
             if (!e.Item.Checked)
+            {
                 ConfigurationContext.Current.ConfigurationTasks.Remove(e.Item.Tag as IConfigurationTask);
-            else if(e.Item.Tag != null && ConfigurationContext.Current.ConfigurationTasks.IndexOf(e.Item.Tag as IConfigurationTask) == -1)
+            }
+            else if (e.Item.Tag != null && ConfigurationContext.Current.ConfigurationTasks.IndexOf(e.Item.Tag as IConfigurationTask) == -1)
             {
                 ConfigurationContext.Current.ConfigurationTasks.Insert(e.Item.Index, e.Item.Tag as IConfigurationTask);
             }

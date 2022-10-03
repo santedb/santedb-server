@@ -3,16 +3,11 @@ using RestSrvr;
 using SanteDB.Authentication.OAuth2.Configuration;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Claims;
-using SanteDB.Core.Security.Principal;
 using SanteDB.Rest.Common;
 using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Linq;
 using System.Net;
 using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Authentication.OAuth2.Model
 {
@@ -38,7 +33,7 @@ namespace SanteDB.Authentication.OAuth2.Model
         public RestOperationContext OperationContext { get; }
 
         public HttpListenerRequest IncomingRequest => OperationContext?.IncomingRequest;
-        public HttpListenerResponse OutgoingResponse => OperationContext?.OutgoingResponse; 
+        public HttpListenerResponse OutgoingResponse => OperationContext?.OutgoingResponse;
         #endregion
 
         #region Request Header Values

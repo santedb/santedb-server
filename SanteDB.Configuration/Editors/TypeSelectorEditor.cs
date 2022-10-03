@@ -19,7 +19,6 @@
  * Date: 2022-5-30
  */
 using SanteDB.Core.Configuration;
-using SanteDB.Core.Model;
 using SanteDB.Core.Model.Attributes;
 using SanteDB.Core.Services;
 using System;
@@ -76,7 +75,7 @@ namespace SanteDB.Configuration.Editors
         {
             if (provider != null)
             {
-                var winService = (IWindowsFormsEditorService) provider.GetService(typeof(IWindowsFormsEditorService));
+                var winService = (IWindowsFormsEditorService)provider.GetService(typeof(IWindowsFormsEditorService));
 
                 if (typeof(IList).IsAssignableFrom(context.PropertyDescriptor.PropertyType)) // multi-select
                 {

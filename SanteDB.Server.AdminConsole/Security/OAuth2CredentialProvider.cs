@@ -18,40 +18,40 @@
  * User: fyfej
  * Date: 2022-5-30
  */
-using System.Diagnostics.CodeAnalysis;
 using SanteDB.Core.Http;
 using SanteDB.Core.Security;
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Principal;
 
 namespace SanteDB.Server.AdminConsole.Security
 {
-	/// <summary>
-	/// Credential providerwhich will identify this application
-	/// </summary>
-	[ExcludeFromCodeCoverage]
-	public class OAuth2CredentialProvider : ICredentialProvider
-	{
-		#region ICredentialProvider implementation
-		/// <summary>
-		/// Gets or sets the credentials which are used to authenticate
-		/// </summary>
-		/// <returns>The credentials.</returns>
-		/// <param name="context">Context.</param>
-		public Credentials GetCredentials (IRestClient context)
-		{
-			// return this application's credentials
-			return new OAuthTokenServiceCredentials (AuthenticationContext.Current.Principal);
-		}
+    /// <summary>
+    /// Credential providerwhich will identify this application
+    /// </summary>
+    [ExcludeFromCodeCoverage]
+    public class OAuth2CredentialProvider : ICredentialProvider
+    {
+        #region ICredentialProvider implementation
+        /// <summary>
+        /// Gets or sets the credentials which are used to authenticate
+        /// </summary>
+        /// <returns>The credentials.</returns>
+        /// <param name="context">Context.</param>
+        public Credentials GetCredentials(IRestClient context)
+        {
+            // return this application's credentials
+            return new OAuthTokenServiceCredentials(AuthenticationContext.Current.Principal);
+        }
 
-		/// <summary>
-		/// Authentication request is required
-		/// </summary>
-		/// <param name="context">Context.</param>
-		public Credentials Authenticate (IRestClient context)
-		{
-			// return this application's credentials
-			return new OAuthTokenServiceCredentials (AuthenticationContext.Current.Principal);
-		}
+        /// <summary>
+        /// Authentication request is required
+        /// </summary>
+        /// <param name="context">Context.</param>
+        public Credentials Authenticate(IRestClient context)
+        {
+            // return this application's credentials
+            return new OAuthTokenServiceCredentials(AuthenticationContext.Current.Principal);
+        }
 
         /// <summary>
         /// Get oauth credentials

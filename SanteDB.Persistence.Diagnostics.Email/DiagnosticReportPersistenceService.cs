@@ -19,32 +19,25 @@
  * Date: 2022-5-30
  */
 using SanteDB.Core;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Event;
-using SanteDB.Core.Model;
 using SanteDB.Core.Model.AMI.Diagnostics;
-using SanteDB.Core.Model.Constants;
+using SanteDB.Core.Model.Query;
 using SanteDB.Core.Model.Security;
+using SanteDB.Core.Model.Serialization;
+using SanteDB.Core.Notifications;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using SanteDB.Persistence.Diagnostics.Email.Configuration;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Net;
-using System.Net.Mail;
-using System.Security.Permissions;
 using System.Security.Principal;
-using System.Text;
 using System.Xml.Serialization;
-using SanteDB.Core.Model.Query;
-using SanteDB.Core.Diagnostics;
-using System.Diagnostics.Tracing;
-using SanteDB.Core.Model.Serialization;
-using SanteDB.Core.Notifications;
-using SanteDB.Core.Security.Services;
 
 namespace SanteDB.Persistence.Diagnostics.Email
 {
@@ -178,11 +171,17 @@ namespace SanteDB.Persistence.Diagnostics.Email
                 var attachments = storageData.Attachments.Select(a =>
                 {
                     if (a is DiagnosticBinaryAttachment bin)
+                    {
                         return new NotificationAttachment(a.FileName ?? a.FileDescription, a.ContentType ?? "application/x-gzip", bin.Content);
+                    }
                     else if (a is DiagnosticTextAttachment txt)
+                    {
                         return new NotificationAttachment(a.FileName ?? a.FileDescription, a.ContentType ?? "text/plain", txt.Content);
+                    }
                     else
+                    {
                         return new NotificationAttachment(a.FileName ?? a.FileDescription, a.ContentType ?? "text/plain", $"Unknown attachment - {a}");
+                    }
                 }).ToList();
 
                 // Attach the application information
@@ -205,7 +204,7 @@ namespace SanteDB.Persistence.Diagnostics.Email
             }
             catch (Exception ex)
             {
-                this.m_traceSource.TraceEvent(EventLevel.Error,  "Error sending to E-Mail: {0}", ex);
+                this.m_traceSource.TraceEvent(EventLevel.Error, "Error sending to E-Mail: {0}", ex);
                 throw new InvalidOperationException("Error sending diagnostic reports to administrative contacts", ex);
             }
         }

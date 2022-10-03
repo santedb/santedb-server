@@ -98,7 +98,10 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
                 Console.Write("(    )   Downloading {0} > {0}.pak", itm);
                 using (var rmtstream = m_client.DownloadApplet(itm))
                 using (var stream = File.Create(itm + ".pak"))
+                {
                     rmtstream.CopyTo(stream);
+                }
+
                 Console.CursorLeft = 1;
                 Console.Write("100%");
                 Console.WriteLine();

@@ -2,15 +2,8 @@
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Services;
-using SanteDB.Core.Services;
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Security.Authentication;
-using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Authentication.OAuth2.TokenRequestHandlers
 {
@@ -25,7 +18,7 @@ namespace SanteDB.Authentication.OAuth2.TokenRequestHandlers
             _Tracer = new Tracer(nameof(DefaultPasswordTokenRequestHandler));
             _PolicyEnforcementService = policyEnforcementService;
             _IdentityProvider = identityProvider;
-            
+
         }
 
         /// <inheritdoc />

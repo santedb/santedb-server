@@ -18,7 +18,6 @@
  * User: fyfej
  * Date: 2022-5-30
  */
-using SanteDB.Core.Attributes;
 using System.Reflection;
 using System.Runtime.InteropServices;
 

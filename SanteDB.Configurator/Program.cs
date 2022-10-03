@@ -84,7 +84,9 @@ namespace SanteDB.Configurator
                     // Now load all plugins on the assembly
                     var pluginInfo = asm.GetCustomAttribute<PluginAttribute>();
                     if (pluginInfo != null)
+                    {
                         ConfigurationContext.Current.PluginAssemblies.Add(asm);
+                    }
                 }
                 catch (Exception e)
                 {
@@ -109,7 +111,9 @@ namespace SanteDB.Configurator
                     try
                     {
                         if (init.ShowDialog() == DialogResult.Cancel)
+                        {
                             return;
+                        }
                     }
                     finally
                     {
@@ -128,16 +132,19 @@ namespace SanteDB.Configurator
                 }
 
                 frmMain frmMain = new frmMain();
-                    // Check for updates
-                    foreach (var t in ConfigurationContext.Current.Features
-                        .Where(o => o.Flags.HasFlag(FeatureFlags.AlwaysConfigure) && !o.Flags.HasFlag(FeatureFlags.SystemFeature))
-                        .SelectMany(o => o.CreateInstallTasks())
-                        .Where(o => o.VerifyState(ConfigurationContext.Current.Configuration)))
-                        ConfigurationContext.Current.ConfigurationTasks.Add(t);
+                // Check for updates
+                foreach (var t in ConfigurationContext.Current.Features
+                    .Where(o => o.Flags.HasFlag(FeatureFlags.AlwaysConfigure) && !o.Flags.HasFlag(FeatureFlags.SystemFeature))
+                    .SelectMany(o => o.CreateInstallTasks())
+                    .Where(o => o.VerifyState(ConfigurationContext.Current.Configuration)))
+                {
+                    ConfigurationContext.Current.ConfigurationTasks.Add(t);
+                }
+
                 ConfigurationContext.Current.Apply(frmMain);
                 Application.Run(frmMain);
             }
-            catch(TargetInvocationException e)
+            catch (TargetInvocationException e)
             {
                 MessageBox.Show(e.InnerException.Message, "Error Starting Config Tool");
 
@@ -159,17 +166,26 @@ namespace SanteDB.Configurator
         internal static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
             foreach (Assembly asm in AppDomain.CurrentDomain.GetAssemblies())
+            {
                 if (args.Name == asm.FullName)
+                {
                     return asm;
+                }
+            }
 
             /// Try for an non-same number Version
             foreach (Assembly asm in AppDomain.CurrentDomain.GetAssemblies())
             {
                 string fAsmName = args.Name;
                 if (fAsmName.Contains(","))
+                {
                     fAsmName = fAsmName.Substring(0, fAsmName.IndexOf(","));
+                }
+
                 if (fAsmName == asm.GetName().Name)
+                {
                     return asm;
+                }
             }
 
             return null;

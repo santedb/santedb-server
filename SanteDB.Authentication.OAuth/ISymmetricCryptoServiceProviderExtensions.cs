@@ -1,7 +1,6 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using SanteDB.Core.Security;
 using System;
-using System.Collections.Generic;
 using System.Text;
 
 namespace SanteDB.Authentication.OAuth2

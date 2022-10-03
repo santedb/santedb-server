@@ -24,8 +24,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Messaging.Atna.Configuration
 {
@@ -98,7 +96,7 @@ namespace SanteDB.Messaging.Atna.Configuration
             var auditConfiguration = this.m_configuration = configuration.GetSection<AtnaConfigurationSection>();
             if (auditConfiguration == null)
             {
-                auditConfiguration= this.m_configuration = new AtnaConfigurationSection();
+                auditConfiguration = this.m_configuration = new AtnaConfigurationSection();
                 configuration.AddSection(auditConfiguration);
             }
 
@@ -219,6 +217,7 @@ namespace SanteDB.Messaging.Atna.Configuration
 
             configuration.GetSection<ApplicationServiceContextConfigurationSection>().ServiceProviders.RemoveAll(r => typeof(IAuditDispatchService).IsAssignableFrom(r.Type));
             configuration.GetSection<ApplicationServiceContextConfigurationSection>().ServiceProviders.Add(new TypeReferenceConfiguration(typeof(AtnaAuditService)));
+            this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs(1.0f, String.Empty));
             return true;
         }
 

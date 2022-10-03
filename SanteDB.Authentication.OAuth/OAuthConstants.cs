@@ -61,7 +61,7 @@ namespace SanteDB.Authentication.OAuth2
         /// Grant name for client credentials
         /// </summary>
         public const string GrantNameClientCredentials = "client_credentials";
-        
+
         /// <summary>
         /// JWT token type
         /// </summary>

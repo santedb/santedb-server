@@ -21,10 +21,6 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Authentication.OAuth2.Model
 {
@@ -94,6 +90,6 @@ namespace SanteDB.Authentication.OAuth2.Model
         /// </summary>
         [JsonProperty("id_token_signing_alg_values_supported")]
         public List<String> IdTokenSigning { get; set; }
-        
+
     }
 }

@@ -20,7 +20,6 @@
  */
 using Newtonsoft.Json;
 using System;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SanteDB.Authentication.OAuth2.Model
 {

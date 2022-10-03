@@ -19,16 +19,9 @@
  * Date: 2022-5-30
  */
 using RestSrvr;
-using SanteDB.Authentication.OAuth2.Configuration;
-using SanteDB.Core.Security;
 using SanteDB.Core.Security.Claims;
-using SanteDB.Core.Security.Principal;
-using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Diagnostics.CodeAnalysis;
-using System.Net;
-using System.Security.Principal;
 
 namespace SanteDB.Authentication.OAuth2.Model
 {
@@ -67,22 +60,22 @@ namespace SanteDB.Authentication.OAuth2.Model
         /// </summary>
         public string RefreshToken => FormFields?[OAuthConstants.FormField_RefreshToken];
         ///<summary>Auth code when grant type is Authorization code.</summary>
-        public string AuthorizationCode => FormFields?[OAuthConstants.FormField_AuthorizationCode]; 
+        public string AuthorizationCode => FormFields?[OAuthConstants.FormField_AuthorizationCode];
 
-        
+
         public string CodeVerifier { get; set; }
         public string CodeVerifierMethod { get; set; }
         #endregion
 
         ///<summary>Scope of the grant</summary>
         public List<string> Scopes { get; set; }
-        
+
         /// <summary>
         /// Any additional claims that were part of the request. Handlers are free to ignore these additional claims when they do not make sense as part of their request.
         /// </summary>
         public List<IClaim> AdditionalClaims { get; set; }
-        
-        
+
+
 
     }
 }

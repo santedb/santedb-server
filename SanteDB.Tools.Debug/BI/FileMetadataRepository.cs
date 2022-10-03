@@ -18,7 +18,6 @@
  * User: fyfej
  * Date: 2022-5-30
  */
-using SanteDB.Core.Model;
 using SanteDB.BI.Model;
 using SanteDB.BI.Services;
 using SanteDB.BI.Util;
@@ -34,9 +33,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace SanteDB.Tools.Debug.BI
 {
@@ -169,7 +166,9 @@ namespace SanteDB.Tools.Debug.BI
                 }
             }
             else
+            {
                 throw new KeyNotFoundException($"Cannot find definition for {id}");
+            }
         }
 
         /// <summary>
@@ -183,7 +182,10 @@ namespace SanteDB.Tools.Debug.BI
 
             string path = this.m_configuration.BiMetadataRepository.First().Path;
             foreach (var s in metadata.Id.Split('.'))
+            {
                 path = Path.Combine(path, s);
+            }
+
             path += ".xml";
 
             try
@@ -196,9 +198,15 @@ namespace SanteDB.Tools.Debug.BI
                 this.m_tracer.TraceInfo("Saving {0} to {1}", metadata.Id, path);
 
                 if (!Directory.Exists(Path.GetDirectoryName(path)))
+                {
                     Directory.CreateDirectory(Path.GetDirectoryName(path));
+                }
+
                 using (var fs = File.Create(path))
+                {
                     metadata.Save(fs);
+                }
+
                 this.m_assetDictionary.TryAdd(metadata.Id, new FileBiMetadata(metadata, path));
                 return metadata;
             }
@@ -242,7 +250,9 @@ namespace SanteDB.Tools.Debug.BI
                 }
             }
             else
+            {
                 throw new KeyNotFoundException($"Cannot find asset with id {id}");
+            }
         }
 
         /// <summary>
@@ -269,7 +279,9 @@ namespace SanteDB.Tools.Debug.BI
         private void Rescan()
         {
             foreach (var path in this.m_configuration.BiMetadataRepository)
+            {
                 this.LoadDefinitions(path.Path);
+            }
         }
 
         /// <summary>
@@ -280,14 +292,19 @@ namespace SanteDB.Tools.Debug.BI
             this.m_tracer.TraceInfo("Scanning {0} for definitions...", path);
 
             foreach (var subDir in Directory.GetDirectories(path))
+            {
                 this.LoadDefinitions(subDir);
+            }
+
             foreach (var f in Directory.GetFiles(path, "*.xml"))
             {
                 try
                 {
                     BiDefinition asset = null;
                     using (var fs = File.OpenRead(f))
+                    {
                         asset = BiDefinition.Load(fs);
+                    }
 
                     if (asset is BiPackage)
                     {
@@ -301,7 +318,9 @@ namespace SanteDB.Tools.Debug.BI
                         File.Move(f, Path.ChangeExtension(f, "bak"));
                     }
                     else
+                    {
                         this.m_assetDictionary.TryAdd(asset.Id, new FileBiMetadata(asset, f));
+                    }
                 }
                 catch (Exception e)
                 {
@@ -326,10 +345,9 @@ namespace SanteDB.Tools.Debug.BI
         /// <inheritdoc/>
         public IQueryResultSet<TBisDefinition> Query<TBisDefinition>(Expression<Func<TBisDefinition, bool>> filter) where TBisDefinition : BiDefinition
         {
-            int r = 0;
             var filterFn = filter.Compile();
             return new TransformQueryResultSet<FileBiMetadata, TBisDefinition>(
-                this.m_assetDictionary.Values.Where(p=>p.Definition is TBisDefinition).Distinct().AsResultSet(),
+                this.m_assetDictionary.Values.Where(p => p.Definition is TBisDefinition).Distinct().AsResultSet(),
                 f =>
                 {
                     using (var fs = File.OpenRead(f.FilePath))

@@ -18,6 +18,9 @@
  * User: fyfej
  * Date: 2022-5-30
  */
+using SanteDB.Core.Configuration;
+using SanteDB.Core.Model;
+using SanteDB.Core.Model.Serialization;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -29,9 +32,6 @@ using System.Reflection;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
 using System.Xml.Serialization;
-using SanteDB.Core.Configuration;
-using SanteDB.Core.Model;
-using SanteDB.Core.Model.Serialization;
 
 namespace SanteDB.Configuration.Editors
 {
@@ -50,7 +50,7 @@ namespace SanteDB.Configuration.Editors
 
             if (provider != null)
             {
-                var winService = (IWindowsFormsEditorService) provider.GetService(typeof(IWindowsFormsEditorService));
+                var winService = (IWindowsFormsEditorService)provider.GetService(typeof(IWindowsFormsEditorService));
 
                 if (typeof(IList).IsAssignableFrom(context.PropertyDescriptor.PropertyType)) // multi-select
                 {
@@ -78,7 +78,7 @@ namespace SanteDB.Configuration.Editors
                                 {
                                     Checked = listValue?.Any(v => v.TypeXml == type) == true,
                                     Tag = new ResourceTypeReferenceConfiguration
-                                        {TypeXml = type}
+                                    { TypeXml = type }
                                 };
                             })
                             .ToArray());
@@ -108,7 +108,7 @@ namespace SanteDB.Configuration.Editors
                             {
                                 msb.BindToName(o, out var asm, out var type);
                                 return new ResourceTypeReferenceConfiguration
-                                    {TypeXml = type};
+                                { TypeXml = type };
                             })
                             .ToArray());
                     }

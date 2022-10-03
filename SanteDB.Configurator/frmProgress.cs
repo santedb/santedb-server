@@ -19,17 +19,12 @@
  * Date: 2022-5-30
  */
 using SanteDB.Configuration;
-using SanteDB.Core.Configuration;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace SanteDB.Configurator
@@ -127,14 +122,21 @@ namespace SanteDB.Configurator
             {
                 var lvi = lsvStatus.Items.OfType<ListViewItem>().FirstOrDefault(o => o.Tag == ConfigurationContext.Current.ConfigurationTasks.First());
                 if (lvi.ImageIndex < 0)
+                {
                     lvi.ImageIndex = 0;
+                }
                 else
+                {
                     lvi.ImageIndex = ((lvi.ImageIndex + 1) % 4);
+                }
+
                 lvi.EnsureVisible();
                 lvi.SubItems[1].Text = this.ActionStatus.ToString();
             }
             else
+            {
                 pgMain.Value = 100;
+            }
         }
 
         /// <summary>
@@ -162,8 +164,9 @@ namespace SanteDB.Configurator
                 e.Graphics.DrawString($"{e.SubItem.Text}%", SystemFonts.DefaultFont, SystemBrushes.ControlText, e.Bounds.Left + pbWidth + 10, e.Bounds.Top + ((e.Bounds.Height - txtSize.Height) / 2));
             }
             else
+            {
                 e.DrawDefault = true;
-
+            }
         }
 
         /// <summary>

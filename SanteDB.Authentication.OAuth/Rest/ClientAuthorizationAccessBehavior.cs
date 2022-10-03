@@ -29,7 +29,6 @@ using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using System;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Tracing;
 using System.Security;
@@ -69,15 +68,22 @@ namespace SanteDB.Authentication.OAuth2.Wcf
                 var authHeader = httpRequest.Headers["Authorization"];
                 if (String.IsNullOrEmpty(authHeader) ||
                     !authHeader.ToLowerInvariant().StartsWith("basic"))
+                {
                     throw new AuthenticationException("Invalid authentication scheme");
+                }
+
                 authHeader = authHeader.Substring(6);
                 var b64Data = Encoding.UTF8.GetString(Convert.FromBase64String(authHeader)).Split(':');
                 if (b64Data.Length != 2)
+                {
                     throw new SecurityException("Malformed HTTP Basic Header");
+                }
 
                 var principal = identityService.Authenticate(b64Data[0], b64Data[1]);
                 if (principal == null)
+                {
                     throw new AuthenticationException("Invalid client credentials");
+                }
 
                 // Client secret
                 RestOperationContext.Current.Data.Add("symm_secret", b64Data[1]);

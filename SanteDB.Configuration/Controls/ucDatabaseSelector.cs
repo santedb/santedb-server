@@ -18,20 +18,17 @@
  * User: fyfej
  * Date: 2022-5-30
  */
+using SanteDB.Configuration.Editors;
+using SanteDB.Core.Configuration;
+using SanteDB.Core.Configuration.Data;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
 using System.Data;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using SanteDB.Core.Configuration.Data;
 using System.Drawing.Design;
-using SanteDB.Core.Configuration;
-using SanteDB.Configuration.Editors;
+using System.Linq;
+using System.Windows.Forms;
 
 namespace SanteDB.Configuration.Controls
 {
@@ -70,7 +67,8 @@ namespace SanteDB.Configuration.Controls
         public ConnectionString ConnectionString
         {
             get => this.m_connectionString;
-            set {
+            set
+            {
                 this.m_connectionString = value;
                 // Select provider
                 this.cbxProviderType.SelectedItem = this.cbxProviderType.Items.OfType<DataProviderWrapper>().FirstOrDefault(o => o.Provider.Invariant == value.Provider);
@@ -80,7 +78,8 @@ namespace SanteDB.Configuration.Controls
         /// <summary>
         /// Gets the provider
         /// </summary>
-        public IDataConfigurationProvider Provider {
+        public IDataConfigurationProvider Provider
+        {
             get
             {
                 return (this.cbxProviderType.SelectedItem as DataProviderWrapper)?.Provider as IDataConfigurationProvider;
@@ -93,7 +92,9 @@ namespace SanteDB.Configuration.Controls
         private void cbxProviderType_DropDown(object sender, EventArgs e)
         {
             if (cbxProviderType.Items.Count == 0)
+            {
                 cbxProviderType.Items.AddRange(ConfigurationContext.Current.DataProviders.Select(p => new DataProviderWrapper(p)).ToArray());
+            }
         }
 
         /// <summary>
@@ -106,10 +107,13 @@ namespace SanteDB.Configuration.Controls
             this.ConfigurationChanged?.Invoke(this, EventArgs.Empty);
 
             if (this.m_connectionString.Provider != this.Provider?.Invariant)
+            {
                 this.m_connectionString = this.Provider.CreateConnectionString(new Dictionary<string, object>());
+            }
 
             var extendedValueProperty = new DynamicPropertyClass();
-            foreach (var kv in this.Provider.Options) {
+            foreach (var kv in this.Provider.Options)
+            {
                 Type typ = typeof(String);
                 UITypeEditor uie = null;
                 List<Attribute> attrs = new List<Attribute>() {
@@ -117,7 +121,7 @@ namespace SanteDB.Configuration.Controls
                 };
 
                 // Values
-                switch(kv.Value)
+                switch (kv.Value)
                 {
                     case ConfigurationOptionType.Boolean:
                         typ = typeof(bool);

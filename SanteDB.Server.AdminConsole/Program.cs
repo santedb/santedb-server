@@ -46,15 +46,22 @@ namespace SanteDB.Server.AdminConsole
             var options = pp.Parse(args);
 
             if (options.Help)
+            {
                 pp.WriteHelp(Console.Out);
+            }
             else
+            {
                 try
                 {
                     // Add a console trace output
                     if (!String.IsNullOrEmpty(options.Verbosity))
+                    {
                         Tracer.AddWriter(new Shell.ConsoleTraceWriter(options.Verbosity, new Dictionary<String, EventLevel>()), (EventLevel)Enum.Parse(typeof(EventLevel), options.Verbosity));
+                    }
                     else
+                    {
                         Tracer.AddWriter(new Shell.ConsoleTraceWriter("Error", new Dictionary<String, EventLevel>()), EventLevel.Error);
+                    }
 
                     ApplicationContext.Initialize(options);
                     ApplicationContext.Current.Start();
@@ -69,6 +76,7 @@ namespace SanteDB.Server.AdminConsole
                 {
                     Console.ResetColor();
                 }
+            }
 #if DEBUG
             Console.ReadKey();
 #endif

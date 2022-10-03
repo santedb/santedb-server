@@ -20,7 +20,6 @@
  */
 using MohawkCollege.Util.Console.Parameters;
 using SanteDB.Core;
-using SanteDB.Core.Services.Impl;
 using System.ServiceProcess;
 
 namespace SanteDB
@@ -30,40 +29,40 @@ namespace SanteDB
     /// </summary>
     /// <seealso cref="System.ServiceProcess.ServiceBase" />
     public partial class SanteDBService : ServiceBase
-	{
+    {
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="SanteDBService"/> class.
-		/// </summary>
-		public SanteDBService()
-		{
-			InitializeComponent();
-			this.ServiceName = "SanteDB Host Process";
-		}
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SanteDBService"/> class.
+        /// </summary>
+        public SanteDBService()
+        {
+            InitializeComponent();
+            this.ServiceName = "SanteDB Host Process";
+        }
 
-		/// <summary>
-		/// When implemented in a derived class, executes when a Start command is sent to the service by the Service Control Manager (SCM) or when the operating system starts (for a service that starts automatically). Specifies actions to take when the service starts.
-		/// </summary>
-		/// <param name="args">Data passed by the start command.</param>
-		protected override void OnStart(string[] args)
-		{
-			var parms = new ParameterParser<ConsoleParameters>().Parse(args);
-			try
-			{
-				ServiceUtil.Start(typeof(Program).GUID, new ServerApplicationContext(parms.ConfigFile));
-			}
-			catch
-			{
-				Stop();
-			}
-		}
+        /// <summary>
+        /// When implemented in a derived class, executes when a Start command is sent to the service by the Service Control Manager (SCM) or when the operating system starts (for a service that starts automatically). Specifies actions to take when the service starts.
+        /// </summary>
+        /// <param name="args">Data passed by the start command.</param>
+        protected override void OnStart(string[] args)
+        {
+            var parms = new ParameterParser<ConsoleParameters>().Parse(args);
+            try
+            {
+                ServiceUtil.Start(typeof(Program).GUID, new ServerApplicationContext(parms.ConfigFile));
+            }
+            catch
+            {
+                Stop();
+            }
+        }
 
-		/// <summary>
-		/// When implemented in a derived class, executes when a Stop command is sent to the service by the Service Control Manager (SCM). Specifies actions to take when a service stops running.
-		/// </summary>
-		protected override void OnStop()
-		{
-			ServiceUtil.Stop();
-		}
-	}
+        /// <summary>
+        /// When implemented in a derived class, executes when a Stop command is sent to the service by the Service Control Manager (SCM). Specifies actions to take when a service stops running.
+        /// </summary>
+        protected override void OnStop()
+        {
+            ServiceUtil.Stop();
+        }
+    }
 }
