@@ -138,6 +138,8 @@ namespace SanteDB.Authentication.OAuth2.Rest
 
         protected readonly ISymmetricCryptographicProvider _SymmetricProvider;
 
+        readonly IAuditService _AuditService;
+
 
         // XHTML
         private const string XS_HTML = "http://www.w3.org/1999/xhtml";
@@ -151,6 +153,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
         /// </summary>
         public OAuthServiceBehavior()
         {
+            _AuditService = ApplicationServiceContext.Current.GetAuditService();
             m_policyEnforcementService = ApplicationServiceContext.Current.GetService<IPolicyEnforcementService>();
             var configurationManager = ApplicationServiceContext.Current.GetService<IConfigurationManager>();
             m_configuration = configurationManager.GetSection<OAuthConfigurationSection>();
@@ -553,7 +556,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
 
             var session = m_SessionProvider.Establish(claimsPrincipal, remoteIp, isOverride, purposeOfUse, scopes?.ToArray(), additionalClaims.FirstOrDefault(o => o.Type == SanteDBClaimTypes.Language)?.Value);
 
-            AuditUtil.AuditSessionStart(session, claimsPrincipal, true);
+            _AuditService.Audit().ForSessionStart(session, claimsPrincipal, true).Send();
 
             return session;
         }
@@ -770,7 +773,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
                     m_traceSource.TraceVerbose($"Establishing session in {nameof(OAuthServiceBehavior)}. This is expected when the handler does not initialize the session.");
                     context.Session = EstablishSession(context.UserPrincipal ?? context.ApplicationPrincipal, context.ApplicationPrincipal, context.DevicePrincipal, context.Scopes, context.AdditionalClaims);
 
-                    AuditUtil.AuditSessionStart(context.Session, context.UserPrincipal ?? context.ApplicationPrincipal, context.Session != null);
+                    _AuditService.Audit().ForSessionStart(context.Session, context.UserPrincipal ?? context.ApplicationPrincipal, context.Session != null).Send();
 
                     if (null == context.Session)
                     {
@@ -1066,7 +1069,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
         }
 
         /// <summary>
-        /// Render an authorization response in the form [redirect_uri]?code=XXX&state=YYY
+        /// Render an authorization response in the form [redirect_uri]?code=XXX&amp;state=YYY
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
@@ -1079,7 +1082,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
         }
 
         /// <summary>
-        /// Render an authorization response in the form [redirect_uri]#code=XXX&state=YYY
+        /// Render an authorization response in the form [redirect_uri]#code=XXX&amp;state=YYY
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
