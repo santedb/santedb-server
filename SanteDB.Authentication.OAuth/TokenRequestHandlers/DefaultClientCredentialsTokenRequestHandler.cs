@@ -45,7 +45,7 @@ namespace SanteDB.Authentication.OAuth2.TokenRequestHandlers
                 //return this.CreateErrorCondition(OAuthErrorType.invalid_client, "invalid client secret");
             }
 
-            _PolicyEnforcementService?.Demand(OAuthConstants.OAuthClientCredentialFlowPolicy);
+            _PolicyEnforcementService?.Demand(OAuthConstants.OAuthClientCredentialFlowPolicy, context.ApplicationPrincipal);
 
             if (null != context.DevicePrincipal)
             {

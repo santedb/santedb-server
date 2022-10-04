@@ -219,6 +219,9 @@ namespace SanteDB.Configuration.Controls
                         case ConfigurationOptionType.FileName:
                             uiEditor = new System.Windows.Forms.Design.FileNameEditor();
                             break;
+                        case ConfigurationOptionType.Certificate:
+                            uiEditor = new X509Certificate2Editor();
+                            break;
                         case ConfigurationOptionType.Object:
                             attribute = new Attribute[] {
                                         new TypeConverterAttribute(typeof(ExpandableObjectConverter))

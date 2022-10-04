@@ -135,6 +135,9 @@ namespace SanteDB.Configuration.Controls
                     case ConfigurationOptionType.FileName:
                         uie = new System.Windows.Forms.Design.FileNameEditor();
                         break;
+                    case ConfigurationOptionType.Certificate:
+                        uie = new X509Certificate2Editor();
+                        break;
                     case ConfigurationOptionType.DatabaseName:
                         uie = new DatabaseNameEditor(this.Provider, this.ConnectionString);
                         break;

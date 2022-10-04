@@ -4,12 +4,18 @@ The SanteDB leverages several third party artifacts to do its job. This file lis
 
 ## 1.1 Primary Copyright Notices
 
-SanteDB, Copyright (C) 2021 SanteSuite Inc. and the SanteSuite Contributors.
-
++ SanteDB, Copyright (C) 2021-2022 SanteSuite Inc. and the SanteSuite Contributors.
 + Portions Copyright (C) 2019 - 2021 Fyfe Software Inc.
 + Portions Copyright (C) 2015 - 2018 Mohawk College of Applied Arts and Technology
 
-This product includes software developed by Borland Software Corp.
+The SanteSuite community would like to extend thanks to our dedicated community partners which maintain this software:
+
+* [SanteSuite Inc](https://santesuite.com)
+* [Fyfe Software Inc](https://fyfesoftware.ca)
+* Hamilton Health Sciences CREATE Lab
+* [Mohawk College MEDIC Centre](https://github.com/MohawkMEDIC/)
+
+This software includes components developed by Borland Software Corp.
 
 + Portions Copyright (C) 2014 Adam Hathcock
 + Portions Copyright (C) 2013 Sebastien Ros

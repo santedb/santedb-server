@@ -132,6 +132,40 @@
   </update>
 
   <sql>
+    <exec invariant="sqlite">
+        <![CDATA[
+      		
+-- DOCUMENT HAS COMPONENT DOCUMENT SECTION
+INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
+	VALUES((randomblob(16)), (x'0F54B9788B436F4B8D83AAF4979DBC64'), (x'F744697A3789984EAE0D452B1D8124F4'), (x'35A76EE843F2F441BF33AA78EB2E8466'), 'Document=[HasComponent]=>DocumentSection', 2);--#!
+
+-- DOCUMENT DOCUMENTS ANY ACT
+INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
+	VALUES ((randomblob(16)), (x'34A64B0F0751AB4E965825BE293CD831'), (x'F744697A3789984EAE0D452B1D8124F4'), null, 'Document=[Documents]=>*', 2);--#!
+-- DOCUMENT SECTION DOCUMENTS ANY ACT
+INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
+	VALUES((randomblob(16)), (x'34A64B0F0751AB4E965825BE293CD831'), (x'35A76EE843F2F441BF33AA78EB2E8466'), NULL, 'DocumentSection=[Documents]=>*', 2);--#!
+
+-- DOCUMENT SECTION IS DERIVED FROM 
+INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
+	VALUES((randomblob(16)), (x'F8A0B6816AB85F499D5D8A4073FDD882'), (x'35A76EE843F2F441BF33AA78EB2E8466'), NULL, 'DocumentSection=[IsDerivedFrom]=>*', 2);--#!
+
+-- DOCUMENT SECTION IS EXCERPT OF ANY
+INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
+	VALUES((randomblob(16)), (x'05E9C6FF1D160B4C8CDEA04E9E9D0CD5'), (x'35A76EE843F2F441BF33AA78EB2E8466'), NULL, 'DocumentSection=[IsExcerptOf]=>*', 2);--#!
+
+
+-- CARE PLAN HAS COMPONENT ANY
+INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
+	VALUES((randomblob(16)), (x'0F54B9788B436F4B8D83AAF4979DBC64'), (x'B932220494A6E0429708F387393A6C80'), null, 'CarePlan=[HasComponent]=>*', 2);--#!
+
+
+-- LIST HAS COMPONENT ANY
+INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
+	VALUES((randomblob(16)), (x'0F54B9788B436F4B8D83AAF4979DBC64'), (x'893432B0099A1A41BB55FF283830EA1A'), NULL, 'List=[HasComponent]=>*', 2);--#!
+
+      ]]>
+    </exec>
     <exec invariant="npgsql">
       <![CDATA[
       		
