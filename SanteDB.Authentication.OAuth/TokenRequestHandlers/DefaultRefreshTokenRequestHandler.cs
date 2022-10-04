@@ -11,6 +11,7 @@ namespace SanteDB.Authentication.OAuth2.TokenRequestHandlers
     {
         readonly ISessionTokenResolverService _SessionResolver;
         readonly ISessionIdentityProviderService _SessionIdentityProvider;
+        readonly IAuditService _AuditService;
         readonly Tracer _Tracer;
 
         /// <summary>
@@ -18,11 +19,12 @@ namespace SanteDB.Authentication.OAuth2.TokenRequestHandlers
         /// </summary>
         /// <param name="sessionResolver">Injected through dependency injection.</param>
         /// <param name="sessionIdentityProvider"></param>
-        public DefaultRefreshTokenRequestHandler(ISessionTokenResolverService sessionResolver, ISessionIdentityProviderService sessionIdentityProvider)
+        public DefaultRefreshTokenRequestHandler(ISessionTokenResolverService sessionResolver, ISessionIdentityProviderService sessionIdentityProvider, IAuditService auditService)
         {
             _Tracer = new Tracer(nameof(DefaultRefreshTokenRequestHandler));
             _SessionResolver = sessionResolver;
             _SessionIdentityProvider = sessionIdentityProvider;
+            _AuditService = auditService;
         }
 
         /// <inheritdoc/>
@@ -49,7 +51,7 @@ namespace SanteDB.Authentication.OAuth2.TokenRequestHandlers
 
                 var principal = _SessionIdentityProvider.Authenticate(context.Session);
 
-                AuditUtil.AuditSessionStart(context.Session, principal, true);
+                _AuditService.Audit().ForSessionStart(context.Session, principal, null != context.Session).Send();
 
                 if (null == context.Session)
                 {
