@@ -56,11 +56,7 @@
     autoInsertChildren="true"
     prepareStatements="true" />
   <section xsi:type="AdoPersistenceConfigurationSection" readWriteConnectionString="PSQL" readOnlyConnectionString="PSQL" traceSql="false" providerType="npgsql" versioning="default"  autoUpdateExisting="true" keyValidation="false" autoInsertChildren="true" prepareStatements="true" loadStrategy="SyncLoad" encryptPublicKeys="false" deleteStrategy="LogicalDelete" >
-    <validation unique="loose" scope="loose" authority="loose" format="loose" checkDigit="loose" />
-    <maxPageSize xsi:nil="true" />
-    <caching>
-      <target>ModelObjects</target>
-      <dataObjectExpiration />
-    </caching>
+    <validation unique="loose" scope="strict" authority="strict" format="loose" checkDigit="loose" />
+   
   </section>
 </SanteDBConfiguration>

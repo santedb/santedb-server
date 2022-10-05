@@ -3,10 +3,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Authentication.OAuth2.Model.Jwks
 {
@@ -28,7 +25,7 @@ namespace SanteDB.Authentication.OAuth2.Model.Jwks
         {
             _KeySet = keySet;
             Keys = new KeyList(_KeySet.Keys, ToKey, FromKey);
-        }   
+        }
 
         private Key ToKey(JsonWebKey jwk)
         {
@@ -75,12 +72,12 @@ namespace SanteDB.Authentication.OAuth2.Model.Jwks
                 K = key.K
             };
 
-            foreach(var keyop in key.KeyOperations)
+            foreach (var keyop in key.KeyOperations)
             {
                 jwk.KeyOps.Add(keyop);
             }
 
-            foreach(var cert in key.CertificateChain)
+            foreach (var cert in key.CertificateChain)
             {
                 jwk.X5c.Add(cert);
             }

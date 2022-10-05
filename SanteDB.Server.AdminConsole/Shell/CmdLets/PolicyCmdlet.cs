@@ -73,11 +73,17 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
             IEnumerable<SecurityPolicy> policies = null;
 
             if (!String.IsNullOrEmpty(parms.Name))
+            {
                 policies = m_client.GetPolicies(o => o.Name.Contains(parms.Name)).CollectionItem.OfType<SecurityPolicy>();
+            }
             else if (!String.IsNullOrEmpty(parms.Oid))
+            {
                 policies = m_client.GetPolicies(o => o.Oid.Contains(parms.Oid)).CollectionItem.OfType<SecurityPolicy>();
+            }
             else
+            {
                 policies = m_client.GetPolicies(o => true).CollectionItem.OfType<SecurityPolicy>();
+            }
 
             // Now output
             DisplayUtil.TablePrint(policies,
@@ -147,13 +153,18 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
             if (!String.IsNullOrEmpty(parms.GrantType))
             {
                 if (Int32.TryParse(parms.GrantType, out int grantParm))
+                {
                     grant = (PolicyGrantType)grantParm;
+                }
                 else if (!Enum.TryParse<PolicyGrantType>(parms.GrantType, out grant))
+                {
                     throw new InvalidOperationException($"Can't understand {parms.GrantType}");
+                }
             }
 
             List<SecurityPolicyInfo> policies = null;
             if (parms.Policy?.Count > 0)
+            {
                 policies = parms.Policy.OfType<String>().Select(o => m_client.GetPolicies(r => r.Oid == o).CollectionItem.FirstOrDefault()).OfType<SecurityPolicy>().Select(o => new SecurityPolicyInfo()
                 {
                     CanOverride = false,
@@ -162,9 +173,12 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
                     Name = o.Name,
                     Policy = o
                 }).ToList();
+            }
 
             if (parms.Policy == null || policies.Count() != parms.Policy.Count)
+            {
                 throw new InvalidOperationException("Could not find one or more policies");
+            }
 
             var policyGrant = String.Join(";", policies.Select(o => o.Name));
 
@@ -175,7 +189,10 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
                 {
                     var role = m_client.Query<SecurityRole>(o => o.Name == r, 0, 1, out int _).CollectionItem.FirstOrDefault() as SecurityRoleInfo;
                     if (role == null)
+                    {
                         throw new KeyNotFoundException($"Role {r} not found");
+                    }
+
                     policies.ForEach(o => m_client.Client.Post<SecurityPolicyInfo, SecurityPolicyInfo>($"SecurityRole/{role.Entity.Key}/policy", o));
                     Console.WriteLine("{2}: {1} TO {0}", r, policyGrant, grant);
                 }
@@ -188,7 +205,10 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
                 {
                     var device = m_client.Query<SecurityDevice>(o => o.Name == d, 0, 1, out int _).CollectionItem.FirstOrDefault() as SecurityDeviceInfo;
                     if (device == null)
+                    {
                         throw new KeyNotFoundException($"Device {d} not found");
+                    }
+
                     policies.ForEach(o => m_client.Client.Post<SecurityPolicyInfo, SecurityPolicyInfo>($"SecurityDevice/{device.Entity.Key}/policy", o));
                     Console.WriteLine("{2}: {1} TO {0}", d, policyGrant, grant);
                 }
@@ -200,7 +220,10 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
                 {
                     var application = m_client.Query<SecurityApplication>(o => o.Name == a, 0, 1, out int _).CollectionItem.FirstOrDefault() as SecurityApplicationInfo;
                     if (application == null)
+                    {
                         throw new KeyNotFoundException($"Application {a} not found");
+                    }
+
                     policies.ForEach(o => m_client.Client.Post<SecurityPolicyInfo, SecurityPolicyInfo>($"SecurityApplication/{application.Entity.Key}/policy", o));
                     Console.WriteLine("{2}: {1} TO {0}", a, policyGrant, grant);
                 }

@@ -28,7 +28,7 @@
   <include>config\santedb.email_notification.config.xml</include>
   <include>config\santedb.match.file_configuration.config.xml</include>
   <include>config\santedb.oauth.config.xml</include>
-  <include>config\santedb.data.firebird.config.xml</include>
+  <include>config\santedb.data.psql.config.xml</include>
   <include>config\santedb.dataquality.config.xml</include>
   <include>config\santedb.security.config.xml</include>
   <include>config\santedb.rest.config.xml</include>

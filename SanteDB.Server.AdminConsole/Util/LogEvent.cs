@@ -72,7 +72,9 @@ namespace SanteDB.Server.AdminConsole.Util
         {
             using (var strm = new GZipStream(File.OpenRead(filename), CompressionMode.Decompress))
             using (var sw = new StreamReader(strm))
+            {
                 return LogEvent.Load(sw);
+            }
         }
 
         /// <summary>
@@ -81,7 +83,9 @@ namespace SanteDB.Server.AdminConsole.Util
         public static List<LogEvent> Load(String filename)
         {
             using (var sw = File.OpenText(filename))
+            {
                 return LogEvent.Load(sw);
+            }
         }
 
         /// <summary>
@@ -99,14 +103,21 @@ namespace SanteDB.Server.AdminConsole.Util
             LogEvent current = null;
 
             while (!stream.EndOfStream)
-            { 
+            {
                 var line = stream.ReadLine();
                 var match = v2Regex.Match(line);
                 if (!match.Success)
+                {
                     match = v1Regex.Match(line);
+                }
+
                 if (match.Success)
                 {
-                    if (current != null) retVal.Add(current);
+                    if (current != null)
+                    {
+                        retVal.Add(current);
+                    }
+
                     current = new LogEvent()
                     {
                         Sequence = current?.Sequence + 1 ?? 0,
@@ -117,9 +128,13 @@ namespace SanteDB.Server.AdminConsole.Util
                         Message = match.Groups[5].Value
                     };
                 }
-                else if(server.IsMatch(line))
+                else if (server.IsMatch(line))
                 {
-                    if (current != null) retVal.Add(current);
+                    if (current != null)
+                    {
+                        retVal.Add(current);
+                    }
+
                     match = server.Match(line);
                     current = new LogEvent()
                     {
@@ -135,7 +150,11 @@ namespace SanteDB.Server.AdminConsole.Util
                 }
                 else if (serverOld.IsMatch(line))
                 {
-                    if (current != null) retVal.Add(current);
+                    if (current != null)
+                    {
+                        retVal.Add(current);
+                    }
+
                     match = serverOld.Match(line);
                     current = new LogEvent()
                     {
@@ -149,9 +168,13 @@ namespace SanteDB.Server.AdminConsole.Util
                         Thread = "NA"
                     };
                 }
-                else if(logCat.IsMatch(line))
+                else if (logCat.IsMatch(line))
                 {
-                    if (current != null) retVal.Add(current);
+                    if (current != null)
+                    {
+                        retVal.Add(current);
+                    }
+
                     match = logCat.Match(line);
                     current = new LogEvent()
                     {
@@ -166,11 +189,15 @@ namespace SanteDB.Server.AdminConsole.Util
                         Thread = match.Groups[3].Value
                     };
                 }
-                else if(current != null)
+                else if (current != null)
+                {
                     current.Message += "\r\n" + line;
+                }
             }
-            if(current != null)
+            if (current != null)
+            {
                 retVal.Add(current);
+            }
 
             return retVal;
         }

@@ -18,7 +18,6 @@
  * User: fyfej
  * Date: 2022-5-30
  */
-using SanteDB.Core.Security;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Services;
 using System;
@@ -57,7 +56,7 @@ namespace SanteDB.Server.AdminConsole.Security
         /// <param name="claim">The claim</param>
         /// <param name="principal">The princiapl asserting the claim</param>
         /// <remarks>Not implemented</remarks>
-        public void AddClaim(string userName, IClaim claim, IPrincipal principal,TimeSpan? expiry = null)
+        public void AddClaim(string userName, IClaim claim, IPrincipal principal, TimeSpan? expiry = null)
         {
             throw new NotImplementedException();
         }
@@ -96,7 +95,7 @@ namespace SanteDB.Server.AdminConsole.Security
         /// <summary>
         /// Creates an identity
         /// </summary>
-        public IIdentity CreateIdentity(string userName,  string password, IPrincipal principal)
+        public IIdentity CreateIdentity(string userName, string password, IPrincipal principal)
         {
             throw new NotSupportedException();
         }
@@ -172,4 +171,3 @@ namespace SanteDB.Server.AdminConsole.Security
         }
     }
 }
- 

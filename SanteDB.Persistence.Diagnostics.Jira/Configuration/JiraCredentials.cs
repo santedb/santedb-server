@@ -24,7 +24,6 @@ using SanteDB.Core.Services;
 using SanteDB.Persistence.Diagnostics.Jira.Model;
 using System;
 using System.Collections.Generic;
-using System.Security.Principal;
 
 namespace SanteDB.Persistence.Diagnostics.Jira.Configuration
 {
@@ -36,7 +35,7 @@ namespace SanteDB.Persistence.Diagnostics.Jira.Configuration
     {
 
 
-       
+
         // JIRA service configuration
         private JiraServiceConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<JiraServiceConfigurationSection>();
 

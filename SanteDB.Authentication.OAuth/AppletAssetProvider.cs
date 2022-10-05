@@ -1,12 +1,8 @@
-﻿using RestSrvr;
-using SanteDB.Core.Applets;
-using System;
+﻿using SanteDB.Core.Applets;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Authentication.OAuth2
 {

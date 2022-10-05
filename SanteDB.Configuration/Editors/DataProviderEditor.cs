@@ -41,7 +41,7 @@ namespace SanteDB.Configuration.Editors
         {
             if (provider != null)
             {
-                var winService = (IWindowsFormsEditorService) provider.GetService(typeof(IWindowsFormsEditorService));
+                var winService = (IWindowsFormsEditorService)provider.GetService(typeof(IWindowsFormsEditorService));
                 var list = new ListBox();
                 list.Click += (o, e) => winService.CloseDropDown();
 

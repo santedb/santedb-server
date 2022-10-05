@@ -1,17 +1,12 @@
-﻿using Microsoft.AspNetCore.Razor.TagHelpers;
-using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using SanteDB.Authentication.OAuth2.Model;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Services;
-using SanteDB.Rest.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Authentication.OAuth2.TokenRequestHandlers
 {
@@ -77,7 +72,7 @@ namespace SanteDB.Authentication.OAuth2.TokenRequestHandlers
                     return false;
                 }
 
-                if (!authcode.dev.Equals(context.DeviceIdentity.Claims?.FirstOrDefault(c=>c.Type == SanteDBClaimTypes.Sid)?.Value))
+                if (!authcode.dev.Equals(context.DeviceIdentity.Claims?.FirstOrDefault(c => c.Type == SanteDBClaimTypes.Sid)?.Value))
                 {
                     context.ErrorType = OAuthErrorType.invalid_grant;
                     context.ErrorMessage = "mismatch device identity";
@@ -105,7 +100,7 @@ namespace SanteDB.Authentication.OAuth2.TokenRequestHandlers
                     return false;
                 }
 
-                if (!authcode.app.Equals(context.ApplicationIdentity.Claims?.FirstOrDefault(c=>c.Type == SanteDBClaimTypes.Sid)?.Value))
+                if (!authcode.app.Equals(context.ApplicationIdentity.Claims?.FirstOrDefault(c => c.Type == SanteDBClaimTypes.Sid)?.Value))
                 {
                     context.ErrorType = OAuthErrorType.invalid_grant;
                     context.ErrorMessage = "mismatch client identity";
@@ -126,18 +121,18 @@ namespace SanteDB.Authentication.OAuth2.TokenRequestHandlers
             }
 
             if (!context.UserIdentity.IsAuthenticated)
-            { 
+            {
                 //Wrap so we can be authenticated
                 context.UserIdentity = new SanteDBClaimsIdentity(context.UserIdentity.Name, true, "LOCAL", (context.UserIdentity as IClaimsIdentity)?.Claims);
             }
-            
+
             context.UserPrincipal = new SanteDBClaimsPrincipal(context.UserIdentity);
 
             context.Nonce = authcode.nonce; //Pass the nonce back.
 
             context.Session = null; //Let the behaviour establish the session.
             return true;
-            
+
         }
 
         private AuthorizationCode DecodeAndValidateAuthorizationCode(string authorizationCode)

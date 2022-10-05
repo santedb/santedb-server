@@ -23,10 +23,6 @@ using SanteDB.Core.Configuration;
 using SanteDB.Core.Configuration.Data;
 using SanteDB.Core.Configuration.Features;
 using SanteDB.Core.Diagnostics;
-using SanteDB.Core.Interfaces;
-using SanteDB.Core.Interop;
-using SanteDB.Core.Services;
-using SanteDB.Core.Services.Impl;
 using SanteDB.OrmLite.Configuration;
 using SanteDB.OrmLite.Providers;
 using System;
@@ -115,16 +111,16 @@ namespace SanteDB.Configuration
                         {
                             return null;
                         }
-                        return feature ;
+                        return feature;
                     }
-                    catch (Exception e)
+                    catch
                     {
                         return null;
                     }
                 }).Union(AppDomain.CurrentDomain.GetAllTypes()
-                    .Where(o=>typeof(IFeatureFactory).IsAssignableFrom(o) && !o.IsInterface && !o.IsAbstract)
-                    .Select(o=>Activator.CreateInstance(o) as IFeatureFactory)
-                    .SelectMany(o=>o.GetFeatures()))
+                    .Where(o => typeof(IFeatureFactory).IsAssignableFrom(o) && !o.IsInterface && !o.IsAbstract)
+                    .Select(o => Activator.CreateInstance(o) as IFeatureFactory)
+                    .SelectMany(o => o.GetFeatures()))
                 .OfType<IFeature>());
         }
 

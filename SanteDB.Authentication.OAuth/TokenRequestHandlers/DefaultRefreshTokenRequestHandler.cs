@@ -1,14 +1,9 @@
-﻿using RestSrvr;
-using SanteDB.Authentication.OAuth2.Model;
+﻿using SanteDB.Authentication.OAuth2.Model;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Audit;
 using SanteDB.Core.Security.Services;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Authentication.OAuth2.TokenRequestHandlers
 {
@@ -16,6 +11,7 @@ namespace SanteDB.Authentication.OAuth2.TokenRequestHandlers
     {
         readonly ISessionTokenResolverService _SessionResolver;
         readonly ISessionIdentityProviderService _SessionIdentityProvider;
+        readonly IAuditService _AuditService;
         readonly Tracer _Tracer;
 
         /// <summary>
@@ -23,11 +19,12 @@ namespace SanteDB.Authentication.OAuth2.TokenRequestHandlers
         /// </summary>
         /// <param name="sessionResolver">Injected through dependency injection.</param>
         /// <param name="sessionIdentityProvider"></param>
-        public DefaultRefreshTokenRequestHandler(ISessionTokenResolverService sessionResolver, ISessionIdentityProviderService sessionIdentityProvider)
+        public DefaultRefreshTokenRequestHandler(ISessionTokenResolverService sessionResolver, ISessionIdentityProviderService sessionIdentityProvider, IAuditService auditService)
         {
             _Tracer = new Tracer(nameof(DefaultRefreshTokenRequestHandler));
             _SessionResolver = sessionResolver;
             _SessionIdentityProvider = sessionIdentityProvider;
+            _AuditService = auditService;
         }
 
         /// <inheritdoc/>
@@ -54,7 +51,7 @@ namespace SanteDB.Authentication.OAuth2.TokenRequestHandlers
 
                 var principal = _SessionIdentityProvider.Authenticate(context.Session);
 
-                AuditUtil.AuditSessionStart(context.Session, principal, true);
+                _AuditService.Audit().ForSessionStart(context.Session, principal, null != context.Session).Send();
 
                 if (null == context.Session)
                 {
@@ -66,7 +63,7 @@ namespace SanteDB.Authentication.OAuth2.TokenRequestHandlers
 
                 return true;
             }
-            catch(SecuritySessionException ex)
+            catch (SecuritySessionException ex)
             {
                 _Tracer.TraceInfo("Failed to initialize session from refresh token. {0}", ex.ToString());
 

@@ -18,15 +18,12 @@
  * User: fyfej
  * Date: 2022-5-30
  */
-using SanteDB.Core.Services;
 using RestSrvr;
 using SanteDB.Core;
-using System;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using SanteDB.Core.Diagnostics;
-using SanteDB.Tools.Debug.Wcf;
+using SanteDB.Core.Services;
+using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SanteDB.Tools.Debug
 {

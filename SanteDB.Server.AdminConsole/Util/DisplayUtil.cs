@@ -18,6 +18,12 @@
  * User: fyfej
  * Date: 2022-5-30
  */
+using SanteDB.Core.Interop;
+using SanteDB.Core.Model;
+using SanteDB.Core.Model.AMI.Auth;
+using SanteDB.Core.Model.Security;
+using SanteDB.Messaging.AMI.Client;
+using SanteDB.Server.AdminConsole.Shell;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -26,13 +32,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
-using SanteDB.Core.Interop;
-using SanteDB.Core.Model;
-using SanteDB.Core.Model.AMI.Auth;
-using SanteDB.Core.Model.Security;
-using SanteDB.Messaging.AMI.Client;
-using SanteDB.Server.AdminConsole.Shell;
 
 namespace SanteDB.Server.AdminConsole.Util
 {
@@ -60,36 +59,50 @@ namespace SanteDB.Server.AdminConsole.Util
         {
 
             if (colNames != null && colNames.Length != columns.Length)
+            {
                 throw new ArgumentException("When specified, colNames must match columns");
+            }
 
             // Column width
             int defaultWidth = (Console.WindowWidth - columns.Length) / columns.Length,
                 c = 0;
-            int[] cWidths = colWidths ?? columns.Select(o=>defaultWidth-2).ToArray();
+            int[] cWidths = colWidths ?? columns.Select(o => defaultWidth - 2).ToArray();
 
-            foreach(var col in columns)
+            foreach (var col in columns)
             {
                 // Only process lambdas
-                if(colNames != null)
+                if (colNames != null)
+                {
+                    if (col.NodeType != ExpressionType.Lambda)
+                    {
+                        continue;
+                    }
+                }
 
-                if (col.NodeType != ExpressionType.Lambda) continue;
                 var body = (col as LambdaExpression).Body;
                 if (body.NodeType == ExpressionType.Convert)
+                {
                     body = (body as UnaryExpression).Operand;
+                }
 
                 var member = (body as MemberExpression)?.Member;
                 string colName = colNames?[c] ?? member?.GetCustomAttribute<DescriptionAttribute>()?.Description ?? member?.Name ?? "??";
                 if (colName.Length > cWidths[c])
+                {
                     Console.Write("{0}... ", colName.Substring(0, colWidths[c] - 3));
+                }
                 else
+                {
                     Console.Write("{0}{1} ", colName, new String(' ', cWidths[c] - colName.Length));
+                }
+
                 c++;
             }
 
             Console.WriteLine();
 
             // Now output data
-            foreach(var tuple in data)
+            foreach (var tuple in data)
             {
                 c = 0;
                 foreach (var col in columns)
@@ -99,11 +112,17 @@ namespace SanteDB.Server.AdminConsole.Util
                         Object value = col.Compile().DynamicInvoke(tuple);
                         String stringValue = value?.ToString();
                         if (stringValue == null)
+                        {
                             Console.Write(new string(' ', cWidths[c] + 1));
+                        }
                         else if (stringValue.Length > cWidths[c])
+                        {
                             Console.Write("{0}... ", stringValue.Substring(0, cWidths[c] - 3));
+                        }
                         else
+                        {
                             Console.Write("{0}{1} ", stringValue, new String(' ', cWidths[c] - stringValue.Length));
+                        }
                     }
                     catch
                     {
@@ -128,7 +147,7 @@ namespace SanteDB.Server.AdminConsole.Util
         {
 
             int d = 0;
-            foreach(var dat in data)
+            foreach (var dat in data)
             {
                 try
                 {
@@ -149,23 +168,31 @@ namespace SanteDB.Server.AdminConsole.Util
             {
                 var existing = policies.FirstOrDefault(o => o.Oid == pol.Oid);
                 if (pol.Grant < existing.Grant)
+                {
                     existing.Grant = pol.Grant;
+                }
             }
 
             Console.WriteLine("\tEffective Policies:");
             foreach (var itm in policies)
             {
-                Console.Write("\t\t{0} [{1}] : ", itm.Name,itm.Oid);
+                Console.Write("\t\t{0} [{1}] : ", itm.Name, itm.Oid);
                 if (itm.Grant == (PolicyGrantType)10) // Lookup parent
                 {
                     var parent = policies.LastOrDefault(o => itm.Oid.StartsWith(o.Oid + ".") && itm.Oid != o.Oid);
                     if (parent != null && parent.Grant <= PolicyGrantType.Grant)
+                    {
                         Console.WriteLine("{0} (inherited from {1})", parent.Grant, parent.Name);
+                    }
                     else
+                    {
                         Console.WriteLine("--- (default DENY)");
+                    }
                 }
                 else
+                {
                     Console.WriteLine("{0} (explicit)", itm.Grant);
+                }
             }
         }
 
@@ -191,10 +218,14 @@ namespace SanteDB.Server.AdminConsole.Util
                         Console.Write(" \b");
                     }
                     else
+                    {
                         Console.CursorLeft = Console.CursorLeft + 1;
+                    }
                 }
                 else if (c == ConsoleKey.Escape)
+                {
                     return String.Empty;
+                }
                 else if (c != ConsoleKey.Enter)
                 {
                     passwd.Append(ki.KeyChar);

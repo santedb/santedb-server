@@ -121,10 +121,16 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
 
             using (var ms = new MemoryStream(log.Contents))
             using (var sr = new StreamReader(ms))
+            {
                 if (!logOptions.RawPrint)
+                {
                     PrintFiltered(LogEvent.Load(sr), logOptions);
+                }
                 else
+                {
                     PrintRaw(sr, logOptions);
+                }
+            }
         }
 
         /// <summary>
@@ -135,10 +141,10 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
         {
 
             var loginfo = m_client.GetLogs();
-            foreach(var it in loginfo.CollectionItem.OfType<LogFileInfo>())
+            foreach (var it in loginfo.CollectionItem.OfType<LogFileInfo>())
             {
                 string strSize = (it.Size / 1024).ToString("0");
-                Console.WriteLine("{0}\t\t{1} kb{2}{3:o}", it.Name, strSize, new String(' ',10 - strSize.Length), it.LastWrite);
+                Console.WriteLine("{0}\t\t{1} kb{2}{3:o}", it.Name, strSize, new String(' ', 10 - strSize.Length), it.LastWrite);
             }
         }
 
@@ -169,10 +175,16 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
 
                 using (var ms = new MemoryStream(log.Contents))
                 using (var sr = new StreamReader(ms))
+                {
                     if (!logOptions.RawPrint)
+                    {
                         PrintFiltered(LogEvent.Load(sr), logOptions);
+                    }
                     else
+                    {
                         PrintRaw(sr, logOptions);
+                    }
+                }
             }
         }
 
@@ -188,7 +200,7 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
 
             var ln = 0;
             var line = sr;
-            while(!sr.EndOfStream)
+            while (!sr.EndOfStream)
             {
 
                 var lineData = sr.ReadLine();
@@ -201,20 +213,24 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
                     // Add
                     buffer.Enqueue(lineData);
                     if (buffer.Count > nLines && !logOptions.All)
+                    {
                         buffer.Dequeue();
+                    }
 
                     // Head?
                     if (logOptions.Head && buffer.Count >= nLines)
+                    {
                         break;
+                    }
                 }
             }
 
             // Output the content of the lines
             var ol = 0;
-            while(buffer.Count > 0)
+            while (buffer.Count > 0)
             {
                 Console.WriteLine(buffer.Dequeue());
-                if(ol++ > Console.WindowHeight && logOptions.Page)
+                if (ol++ > Console.WindowHeight && logOptions.Page)
                 {
                     ol = 0;
                     Console.WriteLine("Press [Enter]...");
@@ -231,18 +247,23 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
             var nLines = Int32.Parse(logOptions.NumLines ?? "25");
             var searchRegex = new Regex(logOptions.Grep ?? ".*");
             var typeFilter = (EventLevel)Enum.Parse(typeof(EventLevel), logOptions.Filter ?? "Verbose");
-            var filteredEvents = list.Where(o =>  searchRegex.IsMatch(o.Message) && o.Level <= typeFilter).ToList();
+            var filteredEvents = list.Where(o => searchRegex.IsMatch(o.Message) && o.Level <= typeFilter).ToList();
             int ofs = logOptions.Head || logOptions.All ? 0 : filteredEvents.Count - nLines;
-            if (ofs < 0) ofs = 0;
+            if (ofs < 0)
+            {
+                ofs = 0;
+            }
 
             if (logOptions.Head && !logOptions.All)
+            {
                 filteredEvents = filteredEvents.Take(nLines).ToList();
+            }
 
             // Output the content of the lines
-            for(int i = ofs; i < filteredEvents.Count; i++)
+            for (int i = ofs; i < filteredEvents.Count; i++)
             {
                 Console.WriteLine("{0:o}\t{1}\tTHD#:{2}\t{3}", filteredEvents[i].Date, filteredEvents[i].Level, filteredEvents[i].Thread, filteredEvents[i].Message);
-                if(logOptions.Page && i % Console.WindowHeight == 0)
+                if (logOptions.Page && i % Console.WindowHeight == 0)
                 {
                     Console.WriteLine("Press [Enter]...");
                     Console.ReadKey();

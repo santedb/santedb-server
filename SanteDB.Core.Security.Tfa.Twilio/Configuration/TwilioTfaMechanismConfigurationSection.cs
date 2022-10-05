@@ -20,7 +20,6 @@
  */
 using SanteDB.Core.Configuration;
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Xml.Serialization;
 
 namespace SanteDB.Core.Security.Tfa.Twilio.Configuration
@@ -31,30 +30,30 @@ namespace SanteDB.Core.Security.Tfa.Twilio.Configuration
     [XmlType(nameof(TwilioTfaMechanismConfigurationSection), Namespace = "http://santedb.org/configuration")]
     [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage] // Serialization class
     public class TwilioTfaMechanismConfigurationSection : IConfigurationSection
-	{
-		/// <summary>
-		/// Creates a new template mechanism configuration
-		/// </summary>
-		public TwilioTfaMechanismConfigurationSection()
-		{
-		}
+    {
+        /// <summary>
+        /// Creates a new template mechanism configuration
+        /// </summary>
+        public TwilioTfaMechanismConfigurationSection()
+        {
+        }
 
-		/// <summary>
-		/// Authentication token
-		/// </summary>
+        /// <summary>
+        /// Authentication token
+        /// </summary>
         [XmlAttribute("auth")]
-		public String Auth { get; set; }
+        public String Auth { get; set; }
 
-		/// <summary>
-		/// From number
-		/// </summary>
+        /// <summary>
+        /// From number
+        /// </summary>
         [XmlAttribute("from")]
-		public String From { get; set; }
+        public String From { get; set; }
 
-		/// <summary>
-		/// SID configuration
-		/// </summary>
+        /// <summary>
+        /// SID configuration
+        /// </summary>
         [XmlAttribute("sid")]
-		public String Sid { get; set; }
-	}
+        public String Sid { get; set; }
+    }
 }

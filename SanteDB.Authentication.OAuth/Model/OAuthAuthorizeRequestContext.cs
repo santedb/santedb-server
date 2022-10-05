@@ -1,14 +1,6 @@
 ﻿using RestSrvr;
-using SanteDB.Core.Security.Claims;
-using SanteDB.Core.Security.Principal;
 using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Linq;
-using System.Net;
-using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Authentication.OAuth2.Model
 {
@@ -49,7 +41,7 @@ namespace SanteDB.Authentication.OAuth2.Model
         }
         public string RedirectUri => GetValue(OAuthConstants.AuthorizeParameter_RedirectUri);
 
-        
+
 
         public Guid ActivityId
         {

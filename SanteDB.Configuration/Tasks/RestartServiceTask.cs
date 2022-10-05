@@ -18,17 +18,13 @@
  * User: fyfej
  * Date: 2022-5-30
  */
-using SanteDB.Configuration;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Services;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace SanteDB.Configuration.Tasks

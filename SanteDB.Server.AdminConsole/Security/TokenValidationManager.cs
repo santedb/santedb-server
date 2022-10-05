@@ -47,7 +47,7 @@ namespace SanteDB.Server.AdminConsole.Security
         internal static bool OnSymmetricKeyValidationCallback(Object source, int keyId, String issuer)
         {
             return SymmetricKeyValidationCallback?.Invoke(source, keyId, issuer) == true;
-        } 
+        }
 
     }
 }

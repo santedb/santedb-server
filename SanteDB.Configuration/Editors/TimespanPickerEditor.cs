@@ -54,14 +54,14 @@ namespace SanteDB.Configuration.Editors
                 this.editorService = provider.GetService(typeof(IWindowsFormsEditorService)) as IWindowsFormsEditorService;
             }
 
-            if ((DateTime) value == DateTime.MinValue)
+            if ((DateTime)value == DateTime.MinValue)
             {
                 value = DateTime.Now;
             }
 
             if (this.editorService != null)
             {
-                this.picker.Value = DateTime.Today.Add((TimeSpan) value);
+                this.picker.Value = DateTime.Today.Add((TimeSpan)value);
                 this.editorService.DropDownControl(this.picker);
                 value = this.picker.Value.TimeOfDay;
             }

@@ -18,12 +18,12 @@
  * User: fyfej
  * Date: 2022-5-30
  */
+using SanteDB.Core.Services;
 using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
-using SanteDB.Core.Services;
 
 namespace SanteDB.Configuration.Converters
 {

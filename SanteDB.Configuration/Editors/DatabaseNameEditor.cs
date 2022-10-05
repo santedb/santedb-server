@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2022-5-30
  */
+using SanteDB.Core.Configuration.Data;
 using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
@@ -26,7 +27,6 @@ using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
-using SanteDB.Core.Configuration.Data;
 
 namespace SanteDB.Configuration.Editors
 {
@@ -90,7 +90,7 @@ namespace SanteDB.Configuration.Editors
         {
             if (provider != null)
             {
-                var winService = (IWindowsFormsEditorService) provider.GetService(typeof(IWindowsFormsEditorService));
+                var winService = (IWindowsFormsEditorService)provider.GetService(typeof(IWindowsFormsEditorService));
                 var list = new ListBox();
                 list.Click += (o, e) => winService.CloseDropDown();
 
@@ -118,9 +118,10 @@ namespace SanteDB.Configuration.Editors
                     if (list.SelectedItem.ToString() == "New...")
                     {
                         var frmNewDatabase = new frmNewDatabase(this.m_connectionString, this.m_provider);
+                        
                         if (frmNewDatabase.ShowDialog() == DialogResult.OK)
                         {
-                            return frmNewDatabase.ConnectionString.GetComponent("database") ?? frmNewDatabase.ConnectionString.GetComponent("initial catalog");
+                            return frmNewDatabase.ConnectionString.GetComponent(this.m_provider.Capabilities.NameSetting);
                         }
 
                         return value;

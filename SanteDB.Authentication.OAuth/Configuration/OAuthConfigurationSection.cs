@@ -54,7 +54,7 @@ namespace SanteDB.Authentication.OAuth2.Configuration
         /// </summary>
         [XmlArray("allowedClaims"), XmlArrayItem("add")]
         public List<String> AllowedClientClaims { get; set; }
-        
+
         /// <summary>
         /// Issuer name. This corresponds to the iss claim in any issued tokens.
         /// </summary>
@@ -77,7 +77,7 @@ namespace SanteDB.Authentication.OAuth2.Configuration
         /// <summary>
         /// When true, allows login using client_credentials without any node authentication
         /// </summary>
-        [XmlElement("allowNodelessClientAuth"), 
+        [XmlElement("allowNodelessClientAuth"),
             Description("When enabled, allows clients to authenticate with client_credentials grant with no node authentication")]
         public bool AllowClientOnlyGrant { get; set; }
 

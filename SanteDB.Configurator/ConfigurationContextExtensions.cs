@@ -21,15 +21,11 @@
 using SanteDB.Configuration;
 using SanteDB.Configuration.Tasks;
 using SanteDB.Core.Diagnostics;
-using SanteDB.Core.Security;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace SanteDB.Configurator
@@ -48,15 +44,21 @@ namespace SanteDB.Configurator
             var tracer = new Tracer("Configuration Context");
 
             if (me.ConfigurationTasks.Count == 0)
+            {
                 return;
+            }
 
             // Add the save task
             if (!me.ConfigurationTasks.OfType<SaveConfigurationTask>().Any())
+            {
                 me.ConfigurationTasks.Add(new SaveConfigurationTask());
+            }
             // Is the WindowsService installed?
             var rstr = new RestartServiceTask();
             if (rstr.VerifyState(me.Configuration))
+            {
                 me.ConfigurationTasks.Add(new RestartServiceTask());
+            }
 
             var confirmDlg = new frmTaskList();
             confirmDlg.Owner = owner;
@@ -74,7 +76,7 @@ namespace SanteDB.Configurator
             }
 
             var progress = new frmProgress();
-            
+
             try
             {
                 progress.Owner = owner;
@@ -101,7 +103,10 @@ namespace SanteDB.Configurator
 
                             progress.OverallStatusText = $"Applying {ct.Feature.Name}";
                             if (ct.VerifyState(me.Configuration) && !ct.Execute(me.Configuration))
+                            {
                                 tracer.TraceWarning("Configuration task {0} reported unsuccessful deployment", ct.Name);
+                            }
+
                             me.ConfigurationTasks.Remove(ct);
                             progress.OverallStatus = (int)(((float)++i / t) * 100.0);
                         }
@@ -119,9 +124,15 @@ namespace SanteDB.Configurator
                 });
 
                 exeThd.Start();
-                while (!complete) Application.DoEvents();
+                while (!complete)
+                {
+                    Application.DoEvents();
+                }
 
-                if (errCode != null) throw errCode;
+                if (errCode != null)
+                {
+                    throw errCode;
+                }
 
                 progress.OverallStatusText = "Reloading Configuration...";
                 progress.OverallStatus = 100;

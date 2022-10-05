@@ -18,24 +18,21 @@
  * User: fyfej
  * Date: 2022-5-30
  */
+using SanteDB.BI.Services.Impl;
+using SanteDB.Core.Applets.Services.Impl;
 using SanteDB.Core.Configuration;
+using SanteDB.Core.Data.Initialization;
+using SanteDB.Core.Notifications;
+using SanteDB.Core.PubSub.Broker;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Privacy;
 using SanteDB.Core.Services;
 using SanteDB.Core.Services.Impl;
+using SanteDB.Core.Services.Impl.Repository;
+using SanteDB.Rest.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SanteDB.Core.PubSub.Broker;
-using SanteDB.Core.Notifications;
-using SanteDB.Core.Services.Impl.Repository;
-using SanteDB.Core.Data.Initialization;
-using RestSrvr;
-using SanteDB.BI.Services.Impl;
-using SanteDB.Core.Applets.Services.Impl;
-using SanteDB.Rest.Common;
 
 namespace SanteDB.Configuration.Tasks
 {
@@ -128,11 +125,17 @@ namespace SanteDB.Configuration.Tasks
         {
             var nServices = configuration.GetSection<ApplicationServiceContextConfigurationSection>().ServiceProviders.Count(s => SERVICE_TYPES.Any(o => o == s.Type));
             if (nServices == SERVICE_TYPES.Length)
+            {
                 return FeatureInstallState.Installed;
+            }
             else if (nServices == 0)
+            {
                 return FeatureInstallState.NotInstalled;
+            }
             else
+            {
                 return FeatureInstallState.PartiallyInstalled;
+            }
         }
 
         /// <summary>
@@ -191,7 +194,10 @@ namespace SanteDB.Configuration.Tasks
             {
                 var appSection = configuration.GetSection<ApplicationServiceContextConfigurationSection>();
                 foreach (var svc in SERVICE_TYPES.Reverse())
+                {
                     appSection.ServiceProviders.RemoveAll(o => o.Type == svc);
+                }
+
                 return true;
             }
 

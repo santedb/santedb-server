@@ -25,8 +25,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Messaging.Atna.Docker
 {
@@ -76,7 +74,9 @@ namespace SanteDB.Messaging.Atna.Docker
             // Is the ATNA audit service available?
             var serviceConfiguration = configuration.GetSection<ApplicationServiceContextConfigurationSection>().ServiceProviders;
             if (!serviceConfiguration.Any(s => s.Type == typeof(AtnaAuditService)))
+            {
                 serviceConfiguration.Add(new TypeReferenceConfiguration(typeof(AtnaAuditService)));
+            }
 
             // Configure the ATNA service?
             if (settings.TryGetValue(TargetSetting, out string target))

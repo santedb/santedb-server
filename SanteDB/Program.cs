@@ -23,10 +23,8 @@ using Mono.Unix;
 using SanteDB.Core;
 using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Configuration;
-using SanteDB.Core.Model;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
-using SanteDB.Core.Services.Impl;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -90,11 +88,13 @@ namespace SanteDB
 
                 // What to do?
                 if (parameters.ShowHelp)
+                {
                     parser.WriteHelp(Console.Out);
-                else if(parameters.ConfigTest)
+                }
+                else if (parameters.ConfigTest)
                 {
                     IEnumerable<String> configFilesToTest = null;
-                    if(String.IsNullOrEmpty(parameters.ConfigFile))
+                    if (String.IsNullOrEmpty(parameters.ConfigFile))
                     {
                         configFilesToTest = Directory.GetFiles(Path.Combine(Path.GetDirectoryName(typeof(Program).Assembly.Location), "config"), "*.xml", SearchOption.AllDirectories);
                     }
@@ -103,7 +103,7 @@ namespace SanteDB
                         configFilesToTest = new String[] { parameters.ConfigFile };
                     }
                     Console.WriteLine("Testing configuration files");
-                    foreach(var file in configFilesToTest)
+                    foreach (var file in configFilesToTest)
                     {
                         try
                         {
@@ -116,7 +116,7 @@ namespace SanteDB
                                 }
                             }
                         }
-                        catch(Exception e)
+                        catch (Exception e)
                         {
                             Console.WriteLine("\tFAIL: {0}", e);
                         }
@@ -136,13 +136,20 @@ namespace SanteDB
                         {
                             var configFile = parameters.ConfigFile;
                             if (String.IsNullOrEmpty(configFile))
+                            {
                                 configFile = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), $"santedb.config.{parameters.InstanceName}.xml");
+                            }
                             else if (!Path.IsPathRooted(configFile))
+                            {
                                 configFile = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), configFile);
+                            }
+
                             ServiceTools.ServiceInstaller.Install($"SanteDB{instanceSuffix}", $"SanteDB Host Process - {parameters.InstanceName}", $"{Assembly.GetEntryAssembly().Location} --name={parameters.InstanceName} --config={configFile}", null, null, ServiceTools.ServiceBootFlag.AutoStart);
                         }
                         else
+                        {
                             ServiceTools.ServiceInstaller.Install($"SanteDB", "SanteDB Host Process", $"{Assembly.GetEntryAssembly().Location}", null, null, ServiceTools.ServiceBootFlag.AutoStart);
+                        }
                     }
                 }
                 else if (parameters.UnInstall)
@@ -180,7 +187,9 @@ namespace SanteDB
                     configuration.AddSection(serverConfiguration);
 
                     using (var fs = File.Create(Path.Combine(Path.GetDirectoryName(typeof(Program).Assembly.Location), "default.config.xml")))
+                    {
                         configuration.Save(fs);
+                    }
                 }
                 else if (parameters.ConsoleMode)
                 {
@@ -190,16 +199,23 @@ namespace SanteDB
 
                     // Detect platform
                     if (System.Environment.OSVersion.Platform != PlatformID.Win32NT)
+                    {
                         Console.WriteLine("Not running on WindowsNT, some features may not function correctly");
-                    else try
+                    }
+                    else
+                    {
+                        try
                         {
                             if (!EventLog.SourceExists("SanteDB Host Process"))
+                            {
                                 EventLog.CreateEventSource("SanteDB Host Process", "santedb");
+                            }
                         }
                         catch (Exception e)
                         {
                             Console.WriteLine("WARN: Error creating EventLog source. Not running as admin? {0}", e);
                         }
+                    }
 
                     ServiceUtil.Start(typeof(Program).GUID, new ServerApplicationContext(parameters.ConfigFile));
                     if (!parameters.StartupTest)
@@ -260,7 +276,7 @@ namespace SanteDB
             {
 #if DEBUG
                 Trace.TraceError("011 899 981 199 911 9725 3!!! {0}", e.ToString());
-               
+
 
                 EventLog.WriteEntry("SanteDB Host Process", $"011 899 981 199 911 9725 3!!! {e}", EventLogEntryType.Error, 911);
 
@@ -268,7 +284,10 @@ namespace SanteDB
                 Trace.TraceError("Error encountered: {0}. Will terminate", e);
 #endif
                 if (hasConsole)
+                {
                     Console.WriteLine("011 899 981 199 911 9725 3!!! {0}", e.ToString());
+                }
+
                 try
                 {
                     EventLog.WriteEntry("SanteDB Host Process", $"011 899 981 199 911 9725 3!!! {e}", EventLogEntryType.Error, 911);
@@ -306,18 +325,26 @@ namespace SanteDB
                             prop.SetValue(instance, value);
                             var defaultValue = GetDefaultValue(prop.PropertyType.GetGenericArguments()[0], prop.Name);
                             if (defaultValue != null)
+                            {
                                 value.Add(defaultValue);
+                            }
                             else
+                            {
                                 value.Add(CreateFullXmlObject(xeType ?? prop.PropertyType.GetGenericArguments()[0]));
+                            }
                         }
                         else
                         {
                             // TODO : Choice
                             var defaultValue = GetDefaultValue(prop.PropertyType, prop.Name);
                             if (defaultValue != null)
+                            {
                                 prop.SetValue(instance, defaultValue);
+                            }
                             else
+                            {
                                 prop.SetValue(instance, CreateFullXmlObject(xeType ?? prop.PropertyType));
+                            }
                         }
                     }
                 }
@@ -341,8 +368,11 @@ namespace SanteDB
                 return SHA256.Create().ComputeHash(Console.InputEncoding.GetBytes(data));
             }
             else if (fieldName.StartsWith("Xml"))
+            {
                 return DateTime.Now.ToString("o");
+            }
             else
+            {
                 switch (propertyType.StripNullable().Name.ToLower())
                 {
                     case "bool":
@@ -390,6 +420,7 @@ namespace SanteDB
                         }
                         return null;
                 }
+            }
         }
     }
 }

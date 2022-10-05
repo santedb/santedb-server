@@ -27,7 +27,6 @@ using SanteDB.Core.Interop;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Services;
-using SanteDB.Core.Services.Impl;
 using SanteDB.Messaging.AMI.Client;
 using SanteDB.Server.AdminConsole.Security;
 using SanteDB.Server.AdminConsole.Util;
@@ -36,9 +35,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
-
-using System.Security.Principal;
-using System.Text;
 
 namespace SanteDB.Server.AdminConsole.Shell
 {
@@ -187,7 +183,9 @@ namespace SanteDB.Server.AdminConsole.Shell
 
                 // Server version
                 if (new Version(amiOptions.InterfaceVersion.Substring(0, amiOptions.InterfaceVersion.LastIndexOf(".")) + ".0") > typeof(AmiServiceClient).Assembly.GetName().Version)
+                {
                     throw new InvalidOperationException($"Server version of AMI is too new for this version of console. Expected {typeof(AmiServiceClient).Assembly.GetName().Version} got {amiOptions.InterfaceVersion}");
+                }
 
                 foreach (var itm in amiOptions.Endpoints)
                 {
@@ -203,9 +201,12 @@ namespace SanteDB.Server.AdminConsole.Shell
                     };
 
                     if (itm.Capabilities.HasFlag(ServiceEndpointCapabilities.Compression))
+                    {
                         config.Binding.Optimize = true;
+                    }
 
                     if (itm.Capabilities.HasFlag(ServiceEndpointCapabilities.BearerAuth))
+                    {
                         config.Binding.Security = new RestClientSecurityConfiguration()
                         {
                             CredentialProvider = new TokenCredentialProvider(),
@@ -214,9 +215,11 @@ namespace SanteDB.Server.AdminConsole.Shell
                             CertificateValidatorXml = new SanteDB.Core.Configuration.TypeReferenceConfiguration(typeof(ConsoleCertificateValidator))
 
                         };
+                    }
                     else if (itm.Capabilities.HasFlag(ServiceEndpointCapabilities.BasicAuth))
                     {
                         if (itm.ServiceType == ServiceEndpointType.AuthenticationService)
+                        {
                             config.Binding.Security = new RestClientSecurityConfiguration()
                             {
                                 CredentialProvider = new OAuth2CredentialProvider(),
@@ -224,7 +227,9 @@ namespace SanteDB.Server.AdminConsole.Shell
                                 PreemptiveAuthentication = true,
                                 CertificateValidatorXml = new SanteDB.Core.Configuration.TypeReferenceConfiguration(typeof(ConsoleCertificateValidator))
                             };
+                        }
                         else
+                        {
                             config.Binding.Security = new RestClientSecurityConfiguration()
                             {
                                 CredentialProvider = new HttpBasicTokenCredentialProvider(),
@@ -232,15 +237,18 @@ namespace SanteDB.Server.AdminConsole.Shell
                                 PreemptiveAuthentication = true,
                                 CertificateValidatorXml = new SanteDB.Core.Configuration.TypeReferenceConfiguration(typeof(ConsoleCertificateValidator))
                             };
+                        }
                     }
 
                     config.Endpoint.AddRange(itm.BaseUrl.Select(o => new RestClientEndpointConfiguration(o.Replace("0.0.0.0", this.m_configuration.RealmId)))); //  new   new AdminClientEndpointDescription(o.Replace("0.0.0.0", this.m_configuration.RealmId))));
 
                     // Add client
                     if (!this.m_restClients.ContainsKey(itm.ServiceType))
+                    {
                         this.m_restClients.Add(itm.ServiceType, new RestClient(
                             config
                         ));
+                    }
                 }
 
                 // Attempt to get server time from clinical interface which should challenge
@@ -273,16 +281,22 @@ namespace SanteDB.Server.AdminConsole.Shell
                     this.m_configuration.User = Console.ReadLine();
                 }
                 else
+                {
                     Console.WriteLine("Username:{0}", this.m_configuration.User);
+                }
 
                 if (String.IsNullOrEmpty(this.m_configuration.Password))
                 {
                     this.m_configuration.Password = DisplayUtil.PasswordPrompt("Password:");
                     if (String.IsNullOrEmpty(this.m_configuration.Password))
+                    {
                         return false;
+                    }
                 }
                 else
+                {
                     Console.WriteLine("Password:{0}", new String('*', this.m_configuration.Password.Length * 2));
+                }
 
                 // Now authenticate
                 try

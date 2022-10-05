@@ -19,12 +19,12 @@
  * Date: 2022-5-30
  */
 using MohawkCollege.Util.Console.Parameters;
+using SanteDB.Core.Interop;
 using SanteDB.Core.Model.AMI.Auth;
 using SanteDB.Core.Model.AMI.Collections;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.Patch;
 using SanteDB.Core.Model.Security;
-using SanteDB.Core.Security;
 using SanteDB.Messaging.AMI.Client;
 using SanteDB.Server.AdminConsole.Attributes;
 using SanteDB.Server.AdminConsole.Util;
@@ -34,7 +34,6 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using SanteDB.Core.Interop;
 
 namespace SanteDB.Server.AdminConsole.Shell.CmdLets
 {
@@ -98,16 +97,26 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
         {
             var roles = new List<SecurityRoleInfo>();
             if (parms.Roles?.Count > 0)
+            {
                 roles = parms.Roles.OfType<String>().Select(o => m_client.GetRoles(r => r.Name == o).CollectionItem.FirstOrDefault()).OfType<SecurityRoleInfo>().ToList();
-            if (roles.Count == 0)
-                throw new InvalidOperationException("The specified roles do not exit. Roles are case sensitive"); ;
+            }
 
             if (roles.Count == 0)
-                throw new InvalidOperationException("The specified roles do not exit. Roles are case sensitive"); ;
+            {
+                throw new InvalidOperationException("The specified roles do not exit. Roles are case sensitive");
+            };
+
+            if (roles.Count == 0)
+            {
+                throw new InvalidOperationException("The specified roles do not exit. Roles are case sensitive");
+            };
             if (parms.UserName == null)
+            {
                 throw new InvalidOperationException("Must specify a user");
+            }
 
             foreach (var un in parms.UserName)
+            {
                 m_client.CreateUser(new SecurityUserInfo()
                 {
                     Entity = new SecurityUser()
@@ -118,6 +127,7 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
                     },
                     Roles = parms.Roles.OfType<String>().ToList()
                 });
+            }
         }
 
         #endregion User Add
@@ -146,13 +156,17 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
         internal static void Userdel(GenericUserParms parms)
         {
             if (parms.UserName == null)
+            {
                 throw new InvalidOperationException("Must specify a user");
+            }
 
             foreach (var un in parms.UserName)
             {
                 var user = m_client.GetUsers(o => o.UserName == un).CollectionItem.FirstOrDefault() as SecurityUserInfo;
                 if (user == null)
+                {
                     throw new KeyNotFoundException($"User {un} not found");
+                }
 
                 m_client.DeleteUser(user.Entity.Key.Value);
             }
@@ -167,13 +181,17 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
         internal static void Userudel(GenericUserParms parms)
         {
             if (parms.UserName == null)
+            {
                 throw new InvalidOperationException("Must specify a user");
+            }
 
             foreach (var un in parms.UserName)
             {
                 var user = m_client.GetUsers(o => o.UserName == un).CollectionItem.FirstOrDefault() as SecurityUserInfo;
                 if (user == null)
+                {
                     throw new KeyNotFoundException($"User {un} not found");
+                }
 
                 var patch = new Patch()
                 {
@@ -197,20 +215,28 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
         internal static void Userlock(UserLockParms parms)
         {
             if (parms.UserName == null)
+            {
                 throw new InvalidOperationException("Must specify a user");
+            }
 
             foreach (var un in parms.UserName)
             {
                 var user = m_client.GetUsers(o => o.UserName == un).CollectionItem.FirstOrDefault() as SecurityUserInfo;
                 if (user == null)
+                {
                     throw new KeyNotFoundException($"User {un} not found");
+                }
 
                 user.Entity.Lockout = !parms.Locked ? null : (DateTime?)DateTime.MaxValue;
 
                 if (parms.Locked)
+                {
                     m_client.Client.Lock<SecurityUserInfo>($"SecurityUser/{user.Key}");
+                }
                 else
+                {
                     m_client.Client.Unlock<SecurityUserInfo>($"SecurityUser/{user.Key}");
+                }
             }
         }
 
@@ -262,18 +288,32 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
             var un = parms.UserName?.OfType<String>()?.FirstOrDefault();
             AmiCollection users = null;
             if (parms.Locked && !String.IsNullOrEmpty(un))
+            {
                 users = m_client.GetUsers(o => o.UserName.Contains(un) && o.Lockout.HasValue);
+            }
             else if (!String.IsNullOrEmpty(un))
+            {
                 users = m_client.GetUsers(o => o.UserName.Contains(un));
+            }
             else
+            {
                 users = m_client.GetUsers(o => o.ObsoletionTime == null);
+            }
 
             if (parms.Active)
+            {
                 users.CollectionItem = users.CollectionItem.OfType<SecurityUserInfo>().Where(o => o.Entity.ObsoletionTime.HasValue).OfType<object>().ToList();
+            }
+
             if (parms.Human)
+            {
                 users.CollectionItem = users.CollectionItem.OfType<SecurityUserInfo>().Where(o => o.Entity.UserClass == ActorTypeKeys.HumanUser).OfType<object>().ToList();
+            }
             else if (parms.System)
+            {
                 users.CollectionItem = users.CollectionItem.OfType<SecurityUserInfo>().Where(o => o.Entity.UserClass != ActorTypeKeys.HumanUser).OfType<object>().ToList();
+            }
+
             DisplayUtil.TablePrint(users.CollectionItem.OfType<SecurityUserInfo>(),
                 new String[] { "SID", "Name", "Last Auth", "Lockout", "ILA", "A" },
                 new int[] { 38, 24, 22, 22, 4, 2 },
@@ -309,19 +349,28 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
         internal static void ChangeRoles(ChangeRoleParms parms)
         {
             if (parms.UserName == null)
+            {
                 throw new InvalidOperationException("Must specify a user");
+            }
 
             foreach (var un in parms.UserName)
             {
                 var user = m_client.GetUsers(o => o.UserName == un).CollectionItem.FirstOrDefault() as SecurityUserInfo;
                 if (user == null)
+                {
                     throw new KeyNotFoundException($"User {un} not found");
+                }
 
                 var roles = new List<SecurityRoleInfo>();
                 if (parms.Roles?.Count > 0)
+                {
                     roles = parms.Roles.OfType<String>().Select(o => m_client.GetRoles(r => r.Name == o).CollectionItem.FirstOrDefault()).OfType<SecurityRoleInfo>().ToList();
+                }
+
                 if (roles.Count == 0)
-                    throw new InvalidOperationException("The specified roles do not exit. Roles are case sensitive"); ;
+                {
+                    throw new InvalidOperationException("The specified roles do not exit. Roles are case sensitive");
+                };
 
                 user.Roles = parms.Roles.OfType<String>().ToList();
                 m_client.UpdateUser(user.Entity.Key.Value, user);
@@ -351,13 +400,17 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
         internal static void SetPassword(UserPasswordParms parms)
         {
             if (parms.UserName == null)
+            {
                 throw new InvalidOperationException("Must specify a user");
+            }
 
             foreach (var un in parms.UserName)
             {
                 var user = m_client.GetUsers(o => o.UserName == un).CollectionItem.FirstOrDefault() as SecurityUserInfo;
                 if (user == null)
+                {
                     throw new KeyNotFoundException($"User {un} not found");
+                }
 
                 if (String.IsNullOrEmpty(parms.Password))
                 {
@@ -375,7 +428,10 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
                     user.Entity.Password = passwd;
                 }
                 else
+                {
                     user.Entity.Password = parms.Password;
+                }
+
                 user.PasswordOnly = true;
                 m_client.UpdateUser(user.Entity.Key.Value, user);
 
@@ -391,13 +447,17 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
         internal static void UserInfo(GenericUserParms parms)
         {
             if (parms.UserName == null)
+            {
                 throw new InvalidOperationException("Must specify a user");
+            }
 
             foreach (var un in parms.UserName)
             {
                 var user = m_client.GetUsers(o => o.UserName == un).CollectionItem.FirstOrDefault() as SecurityUserInfo;
                 if (user == null)
+                {
                     throw new KeyNotFoundException($"User {un} not found");
+                }
 
                 DisplayUtil.PrintPolicies(user,
                     new string[] { "Name", "SID", "Email", "Phone", "Invalid Logins", "Lockout", "Last Login", "Created", "Updated", "De-Activated", "Roles" },

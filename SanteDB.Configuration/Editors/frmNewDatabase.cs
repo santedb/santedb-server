@@ -20,13 +20,8 @@
  */
 using SanteDB.Core.Configuration.Data;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics.CodeAnalysis;
-using System.Drawing;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 namespace SanteDB.Configuration.Editors
@@ -44,8 +39,13 @@ namespace SanteDB.Configuration.Editors
         public frmNewDatabase(ConnectionString connectionString, IDataConfigurationProvider provider)
         {
             InitializeComponent();
-            this.ConnectionString = connectionString;
             this.Provider = provider;
+            this.ConnectionString = connectionString;
+
+            this.txtDatabaseAddress.Enabled = !String.IsNullOrEmpty(provider.Capabilities.HostSetting);
+            this.txtOwner.Enabled = provider.Capabilities.SupportsOwnership;
+            this.txtPassword.Enabled = !String.IsNullOrEmpty(provider.Capabilities.PasswordSetting);
+            this.txtUserName.Enabled = !String.IsNullOrEmpty(provider.Capabilities.UserNameSetting);
         }
 
         /// <summary>
@@ -59,11 +59,12 @@ namespace SanteDB.Configuration.Editors
             }
             set
             {
+                
                 this.m_connectionString = value;
-                this.txtOwner.Text = this.txtUserName.Text = value.GetComponent("user id");
-                this.txtPassword.Text = value.GetComponent("password");
-                this.txtDatabaseAddress.Text = value.GetComponent("host") ?? value.GetComponent("server");
-                this.cbxDatabase.SelectedValue = value.GetComponent("initial catalog") ?? value.GetComponent("database");
+                this.txtOwner.Text = this.txtUserName.Text = value.GetComponent(this.Provider.Capabilities.UserNameSetting);
+                this.txtPassword.Text = value.GetComponent(this.Provider.Capabilities.PasswordSetting);
+                this.txtDatabaseAddress.Text = value.GetComponent(this.Provider.Capabilities.HostSetting);
+                this.cbxDatabase.SelectedValue = value.GetComponent(this.Provider.Capabilities.NameSetting);
             }
         }
 
@@ -103,7 +104,7 @@ namespace SanteDB.Configuration.Editors
         /// </summary>
         private void btnOk_Click(object sender, EventArgs e)
         {
-            if (txtUserName.Text == "")
+            if (txtUserName.Enabled && txtUserName.Text == "")
             {
                 errMain.SetError(txtUserName, "Superuser must be provided");
                 return;
@@ -124,7 +125,7 @@ namespace SanteDB.Configuration.Editors
                 this.DialogResult = System.Windows.Forms.DialogResult.OK;
                 this.Close();
             }
-            catch(System.Reflection.TargetInvocationException ex)
+            catch (System.Reflection.TargetInvocationException ex)
             {
                 MessageBox.Show(String.Format("Create database failed, error was : {0}", ex.InnerException.Message), "Creation Error");
 
@@ -137,23 +138,23 @@ namespace SanteDB.Configuration.Editors
 
         private void txtDatabaseAddress_TextChanged(object sender, EventArgs e)
         {
-            this.m_connectionString.SetComponent("host", txtDatabaseAddress.Text);
+            this.m_connectionString.SetComponent(this.Provider.Capabilities.HostSetting, txtDatabaseAddress.Text);
         }
 
         private void txtUserName_TextChanged(object sender, EventArgs e)
         {
-            this.m_connectionString.SetComponent("user id", txtUserName.Text);
+            this.m_connectionString.SetComponent(this.Provider.Capabilities.UserNameSetting, txtUserName.Text);
         }
 
         private void txtPassword_TextChanged(object sender, EventArgs e)
         {
-            this.m_connectionString.SetComponent("password", txtPassword.Text);
+            this.m_connectionString.SetComponent(this.Provider.Capabilities.PasswordSetting, txtPassword.Text);
         }
 
         private void cbxDatabase_TextChanged(object sender, EventArgs e)
         {
             btnOk.Enabled = !String.IsNullOrEmpty(this.cbxDatabase.Text) &&
-                !String.IsNullOrEmpty(this.txtOwner.Text);
+                (!this.txtOwner.Enabled ^ !String.IsNullOrEmpty(this.txtOwner.Text));
         }
     }
 }

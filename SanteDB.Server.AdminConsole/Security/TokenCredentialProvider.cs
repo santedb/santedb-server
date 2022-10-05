@@ -22,7 +22,6 @@ using SanteDB.Core.Http;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Services;
-using SanteDB.Rest.Common.Security;
 using SanteDB.Server.AdminConsole.Shell;
 using System;
 using System.Diagnostics.CodeAnalysis;
@@ -37,20 +36,20 @@ namespace SanteDB.Server.AdminConsole.Security
     /// </summary>
     [ExcludeFromCodeCoverage]
     public class TokenCredentialProvider : ICredentialProvider, IDisposable
-	{
+    {
 
         // Token cred
         private IDisposable m_tokenCred = null;
 
-		#region ICredentialProvider implementation
-		/// <summary>
-		/// Gets or sets the credentials which are used to authenticate
-		/// </summary>
-		/// <returns>The credentials.</returns>
-		/// <param name="context">Context.</param>
-		public Credentials GetCredentials (IRestClient context)
-		{
-            if(!AuthenticationContext.Current.Principal.Identity.IsAuthenticated ||
+        #region ICredentialProvider implementation
+        /// <summary>
+        /// Gets or sets the credentials which are used to authenticate
+        /// </summary>
+        /// <returns>The credentials.</returns>
+        /// <param name="context">Context.</param>
+        public Credentials GetCredentials(IRestClient context)
+        {
+            if (!AuthenticationContext.Current.Principal.Identity.IsAuthenticated ||
                 AuthenticationContext.Current.Principal == AuthenticationContext.AnonymousPrincipal)
             {
                 var credentials = this.Authenticate(context);
@@ -58,15 +57,17 @@ namespace SanteDB.Server.AdminConsole.Security
                 return credentials;
             }
             else
+            {
                 return this.GetCredentials(AuthenticationContext.Current.Principal);
-		}
+            }
+        }
 
-		/// <summary>
-		/// Authenticate a user - this occurs when reauth is required
-		/// </summary>
-		/// <param name="context">Context.</param>
-		public Credentials Authenticate (IRestClient context)
-		{
+        /// <summary>
+        /// Authenticate a user - this occurs when reauth is required
+        /// </summary>
+        /// <param name="context">Context.</param>
+        public Credentials Authenticate(IRestClient context)
+        {
 
             // TODO: Determine why we're reauthenticating... if it is an expired token we'll need to get the refresh token
             var tokenCredentials = AuthenticationContext.Current.Principal as TokenClaimsPrincipal;
@@ -82,18 +83,24 @@ namespace SanteDB.Server.AdminConsole.Security
 
                 }
                 else if (expiryTime > DateTime.Now) // Token is good?
+                {
                     return this.GetCredentials(context);
+                }
                 else // I don't know what happened
+                {
                     throw new SecurityException();
+                }
             }
             else
             {
                 if (ApplicationContext.Current.Authenticate(new OAuthIdentityProvider(), context))
+                {
                     return this.GetCredentials(AuthenticationContext.Current.Principal);
+                }
             }
             return null;
-            
-		}
+
+        }
 
         /// <summary>
         /// Get credentials from the specified principal

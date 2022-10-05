@@ -19,10 +19,10 @@
  * Date: 2022-5-30
  */
 using MohawkCollege.Util.Console.Parameters;
+using SanteDB.Core.Interop;
 using SanteDB.Core.Model.AMI.Auth;
 using SanteDB.Core.Model.AMI.Collections;
 using SanteDB.Core.Model.Security;
-using SanteDB.Core.Security;
 using SanteDB.Messaging.AMI.Client;
 using SanteDB.Server.AdminConsole.Attributes;
 using SanteDB.Server.AdminConsole.Util;
@@ -32,7 +32,6 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using SanteDB.Core.Interop;
 
 namespace SanteDB.Server.AdminConsole.Shell.CmdLets
 {
@@ -104,9 +103,14 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
             var policies = new List<SecurityPolicyInfo>();
 
             if (parms.GrantPolicies?.Count > 0)
+            {
                 policies = parms.GrantPolicies.OfType<String>().Select(o => m_client.GetPolicies(r => r.Oid == o).CollectionItem.FirstOrDefault()).OfType<SecurityPolicy>().Select(o => new SecurityPolicyInfo(o)).ToList();
+            }
+
             if (parms.DenyPolicies?.Count > 0)
+            {
                 policies = policies.Union(parms.DenyPolicies.OfType<String>().Select(o => m_client.GetPolicies(r => r.Oid == o).CollectionItem.FirstOrDefault()).OfType<SecurityPolicy>().Select(o => new SecurityPolicyInfo(o))).ToList();
+            }
 
             policies.ForEach(o => o.Grant = parms.GrantPolicies?.Contains(o.Oid) == true ? PolicyGrantType.Grant : PolicyGrantType.Deny);
 
@@ -148,9 +152,13 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
             AmiCollection list = null;
             int tr = 0;
             if (parms.Active)
+            {
                 list = m_client.Query<SecurityRole>(o => o.ObsoletionTime != null, 0, 100, out tr);
+            }
             else
+            {
                 list = m_client.Query<SecurityRole>(o => o.ObsoletionTime == null, 0, 100, out tr);
+            }
 
             DisplayUtil.TablePrint(list.CollectionItem.OfType<SecurityRoleInfo>(),
                 new String[] { "SID", "Name", "Description", "A" },
@@ -171,11 +179,15 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
         {
 
             if (parms.RoleName == null)
+            {
                 throw new InvalidOperationException("Must specify a role");
+            }
 
             var role = m_client.GetRoles(o => o.Name == parms.RoleName).CollectionItem.FirstOrDefault() as SecurityRoleInfo;
             if (role == null)
+            {
                 throw new KeyNotFoundException($"Role {parms.RoleName} not found");
+            }
 
             DisplayUtil.PrintPolicies(role,
                 new string[] { "Name", "SID", "Description", "Created", "Updated", "De-Activated" },

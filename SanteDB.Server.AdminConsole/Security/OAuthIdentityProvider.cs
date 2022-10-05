@@ -21,7 +21,6 @@
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Http;
 using SanteDB.Core.Http.Description;
-using SanteDB.Core.Interfaces;
 using SanteDB.Core.Interop;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Claims;
@@ -71,9 +70,13 @@ namespace SanteDB.Server.AdminConsole.Security
         public System.Security.Principal.IPrincipal Authenticate(string userName, string password)
         {
             if (String.IsNullOrEmpty(userName))
+            {
                 return this.Authenticate(AuthenticationContext.Current.Principal, password);
+            }
             else
+            {
                 return this.Authenticate(new GenericPrincipal(new GenericIdentity(userName), null), password);
+            }
         }
 
         /// <summary>
@@ -115,15 +118,23 @@ namespace SanteDB.Server.AdminConsole.Security
                     // Create grant information
                     OAuthTokenRequest request = null;
                     if (!String.IsNullOrEmpty(password))
+                    {
                         request = new OAuthTokenRequest(principal.Identity.Name, password, scope);
+                    }
                     else if (principal is TokenClaimsPrincipal)
+                    {
                         request = new OAuthTokenRequest(principal as TokenClaimsPrincipal, scope);
+                    }
                     else
+                    {
                         request = new OAuthTokenRequest(principal.Identity.Name, null, scope);
+                    }
 
                     // Set credentials
                     if (restClient.Description.Binding.Security?.Mode == SecurityScheme.Basic)
+                    {
                         restClient.Credentials = new OAuthTokenServiceCredentials(principal);
+                    }
                     else
                     {
                         request.ClientId = ApplicationContext.Current.ApplicationName;
@@ -135,7 +146,9 @@ namespace SanteDB.Server.AdminConsole.Security
                         restClient.Requesting += (o, p) =>
                         {
                             if (!String.IsNullOrEmpty(tfaSecret))
+                            {
                                 p.AdditionalHeaders.Add(ExtendedHttpHeaderNames.TfaSecret, tfaSecret);
+                            }
                         };
 
                         OAuthTokenResponse response = restClient.Post<OAuthTokenRequest, OAuthTokenResponse>("oauth2_token", "application/x-www-form-urlencoded", request);

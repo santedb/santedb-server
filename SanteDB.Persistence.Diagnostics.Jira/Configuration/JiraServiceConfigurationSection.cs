@@ -21,10 +21,7 @@
 using Newtonsoft.Json;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Configuration.Http;
-using SanteDB.Core.Http;
-using SanteDB.Core.Http.Description;
 using System;
-using System.Collections.Generic;
 using System.Xml.Serialization;
 
 namespace SanteDB.Persistence.Diagnostics.Jira.Configuration

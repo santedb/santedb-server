@@ -192,6 +192,20 @@
   </update>
 
   <sql>
+    <exec invariant="sqlite">
+      <![CDATA[
+      INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc)
+	SELECT
+		x'DF4E5F395D5D50499F5EF827F72E4B32', CD_ID, CD_ID, 'EQUIVALENT'
+	FROM CD_SET_MEM_ASSOC_TBL WHERE SET_ID = x'67A56D4E9400234F855511DA499593AF';
+
+ -- PERSON SUBCLASSES
+INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES (x'DF4E5F395D5D50499F5EF827F72E4B32',x'46A8E29DF2DDBC4E902E84508C5089EA',x'6F9CCDBAA93F1E48963637457962804D','PERSON-[EQUIVALENT]->PATIENT') ;
+INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES (x'DF4E5F395D5D50499F5EF827F72E4B32',x'6F9CCDBAA93F1E48963637457962804D',x'46A8E29DF2DDBC4E902E84508C5089EA','PATIENT-[EQUIVALENT]->PERSON') ;
+INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES (x'DF4E5F395D5D50499F5EF827F72E4B32',x'46A8E29DF2DDBC4E902E84508C5089EA',x'D8FE046B64C19C46910BF824C2BDA4F0','PERSON-[EQUIVALENT]->PROVIDER') ;
+INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES (x'DF4E5F395D5D50499F5EF827F72E4B32',x'D8FE046B64C19C46910BF824C2BDA4F0',x'46A8E29DF2DDBC4E902E84508C5089EA','PROVIDER-[EQUIVALENT]->PERSON') ;
+]]>
+    </exec>
     <exec invariant="npgsql">
       <![CDATA[
 INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc)

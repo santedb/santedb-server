@@ -18,15 +18,11 @@
  * User: fyfej
  * Date: 2022-5-30
  */
-using SanteDB.Configuration.Editors;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Configuration.Converters
 {
@@ -51,9 +47,13 @@ namespace SanteDB.Configuration.Converters
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
             if (value is IEnumerable<String>)
+            {
                 return String.Join(",", value as IEnumerable<String>);
+            }
             else
+            {
                 return value;
+            }
         }
 
     }
