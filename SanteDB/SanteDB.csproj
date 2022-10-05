@@ -533,6 +533,9 @@
     <PackageReference Include="Newtonsoft.Json">
       <Version>13.0.1</Version>
     </PackageReference>
+    <PackageReference Include="Npgsql">
+      <Version>6.0.7</Version>
+    </PackageReference>
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe">
       <Version>6.0.0</Version>
     </PackageReference>
@@ -543,14 +546,6 @@
     <ProjectReference Include="..\santedb-cache-redis\SanteDB.Caching.Redis\SanteDB.Caching.Redis.csproj">
       <Project>{86672094-25cc-4cd5-b085-240e50ec4a5e}</Project>
       <Name>SanteDB.Caching.Redis</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\santedb-client\SanteDB.Messaging.AMI.Client\SanteDB.Messaging.AMI.Client.csproj">
-      <Project>{a5aeb9a8-5e50-49c9-94d7-ae0b2d46c5d9}</Project>
-      <Name>SanteDB.Messaging.AMI.Client</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\santedb-client\SanteDB.Messaging.HDSI.Client\SanteDB.Messaging.HDSI.Client.csproj">
-      <Project>{a5a42bfd-1d1d-430f-bf8a-b0e62f06bb1e}</Project>
-      <Name>SanteDB.Messaging.HDSI.Client</Name>
     </ProjectReference>
     <ProjectReference Include="..\santedb-data\SanteDB.Persistence.Auditing.ADO\SanteDB.Persistence.Auditing.ADO.csproj">
       <Project>{45ea67a6-48f6-4906-84ec-5c13c80c9cc4}</Project>
@@ -563,6 +558,10 @@
     <ProjectReference Include="..\santedb-data\SanteDB.Persistence.PubSub.ADO\SanteDB.Persistence.PubSub.ADO.csproj">
       <Project>{b727f549-3b5d-4094-bdfb-55f15756d2d6}</Project>
       <Name>SanteDB.Persistence.PubSub.ADO</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\santedb-docker\SanteDB.Docker.Core\SanteDB.Docker.Core.csproj">
+      <Project>{284ce885-78e0-48ea-a2e4-6957ad66eab5}</Project>
+      <Name>SanteDB.Docker.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\santedb-fhir\SanteDB.Messaging.FHIR\SanteDB.Messaging.FHIR.csproj">
       <Project>{33836324-c699-4139-ab9c-7524570a04d5}</Project>
@@ -619,10 +618,6 @@
     <ProjectReference Include="..\SanteDB.Persistence.Diagnostics.Jira\SanteDB.Persistence.Diagnostics.Jira.csproj">
       <Project>{18a9f102-023e-4e17-8a70-a91365e1510d}</Project>
       <Name>SanteDB.Persistence.Diagnostics.Jira</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Server.AdminConsole\SanteDB.Server.AdminConsole.csproj">
-      <Project>{98c8b04a-82de-4eef-a0a0-bf098be53ee4}</Project>
-      <Name>SanteDB.Server.AdminConsole</Name>
     </ProjectReference>
     <ProjectReference Include="..\SanteDB.Tools.Debug\SanteDB.Tools.Debug.csproj">
       <Project>{223d4d87-6819-4f38-ae69-a82e249e1879}</Project>

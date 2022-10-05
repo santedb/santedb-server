@@ -119,7 +119,7 @@ namespace SanteDB.Server.AdminConsole.Security
 
         public IEnumerable<IClaim> GetClaims(string userName)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         /// <summary>
