@@ -22,6 +22,7 @@ using Newtonsoft.Json;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Configuration.Http;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Xml.Serialization;
 
 namespace SanteDB.Persistence.Diagnostics.Jira.Configuration
@@ -30,6 +31,7 @@ namespace SanteDB.Persistence.Diagnostics.Jira.Configuration
     /// JIRA Service configuration
     /// </summary>
     [XmlType(nameof(JiraServiceConfigurationSection), Namespace = "http://santedb.org/configuration")]
+    [ExcludeFromCodeCoverage]
     public class JiraServiceConfigurationSection : IConfigurationSection
     {
         /// <summary>

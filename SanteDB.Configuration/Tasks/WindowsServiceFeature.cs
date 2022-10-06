@@ -24,6 +24,7 @@ using ServiceTools;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -34,6 +35,7 @@ namespace SanteDB.Configuration.Tasks
     /// <summary>
     /// Represents a feature which is a windows service installer
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class WindowsServiceFeature : IFeature
     {
         /// <summary>

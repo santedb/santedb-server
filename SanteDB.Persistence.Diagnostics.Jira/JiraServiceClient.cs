@@ -24,12 +24,14 @@ using SanteDB.Persistence.Diagnostics.Jira.Configuration;
 using SanteDB.Persistence.Diagnostics.Jira.Model;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SanteDB.Persistence.Diagnostics.Jira
 {
     /// <summary>
     /// Represents a service client base
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class JiraServiceClient : ServiceClientBase
     {
         /// <summary>

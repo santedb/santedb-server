@@ -18,6 +18,8 @@
  * User: fyfej
  * Date: 2022-5-30
  */
+
+using System.Diagnostics.CodeAnalysis;
 using SanteDB.Core;
 using SanteDB.Core.Data;
 using SanteDB.Core.Model.EntityLoader;
@@ -28,6 +30,7 @@ namespace SanteDB
     /// <summary>
     /// Server based application context
     /// </summary>
+    [ExcludeFromCodeCoverage]
     internal class ServerApplicationContext : SanteDBContextBase
     {
 

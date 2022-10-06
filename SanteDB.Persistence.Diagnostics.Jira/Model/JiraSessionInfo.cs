@@ -18,6 +18,8 @@
  * User: fyfej
  * Date: 2022-5-30
  */
+
+using System.Diagnostics.CodeAnalysis;
 using Newtonsoft.Json;
 
 namespace SanteDB.Persistence.Diagnostics.Jira.Model
@@ -27,6 +29,7 @@ namespace SanteDB.Persistence.Diagnostics.Jira.Model
     /// Represents JIRA session information
     /// </summary>
     [JsonObject]
+    [ExcludeFromCodeCoverage]
     public class JiraSessionInfo
     {
 

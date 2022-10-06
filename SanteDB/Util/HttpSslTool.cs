@@ -21,6 +21,7 @@
 using SanteDB.Rest.Common.Configuration.Interop;
 using System;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -33,6 +34,7 @@ namespace SanteDB.Util
     /// </summary>
     /// <remarks>Class from http://www.pinvoke.net/default.aspx/httpapi/HttpSetServiceConfiguration.html</remarks>
 #pragma warning disable CS1591
+    [ExcludeFromCodeCoverage]
     public class HttpSslTool : ISslCertificateBinder
     {
 

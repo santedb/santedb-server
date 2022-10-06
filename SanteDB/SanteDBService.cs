@@ -18,6 +18,8 @@
  * User: fyfej
  * Date: 2022-5-30
  */
+
+using System.Diagnostics.CodeAnalysis;
 using MohawkCollege.Util.Console.Parameters;
 using SanteDB.Core;
 using System.ServiceProcess;
@@ -28,6 +30,7 @@ namespace SanteDB
     /// SanteDB service.
     /// </summary>
     /// <seealso cref="System.ServiceProcess.ServiceBase" />
+    [ExcludeFromCodeCoverage]
     public partial class SanteDBService : ServiceBase
     {
 

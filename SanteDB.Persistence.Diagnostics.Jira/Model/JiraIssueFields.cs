@@ -20,6 +20,7 @@
  */
 using Newtonsoft.Json;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SanteDB.Persistence.Diagnostics.Jira.Model
 {
@@ -27,6 +28,7 @@ namespace SanteDB.Persistence.Diagnostics.Jira.Model
     /// Issue fields
     /// </summary>
     [JsonObject]
+    [ExcludeFromCodeCoverage]
     public class JiraIssueFields
     {
         /// <summary>

@@ -21,6 +21,7 @@
 using SanteDB.Core.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Xml.Serialization;
 
 namespace SanteDB.Persistence.Diagnostics.Email.Configuration
@@ -29,6 +30,7 @@ namespace SanteDB.Persistence.Diagnostics.Email.Configuration
     /// Represents diagnostic email configuration
     /// </summary>
     [XmlType(nameof(DiagnosticEmailServiceConfigurationSection), Namespace = "http://santedb.org/configuration")]
+    [ExcludeFromCodeCoverage]
     public class DiagnosticEmailServiceConfigurationSection : IConfigurationSection
     {
 
