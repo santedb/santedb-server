@@ -25,6 +25,8 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
+using System.Windows.Forms;
 
 namespace SanteDB.Configuration.Tasks
 {
@@ -68,6 +70,38 @@ namespace SanteDB.Configuration.Tasks
             if (File.Exists(ConfigurationContext.Current.ConfigurationFile))
             {
                 File.Copy(ConfigurationContext.Current.ConfigurationFile, this.m_backupFile, true);
+            }
+            
+            // Protect the configuration file?
+            if(configuration.Sections.OfType<IEncryptedConfigurationSection>().Any() && 
+                configuration.ProtectedSectionKey == null && 
+                MessageBox.Show("Would you like to encrypt sensitive parts of the configuration file?", "Protect Configuration", MessageBoxButtons.YesNo) == DialogResult.Yes) 
+            {
+                try
+                {
+                    using (var store = new X509Store(StoreName.My, StoreLocation.CurrentUser))
+                    {
+                        store.Open(OpenFlags.ReadOnly);
+                        X509Certificate2Collection collection = new X509Certificate2Collection();
+                        foreach(var x509 in store.Certificates)
+                        {
+                            if (x509.HasPrivateKey)
+                                collection.Add(x509);
+                        }
+
+                        configuration.ProtectedSectionKey = new Core.Security.Configuration.X509ConfigurationElement(
+                            StoreLocation.CurrentUser, StoreName.My, X509FindType.FindByThumbprint, X509Certificate2UI.SelectFromCollection(
+                                collection,
+                                "Select Certificate",
+                                "Please select the X.509 to protect the configuration file",
+                                X509SelectionFlag.SingleSelection)[0].Thumbprint
+                            );
+                    }
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show($"Configuration will not be encrypted due to {e.Message}", "Failed to Encrypt");
+                }
             }
 
             configuration.Includes = null;
