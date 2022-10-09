@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2022-5-30
  */
+using SanteDB.Core;
 using SanteDB.Core.Http;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Claims;
@@ -93,7 +94,7 @@ namespace SanteDB.Server.AdminConsole.Security
             }
             else
             {
-                if (ApplicationContext.Current.Authenticate(new OAuthIdentityProvider(), context))
+                if ((ApplicationServiceContext.Current as ApplicationContext).Authenticate(new OAuthIdentityProvider(), context))
                 {
                     return this.GetCredentials(AuthenticationContext.Current.Principal);
                 }

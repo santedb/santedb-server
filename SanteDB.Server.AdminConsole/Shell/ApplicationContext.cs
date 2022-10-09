@@ -83,7 +83,9 @@ namespace SanteDB.Server.AdminConsole.Shell
         /// </summary>
         public static void Initialize(Parameters.ConsoleParameters configuration)
         {
-            ServiceUtil.Start(Guid.Empty, new ApplicationContext(configuration));
+            ApplicationContext.Current = new ApplicationContext(configuration);
+            ServiceUtil.Start(Guid.Empty, ApplicationContext.Current);
+
         }
 
         /// <summary>

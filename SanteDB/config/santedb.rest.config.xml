@@ -26,6 +26,7 @@
     <service name="META" implementationType="SanteDB.Messaging.Metadata.Rest.MetadataServiceBehavior, SanteDB.Messaging.Metadata">
       <endpoint address="http://0.0.0.0:8080/api-docs" contract="SanteDB.Messaging.Metadata.Rest.IMetadataServiceContract, SanteDB.Messaging.Metadata">
         <add type="SanteDB.Rest.Common.Behavior.MessageCompressionEndpointBehavior, SanteDB.Rest.Common"/>
+        <add type="SanteDB.Rest.Common.Behavior.ServerMetadataServiceBehavior, SanteDB.Rest.Common" />
       </endpoint>c
     </service>
     <service name="HDSI" implementationType="SanteDB.Rest.HDSI.HdsiServiceBehavior, SanteDB.Rest.HDSI">
@@ -35,6 +36,7 @@
       <endpoint address="http://0.0.0.0:8080/hdsi" contract="SanteDB.Rest.HDSI.IHdsiServiceContract, SanteDB.Rest.HDSI">
         <behaviors>
           <add type="SanteDB.Rest.Common.Behavior.MessageLoggingEndpointBehavior, SanteDB.Rest.Common"/>
+          <add type="SanteDB.Rest.Common.Behavior.ServerMetadataServiceBehavior, SanteDB.Rest.Common" />
           <add type="SanteDB.Rest.Common.Behavior.MessageCompressionEndpointBehavior, SanteDB.Rest.Common"/>
           <add type="SanteDB.Rest.Common.Behavior.MessageDispatchFormatterBehavior, SanteDB.Rest.Common"/>
         </behaviors>
@@ -46,6 +48,7 @@
       </behaviors>
       <endpoint address="http://0.0.0.0:8080/bis" contract="SanteDB.Rest.BIS.IBisServiceContract, SanteDB.Rest.BIS">
         <behaviors>
+          <add type="SanteDB.Rest.Common.Behavior.ServerMetadataServiceBehavior, SanteDB.Rest.Common" />
           <add type="SanteDB.Rest.Common.Behavior.MessageLoggingEndpointBehavior, SanteDB.Rest.Common"/>
           <add type="SanteDB.Rest.Common.Behavior.MessageCompressionEndpointBehavior, SanteDB.Rest.Common"/>
         </behaviors>
@@ -57,6 +60,7 @@
       </behaviors>
       <endpoint address="http://0.0.0.0:8080/ami" contract="SanteDB.Rest.AMI.IAmiServiceContract, SanteDB.Rest.AMI">
         <behaviors>
+        <add type="SanteDB.Rest.Common.Behavior.ServerMetadataServiceBehavior, SanteDB.Rest.Common" />
           <add type="SanteDB.Rest.Common.Behavior.MessageLoggingEndpointBehavior, SanteDB.Rest.Common"/>
           <add type="SanteDB.Rest.Common.Behavior.MessageCompressionEndpointBehavior, SanteDB.Rest.Common"/>
           <add type="SanteDB.Rest.Common.Behavior.MessageDispatchFormatterBehavior, SanteDB.Rest.Common"/>
@@ -71,6 +75,7 @@
       </behaviors>
       <endpoint address="http://0.0.0.0:8080/fhir" contract="SanteDB.Messaging.FHIR.Rest.IFhirServiceContract, SanteDB.Messaging.FHIR">
         <behaviors>
+          <add type="SanteDB.Rest.Common.Behavior.ServerMetadataServiceBehavior, SanteDB.Rest.Common" />
           <add type="SanteDB.Rest.Common.Behavior.MessageLoggingEndpointBehavior, SanteDB.Rest.Common"/>
           <add type="SanteDB.Rest.Common.Behavior.MessageCompressionEndpointBehavior, SanteDB.Rest.Common"/>
           <add type="SanteDB.Rest.Common.Behavior.CorsEndpointBehavior, SanteDB.Rest.Common">

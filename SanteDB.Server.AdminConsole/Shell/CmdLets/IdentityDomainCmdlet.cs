@@ -58,7 +58,7 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
             /// <summary>
             /// Gets or sets the authority
             /// </summary>
-            [Description("The authority domains to operate on")]
+            [Description("The identity domains to operate on")]
             [Parameter("*")]
             [Parameter("n")]
             [Parameter("nsid")]
@@ -75,14 +75,14 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
             /// Gets or sets the OID
             /// </summary>
             [Parameter("o")]
-            [Description("The OID of the assigning authority")]
+            [Description("The OID of the identity domain")]
             public String Oid { get; set; }
 
             /// <summary>
             /// Gets or sets the URL
             /// </summary>
             [Parameter("u")]
-            [Description("The URL of the assigning authority")]
+            [Description("The URL of the identity domain")]
             public String Url { get; set; }
 
             /// <summary>
@@ -96,41 +96,41 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
             /// Gets or sets the assigner
             /// </summary>
             [Parameter("a")]
-            [Description("The application which may assign identities")]
-            public String Assigner { get; set; }
+            [Description("The applications which may assign identities")]
+            public StringCollection Assigner { get; set; }
 
             /// <summary>
             /// Gets or sets the scope
             /// </summary>
             [Parameter("s")]
-            [Description("The scope of the identity (Patient, Provider, Person, etc.)")]
+            [Description("The scopes of the identity (Patient, Provider, Person, etc.)")]
             public StringCollection Scope { get; set; }
 
             /// <summary>
             /// Indicates the AA is uuq
             /// </summary>
             [Parameter("q")]
-            [Description("Inidicate the authority is unique")]
+            [Description("Inidicate the identity domain is unique")]
             public bool Unique { get; set; }
         }
 
         /// <summary>
         /// Add the assigning authority
         /// </summary>
-        public class ListAssigningAuthorityParams : IdentityDomainParamBase
+        public class ListIdentityDomainParams : IdentityDomainParamBase
         {
             /// <summary>
             /// Gets or sets the OID
             /// </summary>
             [Parameter("o")]
-            [Description("The OID of the assigning authority")]
+            [Description("The OID of the identity domain")]
             public String Oid { get; set; }
 
             /// <summary>
             /// Gets or sets the URL
             /// </summary>
             [Parameter("u")]
-            [Description("The URL of the assigning authority")]
+            [Description("The URL of the identity domain")]
             public String Url { get; set; }
 
             /// <summary>
@@ -145,26 +145,26 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
         /// <summary>
         /// Lists all assigning authorities
         /// </summary>
-        [AdminCommand("aa.list", "Query assigning authorties/identity domains")]
+        [AdminCommand("id.list", "Query identity domains")]
         [Description("This command will list all registered identity domains")]
-        public static void ListAssigningAuthority(ListAssigningAuthorityParams parms)
+        public static void ListIdentityDomain(ListIdentityDomainParams parms)
         {
             IEnumerable<IdentityDomain> auths = null;
             if (!String.IsNullOrEmpty(parms.Name))
             {
-                auths = m_amiClient.GetAssigningAuthorities(o => o.Name.Contains(parms.Name)).CollectionItem.OfType<IdentityDomain>();
+                auths = m_amiClient.GetIdentityDomains(o => o.Name.Contains(parms.Name)).CollectionItem.OfType<IdentityDomain>();
             }
             else if (!String.IsNullOrEmpty(parms.Oid))
             {
-                auths = m_amiClient.GetAssigningAuthorities(o => o.Oid == parms.Oid).CollectionItem.OfType<IdentityDomain>();
+                auths = m_amiClient.GetIdentityDomains(o => o.Oid == parms.Oid).CollectionItem.OfType<IdentityDomain>();
             }
             else if (!String.IsNullOrEmpty(parms.Url))
             {
-                auths = m_amiClient.GetAssigningAuthorities(o => o.Url == parms.Url).CollectionItem.OfType<IdentityDomain>();
+                auths = m_amiClient.GetIdentityDomains(o => o.Url == parms.Url).CollectionItem.OfType<IdentityDomain>();
             }
             else
             {
-                auths = m_amiClient.GetAssigningAuthorities(o => o.CreationTime != null).CollectionItem.OfType<IdentityDomain>();
+                auths = m_amiClient.GetIdentityDomains(o => o.CreationTime != null).CollectionItem.OfType<IdentityDomain>();
             }
 
             DisplayUtil.TablePrint(auths,
@@ -179,18 +179,18 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
         /// Create a new assigning authority
         /// </summary>
         /// <param name="parms"></param>
-        [AdminCommand("aa.add", "Add Assigning Authority application")]
-        [Description("This command will create a new assigning authority which can be used to identify external authorities")]
+        [AdminCommand("id.add", "Add identity domain application")]
+        [Description("This command will create a new identity domain which can be used to identify external authorities")]
         // [PolicyPermission(System.Security.Permissions.SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.UnrestrictedMetadata)]
-        public static void AddAssigningAuthority(AddIdentityDomainParams parms)
+        public static void AddIdentityDomain(AddIdentityDomainParams parms)
         {
 
             // First, resolve the assigner 
-            SecurityApplicationInfo assigner = null;
-            if (!String.IsNullOrEmpty(parms.Assigner))
+            IEnumerable<SecurityApplicationInfo> assigner = null;
+            if (parms.Assigner != null)
             {
-                assigner = m_amiClient.GetApplications(o => o.Name == parms.Assigner).CollectionItem.FirstOrDefault() as SecurityApplicationInfo;
-                if (assigner == null)
+                assigner = parms.Assigner.OfType<String>().Select(a => m_amiClient.GetApplications(o => o.Name == a).CollectionItem.FirstOrDefault()).OfType<SecurityApplicationInfo>().ToList() ;
+                if (!assigner.Any())
                 {
                     throw new KeyNotFoundException("Assigner unknown");
                 }
@@ -219,11 +219,11 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
                 {
                     Url = parms.Url,
                     AuthorityScope = scope,
-                    AssigningAuthority = new List<AssigningAuthority>() { new AssigningAuthority() { AssigningApplication = assigner?.Entity, Reliability = IdentifierReliability.Authoritative } },
+                    AssigningAuthority = assigner.Select(o=> new AssigningAuthority(){ AssigningApplicationKey = o.Entity.Key, Reliability = IdentifierReliability.Authoritative }).ToList(),
                     IsUnique = parms.Unique
                 };
-                aa = m_amiClient.CreateAssigningAuthority(aa);
-                Console.WriteLine("CREATE AUTHORITY {0} = {1}", aa.DomainName, aa.Key);
+                aa = m_amiClient.CreateIdentityDomain(aa);
+                Console.WriteLine("CREATE DOMAIN {0} = {1}", aa.DomainName, aa.Key);
             }
         }
 

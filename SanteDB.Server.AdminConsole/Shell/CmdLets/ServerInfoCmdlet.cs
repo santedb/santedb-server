@@ -46,8 +46,8 @@ namespace SanteDB.Server.AdminConsole.Shell.CmdLets
         {
             try
             {
-                var diagReport = m_client.GetServerDiagnoticReport().ApplicationInfo;
-                Console.WriteLine("* {0} -> v.{1} ({2})", m_client.Client.Description.Endpoint[0].Address, diagReport.Version, diagReport.InformationalVersion);
+                var diagReport = m_client.Options();
+                Console.WriteLine("* {0} -> v.{1} ({2})", m_client.Client.Description.Endpoint[0].Address, diagReport.InterfaceVersion, diagReport.ServerVersion);
             }
             catch { }
         }

@@ -111,14 +111,24 @@ namespace SanteDB.Server.AdminConsole.Shell
             {
                 Console.WriteLine("\t{0}:{1}", l++, i.Message);
 
-                var svcFault = i as RestClientException<RestServiceFault>;
-                if (svcFault != null)
+                if(i is RestClientException<Object> rso && rso.Result is RestServiceFault rsf)
                 {
-                    Console.WriteLine("\t\tREMOTE: {0}", svcFault.Result.Message);
-                    foreach (var itm in svcFault.Result.Rules ?? new List<DetectedIssue>())
+                    Console.WriteLine("\t\tREMOTE: {0}", rsf.Message);
+                    foreach (var itm in rsf.Rules ?? new List<DetectedIssue>())
                     {
                         Console.WriteLine("\t\tREMOTE: RULE: {0} {1}", itm.Priority.ToString(), itm.Text);
                     }
+
+                    rsf = rsf.CausedBy;
+                    while (rsf != null)
+                    {
+                        Console.WriteLine("\t\t\tREMOTE [CAUSE]: {0}", rsf.Message);
+                        foreach (var itm in rsf.Rules ?? new List<DetectedIssue>())
+                        {
+                            Console.WriteLine("\t\t\tREMOTE [CAUSE]: RULE: {0} {1}", itm.Priority.ToString(), itm.Text);
+                        }
+                    }
+
                 }
                 i = i.InnerException;
             }
