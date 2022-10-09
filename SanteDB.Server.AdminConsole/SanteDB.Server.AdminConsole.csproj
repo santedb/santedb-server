@@ -4,6 +4,19 @@
   <PropertyGroup Condition="'$(VersionNumber)' == ''">
     <VersionNumber>2.4.0-debug</VersionNumber>
   </PropertyGroup>
+  <Choose>
+    <When Condition="$(VersionNumber.Contains('-'))">
+      <PropertyGroup>
+        <VersionNumberInfo>$(VersionNumber.Substring(0, $(VersionNumber.IndexOf('-'))))</VersionNumberInfo>
+      </PropertyGroup>
+    </When>
+    <Otherwise>
+      <PropertyGroup>
+        <VersionNumberInfo>$(VersionNumber)</VersionNumberInfo>
+      </PropertyGroup>
+
+    </Otherwise>
+  </Choose>
   <ItemGroup>
     <PackageReference Include="MSBuildTasks" Version="1.5.0.235">
       <PrivateAssets>all</PrivateAssets>
@@ -154,7 +167,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="BeforeBuild" Condition="!$(VersionNumber.EndsWith('-debug'))">
-    <AssemblyInfo CodeLanguage="CS" OutputFile="$(MSBuildProjectDirectory)\Properties\Version.cs" AssemblyVersion="$(VersionNumber)" AssemblyFileVersion="$(VersionNumber)" />
+    <AssemblyInfo CodeLanguage="CS" OutputFile="$(MSBuildProjectDirectory)\Properties\Version.cs" AssemblyVersion="$(VersionNumberInfo)" AssemblyFileVersion="$(VersionNumberInfo)" />
   </Target>
   <ItemGroup>
     <Compile Include="Properties\Version.cs" />

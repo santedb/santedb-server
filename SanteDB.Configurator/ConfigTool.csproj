@@ -2,8 +2,21 @@
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup Condition="'$(VersionNumber)' == ''">
-    <VersionNumber>2.4.0-debug</VersionNumber>
+    <VersionNumber>3.0-debug</VersionNumber>
   </PropertyGroup>
+  <Choose>
+    <When Condition="$(VersionNumber.Contains('-'))">
+      <PropertyGroup>
+        <VersionNumberInfo>$(VersionNumber.Substring(0, $(VersionNumber.IndexOf('-'))))</VersionNumberInfo>
+      </PropertyGroup>
+    </When>
+    <Otherwise>
+      <PropertyGroup>
+        <VersionNumberInfo>$(VersionNumber)</VersionNumberInfo>
+      </PropertyGroup>
+
+    </Otherwise>
+  </Choose>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -179,7 +192,7 @@
     </PackageReference>
   </ItemGroup>
   <Target Name="BeforeBuild" Condition="!$(VersionNumber.EndsWith('-debug'))">
-    <AssemblyInfo CodeLanguage="CS" OutputFile="$(MSBuildProjectDirectory)\Properties\Version.cs" AssemblyVersion="$(VersionNumber)" AssemblyFileVersion="$(VersionNumber)" />
+    <AssemblyInfo CodeLanguage="CS" OutputFile="$(MSBuildProjectDirectory)\Properties\Version.cs" AssemblyVersion="$(VersionNumberInfo)" AssemblyFileVersion="$(VersionNumberInfo)" />
   </Target>
   <ItemGroup>
     <Compile Include="Properties\Version.cs" />
