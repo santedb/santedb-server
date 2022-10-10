@@ -26,7 +26,6 @@
       <PropertyGroup>
         <VersionNumberInfo>$(VersionNumber)</VersionNumberInfo>
       </PropertyGroup>
-
     </Otherwise>
   </Choose>
   <PropertyGroup>
@@ -309,8 +308,8 @@
     </None>
     <None Include="data\SDB_AUDIT.FDB" />
     <None Include="data\SDB_BASE.FDB" />
+    <None Include="SanteDB.iCDR.Runtime.targets" />
     <None Include="SanteDB.nuspec" />
-    <None Include="SanteDB.Server.targets" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\SanteDB.licenseheader">
@@ -638,10 +637,6 @@
       <Project>{18a9f102-023e-4e17-8a70-a91365e1510d}</Project>
       <Name>SanteDB.Persistence.Diagnostics.Jira</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Tools.Debug\SanteDB.Tools.Debug.csproj">
-      <Project>{223d4d87-6819-4f38-ae69-a82e249e1879}</Project>
-      <Name>SanteDB.Tools.Debug</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Services\" />
@@ -655,8 +650,7 @@
   </Target>
   -->
   <Import Project="$(SolutionDir)\santedb-data\SanteDB.Core.TestFramework.FirebirdSQL\SanteDB.Core.TestFramework.FirebirdSQL.targets" />
-  <Target Name="BeforeBuild" >
-    
+  <Target Name="BeforeBuild">
     <AssemblyInfo CodeLanguage="CS" OutputFile="$(MSBuildProjectDirectory)\Properties\Version.cs" AssemblyVersion="$(VersionNumberInfo)" AssemblyFileVersion="$(VersionNumberInfo)" />
   </Target>
 </Project>

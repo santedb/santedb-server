@@ -37,7 +37,7 @@ namespace SanteDB
         /// <summary>
         /// Server application context
         /// </summary>
-        public ServerApplicationContext(string configurationFile) : base(SanteDBHostType.Server, new FileConfigurationService(configurationFile))
+        public ServerApplicationContext(string configurationFile) : base(SanteDBHostType.Server, new FileConfigurationService(configurationFile, true))
         {
             EntitySource.Current = new EntitySource(new PersistenceEntitySource());
         }

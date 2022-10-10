@@ -14,7 +14,6 @@
       <PropertyGroup>
         <VersionNumberInfo>$(VersionNumber)</VersionNumberInfo>
       </PropertyGroup>
-
     </Otherwise>
   </Choose>
   <PropertyGroup>

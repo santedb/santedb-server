@@ -72,3 +72,12 @@
 [submodule "santedb-data"]
 	path = santedb-data
 	url = https://github.com/santedb/santedb-data
+[submodule "santedb-devkit"]
+	path = santedb-devkit
+	url = https://github.com/santedb/santedb-devkit
+[submodule "santedb-dc-core"]
+	path = santedb-dc-core
+	url = https://github.com/santedb/santedb-dc-core
+[submodule "santedb-tools"]
+	path = santedb-tools
+	url = https://github.com/santedb/santedb-tools
