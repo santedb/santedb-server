@@ -8,6 +8,7 @@
 ALTER TABLE act_rel_tbl ADD cls_cd_id UUID; --#!
 ALTER TABLE act_ptcpt_tbl ADD cls_cd_id UUID; --#!
 ALTER TABLE ent_rel_tbl ADD cls_cd_id UUID; --#!
+
 ALTER TABLE act_rel_tbl ADD CONSTRAINT ck_act_rel_cls_cd_id CHECK (cls_cd_id IS NULL OR CK_IS_CD_SET_MEM(cls_cd_id, 'RelationshipClass', FALSE)); --#!
 ALTER TABLE act_ptcpt_tbl ADD CONSTRAINT ck_act_ptcpt_cls_cd_id CHECK (cls_cd_id IS NULL OR CK_IS_CD_SET_MEM(cls_cd_id, 'RelationshipClass', FALSE)); --#!
 ALTER TABLE ent_rel_tbl ADD CONSTRAINT ck_ent_rel_cls_cd_id CHECK (cls_cd_id IS NULL OR CK_IS_CD_SET_MEM(cls_cd_id, 'RelationshipClass', FALSE)); --#!

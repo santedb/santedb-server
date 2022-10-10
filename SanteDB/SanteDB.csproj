@@ -263,10 +263,18 @@
     <None Include="data\000-VIPStatus.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="data\demo\990-demo.concepts.dataset" />
-    <None Include="data\demo\991-demo.facilities.dataset" />
-    <None Include="data\demo\992-demo.places.dataset" />
-    <None Include="data\demo\994-demo.manufactured-materials.dataset" />
+    <None Include="data\demo\990-demo.concepts.dataset">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="data\demo\991-demo.facilities.dataset">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="data\demo\992-demo.places.dataset">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="data\demo\994-demo.manufactured-materials.dataset">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="data\SDB_AUDIT.FDB" />
     <None Include="data\SDB_BASE.FDB" />
     <None Include="SanteDB.nuspec" />
