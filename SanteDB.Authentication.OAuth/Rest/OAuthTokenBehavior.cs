@@ -368,7 +368,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
 
 
             // System claims
-            List<IClaim> claims = claimsPrincipal.Claims.ToList(); //session.Claims.ToList();
+            List<IClaim> claims = session.Claims.ToList(); //session.Claims.ToList();
 
             // Add JTI
             claims.Add(new SanteDBClaim("jti", BitConverter.ToString(session.Id).Replace("-", "")));
