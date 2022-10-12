@@ -122,7 +122,21 @@ namespace SanteDB.Configurator
             });
 
             // Push the initial configuration features onto the service
-            if (rdoEasy.Checked)
+            if(rdoOpen.Checked)
+            {
+                var dlgOpen = new OpenFileDialog()
+                {
+                    Title = "Open Alternate Configuration",
+                    Filter = "Configuration File (*.config.*)|*.config.*"
+                };
+                if (dlgOpen.ShowDialog() == DialogResult.OK)
+                {
+                    ConfigurationContext.Current.LoadConfiguration(dlgOpen.FileName);
+                    ConfigurationContext.Current.Apply(this);
+
+                }
+            }
+            else if (rdoEasy.Checked)
             {
                 // Create feature
                 dbSelector.ConnectionString.Name = "main";

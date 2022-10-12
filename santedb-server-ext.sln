@@ -215,13 +215,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.PatientImporter", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.AdminConsole", "santedb-tools\SanteDB.AdminConsole\SanteDB.AdminConsole.csproj", "{98C8B04A-82DE-4EEF-A0A0-BF098BE53EE4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.AdminConsole.Api", "santedb-tools\SanteDB.AdminConsole.Api\SanteDB.AdminConsole.Api.csproj", "{450E9519-C573-4F07-ADDD-8D0C74B975FF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SanteDB.AdminConsole.Api", "santedb-tools\SanteDB.AdminConsole.Api\SanteDB.AdminConsole.Api.csproj", "{450E9519-C573-4F07-ADDD-8D0C74B975FF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.DevTools", "santedb-tools\SanteDB.DevTools\SanteDB.DevTools.csproj", "{223D4D87-6819-4F38-AE69-A82E249E1879}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SanteDB.DevTools", "santedb-tools\SanteDB.DevTools\SanteDB.DevTools.csproj", "{223D4D87-6819-4F38-AE69-A82E249E1879}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.SDK.BreDebugger", "santedb-tools\SanteDB.BreDebugger\SanteDB.SDK.BreDebugger.csproj", "{16013272-94C9-46DE-84A1-9562A322719D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.VocabImport", "santedb-tools\SanteDB.VocabImport\SanteDB.VocabImport.csproj", "{E3872E49-66F3-4EA1-9F99-2F6D85EBE5C7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SanteDB.DevTools.Test", "santedb-tools\SanteDB.DevTools.Test\SanteDB.DevTools.Test.csproj", "{3BED1F73-9676-4E4F-97BD-EF0D69DDE977}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -1697,6 +1699,26 @@ Global
 		{E3872E49-66F3-4EA1-9F99-2F6D85EBE5C7}.SignedRelease|Any CPU.Build.0 = Release|Any CPU
 		{E3872E49-66F3-4EA1-9F99-2F6D85EBE5C7}.SignedRelease|x86.ActiveCfg = Release|Any CPU
 		{E3872E49-66F3-4EA1-9F99-2F6D85EBE5C7}.SignedRelease|x86.Build.0 = Release|Any CPU
+		{3BED1F73-9676-4E4F-97BD-EF0D69DDE977}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3BED1F73-9676-4E4F-97BD-EF0D69DDE977}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3BED1F73-9676-4E4F-97BD-EF0D69DDE977}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3BED1F73-9676-4E4F-97BD-EF0D69DDE977}.Debug|x86.Build.0 = Debug|Any CPU
+		{3BED1F73-9676-4E4F-97BD-EF0D69DDE977}.MacDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3BED1F73-9676-4E4F-97BD-EF0D69DDE977}.MacDebug|Any CPU.Build.0 = Debug|Any CPU
+		{3BED1F73-9676-4E4F-97BD-EF0D69DDE977}.MacDebug|x86.ActiveCfg = Debug|Any CPU
+		{3BED1F73-9676-4E4F-97BD-EF0D69DDE977}.MacDebug|x86.Build.0 = Debug|Any CPU
+		{3BED1F73-9676-4E4F-97BD-EF0D69DDE977}.MacRelease|Any CPU.ActiveCfg = Release|Any CPU
+		{3BED1F73-9676-4E4F-97BD-EF0D69DDE977}.MacRelease|Any CPU.Build.0 = Release|Any CPU
+		{3BED1F73-9676-4E4F-97BD-EF0D69DDE977}.MacRelease|x86.ActiveCfg = Release|Any CPU
+		{3BED1F73-9676-4E4F-97BD-EF0D69DDE977}.MacRelease|x86.Build.0 = Release|Any CPU
+		{3BED1F73-9676-4E4F-97BD-EF0D69DDE977}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3BED1F73-9676-4E4F-97BD-EF0D69DDE977}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3BED1F73-9676-4E4F-97BD-EF0D69DDE977}.Release|x86.ActiveCfg = Release|Any CPU
+		{3BED1F73-9676-4E4F-97BD-EF0D69DDE977}.Release|x86.Build.0 = Release|Any CPU
+		{3BED1F73-9676-4E4F-97BD-EF0D69DDE977}.SignedRelease|Any CPU.ActiveCfg = Release|Any CPU
+		{3BED1F73-9676-4E4F-97BD-EF0D69DDE977}.SignedRelease|Any CPU.Build.0 = Release|Any CPU
+		{3BED1F73-9676-4E4F-97BD-EF0D69DDE977}.SignedRelease|x86.ActiveCfg = Release|Any CPU
+		{3BED1F73-9676-4E4F-97BD-EF0D69DDE977}.SignedRelease|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1787,6 +1809,7 @@ Global
 		{223D4D87-6819-4F38-AE69-A82E249E1879} = {B79089D5-04F4-467D-A404-5391C062AF7C}
 		{16013272-94C9-46DE-84A1-9562A322719D} = {B79089D5-04F4-467D-A404-5391C062AF7C}
 		{E3872E49-66F3-4EA1-9F99-2F6D85EBE5C7} = {B79089D5-04F4-467D-A404-5391C062AF7C}
+		{3BED1F73-9676-4E4F-97BD-EF0D69DDE977} = {B79089D5-04F4-467D-A404-5391C062AF7C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E73A1AED-8AB7-492C-A4F0-C71FCC5C393C}

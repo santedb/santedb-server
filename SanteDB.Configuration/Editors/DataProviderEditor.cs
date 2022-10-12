@@ -60,7 +60,7 @@ namespace SanteDB.Configuration.Editors
 
                 if (list.SelectedItem != null)
                 {
-                    return (list.SelectedItem as DataProviderWrapper)?.Provider.DbProviderType.AssemblyQualifiedName;
+                    return (list.SelectedItem as DataProviderWrapper)?.Provider.Invariant;
                 }
             }
 
