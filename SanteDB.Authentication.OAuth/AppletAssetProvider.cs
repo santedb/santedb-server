@@ -22,7 +22,7 @@ namespace SanteDB.Authentication.OAuth2
                     continue;
                 }
 
-                _LoginAssetPath = applet.Configuration?.AppSettings?.FirstOrDefault(setting => setting.Name == "oauth2.login")?.Value ?? _LoginAssetPath;
+                _LoginAssetPath = applet.Settings?.FirstOrDefault(setting => setting.Name == "oauth2.login")?.Value ?? _LoginAssetPath;
 
                 if (null != _LoginAssetPath)
                 {

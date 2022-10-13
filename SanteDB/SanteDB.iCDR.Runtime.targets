@@ -11,7 +11,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="$(MSBuildThisFileDirectory)\*.msg">
-      <Link>%(FileName)%(Extension)</Link>
+      <Link>%(FileName)%(Extension)</Link>BB
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="$(MSBuildThisFileDirectory)\*.dat">

@@ -32,6 +32,7 @@ using SanteDB.Core.Services.Impl.Repository;
 using SanteDB.Rest.Common;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace SanteDB.Configuration.Tasks
@@ -39,6 +40,7 @@ namespace SanteDB.Configuration.Tasks
     /// <summary>
     /// Represents a feature for core server implementation
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class CoreServerFeatures : IFeature
     {
         /// <summary>

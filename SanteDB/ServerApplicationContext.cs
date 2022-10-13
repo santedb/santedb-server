@@ -18,6 +18,8 @@
  * User: fyfej
  * Date: 2022-5-30
  */
+
+using System.Diagnostics.CodeAnalysis;
 using SanteDB.Core;
 using SanteDB.Core.Data;
 using SanteDB.Core.Model.EntityLoader;
@@ -28,13 +30,14 @@ namespace SanteDB
     /// <summary>
     /// Server based application context
     /// </summary>
+    [ExcludeFromCodeCoverage]
     internal class ServerApplicationContext : SanteDBContextBase
     {
 
         /// <summary>
         /// Server application context
         /// </summary>
-        public ServerApplicationContext(string configurationFile) : base(SanteDBHostType.Server, new FileConfigurationService(configurationFile))
+        public ServerApplicationContext(string configurationFile) : base(SanteDBHostType.Server, new FileConfigurationService(configurationFile, true))
         {
             EntitySource.Current = new EntitySource(new PersistenceEntitySource());
         }

@@ -24,6 +24,7 @@ using SanteDB.Core.Services;
 using SanteDB.Persistence.Diagnostics.Jira.Model;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SanteDB.Persistence.Diagnostics.Jira.Configuration
 {
@@ -31,6 +32,7 @@ namespace SanteDB.Persistence.Diagnostics.Jira.Configuration
     /// <summary>
     /// Represents a JIRA session credential
     /// </summary>
+    [ExcludeFromCodeCoverage]
     internal class JiraCredentials : Credentials
     {
 

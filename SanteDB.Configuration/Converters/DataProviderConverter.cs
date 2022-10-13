@@ -48,7 +48,7 @@ namespace SanteDB.Configuration.Converters
         {
             if (value is string)
             {
-                return new DataProviderWrapper(ConfigurationContext.Current.DataProviders.FirstOrDefault(o => o.Invariant.Equals(value.ToString(), StringComparison.OrdinalIgnoreCase)))?.Provider.Name;
+                return new DataProviderWrapper(ConfigurationContext.Current.DataProviders.FirstOrDefault(o => o.DbProviderType == Type.GetType(value.ToString()) || o.Invariant.Equals(value.ToString(), StringComparison.OrdinalIgnoreCase)))?.Provider.Name;
             }
 
             return value;

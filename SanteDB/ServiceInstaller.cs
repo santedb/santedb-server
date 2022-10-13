@@ -19,6 +19,7 @@
  * Date: 2022-5-30
  */
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SanteDB
 {
@@ -27,6 +28,7 @@ namespace SanteDB
     /// </summary>
     /// <seealso cref="System.Configuration.Install.Installer" />
     [RunInstaller(true)]
+    [ExcludeFromCodeCoverage]
     public class ServiceInstaller : System.Configuration.Install.Installer
     {
 

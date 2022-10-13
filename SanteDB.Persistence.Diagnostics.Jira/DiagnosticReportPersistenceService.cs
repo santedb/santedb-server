@@ -32,6 +32,7 @@ using SanteDB.Core.Services;
 using SanteDB.Persistence.Diagnostics.Jira.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
@@ -48,6 +49,7 @@ namespace SanteDB.Persistence.Diagnostics.Jira
 #pragma warning disable CS0067
 
     [ServiceProvider("JIRA Based Diagnostic (Bug) Report Submissions")]
+    [ExcludeFromCodeCoverage]
     public class JiraDiagnosticReportPersistenceService : IDataPersistenceService<DiagnosticReport>
     {
         /// <summary>

@@ -1,6 +1,7 @@
 ﻿using SanteDB.Core.Http;
 using SanteDB.Persistence.Diagnostics.Jira.Model;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Principal;
 
 namespace SanteDB.Persistence.Diagnostics.Jira.Configuration
@@ -8,6 +9,7 @@ namespace SanteDB.Persistence.Diagnostics.Jira.Configuration
     /// <summary>
     /// Credential provider for JIRA
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class JiraCredentialProvider : ICredentialProvider
     {
         public const string UserNameConfigurationProperty = "username";
