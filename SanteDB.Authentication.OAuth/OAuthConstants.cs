@@ -88,9 +88,19 @@ namespace SanteDB.Authentication.OAuth2
         public const string OAuthClientCredentialFlowPolicy = OAuthLoginPolicy + ".1";
 
         /// <summary>
+        /// Client credentials policy without a device authorization present.
+        /// </summary>
+        public const string OAuthClientCredentialFlowPolicyWithoutDevice = OAuthClientCredentialFlowPolicy + ".0";
+
+        /// <summary>
         /// Password credentials policy
         /// </summary>
         public const string OAuthPasswordFlowPolicy = OAuthLoginPolicy + ".2";
+
+        /// <summary>
+        /// Password credentials policy without a device authorization present.
+        /// </summary>
+        public const string OAuthPasswordFlowPolicyWithoutDevice = OAuthPasswordFlowPolicy + ".0";
 
         /// <summary>
         /// Code token policy
@@ -98,9 +108,19 @@ namespace SanteDB.Authentication.OAuth2
         public const string OAuthCodeFlowPolicy = OAuthLoginPolicy + ".3";
 
         /// <summary>
-        /// Code token policy
+        /// Code token policy without a device authorization present.
+        /// </summary>
+        public const string OAuthCodeFlowPolicyWithoutDevice = OAuthCodeFlowPolicy + ".0";
+        
+        /// <summary>
+        /// Reset password flow policy.
         /// </summary>
         public const string OAuthResetFlowPolicy = OAuthLoginPolicy + ".4";
+
+        /// <summary>
+        /// Reset password flow policy without a device authorization present.
+        /// </summary>
+        public const string OAuthResetFlowPolicyWithoutDevice = OAuthResetFlowPolicy + ".0";
 
         /// <summary>
         /// In a token request, this is the grant type field key

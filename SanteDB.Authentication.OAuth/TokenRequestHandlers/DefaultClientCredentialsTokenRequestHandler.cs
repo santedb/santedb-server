@@ -51,6 +51,10 @@ namespace SanteDB.Authentication.OAuth2.TokenRequestHandlers
             {
                 _PolicyEnforcementService?.Demand(OAuthConstants.OAuthClientCredentialFlowPolicy, context.DevicePrincipal);
             }
+            else
+            {
+                _PolicyEnforcementService?.Demand(OAuthConstants.OAuthClientCredentialFlowPolicyWithoutDevice, context.ApplicationPrincipal);
+            }
 
             if (null == context.DevicePrincipal && context.Configuration?.AllowClientOnlyGrant != true)
             {

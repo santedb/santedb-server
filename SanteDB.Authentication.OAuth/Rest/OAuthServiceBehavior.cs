@@ -932,7 +932,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
 
             if (null != context.DevicePrincipal)
             {
-                m_policyEnforcementService.Demand(OAuthConstants.OAuthCodeFlowPolicy, context.DevicePrincipal);
+                m_policyEnforcementService?.Demand(OAuthConstants.OAuthCodeFlowPolicy, context.DevicePrincipal);
             }
 
             context.ApplicationIdentity = m_AppIdentityProvider.GetIdentity(context.ClientId) as IClaimsIdentity;
