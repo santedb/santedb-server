@@ -72,6 +72,7 @@ namespace SanteDB.Authentication.OAuth2.TokenRequestHandlers
                 _Tracer.TraceInfo("Authentication failed in Token request.");
                 context.ErrorType = OAuthErrorType.invalid_grant;
                 context.ErrorMessage = "invalid password";
+                return false;
             }
 
             context.Session = null; //Setting this to null will let the OAuthTokenBehavior establish the session for us.

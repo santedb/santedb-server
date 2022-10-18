@@ -154,7 +154,14 @@ namespace SanteDB.Authentication.OAuth2
         /// In a token request, this is the password field key
         /// </summary>
         public const string FormField_Password = "password";
-
+        /// <summary>
+        /// In a token request with a grant type of x_challenge, this is the challenge key.
+        /// </summary>
+        public const string FormField_Challenge = "challenge";
+        /// <summary>
+        /// In a token request with a grant type of x_challenge, this is the response to the challenge.
+        /// </summary>
+        public const string FormField_ChallengeResponse = "response";
 
         public const string DataKey_SymmetricSecret = "symm_secret";
 
@@ -171,5 +178,6 @@ namespace SanteDB.Authentication.OAuth2
         public const string AuthorizeParameter_ResponseType = "response_type";
         public const string AuthorizeParameter_ResponseMode = "response_mode";
         public const string AuthorizeParameter_RedirectUri = "redirect_uri";
+        
     }
 }
