@@ -609,6 +609,10 @@
       <Project>{4696ce1f-1f0a-4125-98f8-5a2ecb735065}</Project>
       <Name>SanteDB.Queue.RabbitMq</Name>
     </ProjectReference>
+    <ProjectReference Include="..\santedb-restsvc\SanteDB.Rest.AppService\SanteDB.Rest.AppService.csproj">
+      <Project>{5044daa9-50a0-42a7-b125-beaa4e9eb386}</Project>
+      <Name>SanteDB.Rest.AppService</Name>
+    </ProjectReference>
     <ProjectReference Include="..\santedb-restsvc\SanteDB.Rest.WWW\SanteDB.Rest.WWW.csproj">
       <Project>{09b39a55-466f-4678-a644-fdada2ac5b6a}</Project>
       <Name>SanteDB.Rest.WWW</Name>
