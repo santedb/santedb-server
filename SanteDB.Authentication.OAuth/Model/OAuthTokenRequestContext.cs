@@ -61,6 +61,14 @@ namespace SanteDB.Authentication.OAuth2.Model
         public string RefreshToken => FormFields?[OAuthConstants.FormField_RefreshToken];
         ///<summary>Auth code when grant type is Authorization code.</summary>
         public string AuthorizationCode => FormFields?[OAuthConstants.FormField_AuthorizationCode];
+        /// <summary>
+        /// x_challenge challenge form
+        /// </summary>
+        public string SecurityChallenge => FormFields?[OAuthConstants.FormField_Challenge];
+        /// <summary>
+        /// x_challenge response.
+        /// </summary>
+        public string SecurityChallengeResponse => FormFields?[OAuthConstants.FormField_ChallengeResponse];
 
 
         public string CodeVerifier { get; set; }

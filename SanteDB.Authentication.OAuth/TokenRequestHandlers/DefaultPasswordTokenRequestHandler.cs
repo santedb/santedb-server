@@ -37,11 +37,15 @@ namespace SanteDB.Authentication.OAuth2.TokenRequestHandlers
                 //return CreateErrorCondition(OAuthErrorType.invalid_request, "missing username in the request.");
             }
 
-            _PolicyEnforcementService.Demand(OAuthConstants.OAuthPasswordFlowPolicy, context.ApplicationPrincipal);
+            _PolicyEnforcementService?.Demand(OAuthConstants.OAuthPasswordFlowPolicy, context.ApplicationPrincipal);
 
             if (null != context.DevicePrincipal)
             {
-                _PolicyEnforcementService.Demand(OAuthConstants.OAuthPasswordFlowPolicy, context.DevicePrincipal);
+                _PolicyEnforcementService?.Demand(OAuthConstants.OAuthPasswordFlowPolicy, context.DevicePrincipal);
+            }
+            else
+            {
+                _PolicyEnforcementService?.Demand(OAuthConstants.OAuthPasswordFlowPolicyWithoutDevice, context.ApplicationPrincipal);
             }
 
             try
@@ -68,6 +72,7 @@ namespace SanteDB.Authentication.OAuth2.TokenRequestHandlers
                 _Tracer.TraceInfo("Authentication failed in Token request.");
                 context.ErrorType = OAuthErrorType.invalid_grant;
                 context.ErrorMessage = "invalid password";
+                return false;
             }
 
             context.Session = null; //Setting this to null will let the OAuthTokenBehavior establish the session for us.

@@ -113,6 +113,11 @@ namespace SanteDB.Authentication.OAuth2.TokenRequestHandlers
                 context.ErrorMessage = "missing client identity";
             }
 
+            if (null == context.DevicePrincipal)
+            {
+                _PolicyEnforcementService?.Demand(OAuthConstants.OAuthCodeFlowPolicyWithoutDevice, context.ApplicationPrincipal);
+            }
+
             context.UserIdentity = _IdentityProvider.GetIdentity(Guid.Parse(authcode.usr)) as IClaimsIdentity;
 
             if (null == context.UserIdentity)
