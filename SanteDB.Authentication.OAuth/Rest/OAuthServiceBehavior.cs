@@ -119,6 +119,12 @@ namespace SanteDB.Authentication.OAuth2.Rest
         protected readonly JsonWebTokenHandler m_JwtHandler;
 
         protected readonly IAppletSolutionManagerService _AppletSolutionManager;
+
+        /// <summary>
+        /// Applet manager for use in contexts where multiple solutions are not supported (like the dCDR)
+        /// </summary>
+        protected readonly IAppletManagerService _AppletManager;
+
         private IAssetProvider _AssetProvider;
 
         protected readonly ISymmetricCryptographicProvider _SymmetricProvider;
@@ -139,6 +145,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
         public OAuthServiceBehavior()
         {
             _AuditService = ApplicationServiceContext.Current.GetAuditService();
+            _AppletManager = ApplicationServiceContext.Current.GetService<IAppletManagerService>();
             m_policyEnforcementService = ApplicationServiceContext.Current.GetService<IPolicyEnforcementService>();
             var configurationManager = ApplicationServiceContext.Current.GetService<IConfigurationManager>();
             m_configuration = configurationManager.GetSection<OAuthConfigurationSection>();
@@ -217,11 +224,14 @@ namespace SanteDB.Authentication.OAuth2.Rest
 
                 _AssetProvider = new AppletAssetProvider(applets);
             }
-            else
+            else if(_AppletSolutionManager != null)
             {
                 var applets = _AppletSolutionManager.GetApplets("santedb.core.sln");
-
                 _AssetProvider = new AppletAssetProvider(applets);
+            }
+            else
+            {
+                _AssetProvider = new AppletAssetProvider(_AppletManager.Applets);
             }
         }
 
