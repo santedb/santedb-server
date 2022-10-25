@@ -1,4 +1,5 @@
 ﻿using SanteDB.Authentication.OAuth2.Model;
+using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Services;
@@ -10,14 +11,12 @@ namespace SanteDB.Authentication.OAuth2.TokenRequestHandlers
     public class DefaultPasswordTokenRequestHandler : Abstractions.ITokenRequestHandler
     {
         readonly IPolicyEnforcementService _PolicyEnforcementService;
-        readonly IIdentityProviderService _IdentityProvider;
         readonly Tracer _Tracer;
 
-        public DefaultPasswordTokenRequestHandler(IPolicyEnforcementService policyEnforcementService, IIdentityProviderService identityProvider)
+        public DefaultPasswordTokenRequestHandler(IPolicyEnforcementService policyEnforcementService)
         {
             _Tracer = new Tracer(nameof(DefaultPasswordTokenRequestHandler));
             _PolicyEnforcementService = policyEnforcementService;
-            _IdentityProvider = identityProvider;
 
         }
 
@@ -50,13 +49,15 @@ namespace SanteDB.Authentication.OAuth2.TokenRequestHandlers
 
             try
             {
+                var identityprovider = ApplicationServiceContext.Current.GetService<IIdentityProviderService>();
+
                 if (!string.IsNullOrEmpty(context.TfaSecret))
                 {
-                    context.UserPrincipal = _IdentityProvider.Authenticate(context.Username, context.Password, context.TfaSecret) as IClaimsPrincipal;
+                    context.UserPrincipal = identityprovider.Authenticate(context.Username, context.Password, context.TfaSecret) as IClaimsPrincipal;
                 }
                 else
                 {
-                    context.UserPrincipal = _IdentityProvider.Authenticate(context.Username, context.Password) as IClaimsPrincipal;
+                    context.UserPrincipal = identityprovider.Authenticate(context.Username, context.Password) as IClaimsPrincipal;
                 }
             }
             catch (AuthenticationException authnex)

@@ -110,10 +110,6 @@ namespace SanteDB.Authentication.OAuth2.Rest
         /// </summary>
         protected readonly IDeviceIdentityProviderService m_DeviceIdentityProvider;
         /// <summary>
-        /// User identity provider.
-        /// </summary>
-        protected readonly IIdentityProviderService m_IdentityProvider;
-        /// <summary>
         /// JWT Handler to create JWTs with.
         /// </summary>
         protected readonly JsonWebTokenHandler m_JwtHandler;
@@ -154,8 +150,7 @@ namespace SanteDB.Authentication.OAuth2.Rest
             m_SessionResolver = ApplicationServiceContext.Current.GetService<ISessionTokenResolverService>() ?? throw new ApplicationException($"Cannot find instance of {nameof(ISessionTokenResolverService)} in {nameof(ApplicationServiceContext)}.");
             m_SessionProvider = ApplicationServiceContext.Current.GetService<ISessionProviderService>() ?? throw new ApplicationException($"Cannot find instance of {nameof(ISessionProviderService)} in {nameof(ApplicationServiceContext)}.");
             m_AppIdentityProvider = ApplicationServiceContext.Current.GetService<IApplicationIdentityProviderService>() ?? throw new ApplicationException($"Cannot find instance of {nameof(IApplicationIdentityProviderService)} in {nameof(ApplicationServiceContext)}.");
-            m_DeviceIdentityProvider = ApplicationServiceContext.Current.GetService<IDeviceIdentityProviderService>() ?? throw new ApplicationException($"Cannot find instance of {nameof(IDeviceIdentityProviderService)} in {nameof(ApplicationServiceContext)}.");
-            m_IdentityProvider = ApplicationServiceContext.Current.GetService<IIdentityProviderService>() ?? throw new ApplicationException($"Cannot find instance of {nameof(IIdentityProviderService)} in {nameof(ApplicationServiceContext)}.");
+            m_DeviceIdentityProvider = ApplicationServiceContext.Current.GetService<IDeviceIdentityProviderService>() ?? throw new ApplicationException($"Cannot find instance of {nameof(IDeviceIdentityProviderService)} in {nameof(ApplicationServiceContext)}.");            
             _SymmetricProvider = ApplicationServiceContext.Current.GetService<ISymmetricCryptographicProvider>() ?? throw new ApplicationException($"Cannot find instance of {nameof(ISymmetricCryptographicProvider)} in {nameof(ApplicationServiceContext)}.");
 
             //Optimization - try to resolve from the same session provider. 
@@ -957,7 +952,9 @@ namespace SanteDB.Authentication.OAuth2.Rest
             {
                 try
                 {
-                    context.UserPrincipal = m_IdentityProvider.Authenticate(context.Username, context.Password) as IClaimsPrincipal;
+                    var identityprovider = ApplicationServiceContext.Current.GetService<IIdentityProviderService>();
+
+                    context.UserPrincipal = identityprovider.Authenticate(context.Username, context.Password) as IClaimsPrincipal;
                     context.UserIdentity = context.UserPrincipal?.Identities?.FirstOrDefault();
 
                     if (null != context.UserPrincipal)
