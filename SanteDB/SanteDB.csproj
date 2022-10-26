@@ -613,6 +613,10 @@
       <Project>{5044daa9-50a0-42a7-b125-beaa4e9eb386}</Project>
       <Name>SanteDB.Rest.AppService</Name>
     </ProjectReference>
+    <ProjectReference Include="..\santedb-restsvc\SanteDB.Rest.OAuth\SanteDB.Rest.OAuth.csproj">
+      <Project>{1e96cd40-c238-44c9-a7e7-72c49e15c8fa}</Project>
+      <Name>SanteDB.Rest.OAuth</Name>
+    </ProjectReference>
     <ProjectReference Include="..\santedb-restsvc\SanteDB.Rest.WWW\SanteDB.Rest.WWW.csproj">
       <Project>{09b39a55-466f-4678-a644-fdada2ac5b6a}</Project>
       <Name>SanteDB.Rest.WWW</Name>
