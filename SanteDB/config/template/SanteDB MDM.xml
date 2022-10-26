@@ -83,7 +83,7 @@
       <add type="SanteDB.Core.Applets.Services.Impl.AppletSubscriptionRepository, SanteDB.Core.Applets" />
       <add type="SanteDB.Core.Security.Audit.AuditDaemonService, SanteDB.Core.Api" />
       <add type="SanteDB.Core.Protocol.SimpleCarePlanService, SanteDB.Core.Api" />
-      <add type="SanteDB.Authentication.OAuth2.OAuthMessageHandler, SanteDB.Authentication.OAuth2" />
+      <add type="SanteDB.Rest.OAuth.OAuthMessageHandler, SanteDB.Rest.OAuth" />
       <add type="SanteDB.Messaging.FHIR.FhirMessageHandler, SanteDB.Messaging.FHIR" />
       <add type="SanteDB.Rest.HDSI.HdsiMessageHandler, SanteDB.Rest.HDSI" />
       <add type="SanteDB.Messaging.HL7.HL7MessageHandler, SanteDB.Messaging.HL7" />

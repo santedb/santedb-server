@@ -37,7 +37,7 @@
     <add type="SanteDB.Server.Core.Configuration.AppletConfigurationSection, SanteDB.Server.Core" />
     <add type="SanteDB.Core.Configuration.ApplicationServiceContextConfigurationSection, SanteDB.Core.Api" />
     <add type="SanteDB.Core.Configuration.Data.DataConfigurationSection, SanteDB.Core.Api" />
-    <add type="SanteDB.Authentication.OAuth2.Configuration.OAuthConfigurationSection, SanteDB.Authentication.OAuth2" />
+    <add type="SanteDB.Rest.OAuth.Configuration.OAuthConfigurationSection, SanteDB.Rest.OAuth" />
     <add type="SanteDB.Caching.Memory.Configuration.MemoryCacheConfigurationSection, SanteDB.Caching.Memory" />
     <add type="SanteDB.Caching.Redis.Configuration.RedisConfigurationSection, SanteDB.Caching.Redis" />
     <add type="SanteDB.Server.Core.Configuration.JobConfigurationSection, SanteDB.Server.Core" />
@@ -184,7 +184,7 @@
   <!-- Built-In Diagnostics and Logging Configuration -->
   <section xsi:type="DiagnosticsConfigurationSection">
     <sources>
-      <add name="SanteDB.Authentication.OAuth2" filter="Warning" />
+      <add name="SanteDB.Rest.OAuth" filter="Warning" />
       <add name="SanteDB.Caching.Memory" filter="Warning" />
       <add name="SanteDB.Caching.Memory.Query" filter="Warning" />
       <add name="SanteDB.Caching.Redis" filter="Warning" />
@@ -311,7 +311,7 @@
       </endpoint>
     </service>
     <service name="OAuth2">
-      <endpoint address="http://0.0.0.0:8080/auth" contract="SanteDB.Authentication.OAuth2.Rest.IOAuthTokenContract, SanteDB.Authentication.OAuth2" />
+      <endpoint address="http://0.0.0.0:8080/auth" contract="SanteDB.Rest.OAuth.Rest.IOAuthTokenContract, SanteDB.Rest.OAuth" />
     </service>
   </section>
 
@@ -608,7 +608,7 @@
 
       <!-- Messaging Services-->
       <!-- OAUTH 2.0 Plugin -->
-      <add type="SanteDB.Authentication.OAuth2.OAuthMessageHandler, SanteDB.Authentication.OAuth2" />
+      <add type="SanteDB.Rest.OAuth.OAuthMessageHandler, SanteDB.Rest.OAuth" />
 
       <!-- HL7 FHIR Plugin -->
       <add type="SanteDB.Messaging.FHIR.FhirDataInitializationService, SanteDB.Messaging.FHIR" />

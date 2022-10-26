@@ -621,10 +621,6 @@
       <Project>{223d4d87-6819-4f38-ae69-a82e249e1879}</Project>
       <Name>SanteDB.DevTools</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Authentication.OAuth\SanteDB.Authentication.OAuth2.csproj">
-      <Project>{a3975c6f-4fdb-43be-81ab-3357b86173f1}</Project>
-      <Name>SanteDB.Authentication.OAuth2</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SanteDB.Configuration\SanteDB.Configuration.csproj">
       <Project>{032abf00-6c76-47c7-9eca-a840915a17ea}</Project>
       <Name>SanteDB.Configuration</Name>

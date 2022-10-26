@@ -20,7 +20,7 @@
  -->
 <SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://santedb.org/configuration">
   <sections>
-    <add type="SanteDB.Authentication.OAuth2.Configuration.OAuthConfigurationSection, SanteDB.Authentication.OAuth2" />
+    <add type="SanteDB.Rest.OAuth.Configuration.OAuthConfigurationSection, SanteDB.Rest.OAuth" />
   </sections>
   <section xsi:type="OAuthConfigurationSection" issuerName="http://localhost:8080/auth">
     <allowedClaims>
