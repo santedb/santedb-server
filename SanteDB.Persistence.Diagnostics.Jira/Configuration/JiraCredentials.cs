@@ -25,6 +25,7 @@ using SanteDB.Persistence.Diagnostics.Jira.Model;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Net;
 
 namespace SanteDB.Persistence.Diagnostics.Jira.Configuration
 {
@@ -35,7 +36,6 @@ namespace SanteDB.Persistence.Diagnostics.Jira.Configuration
     [ExcludeFromCodeCoverage]
     internal class JiraCredentials : Credentials
     {
-
 
 
         // JIRA service configuration
@@ -55,12 +55,9 @@ namespace SanteDB.Persistence.Diagnostics.Jira.Configuration
         /// <summary>
         /// Get the HTTP headers
         /// </summary>
-        public override Dictionary<string, string> GetHttpHeaders()
+        public override void SetCredentials(HttpWebRequest webRequest)
         {
-            return new Dictionary<string, string>()
-            {
-                { "Cookie", String.Format("{0}={1}", this.m_authentication.Session.Name, this.m_authentication.Session.Value) }
-            };
+            webRequest.CookieContainer.Add(new Cookie(this.m_authentication.Session.Name, this.m_authentication.Session.Value));
         }
     }
 }

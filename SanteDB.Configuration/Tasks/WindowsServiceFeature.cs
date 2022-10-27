@@ -204,7 +204,7 @@ namespace SanteDB.Configuration.Tasks
                             this.m_options.User,
                             this.m_options.Password,
                             this.m_options.StartBehavior);
-                        configuration.GetSection<ApplicationServiceContextConfigurationSection>().AppSettings.Add(new AppSettingKeyValuePair("w32instance.name", this.m_options.ServiceName));
+                        configuration.GetSection<ApplicationServiceContextConfigurationSection>().InstanceName =  this.m_options.ServiceName;
                     }
                     this.ProgressChanged?.Invoke(this, new SanteDB.Core.Services.ProgressChangedEventArgs(1.0f, null));
                     return true;
