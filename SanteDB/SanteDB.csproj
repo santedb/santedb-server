@@ -613,6 +613,10 @@
       <Project>{5044daa9-50a0-42a7-b125-beaa4e9eb386}</Project>
       <Name>SanteDB.Rest.AppService</Name>
     </ProjectReference>
+    <ProjectReference Include="..\santedb-restsvc\SanteDB.Rest.OAuth\SanteDB.Rest.OAuth.csproj">
+      <Project>{1e96cd40-c238-44c9-a7e7-72c49e15c8fa}</Project>
+      <Name>SanteDB.Rest.OAuth</Name>
+    </ProjectReference>
     <ProjectReference Include="..\santedb-restsvc\SanteDB.Rest.WWW\SanteDB.Rest.WWW.csproj">
       <Project>{09b39a55-466f-4678-a644-fdada2ac5b6a}</Project>
       <Name>SanteDB.Rest.WWW</Name>
@@ -620,10 +624,6 @@
     <ProjectReference Include="..\santedb-tools\SanteDB.DevTools\SanteDB.DevTools.csproj">
       <Project>{223d4d87-6819-4f38-ae69-a82e249e1879}</Project>
       <Name>SanteDB.DevTools</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Authentication.OAuth\SanteDB.Authentication.OAuth2.csproj">
-      <Project>{a3975c6f-4fdb-43be-81ab-3357b86173f1}</Project>
-      <Name>SanteDB.Authentication.OAuth2</Name>
     </ProjectReference>
     <ProjectReference Include="..\SanteDB.Configuration\SanteDB.Configuration.csproj">
       <Project>{032abf00-6c76-47c7-9eca-a840915a17ea}</Project>
