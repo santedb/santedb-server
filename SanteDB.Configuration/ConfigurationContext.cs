@@ -228,22 +228,7 @@ namespace SanteDB.Configuration
             {
                 if (this.m_providers == null)
                 {
-                    this.m_providers = AppDomain.CurrentDomain.GetAssemblies()
-                        .Where(o => !o.IsDynamic)
-                        .SelectMany(a =>
-                        {
-                            try
-                            {
-                                return a.ExportedTypes;
-                            }
-                            catch
-                            {
-                                return new List<Type>();
-                            }
-                        })
-                        .Where(t => t != null && typeof(IDataConfigurationProvider).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface)
-                        .Select(i => Activator.CreateInstance(i) as IDataConfigurationProvider)
-                        .ToArray();
+                    this.m_providers = DataConfigurationSection.GetDataConfigurationProviders();
                 }
 
                 return this.m_providers;
