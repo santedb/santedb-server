@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Backup Management Policies">
+  <update insertIfNotExists="true">
+    <SecurityPolicy xmlns="http://santedb.org/model">
+      <id>9B400A9C-F154-4204-A41D-E10D0FA2C659</id>
+      <name>Manage System Backups</name>
+      <oid>1.3.6.1.4.1.33349.3.1.5.9.2.0.18</oid>
+      <isPublic>true</isPublic>
+      <canOverride>false</canOverride>
+    </SecurityPolicy>
+  </update>
+  <update insertIfNotExists="true">
+    <SecurityPolicy xmlns="http://santedb.org/model">
+      <id>AB400A9C-F154-4204-A41D-E10D0FA2C659</id>
+      <name>Create System Backup on (Private or Public)</name>
+      <oid>1.3.6.1.4.1.33349.3.1.5.9.2.0.18.1</oid>
+      <isPublic>true</isPublic>
+      <canOverride>false</canOverride>
+    </SecurityPolicy>
+  </update>
+  <update insertIfNotExists="true">
+    <SecurityPolicy xmlns="http://santedb.org/model">
+      <id>BB400A9C-F154-4204-A41D-E10D0FA2C659</id>
+      <name>Create Private System Backup</name>
+      <oid>1.3.6.1.4.1.33349.3.1.5.9.2.0.18.1.1</oid>
+      <isPublic>true</isPublic>
+      <canOverride>false</canOverride>
+    </SecurityPolicy>
+  </update>
+  <exec>
+    <service type="SanteDB.Core.Security.Services.IPolicyDecisionService, SanteDB.Core.Api" method="ClearCache">
+      <args>
+        <string>SYSTEM</string>
+      </args>
+    </service>
+  </exec>
+</dataset>
