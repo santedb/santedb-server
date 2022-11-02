@@ -34,7 +34,7 @@ namespace SanteDB.Persistence.Diagnostics.Jira.Configuration
     /// Represents a JIRA session credential
     /// </summary>
     [ExcludeFromCodeCoverage]
-    internal class JiraCredentials : Credentials
+    internal class JiraCredentials : RestRequestCredentials
     {
 
 

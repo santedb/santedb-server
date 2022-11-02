@@ -19,7 +19,7 @@ namespace SanteDB.Persistence.Diagnostics.Jira.Configuration
         /// <summary>
         /// Authenticate the JIRA client
         /// </summary>
-        public Credentials Authenticate(IRestClient context)
+        public RestRequestCredentials Authenticate(IRestClient context)
         {
             var credentialProperty = context.Description.Binding.Security.CredentialProviderParameters;
             if (!credentialProperty.TryGetValue(UserNameConfigurationProperty, out string userName) || !credentialProperty.TryGetValue(PasswordConfigurationProperty, out string password))
@@ -35,12 +35,12 @@ namespace SanteDB.Persistence.Diagnostics.Jira.Configuration
         /// <summary>
         /// Get current credentials
         /// </summary>
-        public Credentials GetCredentials(IRestClient context) => this.Authenticate(context);
+        public RestRequestCredentials GetCredentials(IRestClient context) => this.Authenticate(context);
 
         /// <summary>
         /// Not supported to get credentials on this endpoint via principal
         /// </summary>
-        public Credentials GetCredentials(IPrincipal principal)
+        public RestRequestCredentials GetCredentials(IPrincipal principal)
         {
             throw new NotImplementedException();
         }
