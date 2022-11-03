@@ -109,6 +109,9 @@
       <add type="SanteDB.Core.Security.RegexPasswordValidator, SanteDB.Core.Api" />
       <add type="SanteDB.Core.Security.DefaultPolicyDecisionService, SanteDB.Core.Api" />
       <add type="SanteDB.Persistence.Data.Services.AdoPolicyInformationService, SanteDB.Persistence.Data" />
+      <add type="SanteDB.Security.Certs.BouncyCastle.BouncyCastleCertificateGenerator, SanteDB.Security.Certs.BouncyCastle" />
+      <add type="SanteDB.Security.Certs.BouncyCastle.BouncyCastleCertificateSigner, SanteDB.Security.Certs.BouncyCastle" />
+      <add type="SanteDB.Core.Security.RsaKeyInitializationService, SanteDB.Core.Api"/>
     </serviceProviders>
   </section>
 </SanteDBConfiguration>
