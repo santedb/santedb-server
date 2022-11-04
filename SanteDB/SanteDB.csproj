@@ -568,6 +568,10 @@
       <Project>{86672094-25cc-4cd5-b085-240e50ec4a5e}</Project>
       <Name>SanteDB.Caching.Redis</Name>
     </ProjectReference>
+    <ProjectReference Include="..\santedb-certs-bc\SanteDB.Security.Certs.BouncyCastle\SanteDB.Security.Certs.BouncyCastle.csproj">
+      <Project>{9e914c4d-6fd1-4fd4-be0c-46136b370b22}</Project>
+      <Name>SanteDB.Security.Certs.BouncyCastle</Name>
+    </ProjectReference>
     <ProjectReference Include="..\santedb-data\SanteDB.Persistence.Auditing.ADO\SanteDB.Persistence.Auditing.ADO.csproj">
       <Project>{45ea67a6-48f6-4906-84ec-5c13c80c9cc4}</Project>
       <Name>SanteDB.Persistence.Auditing.ADO</Name>
