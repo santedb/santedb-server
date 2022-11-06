@@ -52,4 +52,18 @@
       </name>
     </Concept>
   </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>8E7BEFBC-56D9-49F2-A758-7085CA72D03D</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>PlayedRoleLinkClass</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <conceptSet>F4045AF6-5295-482F-BAB3-C5F2C3738703</conceptSet>
+      <name>
+        <language>en</language>
+        <value>Played Role</value>
+      </name>
+    </Concept>
+  </update>
 </dataset>
