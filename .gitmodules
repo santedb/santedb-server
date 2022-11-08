@@ -80,4 +80,5 @@
 	url = https://github.com/santedb/santedb-tools
 [submodule "santedb-certs-bc"]
 	path = santedb-certs-bc
-	url = https://github.com/santedb/santedb-certs-bc
+	url = https://github.com/santedb/santedb-certs-bc.git
+

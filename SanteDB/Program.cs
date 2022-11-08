@@ -172,7 +172,7 @@ namespace SanteDB
                         {
                             var asm = Assembly.LoadFile(file);
                             Console.WriteLine("Adding service providers from {0}...", file);
-                            serverConfiguration.ServiceProviders.AddRange(asm.ExportedTypes.Where(t => typeof(IServiceImplementation).IsAssignableFrom(t) && !t.IsAbstract && !t.ContainsGenericParameters && t.GetCustomAttribute<ServiceProviderAttribute>() != null).Select(o => new TypeReferenceConfiguration(o)));
+                            serverConfiguration.ServiceProviders.AddRange(asm.ExportedTypes.Where(t => typeof(IServiceImplementation).IsAssignableFrom(t) && !t.IsAbstract && !t.ContainsGenericParameters && t.HasCustomAttribute<ServiceProviderAttribute>()).Select(o => new TypeReferenceConfiguration(o)));
                             Console.WriteLine("Adding sections from {0}...", file);
                             configuration.Sections.AddRange(asm.ExportedTypes.Where(t => typeof(IConfigurationSection).IsAssignableFrom(t)).Select(t => CreateFullXmlObject(t)));
                         }
