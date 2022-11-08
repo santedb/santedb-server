@@ -98,9 +98,6 @@
   <ItemGroup>
     <Compile Include="ConsoleParameters.cs" />
     <Compile Include="ServerApplicationContext.cs" />
-    <None Include="applets\santedb.admin.sln.pak">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="applets\santedb.core.sln.pak">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
