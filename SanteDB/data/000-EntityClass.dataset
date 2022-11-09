@@ -49,6 +49,8 @@ INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES ((randomblob(16)), (x'484260391278604BBC548CC1FFFB1DE6'), null, (x'BA002B6A1B502345B57CF96D8AE44684'), '*=[Informant]=>UserEntity', 3);--#!
 
+UPDATE ent_vrsn_tbl SET cls_cd_id = x'BA002B6A1B502345B57CF96D8AE44684' WHERE ent_id IN (SELECT ENT_ID FROM ENT_VRSN_TBL INNER JOIN USR_ENT_TBL USING (ENT_VRSN_ID));--#!
+
       ]]>
     </exec>
     <exec invariant="npgsql">
@@ -81,6 +83,7 @@ INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_
 	VALUES (uuid_generate_v1(), ('A2594E6E-E8FE-4C68-82A5-D3A46DBEC87D'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Discharger]=>UserEntity', 3);--#!
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES (uuid_generate_v1(), ('39604248-7812-4B60-BC54-8CC1FFFB1DE6'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Informant]=>UserEntity', 3);--#!
+UPDATE ent_vrsn_tbl SET cls_cd_id = '6a2b00ba-501b-4523-b57c-f96d8ae44684' WHERE ent_id IN (SELECT ENT_ID FROM ENT_VRSN_TBL INNER JOIN USR_ENT_TBL USING (ENT_VRSN_ID));--#!
 
       ]]>
     </exec>
@@ -154,6 +157,9 @@ INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_
       <![CDATA[INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES (gen_uuid(), char_to_uuid('A0174216-6439-4351-9483-A241A48029B7'), null, char_to_uuid('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Admitter]=>UserEntity', 3);--#!
 ]]>
+    </exec>
+    <exec invariant="FirebirdSQL">
+      <![CDATA[UPDATE ent_vrsn_tbl SET cls_cd_id = char_to_uuid('6a2b00ba-501b-4523-b57c-f96d8ae44684') WHERE ent_id IN (SELECT ENT_ID FROM ENT_VRSN_TBL INNER JOIN USR_ENT_TBL USING (ENT_VRSN_ID));]]>
     </exec>
 
   </sql>
