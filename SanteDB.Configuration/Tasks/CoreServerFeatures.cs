@@ -68,7 +68,10 @@ namespace SanteDB.Configuration.Tasks
             typeof(AesSymmetricCrypographicProvider),
             typeof(SimpleTfaSecretGenerator),
             typeof(AppletLocalizationService),
-            typeof(CachedResourceCheckoutService)
+            typeof(CachedResourceCheckoutService),
+            typeof(AppletDatasetProvider),
+            typeof(FileSystemDatasetProvider),
+            typeof(DataInitializationService)
         };
 
         /// <summary>

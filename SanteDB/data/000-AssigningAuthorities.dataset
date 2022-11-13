@@ -16,7 +16,7 @@
       <oid>1.3.88</oid>
     </IdentityDomain>
   </update>
-  <insert skipIfError="true" skipIfExists="true">
+  <update insertIfNotExists="true">
     <IdentityDomain xmlns="http://santedb.org/model">
       <id>ff6e7402-8545-48e1-8a70-ebf06f3ee4b8</id>
       <creationTime>2018-08-15T19:35:40.8915561-04:00</creationTime>
@@ -29,8 +29,8 @@
       <validation>^[A-Z]{2}$</validation>
       <isUnique>true</isUnique>
     </IdentityDomain>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <IdentityDomain xmlns="http://santedb.org/model">
       <id>AF1ECAD7-0E74-4508-8818-ED2E5C021348</id>
       <name>US Social Security Number</name>
@@ -39,5 +39,5 @@
       <url>http://hl7.org/fhir/sid/us-ssn</url>
       <isUnique>false</isUnique>
     </IdentityDomain>
-  </insert>
+  </update>
 </dataset>
