@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" id="Elbonian (Demo) Places" xmlns="http://santedb.org/data">
-  <insert>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>aa1ad59d-8466-4a64-91d6-a521b03a7071</id>
       <creationTime>0001-01-01T00:00:00.0000000+00:00</creationTime>
@@ -41,8 +41,8 @@
         </component>
       </address>
     </Place>
-  </insert>
-  <insert>
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>aa843a17-2b76-4bea-91a4-b8d547cc2242</id>
       <creationTime>0001-01-01T00:00:00.0000000+00:00</creationTime>
@@ -89,8 +89,8 @@
         </component>
       </address>
     </Place>
-  </insert>
-  <insert>
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>aa98add3-cc1d-4476-b758-43d55a480864</id>
       <classConcept>d9489d56-ddac-4596-b5c6-8f41d73d8dc5</classConcept>
@@ -141,8 +141,8 @@
         </component>
       </address>
     </Place>
-  </insert>
-  <insert>
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>aa7fe2d0-3d64-4b26-a4a1-9e8d3fcab480</id>
       <classConcept>79dd4f75-68e8-4722-a7f5-8bc2e08f5cd6</classConcept>
@@ -198,8 +198,8 @@
         </component>
       </address>
     </Place>
-  </insert>
-    <insert>
+  </update>
+    <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>aaf42421-3d64-4b26-a4a1-9e8d3fcab480</id>
       <classConcept>79dd4f75-68e8-4722-a7f5-8bc2e08f5cd6</classConcept>
@@ -255,5 +255,5 @@
         </component>
       </address>
     </Place>
-  </insert>
+  </update>
 </dataset>

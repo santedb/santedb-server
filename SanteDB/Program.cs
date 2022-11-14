@@ -277,9 +277,14 @@ namespace SanteDB
 #if DEBUG
                 Trace.TraceError("011 899 981 199 911 9725 3!!! {0}", e.ToString());
 
-
-                EventLog.WriteEntry("SanteDB Host Process", $"011 899 981 199 911 9725 3!!! {e}", EventLogEntryType.Error, 911);
-
+                try
+                {
+                    if (EventLog.Exists("SanteDB Host Process"))
+                    {
+                        EventLog.WriteEntry("SanteDB Host Process", $"011 899 981 199 911 9725 3!!! {e}", EventLogEntryType.Error, 911);
+                    }
+                }
+                catch { }
 #else
                 Trace.TraceError("Error encountered: {0}. Will terminate", e);
 #endif
