@@ -583,6 +583,10 @@
       <Project>{b727f549-3b5d-4094-bdfb-55f15756d2d6}</Project>
       <Name>SanteDB.Persistence.PubSub.ADO</Name>
     </ProjectReference>
+    <ProjectReference Include="..\santedb-data\SanteDB.Persistence.Synchronization.ADO\SanteDB.Persistence.Synchronization.ADO.csproj">
+      <Project>{b312ffef-fb93-4ba9-895c-597dd238bd4f}</Project>
+      <Name>SanteDB.Persistence.Synchronization.ADO</Name>
+    </ProjectReference>
     <ProjectReference Include="..\santedb-docker\SanteDB.Docker.Core\SanteDB.Docker.Core.csproj">
       <Project>{284ce885-78e0-48ea-a2e4-6957ad66eab5}</Project>
       <Name>SanteDB.Docker.Core</Name>
