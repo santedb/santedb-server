@@ -20,14 +20,15 @@
  */
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.i18n;
+using SanteDB.Core.Notifications;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Services;
 using SanteDB.Core.Security.Tfa.Twilio.Configuration;
-using SanteDB.Core.Security.Tfa.Twilio.Resources;
 using SanteDB.Core.Services;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Tracing;
+using System.Globalization;
 using System.Security.Principal;
 using TW = Twilio;
 
@@ -43,17 +44,22 @@ namespace SanteDB.Core.Security.Tfa.Twilio
         // Configuration
         private TwilioTfaMechanismConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<TwilioTfaMechanismConfigurationSection>();
 
+        public const string TFA_TEMPLATE_ID = "org.santedb.notifications.mfa.sms";
+
         private readonly Tracer m_tracer = new Tracer("SanteDB.Core.Security.Tfa.Twilio");
         private readonly ITwoFactorSecretGenerator m_secretGenerator;
         private readonly IPasswordHashingService m_passwordHasher;
+        private readonly INotificationTemplateFiller m_templateFiller;
 
         /// <summary>
         /// DI constructor
         /// </summary>
-        public TfaTwilioMechanism(ITwoFactorSecretGenerator secretGenerator, IPasswordHashingService hashingService)
+        public TfaTwilioMechanism(ITwoFactorSecretGenerator secretGenerator, IPasswordHashingService hashingService, 
+            INotificationTemplateFiller templateFiller)
         {
             this.m_secretGenerator = secretGenerator;
             this.m_passwordHasher = hashingService;
+            this.m_templateFiller = templateFiller;
         }
 
         /// <summary>
@@ -74,7 +80,7 @@ namespace SanteDB.Core.Security.Tfa.Twilio
         {
             get
             {
-                return Strings.mechanism_name;
+                return "SMS";
             }
         }
 
@@ -94,14 +100,18 @@ namespace SanteDB.Core.Security.Tfa.Twilio
                     // Generate a TFA secret and add it as a claim on the user
                     var secret = this.m_passwordHasher.ComputeHash(this.m_secretGenerator.GenerateTfaSecret());
                     ApplicationServiceContext.Current.GetService<IIdentityProviderService>().AddClaim(user.Name, new SanteDBClaim(SanteDBClaimTypes.SanteDBOTAuthCode, secret), AuthenticationContext.SystemPrincipal, new TimeSpan(0, 5, 0));
-                    var client = new TW.TwilioRestClient(this.m_configuration.Sid, this.m_configuration.Auth);
+                    TW.TwilioClient.Init(this.m_configuration.Sid, this.m_configuration.Auth);
 
                     var toNumber = icid.FindFirst(SanteDBClaimTypes.Telephone).Value;
-                    var response = client.SendMessage(this.m_configuration.From, toNumber, String.Format(Strings.default_body, secret));
+                    var message = this.m_templateFiller.FillTemplate(TFA_TEMPLATE_ID, CultureInfo.CurrentUICulture.TwoLetterISOLanguageName, new { code = secret });
+                    var response = TW.Rest.Api.V2010.Account.MessageResource.Create(
+                        body: message.Body,
+                        from: new TW.Types.PhoneNumber(this.m_configuration.From),
+                        to: new TW.Types.PhoneNumber(toNumber));
 
-                    if (response.RestException != null)
+                    if (response.ErrorCode.HasValue)
                     {
-                        throw new Exception(response.RestException.Message ?? "" + " " + (response.RestException.Code ?? "") + " " + (response.RestException.MoreInfo ?? "") + " " + (response.RestException.Status ?? ""));
+                        throw new Exception(response.ErrorMessage ?? "" + " " + (response.ErrorCode ?? 0));
                     }
 
                     return $"Code sent to ******{toNumber.Substring(toNumber.Length - 4, 4)}";
