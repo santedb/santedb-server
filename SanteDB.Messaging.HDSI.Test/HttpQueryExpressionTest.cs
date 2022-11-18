@@ -38,6 +38,27 @@ namespace SanteDB.Messaging.HDSI.Test
     public class HttpQueryExpressionTest
     {
 
+        [Test]
+        public void TestComposeControlParameters()
+        {
+            var query = "dateOfBirth=!null&_someOtherValue=true".ParseQueryString();
+            var linq = QueryExpressionParser.BuildLinqExpression<Patient>(query);
+            Assert.IsTrue(linq.ToString().Contains("WithControl"));
+            Assert.IsTrue((bool)linq.Compile().DynamicInvoke(new Patient() { DateOfBirth = DateTime.Now }));
+
+            query = "dateOfBirth=!null&_sub=$sub.id&_sub=$sub2.id".ParseQueryString();
+            linq = QueryExpressionParser.BuildLinqExpression<Patient>(query, new System.Collections.Generic.Dictionary<string, Func<object>>()
+            {
+                { "sub", () => new Patient() { Key = Guid.Empty } },
+                { "sub2", () => new Patient() { Key = Guid.Empty } }
+            }, safeNullable: false, lazyExpandVariables: false);
+            Assert.IsTrue((bool)linq.Compile().DynamicInvoke(new Patient() { DateOfBirth = DateTime.Now }));
+
+            // Re-parse
+            var parsedQuery = QueryExpressionBuilder.BuildQuery(linq);
+            var parsedQueryString = parsedQuery.ToHttpString();
+            Assert.AreEqual(parsedQueryString, "dateOfBirth=%21null&_sub=00000000-0000-0000-0000-000000000000&_sub=00000000-0000-0000-0000-000000000000");
+        }
 
         /// <summary>
         /// Test query by key
