@@ -32,26 +32,26 @@ namespace SanteDB.Core.Security.Tfa.Twilio.Configuration
     public class TwilioTfaMechanismConfigurationSection : IConfigurationSection
     {
         /// <summary>
-        /// Creates a new template mechanism configuration
+        /// Creates a new configuration instance for a Twilio account.
         /// </summary>
         public TwilioTfaMechanismConfigurationSection()
         {
         }
 
         /// <summary>
-        /// Authentication token
+        /// Twilio Auth Token. This value is found in the Twilio Console under the Account Info section.
         /// </summary>
         [XmlAttribute("auth")]
         public String Auth { get; set; }
 
         /// <summary>
-        /// From number
+        /// E164 phone number to send text messages or place calls from.
         /// </summary>
         [XmlAttribute("from")]
         public String From { get; set; }
 
         /// <summary>
-        /// SID configuration
+        /// Twilio Account SID. This value is found in the Twilio Console undeer the Account Info section.
         /// </summary>
         [XmlAttribute("sid")]
         public String Sid { get; set; }
