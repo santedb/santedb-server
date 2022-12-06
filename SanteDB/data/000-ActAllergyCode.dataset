@@ -3,7 +3,6 @@
   <update insertIfNotExists="true">
     <CodeSystem xmlns="http://santedb.org/model">
       <id>02823B47-C315-4366-8883-442E646D34BE</id>
-      
       <name>ActCode</name>
       <oid>2.16.840.1.113883.5.4</oid>
       <authority>ActCode</authority>
@@ -13,11 +12,9 @@
   <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>fe4280a7-0921-482e-9d10-cc0b1eb88057</id>
-      
       <mnemonic>ALG</mnemonic>
       <codeSystem>02823B47-C315-4366-8883-442E646D34BE</codeSystem>
       <name>
-        
         <language>en</language>
         <value>Allergy</value>
         <phoneticAlgorithm xsi:nil="true" />
