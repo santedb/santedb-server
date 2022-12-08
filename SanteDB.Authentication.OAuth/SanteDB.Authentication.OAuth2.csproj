@@ -42,7 +42,7 @@
     <DocumentationFile>..\bin\Release\SanteDB.Authentication.OAuth2.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="4.0.4.403061554" />
   </ItemGroup>
   <ItemGroup>
