@@ -47,17 +47,17 @@ namespace SanteDB.Core.Security.Tfa.Twilio
         public const string TFA_TEMPLATE_ID = "org.santedb.notifications.mfa.sms";
 
         private readonly Tracer m_tracer = new Tracer("SanteDB.Core.Security.Tfa.Twilio");
-        private readonly ITwoFactorSecretGenerator m_secretGenerator;
+        private readonly ITfaCodeProvider m_CodeProvider;
         private readonly IPasswordHashingService m_passwordHasher;
         private readonly INotificationTemplateFiller m_templateFiller;
 
         /// <summary>
         /// DI constructor
         /// </summary>
-        public TfaTwilioMechanism(ITwoFactorSecretGenerator secretGenerator, IPasswordHashingService hashingService, 
+        public TfaTwilioMechanism(ITfaCodeProvider codeProvider, IPasswordHashingService hashingService, 
             INotificationTemplateFiller templateFiller)
         {
-            this.m_secretGenerator = secretGenerator;
+            this.m_CodeProvider = codeProvider;
             this.m_passwordHasher = hashingService;
             this.m_templateFiller = templateFiller;
         }
@@ -98,9 +98,9 @@ namespace SanteDB.Core.Security.Tfa.Twilio
                 try
                 {
                     // Generate a TFA secret and add it as a claim on the user
-                    var secret = this.m_passwordHasher.ComputeHash(this.m_secretGenerator.GenerateTfaSecret());
-                    ApplicationServiceContext.Current.GetService<IIdentityProviderService>().AddClaim(user.Name, new SanteDBClaim(SanteDBClaimTypes.SanteDBOTAuthCode, secret), AuthenticationContext.SystemPrincipal, new TimeSpan(0, 5, 0));
-                    TW.TwilioClient.Init(this.m_configuration.Sid, this.m_configuration.Auth);
+                    var secret = this.m_CodeProvider.GenerateTfaCode(user);
+                    //ApplicationServiceContext.Current.GetService<IIdentityProviderService>().AddClaim(user.Name, new SanteDBClaim(SanteDBClaimTypes.SanteDBOTAuthCode, secret), AuthenticationContext.SystemPrincipal, new TimeSpan(0, 5, 0));
+                    //TW.TwilioClient.Init(this.m_configuration.Sid, this.m_configuration.Auth);
 
                     var toNumber = icid.FindFirst(SanteDBClaimTypes.Telephone).Value;
                     var message = this.m_templateFiller.FillTemplate(TFA_TEMPLATE_ID, CultureInfo.CurrentUICulture.TwoLetterISOLanguageName, new { code = secret });

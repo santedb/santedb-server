@@ -196,7 +196,7 @@ namespace SanteDB.Persistence.Diagnostics.Email
 
                 var notificationService = ApplicationServiceContext.Current.GetService<INotificationService>();
                 var recipients = this.m_configuration?.Recipients.Select(o => o.StartsWith("mailto:") ? o : $"mailto:{o}").ToArray();
-                notificationService?.Send(recipients, subject, body, null, true, attachments.ToArray());
+                notificationService?.SendNotification(recipients, subject, body, null, true, attachments.ToArray());
 
                 // Invoke
                 this.Inserted?.Invoke(this, new DataPersistedEventArgs<DiagnosticReport>(storageData, mode, overrideAuthContext));

@@ -25,11 +25,19 @@
   <section xsi:type="OAuthConfigurationSection" issuerName="http://localhost:8080/auth">
     <allowedClaims>
       <add>scope</add>
+      <add>role</add>
       <add>PolicyOverride</add>
       <add>ResourceId</add>
       <add>PurposeOfUse</add>
       <add>FacilityId</add>
       <add>OrganizationId</add>
+      <add>name</add>
+      <add>sid</add>
+      <add>email</add>
+      <add>phone_number</add>
+      <add>appid</add>
+      <add>devid</add>
+      <add>usrid</add>
     </allowedClaims>
     <tokenType>bearer</tokenType>
     <allowNodelessClientAuth>true</allowNodelessClientAuth>
