@@ -47,14 +47,14 @@ namespace SanteDB.Core.Security.Tfa.Twilio
         public const string TFA_TEMPLATE_ID = "org.santedb.notifications.mfa.sms";
 
         private readonly Tracer m_tracer = new Tracer("SanteDB.Core.Security.Tfa.Twilio");
-        private readonly ITwoFactorSecretGenerator m_secretGenerator;
+        private readonly ITfaCodeGenerator m_secretGenerator;
         private readonly IPasswordHashingService m_passwordHasher;
         private readonly INotificationTemplateFiller m_templateFiller;
 
         /// <summary>
         /// DI constructor
         /// </summary>
-        public TfaTwilioMechanism(ITwoFactorSecretGenerator secretGenerator, IPasswordHashingService hashingService, 
+        public TfaTwilioMechanism(ITfaCodeGenerator secretGenerator, IPasswordHashingService hashingService, 
             INotificationTemplateFiller templateFiller)
         {
             this.m_secretGenerator = secretGenerator;
@@ -98,7 +98,7 @@ namespace SanteDB.Core.Security.Tfa.Twilio
                 try
                 {
                     // Generate a TFA secret and add it as a claim on the user
-                    var secret = this.m_passwordHasher.ComputeHash(this.m_secretGenerator.GenerateTfaSecret());
+                    var secret = this.m_passwordHasher.ComputeHash(this.m_secretGenerator.GenerateTfaCode(icid));
                     ApplicationServiceContext.Current.GetService<IIdentityProviderService>().AddClaim(user.Name, new SanteDBClaim(SanteDBClaimTypes.SanteDBOTAuthCode, secret), AuthenticationContext.SystemPrincipal, new TimeSpan(0, 5, 0));
                     TW.TwilioClient.Init(this.m_configuration.Sid, this.m_configuration.Auth);
 
