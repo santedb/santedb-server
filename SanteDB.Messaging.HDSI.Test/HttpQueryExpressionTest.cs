@@ -38,6 +38,7 @@ namespace SanteDB.Messaging.HDSI.Test
     public class HttpQueryExpressionTest
     {
 
+
         [Test]
         public void TestComposeControlParameters()
         {

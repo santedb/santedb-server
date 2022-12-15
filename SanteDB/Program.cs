@@ -65,7 +65,8 @@ namespace SanteDB
 
             AppDomain.CurrentDomain.SetData(
                "DataDirectory",
-               Path.GetDirectoryName(typeof(Program).Assembly.Location));
+               Path.GetDirectoryName(typeof(Program).Assembly.Location)
+            );
 
             // Handle Unahndled exception
             AppDomain.CurrentDomain.UnhandledException += (o, e) =>
