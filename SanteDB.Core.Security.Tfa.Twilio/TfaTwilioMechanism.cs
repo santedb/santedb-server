@@ -133,15 +133,7 @@ namespace SanteDB.Core.Security.Tfa.Twilio
         /// </summary>
         public bool Validate(IIdentity user, String tfaSecret)
         {
-            if (user is IClaimsIdentity ci)
-            {
-                return ci.FindFirst(SanteDBClaimTypes.SanteDBOTAuthCode)?.Value == this.m_passwordHasher.ComputeHash(tfaSecret);
-            }
-            else
-            {
-                // TODO: When a non-CI is provided
-                return false;
-            }
+            return m_CodeProvider.VerifyTfaCode(user, tfaSecret, DateTimeOffset.UtcNow);
         }
     }
 }
