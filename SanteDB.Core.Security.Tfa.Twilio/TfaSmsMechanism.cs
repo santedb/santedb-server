@@ -8,6 +8,7 @@ using System.Globalization;
 using System.Security.Principal;
 using System.Text;
 using Twilio.TwiML.Voice;
+using System.Linq;
 
 namespace SanteDB.Security.Tfa.Twilio
 {
@@ -57,6 +58,7 @@ namespace SanteDB.Security.Tfa.Twilio
                     tfa = secret,
                     secret,
                     code = secret,
+                    codeWithSpaces = string.Join(" ", secret.Select(s => s.ToString())),
                     principal = AuthenticationContext.Current.Principal
                 };
 
