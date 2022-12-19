@@ -26,6 +26,7 @@ using SanteDB.Core.Notifications;
 using SanteDB.Core.PubSub.Broker;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Privacy;
+using SanteDB.Core.Security.Tfa;
 using SanteDB.Core.Services;
 using SanteDB.Core.Services.Impl;
 using SanteDB.Core.Services.Impl.Repository;
@@ -66,7 +67,7 @@ namespace SanteDB.Configuration.Tasks
             typeof(LocalTemplateDefinitionRepositoryService),
             typeof(DefaultDataSigningService),
             typeof(AesSymmetricCrypographicProvider),
-            typeof(SimpleTfaSecretGenerator),
+            typeof(Rfc4226TfaCodeProvider),
             typeof(AppletLocalizationService),
             typeof(CachedResourceCheckoutService),
             typeof(AppletDatasetProvider),
