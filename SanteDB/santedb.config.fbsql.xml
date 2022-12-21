@@ -68,8 +68,8 @@
       <add type="SanteDB.Persistence.Data.ADO.Services.AdoRoleProvider, SanteDB.Persistence.Data.ADO" />
       <add type="SanteDB.Persistence.Data.ADO.Services.AdoPersistenceService, SanteDB.Persistence.Data.ADO" />
       <add type="SanteDB.Persistence.Data.ADO.Services.AdoSubscriptionExecutor, SanteDB.Persistence.Data.ADO" />
-      <add type="SanteDB.Server.Core.Security.SimpleTfaSecretGenerator, SanteDB.Server.Core" />
-      <add type="SanteDB.Server.Core.Security.DefaultTfaRelayService, SanteDB.Server.Core" />
+      <add type="SanteDB.Server.Core.Security.Tfa.Rfc4226TfaCodeProvider, SanteDB.Server.Core" />
+      <add type="SanteDB.Server.Core.Security.DefaultTfaService, SanteDB.Server.Core" />
       <add type="SanteDB.Server.Core.Security.DefaultDataSigningService, SanteDB.Server.Core" />
       <add type="SanteDB.Server.Core.Security.DefaultPasswordValidationService, SanteDB.Server.Core" />
       <add type="SanteDB.Core.Security.DefaultPolicyDecisionService, SanteDB.Core.Api" />

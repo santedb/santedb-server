@@ -59,7 +59,7 @@
       <add type="SanteDB.Core.Notifications.DefaultNotificationService, SanteDB.Core.Api" />
       <add type="SanteDB.Core.Security.DefaultDataSigningService, SanteDB.Core.Api" />
       <add type="SanteDB.Core.Security.AesSymmetricCrypographicProvider, SanteDB.Core.Api" />
-      <add type="SanteDB.Core.Security.SimpleTfaSecretGenerator, SanteDB.Core.Api" />
+      <add type="SanteDB.Core.Security.Tfa.Rfc4226TfaCodeProvider, SanteDB.Core.Api" />
       <add type="SanteDB.Core.Applets.Services.Impl.AppletLocalizationService, SanteDB.Core.Applets" />
       <add type="SanteDB.Core.Services.Impl.CachedResourceCheckoutService, SanteDB.Core.Api" />
       <add type="SanteDB.Core.Security.DefaultPolicyEnforcementService, SanteDB.Core.Api" />
@@ -73,7 +73,7 @@
       <add type="SanteDB.Persistence.Data.Services.AdoRoleProvider, SanteDB.Persistence.Data" />
       <add type="SanteDB.Persistence.Data.Services.AdoSubscriptionExecutor, SanteDB.Persistence.Data" />
       <add type="SanteDB.Persistence.Data.Services.AdoDatasetInstallerService, SanteDB.Persistence.Data" />
-      <add type="SanteDB.Core.Security.DefaultTfaRelayService, SanteDB.Core.Api" />
+      <add type="SanteDB.Core.Security.DefaultTfaService, SanteDB.Core.Api" />
       <add type="SanteDB.Messaging.Atna.AtnaAuditService, SanteDB.Messaging.Atna" />
       <add type="SanteDB.Core.Security.Privacy.DataPolicyFilterService, SanteDB.Core.Api" />
       <add type="SanteDB.Caching.Memory.MemoryCacheService, SanteDB.Caching.Memory" />
