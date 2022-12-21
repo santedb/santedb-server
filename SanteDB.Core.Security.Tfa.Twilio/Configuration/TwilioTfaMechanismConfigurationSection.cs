@@ -51,7 +51,7 @@ namespace SanteDB.Core.Security.Tfa.Twilio.Configuration
         public String From { get; set; }
 
         /// <summary>
-        /// Twilio Account SID. This value is found in the Twilio Console undeer the Account Info section.
+        /// Twilio Account SID. This value is found in the Twilio Console under the Account Info section.
         /// </summary>
         [XmlAttribute("sid")]
         public String Sid { get; set; }

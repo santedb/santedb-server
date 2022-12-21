@@ -39,7 +39,7 @@ namespace SanteDB.Security.Tfa.Twilio
 
                     if ("tel".Equals(number.Protocol, StringComparison.OrdinalIgnoreCase))
                     {
-                        var call = Twlo.Rest.Api.V2010.Account.CallResource.Create(new Twlo.Rest.Api.V2010.Account.CreateCallOptions((Twlo.Types.PhoneNumber)address, (Twlo.Types.PhoneNumber)_ClientFactory.FromNumber)
+                        var call = Twlo.Rest.Api.V2010.Account.CallResource.Create(new Twlo.Rest.Api.V2010.Account.CreateCallOptions((Twlo.Types.PhoneNumber)number.Number, (Twlo.Types.PhoneNumber)_ClientFactory.FromNumber)
                         {
                             Twiml = body
                         }, client);
