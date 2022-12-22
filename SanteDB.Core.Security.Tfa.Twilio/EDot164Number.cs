@@ -10,7 +10,7 @@ namespace SanteDB.Security.Tfa.Twilio
     /// </summary>
     internal class EDot164Number
     {
-        private static readonly Regex s_NumberRegex = new Regex(@"^(?:(sms|tel|mms)\:\/\/)?(\+[1-9]\d{1,14})\;?(?:\;.+?)*$", RegexOptions.Compiled | RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(250));
+        private static readonly Regex s_NumberRegex = new Regex(@"^(?:(sms|tel|mms)\:\/?\/?)?(\+[1-9]\d{1,14})\;?(?:\;.+?)*$", RegexOptions.Compiled | RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(250));
 
         readonly Match _Matched;
 
