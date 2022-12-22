@@ -19,11 +19,13 @@ namespace SanteDB.Security.Tfa.Twilio
 
         readonly INotificationService _NotificationService;
         readonly ITfaCodeProvider _TfaCodeProvider;
+        readonly ITfaSecretManager _TfaSecretManager;
 
-        public TfaSmsMechanism(INotificationService notificationService, ITfaCodeProvider tfaCodeProvider)
+        public TfaSmsMechanism(INotificationService notificationService, ITfaCodeProvider tfaCodeProvider, ITfaSecretManager secretManager)
         {
             _NotificationService = notificationService;
             _TfaCodeProvider = tfaCodeProvider;
+            _TfaSecretManager = secretManager;
         }
 
         public Guid Id => s_TfaMechanismId;
@@ -50,16 +52,27 @@ namespace SanteDB.Security.Tfa.Twilio
                     tonumber = "sms:" + tonumber;
                 }
 
-                var secret = _TfaCodeProvider.GenerateTfaCode(ci);
 
-                var templatemodel = new
+                string secret = null; 
+                try
                 {
-                    user,
-                    tfa = secret,
-                    secret,
-                    code = secret,
-                    codeWithSpaces = string.Join(" ", secret.Select(s => s.ToString())),
-                    principal = AuthenticationContext.Current.Principal
+                    secret = _TfaCodeProvider.GenerateTfaCode(ci);
+                }
+                catch (ArgumentException)
+                {
+                    secret = _TfaSecretManager.StartTfaRegistration(ci, 6, AuthenticationContext.SystemPrincipal);
+                    _TfaSecretManager.FinishTfaRegistration(ci, secret, AuthenticationContext.SystemPrincipal);
+                    secret = _TfaCodeProvider.GenerateTfaCode(ci);
+                }
+
+                var templatemodel = new Dictionary<string, object>
+                {
+                    {"user", user },
+                    { "tfa", secret },
+                    {"secret", secret },
+                    { "code", secret },
+                    { "codeWithSpaces", string.Join(" ", secret.Select(s => s.ToString())) },
+                    { "principal", AuthenticationContext.Current.Principal }
                 };
 
                 try
