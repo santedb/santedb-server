@@ -189,19 +189,19 @@ namespace SanteDB.Persistence.Diagnostics.Jira
                     e.AdditionalHeaders.Add("X-Atlassian-Token", "nocheck");
                 };
                 // Attachments
-                List<MultipartAttachment> attachments = new List<MultipartAttachment>();
+                List<MultiPartFormData> attachments = new List<MultiPartFormData>();
 
                 foreach (var itm in storageData.Attachments)
                 {
                     if (itm is DiagnosticBinaryAttachment)
                     {
                         var bin = itm as DiagnosticBinaryAttachment;
-                        attachments.Add(new MultipartAttachment(bin.Content, "application/x-gzip", bin.FileDescription, true));
+                        attachments.Add(new MultiPartFormData(bin.FileDescription, bin.Content, "application/x-gzip", bin.FileDescription, true));
                     }
                     else
                     {
                         var txt = itm as DiagnosticTextAttachment;
-                        attachments.Add(new MultipartAttachment(Encoding.UTF8.GetBytes(txt.Content), "text/plain", txt.FileName, true));
+                        attachments.Add(new MultiPartFormData(txt.FileName, Encoding.UTF8.GetBytes(txt.Content), "text/plain", txt.FileName, true));
                     }
                 }
 
@@ -210,7 +210,7 @@ namespace SanteDB.Persistence.Diagnostics.Jira
                 {
                     XmlSerializer xsz = XmlModelSerializerFactory.Current.CreateSerializer(typeof(DiagnosticApplicationInfo));
                     xsz.Serialize(ms, storageData.ApplicationInfo);
-                    attachments.Add(new MultipartAttachment(ms.ToArray(), "text/xml", "appinfo.xml", true));
+                    attachments.Add(new MultiPartFormData("appinfo.xml", ms.ToArray(), "text/xml", "applinfo.xml", true));
                 }
                 serviceClient.CreateAttachment(issue, attachments);
                 storageData.CorrelationId = issue.Key;

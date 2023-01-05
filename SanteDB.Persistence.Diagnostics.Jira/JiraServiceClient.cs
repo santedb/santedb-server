@@ -62,19 +62,19 @@ namespace SanteDB.Persistence.Diagnostics.Jira
         /// <summary>
         /// Create an attachment
         /// </summary>
-        public void CreateAttachment(JiraIssueResponse issue, MultipartAttachment attachment)
+        public void CreateAttachment(JiraIssueResponse issue, MultiPartFormData attachment)
         {
             String boundary = String.Format("------{0:N}", Guid.NewGuid());
-            this.Client.Post<MultipartAttachment, Object>(String.Format("api/2/issue/{0}/attachments", issue.Key), String.Format("multipart/form-data; boundary={0}", boundary), attachment);
+            this.Client.Post<MultiPartFormData, Object>(String.Format("api/2/issue/{0}/attachments", issue.Key), String.Format("multipart/form-data; boundary={0}", boundary), attachment);
         }
 
         /// <summary>
         /// Create an attachment
         /// </summary>
-        public void CreateAttachment(JiraIssueResponse issue, List<MultipartAttachment> attachment)
+        public void CreateAttachment(JiraIssueResponse issue, List<MultiPartFormData> attachment)
         {
             String boundary = String.Format("------{0:N}", Guid.NewGuid());
-            this.Client.Post<List<MultipartAttachment>, Object>(String.Format("api/2/issue/{0}/attachments", issue.Key), String.Format("multipart/form-data; boundary={0}", boundary), attachment);
+            this.Client.Post<List<MultiPartFormData>, Object>(String.Format("api/2/issue/{0}/attachments", issue.Key), String.Format("multipart/form-data; boundary={0}", boundary), attachment);
         }
     }
 }
