@@ -4,6 +4,10 @@
 #define MyAppName "SanteDB Administrative Console"
 #define MyAppPublisher "SanteDB Community"
 #define MyAppURL "http://santesuite.org"
+#ifndef MyAppVersion
+#define MyAppVersion "3.0"
+#endif 
+
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
@@ -60,10 +64,9 @@ Source: ..\bin\Release\SanteDB.Docker.Core.dll; DestDir: {app}
 Source: ..\bin\Release\SanteDB.Messaging.AMI.Client.dll; DestDir: {app}
 Source: ..\bin\Release\SanteDB.Messaging.HDSI.Client.dll; DestDir: {app}
 Source: ..\bin\Release\SanteDB.Rest.Common.dll; DestDir: {app}
-Source: ..\bin\Release\SanteDB.Server.AdminConsole.Api.dll; DestDir: {app}
-Source: ..\bin\Release\SanteDB.Server.Core.dll; DestDir: {app}
-Source: ..\bin\Release\sdbac.exe; DestDir: {app}
-Source: ..\bin\Release\sdbac.exe.config; DestDir: {app}
+Source: ..\santedb-tools\bin\Release\net4.8\sdbac.exe; DestDir: {app}
+Source: ..\santedb-tools\bin\Release\net4.8\sdbac.exe.config; DestDir: {app}
+Source: ..\santedb-tools\bin\Release\net4.8\SanteDB.AdminConsole.Api.dll; DestDir: {app}
 Source: ..\bin\Release\SharpCompress.dll; DestDir: {app}
 Source: ..\bin\Release\System.Buffers.dll; DestDir: {app}
 Source: ..\bin\Release\System.Collections.Concurrent.dll; DestDir: {app}
