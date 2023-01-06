@@ -207,7 +207,7 @@ Source: ..\bin\Release\SanteDB.Core.i18n.dll; DestDir: {app}; Components: server
 Source: ..\bin\Release\zxing.dll; DestDir: {app}; Components: server core
 Source: ..\bin\Release\zxing.presentation.dll; DestDir: {app}; Components: server core
 Source: ..\bin\Release\ZXing.Windows.Compatibility.dll; DestDir: {app}; Components: server core
-Source: ..\bin\Release\fr\*; DestDir: {app}\fr; Components: server core
+;Source: ..\bin\Release\fr\*; DestDir: {app}\fr; Components: server core
 
 ; Client Services
 Source: ..\bin\Release\SanteDB.Client.dll; DestDir: {app}; Components: msg\app dcdr;
