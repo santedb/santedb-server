@@ -134,7 +134,6 @@ Source: ..\bin\Release\SanteDB.Queue.Msmq.dll; DestDir: {app}; Components: inter
 
 ; Demo Data
 Source: ..\SanteDB\Data\Demo\*.dataset; DestDir: {app}\data; Components: demo
-Source: ..\SanteDB\santedb.config.fbsql.xml; DestDir: {app}; DestName: santedb.config.xml; Components: demo
 
 ; Config Samples
 Source: ..\SanteDB\santedb.config.fbsql.xml; DestDir: {app}; DestName: santedb.config.fbsql.xml; Components: db\fbsql
