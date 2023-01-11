@@ -91,9 +91,16 @@ namespace SanteDB.Configurator
 
         public frmMain()
         {
-            Tracer.AddWriter(new FormTraceWriter(this), EventLevel.LogAlways);
-            InitializeComponent();
-            this.PopulateConfiguration();
+            try
+            {
+                Tracer.AddWriter(new FormTraceWriter(this), EventLevel.LogAlways);
+                InitializeComponent();
+                this.PopulateConfiguration();
+            }
+            catch(Exception e)
+            {
+                MessageBox.Show(e.ToString(), "Error Starting Configuration Tool");
+            }
         }
 
         // Configuration hash

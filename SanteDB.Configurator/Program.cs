@@ -146,18 +146,35 @@ namespace SanteDB.Configurator
             }
             catch (TargetInvocationException e)
             {
-                MessageBox.Show(e.InnerException.Message, "Error Starting Config Tool");
-
+                MessageBox.Show(CreateExceptionMessage(e), "Error Starting Config Tool");
             }
             catch (Exception e)
             {
                 Console.WriteLine("Configuration Tooling Fatal Error: {0}", e);
-                MessageBox.Show(e.Message, "Error Starting Config Tool");
+                MessageBox.Show(CreateExceptionMessage(e), "Error Starting Config Tool");
             }
             finally
             {
                 Environment.Exit(0);
             }
+        }
+
+        /// <summary>
+        /// Create exception message
+        /// </summary>
+        private static string CreateExceptionMessage(Exception e)
+        {
+            var retVal = String.Empty;
+            while(e != null)
+            {
+                retVal += e;
+                e = e.InnerException;
+                if(e != null)
+                {
+                    retVal += " - Cause: ";
+                }
+            }
+            return retVal;
         }
 
         /// <summary>
