@@ -164,19 +164,7 @@ namespace SanteDB.Configuration
         public IEnumerable<Type> GetAllTypes()
         {
             // HACK: The weird TRY/CATCH in select many is to prevent mono from throwning a fit
-            return AppDomain.CurrentDomain.GetAssemblies()
-                .Where(a => !a.IsDynamic)
-                .SelectMany(a =>
-                {
-                    try
-                    {
-                        return a.ExportedTypes;
-                    }
-                    catch
-                    {
-                        return new List<Type>();
-                    }
-                });
+            return AppDomain.CurrentDomain.GetAllTypes();
         }
 
         /// <summary>
