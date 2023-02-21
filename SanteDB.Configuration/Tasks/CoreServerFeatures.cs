@@ -67,6 +67,7 @@ namespace SanteDB.Configuration.Tasks
             typeof(DefaultDataSigningService),
             typeof(AesSymmetricCrypographicProvider),
             typeof(Rfc4226TfaCodeProvider),
+            typeof(DefaultTfaService),
             typeof(AppletLocalizationService),
             typeof(CachedResourceCheckoutService),
             typeof(AppletDatasetProvider),
