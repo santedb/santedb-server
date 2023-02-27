@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<dataset xmlns="http://santedb.org/data" id="Core Extension Types">
+<dataset xmlns="http://santedb.org/data" id="Core Extension Types v3">
   <update insertIfNotExists="true">
     <ExtensionType xmlns="http://santedb.org/model">
       <id>77B53CBA-C32F-442B-B7A7-ED08184A0FA5</id>
