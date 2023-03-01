@@ -46,8 +46,8 @@
     <Place xmlns="http://santedb.org/model">
       <id>aa843a17-2b76-4bea-91a4-b8d547cc2242</id>
       <creationTime>0001-01-01T00:00:00.0000000+00:00</creationTime>
-      <classConcept>8cf4b0b0-84e5-4122-85fe-6afa8240c218</classConcept>
-      <determinerConcept>f29f08de-78a7-4a5e-aeaf-7b545ba19a09</determinerConcept>
+      <classConcept>4d1a5c28-deb7-411e-b75f-d524f90dfa63</classConcept>
+        <determinerConcept>f29f08de-78a7-4a5e-aeaf-7b545ba19a09</determinerConcept>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
       <typeConcept>20bb9f46-67ea-4829-abd2-00bd5c3c70e1</typeConcept>
       <relationship>
