@@ -60,7 +60,7 @@ namespace SanteDB.Security.Tfa.Twilio
                 }
                 catch (ArgumentException)
                 {
-                    secret = _TfaSecretManager.StartTfaRegistration(ci, 6, AuthenticationContext.SystemPrincipal);
+                    secret = _TfaSecretManager.StartTfaRegistration(ci, 6, Core.Security.Tfa.Rfc4226Mode.HotpIncrementOnGenerate, AuthenticationContext.SystemPrincipal);
                     _TfaSecretManager.FinishTfaRegistration(ci, secret, AuthenticationContext.SystemPrincipal);
                     secret = _TfaCodeProvider.GenerateTfaCode(ci);
                 }
