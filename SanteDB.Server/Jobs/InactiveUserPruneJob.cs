@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2021, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2022, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  *
@@ -16,7 +16,7 @@
  * the License.
  *
  * User: fyfej
- * Date: 2021-8-27
+ * Date: 2022-5-30
  */
 using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
@@ -38,16 +38,16 @@ using System.Threading.Tasks;
 namespace SanteDB.Server.Jobs
 {
     /// <summary>
-    /// A job which prunes old users from the system 
+    /// A job which prunes old users from the system
     /// </summary>
     public class InactiveUserPruneJob : IJob
     {
+        private readonly Tracer m_tracer = Tracer.GetTracer(typeof(InactiveUserPruneJob));
+        private readonly IRepositoryService<SecurityUser> m_securityUserRepository;
+        private readonly IRepositoryService<UserEntity> m_userEntityRepository;
+        private readonly INotificationService m_notificationService;
+        private readonly INotificationTemplateFiller m_templateFiller;
         private readonly IJobStateManagerService m_stateManager;
-
-        /// <summary>
-        /// Tracer for inactivity
-        /// </summary>
-        private Tracer m_tracer = Tracer.GetTracer(typeof(InactiveUserPruneJob));
 
         // Cancel flag
         private volatile bool m_cancelFlag = false;
@@ -55,8 +55,12 @@ namespace SanteDB.Server.Jobs
         /// <summary>
         /// DI constructor
         /// </summary>
-        public InactiveUserPruneJob(IJobStateManagerService stateManagerService)
+        public InactiveUserPruneJob(IJobStateManagerService stateManagerService, IRepositoryService<SecurityUser> securityUserRepository, IRepositoryService<UserEntity> userEntityRepository, INotificationService notificationService, INotificationTemplateFiller templateFiller)
         {
+            this.m_securityUserRepository = securityUserRepository;
+            this.m_userEntityRepository = userEntityRepository;
+            this.m_notificationService = notificationService;
+            this.m_templateFiller = templateFiller;
             this.m_stateManager = stateManagerService;
         }
 
@@ -108,72 +112,66 @@ namespace SanteDB.Server.Jobs
                 {
                     this.m_tracer.TraceInfo("Will notify users of inactivity...");
                     int days = parameters.Length > 0 ? (int)parameters[0] : 28;
-                    var userRepository = ApplicationServiceContext.Current.GetService<IRepositoryService<SecurityUser>>();
-                    var entityRepository = ApplicationServiceContext.Current.GetService<IRepositoryService<UserEntity>>();
-                    var notificationService = ApplicationServiceContext.Current.GetService<INotificationService>();
-                    var templateService = ApplicationServiceContext.Current.GetService<INotificationTemplateFiller>();
+                    
 
                     DateTimeOffset cutoff = DateTimeOffset.Now.AddDays(-days);
 
-                    int offset = 0, totalResults = 1;
-                    while (offset < totalResults)
+                    List<SecurityUser> actionedUser = new List<SecurityUser>(10);
+
+                    var users = this.m_securityUserRepository.Find(o => o.UserClass == ActorTypeKeys.HumanUser && o.LastLoginTime < cutoff);
+                    int count = users.Count(), i = 0;
+                    // Users who haven't logged in
+                    foreach (var usr in users)
                     {
-                        this.m_stateManager.SetProgress(this, "Pruning Users", (float)offset / (float)totalResults);
-                        List<SecurityUser> actionedUser = new List<SecurityUser>(10);
+                        // Cancel request?
+                        if (this.m_cancelFlag) break;
 
-                        // Users who haven't logged in 
-                        foreach (var usr in userRepository.Find(o => o.UserClass == ActorTypeKeys.HumanUser && o.LastLoginTime < cutoff, offset, 100, out totalResults))
+                        double daysSinceLastLogin = 0;
+                        if (!usr.LastLoginTime.HasValue)
+                            daysSinceLastLogin = DateTimeOffset.Now.Subtract(usr.CreationTime).TotalDays;
+                        else
+                            daysSinceLastLogin = DateTimeOffset.Now.Subtract(usr.LastLoginTime.Value).TotalDays;
+
+                        this.m_stateManager.SetProgress(this, "Pruning Inactive Users", (float)i / (float)count);
+                        // To which address?
+                        String[] to = null;
+                        if (usr.EmailConfirmed)
+                            to = new string[] { $"mailto:{usr.Email}" };
+                        else if (usr.PhoneNumberConfirmed)
+                            to = new string[] { $"tel:{usr.Email}" };
+
+                        var entity = this.m_userEntityRepository.Find(o => o.SecurityUserKey == usr.Key).FirstOrDefault();
+                        var lang = entity?.GetPersonLanguages()?.FirstOrDefault(o => o.IsPreferred)?.LanguageCode;
+
+                        // Template and action
+                        string templateId = null;
+                        if (daysSinceLastLogin > days + 7) // a week since we notified them, obsolete
                         {
-                            // Cancel request?
-                            if (this.m_cancelFlag) break;
-
-                            double daysSinceLastLogin = 0;
-                            if (!usr.LastLoginTime.HasValue)
-                                daysSinceLastLogin = DateTimeOffset.Now.Subtract(usr.CreationTime).TotalDays;
-                            else
-                                daysSinceLastLogin = DateTimeOffset.Now.Subtract(usr.LastLoginTime.Value).TotalDays;
-
-                            // To which address?
-                            String[] to = null;
-                            if (usr.EmailConfirmed)
-                                to = new string[] { $"mailto:{usr.Email}" };
-                            else if (usr.PhoneNumberConfirmed)
-                                to = new string[] { $"tel:{usr.Email}" };
-
-                            // Template and action
-                            string templateId = null;
-                            if (daysSinceLastLogin > days + 7) // a week since we notified them, obsolete
-                            {
-                                actionedUser.Add(usr);
-                                this.m_tracer.TraceVerbose("De-activating user {0}...", usr.UserName);
-                                userRepository.Obsolete(usr.Key.Value);
-                                templateId = "org.santedb.notification.security.user.inactiveRemoved";
-                            }
-                            else
-                                templateId = "org.santedb.notification.security.user.inactiveWarned";
-
-                            var entity = entityRepository.Find(o => o.SecurityUserKey == usr.Key, 0, 1, out int _).FirstOrDefault();
-                            var lang = entity?.GetPersonLanguages()?.FirstOrDefault(o => o.IsPreferred)?.LanguageCode;
-
-                            var template = templateService.FillTemplate(templateId, lang, new
-                            {
-                                removalDays = Math.Round((days + 7) - daysSinceLastLogin),
-                                removalDate = DateTime.Now.AddDays((days + 7) - daysSinceLastLogin).Date,
-                                user = usr,
-                                entity = entity
-                            });
-
-                            // Send the notification
-                            this.m_tracer.TraceVerbose("Sending {0} notification to {1}...", templateId, usr.UserName);
-                            notificationService.Send(to, template.Subject, template.Body);
+                            actionedUser.Add(usr);
+                            this.m_tracer.TraceVerbose("De-activating user {0}...", usr.UserName);
+                            this.m_securityUserRepository.Delete(usr.Key.Value);
+                            templateId = "org.santedb.notification.security.user.inactiveRemoved";
                         }
-                        offset += 100;
+                        else
+                            templateId = "org.santedb.notification.security.user.inactiveWarned";
 
-                        // Audit that we deleted users
-                        if (actionedUser.Count > 0)
-                            AuditUtil.AuditSecurityDeletionAction(actionedUser, true, new String[] { "obsoletionTime" });
+                       
+                        var template = this.m_templateFiller.FillTemplate(templateId, lang, new
+                        {
+                            removalDays = Math.Round((days + 7) - daysSinceLastLogin),
+                            removalDate = DateTime.Now.AddDays((days + 7) - daysSinceLastLogin).Date,
+                            user = usr,
+                            entity = entity
+                        });
+
+                        // Send the notification
+                        this.m_tracer.TraceVerbose("Sending {0} notification to {1}...", templateId, usr.UserName);
+                        this.m_notificationService.Send(to, template.Subject, template.Body);
                     }
 
+                    // Audit that we deleted users
+                    if (actionedUser.Count > 0)
+                        AuditUtil.AuditSecurityDeletionAction(actionedUser, true, new String[] { "obsoletionTime" });
                     this.m_stateManager.SetState(this, JobStateType.Completed);
                 }
             }

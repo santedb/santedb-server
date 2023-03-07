@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
- - Copyright 2021-2021 SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ - Copyright 2021-2022 SanteSuite Contributors (See NOTICE.md for full copyright notices)
  - Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  - Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  -
@@ -17,7 +17,7 @@
  - the License.
  -
  - User: fyfej
- - Date: 2021-8-27
+ - Date: 2022-5-30
  -->
 <SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.9.1.23074" xmlns:santempi="http://santedb.org/configuration/santempi" xmlns:santeguard="http://santedb.org/configuration/santeguard" xmlns="http://santedb.org/configuration">
   <sections>
@@ -68,7 +68,7 @@
       <add type="SanteDB.Persistence.Data.ADO.Services.AdoPersistenceService, SanteDB.Persistence.Data.ADO" />
       <add type="SanteDB.Persistence.Data.ADO.Services.AdoSubscriptionExecutor, SanteDB.Persistence.Data.ADO" />
       <add type="SanteDB.Server.Core.Security.SimpleTfaSecretGenerator, SanteDB.Server.Core" />
-      <add type="SanteDB.Server.Core.Security.DefaultTfaRelayService, SanteDB.Server.Core" />
+      <add type="SanteDB.Server.Core.Security.DefaultTfaService, SanteDB.Server.Core" />
       <add type="SanteDB.Server.Core.Security.DefaultDataSigningService, SanteDB.Server.Core" />
       <add type="SanteDB.Server.Core.Security.DefaultPasswordValidationService, SanteDB.Server.Core" />
       <add type="SanteDB.Core.Security.DefaultPolicyDecisionService, SanteDB.Core.Api" />
@@ -104,7 +104,7 @@
       <!--<add type="SanteDB.Persistence.MDM.Services.MdmDaemonService, SanteDB.Persistence.MDM" />-->
 
       <!-- Messaging Services-->
-      <add type="SanteDB.Authentication.OAuth2.OAuthMessageHandler, SanteDB.Authentication.OAuth2" />
+      <add type="SanteDB.Rest.OAuth.OAuthMessageHandler, SanteDB.Rest.OAuth" />
       <add type="SanteDB.Messaging.FHIR.FhirMessageHandler, SanteDB.Messaging.FHIR" />
       <add type="SanteDB.Messaging.FHIR.FhirDataInitializationService, SanteDB.Messaging.FHIR" />
       <!--<add type="SanteDB.Messaging.GS1.StockSubscriber, SanteDB.Messaging.GS1" />

@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2021, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2022, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  *
@@ -16,14 +16,13 @@
  * the License.
  *
  * User: fyfej
- * Date: 2021-8-27
+ * Date: 2022-5-30
  */
-
+using Newtonsoft.Json;
 using SanteDB.Core.Configuration;
-using SanteDB.Core.Http;
-using SanteDB.Core.Http.Description;
+using SanteDB.Core.Configuration.Http;
 using System;
-using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Xml.Serialization;
 
 namespace SanteDB.Persistence.Diagnostics.Jira.Configuration
@@ -32,7 +31,8 @@ namespace SanteDB.Persistence.Diagnostics.Jira.Configuration
     /// JIRA Service configuration
     /// </summary>
     [XmlType(nameof(JiraServiceConfigurationSection), Namespace = "http://santedb.org/configuration")]
-    public class JiraServiceConfigurationSection : IConfigurationSection, IRestClientDescription
+    [ExcludeFromCodeCoverage]
+    public class JiraServiceConfigurationSection : IConfigurationSection
     {
         /// <summary>
         /// Creates a new jira service configuration
@@ -42,21 +42,10 @@ namespace SanteDB.Persistence.Diagnostics.Jira.Configuration
         }
 
         /// <summary>
-        /// Accept
+        /// Gets the API configuration
         /// </summary>
-        public string Accept => "application/json";
-
-        /// <summary>
-        /// Gets or sets the username
-        /// </summary>
-        [XmlAttribute("userName"), ConfigurationRequired]
-        public String UserName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the password
-        /// </summary>
-        [XmlAttribute("password"), ConfigurationRequired]
-        public String Password { get; set; }
+        [XmlElement("jiraEndpoint"), JsonProperty("jiraEndpoint")]
+        public RestClientDescriptionConfiguration ApiConfiguration { get; set; }
 
         /// <summary>
         /// Gets or sets the project
@@ -64,31 +53,5 @@ namespace SanteDB.Persistence.Diagnostics.Jira.Configuration
         [XmlAttribute("project"), ConfigurationRequired]
         public String Project { get; set; }
 
-        /// <summary>
-        /// Gets whether a tracing is enabled.
-        /// </summary>
-        [XmlAttribute("trace")]
-        public bool Trace { get; }
-
-        /// <summary>
-        /// Gets or sets the endpoint information
-        /// </summary>
-        [XmlAttribute("url"), ConfigurationRequired]
-        public String Endpoint { get; set; }
-
-        /// <summary>
-        /// Get the endpoint
-        /// </summary>
-        [XmlIgnore]
-        List<IRestClientEndpointDescription> IRestClientDescription.Endpoint => new List<IRestClientEndpointDescription>()
-        {
-            new ServiceClientEndpointDescription(this.Endpoint)
-        };
-
-        /// <summary>
-        /// Rest binding
-        /// </summary>
-        [XmlIgnore]
-        IRestClientBindingDescription IRestClientDescription.Binding => new JiraRestClientBindingDescription();
     }
 }

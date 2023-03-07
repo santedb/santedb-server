@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2021, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2022, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  *
@@ -16,9 +16,15 @@
  * the License.
  *
  * User: fyfej
- * Date: 2021-8-27
+ * Date: 2022-5-30
  */
-
+using SanteDB.Core;
+using SanteDB.Core.Configuration;
+using SanteDB.Core.Configuration.Data;
+using SanteDB.Core.Configuration.Features;
+using SanteDB.Core.Diagnostics;
+using SanteDB.OrmLite.Configuration;
+using SanteDB.OrmLite.Providers;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -28,12 +34,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using SanteDB.Core;
-using SanteDB.Core.Configuration;
-using SanteDB.Core.Configuration.Data;
-using SanteDB.Core.Diagnostics;
-using SanteDB.OrmLite.Configuration;
-using SanteDB.OrmLite.Providers;
+
 
 namespace SanteDB.Configuration
 {
@@ -99,19 +100,7 @@ namespace SanteDB.Configuration
         /// </summary>
         public void InitializeFeatures()
         {
-            this.Features.AddRange(AppDomain.CurrentDomain.GetAssemblies()
-                .Where(o => !o.IsDynamic)
-                .SelectMany(a =>
-                {
-                    try
-                    {
-                        return a.ExportedTypes;
-                    }
-                    catch
-                    {
-                        return new List<Type>();
-                    }
-                })
+            this.Features.AddRange(AppDomain.CurrentDomain.GetAllTypes()
                 .Where(t => typeof(IFeature).IsAssignableFrom(t) && !t.ContainsGenericParameters && !t.IsAbstract && !t.IsInterface)
                 .Select(i =>
                 {
@@ -122,14 +111,16 @@ namespace SanteDB.Configuration
                         {
                             return null;
                         }
-
                         return feature;
                     }
-                    catch (Exception e)
+                    catch
                     {
                         return null;
                     }
-                })
+                }).Union(AppDomain.CurrentDomain.GetAllTypes()
+                    .Where(o => typeof(IFeatureFactory).IsAssignableFrom(o) && !o.IsInterface && !o.IsAbstract)
+                    .Select(o => Activator.CreateInstance(o) as IFeatureFactory)
+                    .SelectMany(o => o.GetFeatures()))
                 .OfType<IFeature>());
         }
 
@@ -173,19 +164,7 @@ namespace SanteDB.Configuration
         public IEnumerable<Type> GetAllTypes()
         {
             // HACK: The weird TRY/CATCH in select many is to prevent mono from throwning a fit
-            return AppDomain.CurrentDomain.GetAssemblies()
-                .Where(a => !a.IsDynamic)
-                .SelectMany(a =>
-                {
-                    try
-                    {
-                        return a.ExportedTypes;
-                    }
-                    catch
-                    {
-                        return new List<Type>();
-                    }
-                });
+            return AppDomain.CurrentDomain.GetAllTypes();
         }
 
         /// <summary>
@@ -237,22 +216,7 @@ namespace SanteDB.Configuration
             {
                 if (this.m_providers == null)
                 {
-                    this.m_providers = AppDomain.CurrentDomain.GetAssemblies()
-                        .Where(o => !o.IsDynamic)
-                        .SelectMany(a =>
-                        {
-                            try
-                            {
-                                return a.ExportedTypes;
-                            }
-                            catch
-                            {
-                                return new List<Type>();
-                            }
-                        })
-                        .Where(t => t != null && typeof(IDataConfigurationProvider).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface)
-                        .Select(i => Activator.CreateInstance(i) as IDataConfigurationProvider)
-                        .ToArray();
+                    this.m_providers = DataConfigurationSection.GetDataConfigurationProviders();
                 }
 
                 return this.m_providers;

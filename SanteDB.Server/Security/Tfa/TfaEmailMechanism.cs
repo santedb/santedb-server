@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2021, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2022, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  *
@@ -16,7 +16,7 @@
  * the License.
  *
  * User: fyfej
- * Date: 2021-8-27
+ * Date: 2022-5-30
  */
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Model.Entities;
@@ -35,6 +35,7 @@ using SanteDB.Core.Security.Services;
 using SanteDB.Core;
 using SanteDB.Core.Security;
 using SanteDB.Server.Core.Services;
+using System.Security.Principal;
 
 namespace SanteDB.Server.Security.Tfa.Email
 {
@@ -43,9 +44,24 @@ namespace SanteDB.Server.Security.Tfa.Email
     /// </summary>
     public class TfaEmailMechanism : ITfaMechanism
     {
+        private ITwoFactorSecretGenerator m_twoFactorSecretGenerator;
+
+        private IIdentityProviderService m_identityProvider;
+
+        private IPasswordHashingService m_hashingProvider;
+
+        /// <summary>
+        /// TFA Mechanism via e-mail
+        /// </summary>
+        public TfaEmailMechanism(ITwoFactorSecretGenerator secretGenerator, IPasswordHashingService passwordHashingService, IIdentityProviderService identityProvider)
+        {
+            this.m_twoFactorSecretGenerator = secretGenerator;
+            this.m_identityProvider = identityProvider;
+            this.m_hashingProvider = passwordHashingService;
+        }
 
         // Tracer
-        private Tracer m_tracer = Tracer.GetTracer(typeof(TfaEmailMechanism));
+        private readonly Tracer m_tracer = Tracer.GetTracer(typeof(TfaEmailMechanism));
 
         /// <summary>
         /// Get the identifier for the challenge
@@ -72,16 +88,10 @@ namespace SanteDB.Server.Security.Tfa.Email
         /// <summary>
         /// Send the mechanism
         /// </summary>
-        public string Send(SecurityUser user)
+        public string Send(IIdentity user)
         {
             if (user == null)
                 throw new ArgumentNullException(nameof(user));
-
-            // Get preferred language for the user
-            var securityService = ApplicationServiceContext.Current.GetService<IRepositoryService<UserEntity>>();
-            var userEntity = securityService?.Find(o => o.SecurityUserKey == user.Key).FirstOrDefault();
-
-            this.m_tracer.TraceEvent(EventLevel.Informational, "Password reset has been requested for {0}", userEntity.Key);
 
             // Gather the e-mail
             var filler = ApplicationServiceContext.Current.GetService<INotificationTemplateFiller>();
@@ -89,34 +99,61 @@ namespace SanteDB.Server.Security.Tfa.Email
                 throw new InvalidOperationException("Cannot find notification filler service");
 
             // We want to send the data in which language?
-            String language = userEntity.LoadCollection<PersonLanguageCommunication>(nameof(Person.LanguageCommunication)).FirstOrDefault(o => o.IsPreferred)?.LanguageCode ??
-                AuthenticationContext.Current.Principal.GetClaimValue(SanteDBClaimTypes.Language) ??
-                CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
+            String language = CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
 
             // Generate a TFA secret and add it as a claim on the user
-            var secret = ApplicationServiceContext.Current.GetService<ITwoFactorSecretGenerator>().GenerateTfaSecret();
+            var secret = this.m_twoFactorSecretGenerator.GenerateTfaSecret();
 
-            ApplicationServiceContext.Current.GetService<IIdentityProviderService>().AddClaim(user.UserName, new SanteDBClaim(SanteDBClaimTypes.SanteDBOTAuthCode, secret), AuthenticationContext.SystemPrincipal, new TimeSpan(0, 5, 0));
-            var template = filler.FillTemplate("tfa.email", language, new
+            if (user is IClaimsIdentity ci)
             {
-                user = userEntity,
-                tfa = secret,
-                principal = AuthenticationContext.Current.Principal
-            });
+                // Get user's e-mail
+                var email = ci.FindFirst(SanteDBClaimTypes.Email)?.Value;
+                if (email == null)
+                {
+                    throw new InvalidOperationException("E-Mail TFA requires e-mail address registered");
+                }
 
-            if (!user.EmailConfirmed)
-                throw new SecurityException($"Cannot send a TFA code to an unconfirmed e-mail address");
+                // Save secret
+                this.m_identityProvider.AddClaim(user.Name, new SanteDBClaim(SanteDBClaimTypes.SanteDBOTAuthCode, this.m_hashingProvider.ComputeHash(secret)), AuthenticationContext.SystemPrincipal, new TimeSpan(0, 5, 0));
+                // Send
+                var template = filler.FillTemplate("tfa.email", language, new
+                {
+                    user = user,
+                    tfa = secret,
+                    principal = AuthenticationContext.Current.Principal
+                });
 
-            try
-            {
-                ApplicationServiceContext.Current.GetService<INotificationService>().Send(new string[] { user.Email }, template.Subject, template.Body, null, false, null);
-                var censoredEmail = user.Email.Split('@')[1];
-                return $"Code sent to *****@{censoredEmail}";
+                try
+                {
+                    ApplicationServiceContext.Current.GetService<INotificationService>().Send(new string[] { email }, template.Subject, template.Body, null, false, null);
+                    var censoredEmail = email.Split('@')[1];
+                    return $"Code sent to *****@{censoredEmail}";
+                }
+                catch (Exception e)
+                {
+                    this.m_tracer.TraceEvent(EventLevel.Error, $"Error sending TFA secret: {e.Message}\r\n{e.ToString()}");
+                    throw new Exception($"Error dispatching OTP TFA code", e);
+                }
             }
-            catch (Exception e)
+            else
             {
-                this.m_tracer.TraceEvent(EventLevel.Error, $"Error sending TFA secret: {e.Message}\r\n{e.ToString()}");
-                throw new Exception($"Error dispatching OTP TFA code", e);
+                throw new InvalidOperationException("TFA E-mail not compatible with this mechanism");
+            }
+        }
+
+        /// <summary>
+        /// Validate the secret
+        /// </summary>
+        public bool Validate(IIdentity user, String tfaSecret)
+        {
+            if (user is IClaimsIdentity ci)
+            {
+                return ci.FindFirst(SanteDBClaimTypes.SanteDBOTAuthCode)?.Value == this.m_hashingProvider.ComputeHash(tfaSecret);
+            }
+            else
+            {
+                // TODO: When a non-CI is provided
+                return false;
             }
         }
     }

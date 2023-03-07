@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2021, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2022, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  *
@@ -16,9 +16,8 @@
  * the License.
  *
  * User: fyfej
- * Date: 2021-8-27
+ * Date: 2022-5-30
  */
-
 using SanteDB.Configuration;
 using SanteDB.Core.Attributes;
 using SanteDB.Core.Configuration;
@@ -85,7 +84,9 @@ namespace SanteDB.Configurator
                     // Now load all plugins on the assembly
                     var pluginInfo = asm.GetCustomAttribute<PluginAttribute>();
                     if (pluginInfo != null)
+                    {
                         ConfigurationContext.Current.PluginAssemblies.Add(asm);
+                    }
                 }
                 catch (Exception e)
                 {
@@ -110,7 +111,9 @@ namespace SanteDB.Configurator
                     try
                     {
                         if (init.ShowDialog() == DialogResult.Cancel)
+                        {
                             return;
+                        }
                     }
                     finally
                     {
@@ -129,24 +132,26 @@ namespace SanteDB.Configurator
                 }
 
                 frmMain frmMain = new frmMain();
-                    // Check for updates
-                    foreach (var t in ConfigurationContext.Current.Features
-                        .Where(o => o.Flags.HasFlag(FeatureFlags.AlwaysConfigure) && !o.Flags.HasFlag(FeatureFlags.SystemFeature))
-                        .SelectMany(o => o.CreateInstallTasks())
-                        .Where(o => o.VerifyState(ConfigurationContext.Current.Configuration)))
-                        ConfigurationContext.Current.ConfigurationTasks.Add(t);
+                // Check for updates
+                foreach (var t in ConfigurationContext.Current.Features
+                    .Where(o => o.Flags.HasFlag(FeatureFlags.AlwaysConfigure) && !o.Flags.HasFlag(FeatureFlags.SystemFeature))
+                    .SelectMany(o => o.CreateInstallTasks())
+                    .Where(o => o.VerifyState(ConfigurationContext.Current.Configuration)))
+                {
+                    ConfigurationContext.Current.ConfigurationTasks.Add(t);
+                }
+
                 ConfigurationContext.Current.Apply(frmMain);
                 Application.Run(frmMain);
             }
-            catch(TargetInvocationException e)
+            catch (TargetInvocationException e)
             {
-                MessageBox.Show(e.InnerException.Message, "Error Starting Config Tool");
-
+                MessageBox.Show(CreateExceptionMessage(e), "Error Starting Config Tool");
             }
             catch (Exception e)
             {
                 Console.WriteLine("Configuration Tooling Fatal Error: {0}", e);
-                MessageBox.Show(e.Message, "Error Starting Config Tool");
+                MessageBox.Show(CreateExceptionMessage(e), "Error Starting Config Tool");
             }
             finally
             {
@@ -155,22 +160,49 @@ namespace SanteDB.Configurator
         }
 
         /// <summary>
+        /// Create exception message
+        /// </summary>
+        private static string CreateExceptionMessage(Exception e)
+        {
+            var retVal = String.Empty;
+            while(e != null)
+            {
+                retVal += e;
+                e = e.InnerException;
+                if(e != null)
+                {
+                    retVal += " - Cause: ";
+                }
+            }
+            return retVal;
+        }
+
+        /// <summary>
         /// Assembly resolution
         /// </summary>
         internal static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
             foreach (Assembly asm in AppDomain.CurrentDomain.GetAssemblies())
+            {
                 if (args.Name == asm.FullName)
+                {
                     return asm;
+                }
+            }
 
             /// Try for an non-same number Version
             foreach (Assembly asm in AppDomain.CurrentDomain.GetAssemblies())
             {
                 string fAsmName = args.Name;
                 if (fAsmName.Contains(","))
+                {
                     fAsmName = fAsmName.Substring(0, fAsmName.IndexOf(","));
+                }
+
                 if (fAsmName == asm.GetName().Name)
+                {
                     return asm;
+                }
             }
 
             return null;

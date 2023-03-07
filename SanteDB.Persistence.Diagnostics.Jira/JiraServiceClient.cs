@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2021, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2022, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  *
@@ -16,21 +16,22 @@
  * the License.
  *
  * User: fyfej
- * Date: 2021-8-27
+ * Date: 2022-5-30
  */
-
 using SanteDB.Core.Http;
 using SanteDB.Core.Interop.Clients;
 using SanteDB.Persistence.Diagnostics.Jira.Configuration;
 using SanteDB.Persistence.Diagnostics.Jira.Model;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SanteDB.Persistence.Diagnostics.Jira
 {
     /// <summary>
     /// Represents a service client base
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class JiraServiceClient : ServiceClientBase
     {
         /// <summary>
@@ -61,19 +62,19 @@ namespace SanteDB.Persistence.Diagnostics.Jira
         /// <summary>
         /// Create an attachment
         /// </summary>
-        public void CreateAttachment(JiraIssueResponse issue, MultipartAttachment attachment)
+        public void CreateAttachment(JiraIssueResponse issue, MultiPartFormData attachment)
         {
             String boundary = String.Format("------{0:N}", Guid.NewGuid());
-            this.Client.Post<MultipartAttachment, Object>(String.Format("api/2/issue/{0}/attachments", issue.Key), String.Format("multipart/form-data; boundary={0}", boundary), attachment);
+            this.Client.Post<MultiPartFormData, Object>(String.Format("api/2/issue/{0}/attachments", issue.Key), String.Format("multipart/form-data; boundary={0}", boundary), attachment);
         }
 
         /// <summary>
         /// Create an attachment
         /// </summary>
-        public void CreateAttachment(JiraIssueResponse issue, List<MultipartAttachment> attachment)
+        public void CreateAttachment(JiraIssueResponse issue, List<MultiPartFormData> attachment)
         {
             String boundary = String.Format("------{0:N}", Guid.NewGuid());
-            this.Client.Post<List<MultipartAttachment>, Object>(String.Format("api/2/issue/{0}/attachments", issue.Key), String.Format("multipart/form-data; boundary={0}", boundary), attachment);
+            this.Client.Post<List<MultiPartFormData>, Object>(String.Format("api/2/issue/{0}/attachments", issue.Key), String.Format("multipart/form-data; boundary={0}", boundary), attachment);
         }
     }
 }

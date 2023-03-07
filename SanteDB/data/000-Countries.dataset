@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" id="Countries of the World" xmlns="http://santedb.org/data">
   
-  <insert skipIfError="true" skipIfExists="true">
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>cac31af5-a9ab-48ef-8b7a-a23d47a56ab0</id>
       <creationTime>2018-08-15T19:35:40.8944854-04:00</creationTime>
@@ -30,8 +30,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>8c0dad2e-4c26-4d2d-8bb5-1ac55aa56520</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -60,8 +60,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>28090889-88af-4d02-bfa4-6489a8ebff67</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -90,8 +90,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>3cbe22d6-e5cb-45df-aed1-733446577954</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -120,8 +120,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>0d45fb86-b489-43eb-b560-a7de279503f6</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -150,8 +150,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>01bba5c3-5179-4c78-b8fb-e44fecfec53f</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -180,8 +180,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>dcb86bdc-0eae-4b39-be8e-fca47e4a6e7d</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -210,8 +210,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>b5f5dae0-fd74-4f45-b2e4-175cd82bdc0b</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -240,8 +240,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>0bf0010b-be9b-49d7-a1b4-a7202117264c</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -270,8 +270,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>8b7c4f6f-8108-4400-b5a1-06c7efa3c66a</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -300,8 +300,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>444196c8-5571-4a3f-9358-7076e635cb6e</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -330,8 +330,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>a4718a79-56dc-4c87-89f7-6a9eaeb2f530</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -360,8 +360,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>329803a9-5ab7-4be7-9d09-b971ec1c81b0</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -390,8 +390,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>7ef48fef-b02c-4b20-9b40-e53e525804e6</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -420,8 +420,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>a5cd5390-e657-4e72-abde-cf1d08c600ea</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -450,8 +450,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>85cd9696-4d95-4c0d-9d4f-f164fb53df91</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -480,8 +480,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>fceaf6bb-4273-4a2b-b4e7-cde752de6b99</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -510,8 +510,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>7a655c43-a799-42b3-a371-f83df1850a3b</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -540,8 +540,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>1db29e81-03bb-41a5-a8dc-ba9adc2dd0a9</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -570,8 +570,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>5f4fb988-d326-4e89-99ae-453e7847c81b</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -600,8 +600,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>cca63491-6261-46d4-a9e8-70e4f3373a71</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -630,8 +630,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>29c208a3-0a67-4463-b505-4c421ae66328</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -660,8 +660,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>0174be47-d8da-415c-bcad-28b225d378cf</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -690,8 +690,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>0fe83b59-f9e9-4159-acc5-91cf7b4cfb7e</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -720,8 +720,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>e459be84-d77e-4069-a519-d233391266e6</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -750,8 +750,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>d6d23c3c-f8c9-40df-99eb-926ac610979b</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -780,8 +780,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>dd83cdb1-3fc4-45a9-b04a-fc7b1c600bbd</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -810,8 +810,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>dce3c20f-8fd8-4eff-bd21-bdc8f82a10f2</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -840,8 +840,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>426a6c08-898b-4031-b91d-afbc347c0961</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -870,8 +870,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>234af58e-1ccf-46a8-b636-3ad98b5f19cb</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -900,8 +900,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>cc97ef89-bff1-4a51-b869-963cdba33e7d</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -930,8 +930,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>ece1a490-cc95-46ca-862f-6637bfe31929</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -960,8 +960,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>93aaaad7-9fe9-4e35-9eaf-56ae79fde991</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -990,8 +990,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>50d1f077-1d73-4fbf-b13c-9e7362ab4228</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -1020,8 +1020,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>91b7c2d9-9635-4a55-8365-1bf3e5cbc762</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -1050,8 +1050,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>99d1be54-0308-40ab-b0b3-dad9c1db9a50</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -1080,8 +1080,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>ab2b69d2-6e4d-4319-bf75-96bc7e68b9d6</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -1110,8 +1110,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>69d0b57b-be4e-4f56-9332-85f4d98871e1</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -1140,8 +1140,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>86ed6bca-d5f4-4cb0-8060-adf23a1cdd7b</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -1170,8 +1170,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>4267257f-9d84-4e96-8721-c28535741688</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -1200,8 +1200,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>48b8bdcb-445b-488f-8894-60c88c56cb98</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -1230,8 +1230,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>5b4bac49-5e90-432d-b69b-ab046485d873</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -1260,8 +1260,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>9b2ea1fc-c1ba-4b6e-9611-c22147b422e1</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -1290,8 +1290,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>5b91505e-6a09-4bde-ad40-52c80431cd79</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -1320,8 +1320,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>7449f29b-99b7-4c58-a31e-691ebb2f3268</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -1350,8 +1350,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>265268b4-eed4-41e2-b7b4-3ca9461978ee</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -1380,8 +1380,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>ae854855-3c52-479a-9df4-21edd46934e7</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -1410,8 +1410,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>f575db62-0bf2-45a2-939b-e05ed5cb9d50</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -1440,8 +1440,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>68c55fc8-2233-4527-abb3-86f50af77193</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -1470,8 +1470,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>3f08cf2c-b62b-410b-8144-2f1d16c98b70</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -1500,8 +1500,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>df426a4e-a6b3-4911-b900-d5bf6f985bf9</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -1530,8 +1530,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>130b5f99-2045-4d54-8649-4137c2af6bc8</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -1560,8 +1560,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>385c1e7b-0b97-414d-b73f-17a96ffa7385</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -1590,8 +1590,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>2dfd5740-29fa-4044-86d0-d2c314da5eb5</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -1620,8 +1620,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>ceea8b95-0023-4980-931f-9fc6c36d28fa</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -1650,8 +1650,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>a6f2a5ac-39bf-4db6-bbdc-3c388f3e7e30</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -1680,8 +1680,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>97cf0b90-30d9-4b7d-a9f4-5fb48995ab07</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -1710,8 +1710,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>74f73d95-f752-46b0-bd24-e93cd84db22c</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -1740,8 +1740,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>813c4702-53e3-4006-9c37-27758a8e8927</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -1770,8 +1770,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>f12bfe96-8238-477d-b3f4-e1f34c7bfee5</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -1800,8 +1800,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>858e4b1c-4e1d-4003-8f0a-96921c206442</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -1830,8 +1830,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>011b8011-7c40-4e8b-bf0f-a2d819ac7180</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -1860,8 +1860,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>bdf5bf9d-6f7c-4371-b7c5-64bf995aa031</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -1890,8 +1890,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>0341a696-aa3b-4906-9216-98b7d5a2d338</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -1920,8 +1920,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>3bd1c109-8081-4a88-bc53-0b8d5edc20d7</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -1950,8 +1950,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>3ce99da2-bf2a-4faa-bdbc-bd262a800bec</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -1980,8 +1980,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>56dae19b-f051-4055-9b74-c35343e809e9</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -2010,8 +2010,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>91edd67b-ca42-4d9f-8381-25d32226da1d</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -2040,8 +2040,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>719c5ffa-8677-4b4a-a272-0b791a4fbdb4</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -2070,8 +2070,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>a436ad91-eb32-4386-bbe1-bb2a6785a06b</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -2100,8 +2100,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>a3eaafaa-619c-42e8-b9a7-10ee095c909e</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -2130,8 +2130,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>8c873fce-76c9-43ce-a201-2c9e4fd1b267</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -2160,8 +2160,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>3c379944-c818-42dd-92a6-e1b561bf80f8</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -2190,8 +2190,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>c247f76a-df6d-44f1-97a1-d9467a430676</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -2220,8 +2220,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>d37fffb7-504b-486e-8fe5-da82d6a9c500</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -2250,8 +2250,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>acd58be2-02fc-4777-82f2-f1a7b2135940</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -2280,8 +2280,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>e9b93258-7f61-4098-8137-4110b4d65545</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -2310,8 +2310,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>d8400d3b-fb5d-4071-8b9f-8d2971e37f1d</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -2340,8 +2340,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>977fa9ee-de0f-4f04-a696-d6ff88854aea</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -2370,8 +2370,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>9d621ae3-a3df-45fe-9328-682e4b1c0ff8</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -2400,8 +2400,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>ca2022ab-6290-457a-9960-9ea0fe918871</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -2430,8 +2430,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>ecbf6cc7-91c8-4ac9-9cef-cb435db33689</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -2460,8 +2460,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>db1dd76b-e5ab-457a-99f7-7bcc8bf5f33c</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -2490,8 +2490,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>5b218f7b-0872-46f8-93b5-621c2aca418d</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -2520,8 +2520,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>e110cd45-cda7-48a5-8794-9c58fb65639b</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -2550,8 +2550,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>7e4bcd27-276a-4578-9664-ac8b9072bb41</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -2580,8 +2580,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>737d1b67-01fa-4fb7-8f35-c4e80b243efe</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -2610,8 +2610,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>9e9c8d43-9778-447f-b16f-2cb24e214e7e</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -2640,8 +2640,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>57b07509-87e9-47ac-942f-871669b16501</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -2670,8 +2670,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>dc2edf3c-46f9-4df8-97c0-960348dcd1c3</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -2700,8 +2700,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>2b526ac1-956c-42d5-9b39-9e4cdb5f701a</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -2730,8 +2730,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>c27f5287-56e3-4862-b30d-69307eb66632</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -2760,8 +2760,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>bf77505e-ab27-488e-9e5f-035fc1b20dc4</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -2790,8 +2790,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>2c841e4e-74be-4bf4-9069-13d69e1a3329</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -2820,8 +2820,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>e7522e68-a8e6-4886-96e3-80187669074d</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -2850,8 +2850,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>9fd854f8-0116-4317-9fcc-5d257cffdd82</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -2880,8 +2880,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>a4807240-7e1e-447c-9898-05439b54bda7</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -2910,8 +2910,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>7e41f63e-ec73-4cca-86c6-3db79b8f7b22</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -2940,8 +2940,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>5e052a9c-51a3-4f9f-987c-358f0c612550</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -2970,8 +2970,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>e2ceb1c8-b55c-45e8-bf09-01e07838d81a</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -3000,8 +3000,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>6156e35c-72b4-4dbf-b296-11fdcdc7b9e3</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -3030,8 +3030,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>a206d8c5-d482-4dc3-ac93-d010b05ae13c</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -3060,8 +3060,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>b6557717-be65-4139-9ec6-fc17916566f0</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -3090,8 +3090,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>e3f18007-9697-464c-8e56-3c08c4f878bb</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -3120,8 +3120,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>1b8c833f-e788-4b29-8c2b-62d5822e9a20</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -3150,8 +3150,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>b2471d21-559d-46c2-8a86-5664fe7fdd12</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -3180,8 +3180,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>7b88f72e-83d9-4e0a-a726-71784eb97a5b</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -3210,8 +3210,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>7cd44c20-38bd-42dc-bca8-14cd5d8a9b6f</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -3240,8 +3240,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>0c10fca1-af76-4475-8ac0-d6956e80ff72</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -3270,8 +3270,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>50f95a50-0e3f-4a55-88da-588fa59c211a</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -3300,8 +3300,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>ea78795c-fdb7-4ba8-8b7c-edc78b45bec2</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -3330,8 +3330,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>cfaebe1d-0cdf-4eb7-b6d0-6c5e7ddb3081</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -3360,8 +3360,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>05f22057-ec64-4e19-92bb-220adf95280f</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -3390,8 +3390,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>179ba4c3-4c8b-45ec-b2cc-7aeec211abe2</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -3420,8 +3420,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>e6fb7192-b474-4bf1-b8b1-420426403b0d</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -3450,8 +3450,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>93b4700a-6b00-4aa6-9f7a-db5cc5f62832</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -3480,8 +3480,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>f9c5a091-6df3-4f7e-ae48-0e6ae28cba39</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -3510,8 +3510,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>548b74bb-6ee0-4f90-92ba-1c5ea8144794</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -3540,8 +3540,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>103e55a0-924e-41ca-bc0f-76e416b1ce87</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -3570,8 +3570,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>4bb796e8-5c7a-4b9d-a761-5e4d855ed397</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -3600,8 +3600,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>8d0860c8-3094-4b86-879a-83a5718e25fd</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -3630,8 +3630,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>19791584-4f0d-4eef-a1b9-dc52064f7a9f</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -3660,8 +3660,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>1f6ec30e-a877-4305-94ef-f95e3077eb55</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -3690,8 +3690,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>f44a391e-db66-448e-9a5d-093a708b962b</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -3720,8 +3720,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>020c5537-19e2-4242-b3c3-0870cd4033c0</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -3750,8 +3750,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>e487df38-7126-4d6e-a71e-dc6d0ca0cc92</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -3780,8 +3780,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>74d84521-b8be-4063-abbc-c45b825a133f</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -3810,8 +3810,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>36a72cf5-db25-4f4e-ade9-33c20b353d81</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -3840,8 +3840,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>4b9da4f8-a22e-4678-9e63-433dc6de8c2d</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -3870,8 +3870,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>56cbb18e-ec24-4c50-82b4-595ef23d50d0</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -3900,8 +3900,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>44c022bf-cf26-48e1-bf5d-71f4b81f3aa1</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -3930,8 +3930,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>99a7528c-4226-4292-8f77-b4a6ee0a3b46</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -3960,8 +3960,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>ab4b1bf6-2db9-436d-a04c-d796495bb7fd</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -3990,8 +3990,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>f08a6f4a-7db6-41ba-a5f7-fe834313d985</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -4020,8 +4020,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>432d1ec4-97f5-4bf4-bfef-b2b45a75b3b8</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -4050,8 +4050,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>43003270-0bb7-45af-8d1f-0aae6b304253</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -4080,8 +4080,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>88cef5e1-5dee-42b3-b3dc-3a7e4607fcc0</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -4110,8 +4110,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>f9d5a475-7394-4e55-b853-865dbeedd9d7</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -4140,8 +4140,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>d624b658-fcd9-4dfe-b5b6-e32248a44b91</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -4170,8 +4170,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>c7c2ad76-f7f8-4014-b868-2f64c5d9d866</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -4200,8 +4200,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>7d08d1ec-609d-4b54-82c4-8663523cabc8</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -4230,8 +4230,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>76aa86e0-5730-4445-983a-dc5402ac2e78</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -4260,8 +4260,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>c1bedb71-0f18-472e-8c92-4f80683df779</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -4290,8 +4290,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>74444ace-2037-4ac2-9b1b-5af76780939f</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -4320,8 +4320,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>0a89aeea-2ede-4e56-b93e-c8fc34e7ce97</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -4350,8 +4350,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>09ad2692-7e0a-46ec-a1a4-238bca3724c8</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -4380,8 +4380,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>7710a73b-618f-4f62-bbfd-50eb380b46cb</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -4410,8 +4410,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>53c068c8-ac35-4efc-a28e-e8adba657213</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -4440,8 +4440,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>1426d7bd-f7dd-474f-866d-0ea17ba4afe7</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -4470,8 +4470,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>f8148c8a-6a21-4193-bbcb-fdbc031dc71e</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -4500,8 +4500,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>b3c6a6e4-d41f-4773-9862-9b32f7094155</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -4530,8 +4530,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>af8a608f-b46a-4a91-9f06-e9fab728c42c</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -4560,8 +4560,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>8bf6f25e-4e05-46aa-a4a1-4ceb5b27b39f</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -4590,8 +4590,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>9ba829f6-4f18-4af5-8109-b6ec96c0adaf</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -4620,8 +4620,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>f0f23f58-7716-41f1-84cb-a3b28427af52</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -4650,8 +4650,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>68a66fdc-21a4-48a3-b567-2d616fa18f13</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -4680,8 +4680,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>97e3207e-6364-43dc-bc98-555cc4c31b1c</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -4710,8 +4710,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>97fc7455-0013-4ce1-8e3f-47485bd53c17</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -4740,8 +4740,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>9079889f-b1d8-461e-9087-391edd2a2e1f</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -4770,8 +4770,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>af6384c8-4295-496b-9aff-a64a4906312a</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -4800,8 +4800,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>3c4fca60-6ed2-4f09-a909-2b2463e66699</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -4830,8 +4830,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>a8827d4d-a019-4079-ae58-f04c1a91ca39</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -4860,8 +4860,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>ee920240-e8f4-49f6-a361-73530002dd4c</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -4890,8 +4890,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>9527e190-582c-4aba-b612-302d0f7fcb12</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -4920,8 +4920,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>fe337dbc-1a25-4eb2-b1c7-44cc5d6b07f8</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -4950,8 +4950,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>f5b11531-0968-4441-8489-920c7b557b13</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -4980,8 +4980,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>06a4fc7d-e1c9-42c8-8b57-e85a95026351</id>
       <creationTime>2018-08-15T19:35:40.8954623-04:00</creationTime>
@@ -5010,8 +5010,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>5d063f40-8f21-45ce-b023-d4b9d90f967a</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -5040,8 +5040,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>cfba9892-8915-4723-9f6c-20dc7795dd6c</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -5070,8 +5070,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>3a11edef-f983-45eb-a784-0878edd0bbcf</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -5100,8 +5100,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>5db9d7e0-426d-464b-8f0c-5b453c347c8c</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -5130,8 +5130,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>6c9e6025-b1f2-4290-8087-074ac3490390</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -5160,8 +5160,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>24995069-ced3-4bcb-a62e-993f2a0c1dda</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -5190,8 +5190,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>570a71b4-edf9-456a-a97e-38259bf065fd</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -5220,8 +5220,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>a4313381-595c-49c6-8361-138a69174ca1</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -5250,8 +5250,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>85cca240-3f5c-401d-8cde-30b9e5b010eb</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -5280,8 +5280,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>e3c7a298-a88c-4d18-ba1e-1b0a8e5bce3c</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -5310,8 +5310,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>45042b5c-ae15-4d45-a6aa-e8b07e839f7d</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -5340,8 +5340,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>4ebb4341-a2ff-424b-96d8-3315f4ebb388</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -5370,8 +5370,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>72ab173c-191e-4ed2-a4c8-68796c1b99a7</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -5400,8 +5400,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>ec178abb-372e-4458-bdcb-a6a1fdaa40ce</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -5430,8 +5430,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>a20ca83c-f5f6-4208-9c29-dc42d24d41d5</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -5460,8 +5460,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>8a9b3993-c00b-4873-bef7-aec0cf1276c9</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -5490,8 +5490,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>3fecdf86-a31c-407a-8735-6f2cba13b2f9</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -5520,8 +5520,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>cdf298da-66b6-4897-a69f-063c499d6f2f</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -5550,8 +5550,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>fa3f3341-1ae2-4a68-9a73-cf2b4999ab57</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -5580,8 +5580,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>9e02a2cf-8af4-4d59-8e5f-dbe9255fea58</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -5610,8 +5610,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>e85567a3-c77f-4dd8-89d5-ee62144177fd</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -5640,8 +5640,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>bf6c5f64-43b9-4b2d-a1e3-52d84e8327fb</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -5670,8 +5670,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>8703d39c-c283-490e-8d36-af242237ba1d</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -5700,8 +5700,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>cce9a745-e388-4cc0-bc64-e7882e5aa58b</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -5730,8 +5730,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>18c1bc83-b1f3-4345-bb0e-120f366c8cb2</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -5760,8 +5760,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>1f805950-e184-4a49-888c-2d4f142719d8</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -5790,8 +5790,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>9ff97367-dc4d-4e9e-96a2-5d95b48cb3ab</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -5820,8 +5820,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>6c8ad845-73fa-41de-9984-ab5287c6d0f9</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -5850,8 +5850,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>74ab7066-2cb4-496c-ba7e-7c470f199bab</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -5880,8 +5880,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>30c8826d-c277-44ab-9657-2090e9037f4e</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -5910,8 +5910,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>cc88cc7a-2506-4a52-9855-73bdbc2ed8fb</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -5940,8 +5940,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>a3ae2721-729f-407c-8593-81f6dbb29f21</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -5970,8 +5970,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>744bf7cf-8fc5-446f-a94a-f629416bb79e</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -6000,8 +6000,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>c61c6f23-ae7d-422b-ba4e-a7bab7731d18</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -6030,8 +6030,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>8e26b8a2-d6e6-49f6-823d-ce4d6e124e2d</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -6060,8 +6060,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>413012df-f6ec-48cf-89df-fa6279e7d133</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -6090,8 +6090,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>e8ccd8af-1629-4e79-b685-d326828e1ae4</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -6120,8 +6120,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>e76f0635-11a6-4f9f-9c30-105dc7dbb2a5</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -6150,8 +6150,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>8a3c123d-3465-4cf1-89ef-b773cc0b5b35</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -6180,8 +6180,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>101d3e65-0ace-4e8a-bb57-0038b5d255a8</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -6210,8 +6210,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>0e91874c-023f-46b9-b23a-0aa18adf5843</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -6240,8 +6240,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>b663e846-1f90-450f-a961-f4a1600688c6</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -6270,8 +6270,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>67d11712-c427-4e65-a40e-66c7b23aaefc</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -6300,8 +6300,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>36e96185-b6e8-4b76-9e59-d0ed3ff38761</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -6330,8 +6330,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>7a775bc8-c8df-480b-b36b-8b9aed9efa33</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -6360,8 +6360,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>c3608602-1dca-49da-8979-051e27e32e89</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -6390,8 +6390,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>24dff26f-12bd-4210-8164-5239aa75fad1</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -6420,8 +6420,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>18d73279-ec2b-4e5e-9736-b216de66371e</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -6450,8 +6450,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>05be5799-d06f-4396-be64-8c7a49dde3d6</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -6480,8 +6480,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>f06b4e2f-ab4f-4c87-b9dc-0fdb38812610</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -6510,8 +6510,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>601253c7-7b16-4153-80d6-d8f674fe611c</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -6540,8 +6540,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>2b51bbff-f01f-4d9b-b5fd-99e923d410bc</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -6570,8 +6570,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>6608c932-7dad-4f48-85b6-39efee4dcaa8</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -6600,8 +6600,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>6f3b1bb5-1c1b-4176-b202-fdb0633ff48e</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -6630,8 +6630,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>7f101184-5abe-440f-bfa5-d6879e2085bf</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -6660,8 +6660,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>5b7a9a16-ada5-4f14-93ae-a2e9f94d9bae</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -6690,8 +6690,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>00a0b933-6e33-4b48-afe6-06ef40c8ff79</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -6720,8 +6720,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>dcf30f4b-1b37-4cd1-9fdb-e759e037ee9e</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -6750,8 +6750,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>892e5686-df63-4f8b-834c-b551bd8c87e9</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -6780,8 +6780,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>b8f9e820-d079-49a7-90e7-071918ad19e4</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -6810,8 +6810,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>8fe9a6f1-e3a7-42f7-bacd-94602a9a61dc</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -6840,8 +6840,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>0a80f0d7-37f5-42d6-8ea4-cf89a5961b91</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -6870,8 +6870,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>8c16ab77-4dd3-4ab0-9201-06c344ee30b9</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -6900,8 +6900,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>60cef496-8d84-46bb-9245-97426ef6b506</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -6930,8 +6930,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>d2299183-e568-47ec-827d-fa6220dee2a2</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -6960,8 +6960,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>fa8daa42-9b11-4e77-a3e7-20a09fff6960</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -6990,8 +6990,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>acd39814-22ce-4184-8639-a988677ef86b</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -7020,8 +7020,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>076492b7-74b5-4abd-8994-57942261323b</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -7050,8 +7050,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>a715554f-4314-4d61-8a7f-07e12247bf7d</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -7080,8 +7080,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>e53596cb-54dc-459a-b85e-2b573a7cd369</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -7110,8 +7110,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>36f70f14-0f46-41b5-a631-bf7f9e9c8e60</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -7140,8 +7140,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>5f55da91-75d0-4866-917b-7ef3effa9648</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -7170,8 +7170,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>b7b5da03-8b94-4fa2-923b-481ed5178a42</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -7200,8 +7200,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>b6d65547-44b3-479f-a350-6296c349313a</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -7230,8 +7230,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>4f195620-8c79-4ded-bb48-820d9a93847b</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -7260,8 +7260,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>8f71ef1f-6eed-48bd-9389-ee306df48f6d</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -7290,8 +7290,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>8c44e321-6035-47d1-9880-bd28c87ffd0d</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -7320,8 +7320,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>46241633-edab-42a3-bbe5-204dd7fc22e0</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -7350,8 +7350,8 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>94455592-006f-487a-bcbc-3b69628ffb83</id>
       <creationTime>2018-08-15T19:35:40.8964386-04:00</creationTime>
@@ -7380,5 +7380,5 @@
       </name>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
     </Place>
-  </insert>
+  </update>
 </dataset>

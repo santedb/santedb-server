@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="MDM Relationship Codes">
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Duplication Relationship Codes">
   <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>2BBF068B-9121-4081-BF3C-AB62C01362EE</id>
@@ -15,10 +15,18 @@
     </Concept>
   </update>
   <sql>
+    <exec invariant="sqlite"><![CDATA[
+      -- FOR PROBABLE RELATIONSHIP TYPE
+      INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc)
+      SELECT
+      x'8B06BF2B21918140BF3CAB62C01362EE', CD_ID, CD_ID, 'PROBABLE DUPLICATE / DUPLICATE'
+      FROM CD_SET_MEM_ASSOC_TBL WHERE SET_ID = x'67A56D4E9400234F855511DA499593AF';
+]]>
+    </exec>
     <exec invariant="npgsql">
       <![CDATA[
 -- FOR PROBABLE RELATIONSHIP TYPE
-INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) 
+INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) 
 	SELECT 
 		'2BBF068B-9121-4081-BF3C-AB62C01362EE', CD_ID, CD_ID, 'PROBABLE DUPLICATE / DUPLICATE'
 	FROM CD_SET_MEM_ASSOC_TBL WHERE SET_ID = '4e6da567-0094-4f23-8555-11da499593af'
@@ -30,7 +38,7 @@ SELECT REG_PATCH('MDM-RELATIONSHIP');
     <exec invariant="fbsql">
       <![CDATA[
 -- FOR PROBABLE RELATIONSHIP TYPE
-INSERT INTO ent_rel_vrfy_cdtbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) 
+INSERT INTO ent_rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) 
 	SELECT 
 		char_to_uuid('2BBF068B-9121-4081-BF3C-AB62C01362EE'), CD_ID, CD_ID, 'PROBABLE DUPLICATE / DUPLICATE'
 	FROM CD_SET_MEM_ASSOC_TBL WHERE SET_ID = char_to_uuid('4e6da567-0094-4f23-8555-11da499593af');

@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2021, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2022, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  *
@@ -16,38 +16,26 @@
  * the License.
  *
  * User: fyfej
- * Date: 2021-8-27
+ * Date: 2022-5-30
  */
-
 using SanteDB.Configuration;
 using SanteDB.Configuration.Controls;
-using SanteDB.Configuration.Converters;
-using SanteDB.Configuration.Editors;
 using SanteDB.Configuration.Features;
-using SanteDB.Configurator.Tasks;
-using SanteDB.Core;
+using SanteDB.Configuration.Tasks;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Configuration.Features;
 using SanteDB.Core.Diagnostics;
-using SanteDB.Core.Services;
-using SanteDB.Server.Core.Configuration.Tasks;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Tracing;
-using System.Drawing;
-using System.Drawing.Design;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Serialization;
 
@@ -76,6 +64,14 @@ namespace SanteDB.Configurator
             }
 
             /// <summary>
+            /// Write a trace event with supporting data
+            /// </summary>
+            public override void TraceEventWithData(EventLevel level, string source, string message, object[] data)
+            {
+                this.WriteTrace(level, source, message);
+            }
+
+            /// <summary>
             /// Write trace
             /// </summary>
             protected override void WriteTrace(EventLevel level, string source, string format, params object[] args)
@@ -95,9 +91,16 @@ namespace SanteDB.Configurator
 
         public frmMain()
         {
-            Tracer.AddWriter(new FormTraceWriter(this), EventLevel.LogAlways);
-            InitializeComponent();
-            this.PopulateConfiguration();
+            try
+            {
+                Tracer.AddWriter(new FormTraceWriter(this), EventLevel.LogAlways);
+                InitializeComponent();
+                this.PopulateConfiguration();
+            }
+            catch(Exception e)
+            {
+                MessageBox.Show(e.ToString(), "Error Starting Configuration Tool");
+            }
         }
 
         // Configuration hash
@@ -151,7 +154,9 @@ namespace SanteDB.Configurator
                         Application.DoEvents();
 
                         using (var ms = typeof(frmMain).Assembly.GetManifestResourceStream("SanteDB.Configurator.License.rtf"))
+                        {
                             rtbLicense.LoadFile(ms, RichTextBoxStreamType.RichText);
+                        }
                     }
                     catch (Exception e) // common on Linux systems in Mono
                     {
@@ -180,7 +185,10 @@ namespace SanteDB.Configurator
                     {
                         try
                         {
-                            if (ftr.ConfigurationType == null) continue;
+                            if (ftr.ConfigurationType == null)
+                            {
+                                continue;
+                            }
                             // Add the features
                             var trvParent = trvFeatures.Nodes.Find(ftr.Group, false).FirstOrDefault();
                             if (trvParent == null)
@@ -201,7 +209,9 @@ namespace SanteDB.Configurator
                             });
 
                             while (!mre.WaitOne(100))
+                            {
                                 Application.DoEvents();
+                            }
 
                             switch (state)
                             {
@@ -243,9 +253,13 @@ namespace SanteDB.Configurator
         private void lsvConfigSections_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (lsvConfigSections.SelectedItems.Count == 0)
+            {
                 pbEditor.SelectedObject = null;
+            }
             else
+            {
                 pbEditor.SelectedObject = lsvConfigSections.SelectedItems[0].Tag;
+            }
         }
 
         /// <summary>
@@ -272,7 +286,10 @@ namespace SanteDB.Configurator
                 if (feature is IEnhancedConfigurationFeature)
                 {
                     if (tcSettings.TabPages.ContainsKey("custom"))
+                    {
                         tcSettings.TabPages.RemoveByKey("custom");
+                    }
+
                     tcSettings.TabPages.Insert(0, "custom", "Properties", 7);
                     tcSettings.TabPages[0].Controls.Add((feature as IEnhancedConfigurationFeature).ConfigurationPanel);
                 }
@@ -289,14 +306,18 @@ namespace SanteDB.Configurator
                 else if (feature.ConfigurationType != null)
                 {
                     if (feature.Configuration == null)
+                    {
                         feature.Configuration = ConfigurationContext.Current.Configuration.GetSection(feature.ConfigurationType) ?? Activator.CreateInstance(feature.ConfigurationType);
+                    }
 
                     // Now set the task
                     pgConfiguration.SelectedObject = feature.Configuration;
                     pgConfiguration.Visible = true;
                 }
                 else
+                {
                     pgConfiguration.Visible = false;
+                }
 
                 lblDescription.Text = $"     {feature.Description}";
                 this.CurrentFeature = feature;
@@ -338,19 +359,26 @@ namespace SanteDB.Configurator
             if (this.HasChanged())
             {
                 foreach (var itm in ConfigurationContext.Current.ConfigurationTasks.Where(o => o.Feature == this.CurrentFeature).ToArray())
+                {
                     ConfigurationContext.Current.ConfigurationTasks.Remove(itm);
+                }
 
                 if (this.CurrentFeature != null)
                 {
                     foreach (var itm in this.CurrentFeature.CreateInstallTasks().ToArray())
+                    {
                         ConfigurationContext.Current.ConfigurationTasks.Add(itm);
+                    }
                 }
             }
 
             foreach (var tsk in ConfigurationContext.Current.Features.Where(o =>
                      o.Flags.HasFlag(FeatureFlags.AlwaysConfigure))
                 .SelectMany(o => o.CreateInstallTasks()))
+            {
                 ConfigurationContext.Current.ConfigurationTasks.Add(tsk);
+            }
+
             ConfigurationContext.Current.ConfigurationTasks.Add(new SaveConfigurationTask());
             ConfigurationContext.Current.Apply(this);
             this.PopulateConfiguration();
@@ -367,11 +395,15 @@ namespace SanteDB.Configurator
 
             // Remove any uninstall tasks related to this feature
             foreach (var itm in ConfigurationContext.Current.ConfigurationTasks.Where(o => o.Feature == this.CurrentFeature).ToArray())
+            {
                 ConfigurationContext.Current.ConfigurationTasks.Remove(itm);
+            }
 
             // Create install tasks
             foreach (var tsk in this.CurrentFeature.CreateInstallTasks())
+            {
                 ConfigurationContext.Current.ConfigurationTasks.Add(tsk);
+            }
         }
 
         /// <summary>
@@ -384,11 +416,15 @@ namespace SanteDB.Configurator
             var feature = (sender as Control).Tag as IFeature;
             // Remove any tasks related to this feature
             foreach (var itm in ConfigurationContext.Current.ConfigurationTasks.Where(o => o.Feature == this.CurrentFeature).ToArray())
+            {
                 ConfigurationContext.Current.ConfigurationTasks.Remove(itm);
+            }
 
             // Create removal tasks
             foreach (var tsk in this.CurrentFeature.CreateUninstallTasks())
+            {
                 ConfigurationContext.Current.ConfigurationTasks.Add(tsk);
+            }
         }
 
         /// <summary>
@@ -416,11 +452,16 @@ namespace SanteDB.Configurator
             if (e.Node?.Tag is IFeature feature && this.HasChanged())
             {
                 foreach (var itm in ConfigurationContext.Current.ConfigurationTasks.Where(o => o.Feature == this.CurrentFeature).ToArray())
+                {
                     ConfigurationContext.Current.ConfigurationTasks.Remove(itm);
+                }
+
                 if (this.CurrentFeature != null)
                 {
                     foreach (var itm in this.CurrentFeature.CreateInstallTasks().ToArray())
+                    {
                         ConfigurationContext.Current.ConfigurationTasks.Add(itm);
+                    }
                 }
             }
         }

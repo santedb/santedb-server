@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2021, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2022, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  *
@@ -16,29 +16,22 @@
  * the License.
  *
  * User: fyfej
- * Date: 2021-8-27
+ * Date: 2022-5-30
  */
-
 using SanteDB.Configuration;
+using SanteDB.Configuration.Tasks;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Configuration.Data;
-using SanteDB.Server.Core.Configuration.Tasks;
 using SanteDB.OrmLite.Configuration;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Data.Common;
 using System.Diagnostics.CodeAnalysis;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using SanteDB.Core.Interfaces;
-using SanteDB.Core;
 using System.IO;
+using System.Linq;
 using System.Reflection;
+using System.Windows.Forms;
 
 namespace SanteDB.Configurator
 {
@@ -129,7 +122,21 @@ namespace SanteDB.Configurator
             });
 
             // Push the initial configuration features onto the service
-            if (rdoEasy.Checked)
+            if(rdoOpen.Checked)
+            {
+                var dlgOpen = new OpenFileDialog()
+                {
+                    Title = "Open Alternate Configuration",
+                    Filter = "Configuration File (*.config.*)|*.config.*"
+                };
+                if (dlgOpen.ShowDialog() == DialogResult.OK)
+                {
+                    ConfigurationContext.Current.LoadConfiguration(dlgOpen.FileName);
+                    ConfigurationContext.Current.Apply(this);
+
+                }
+            }
+            else if (rdoEasy.Checked)
             {
                 // Create feature
                 dbSelector.ConnectionString.Name = "main";
@@ -166,7 +173,9 @@ namespace SanteDB.Configurator
                     }
                     // Add configuration
                     foreach (var tsk in ftr.CreateInstallTasks().Where(o => o.VerifyState(ConfigurationContext.Current.Configuration)))
+                    {
                         ConfigurationContext.Current.ConfigurationTasks.Add(tsk);
+                    }
                 }
 
                 ConfigurationContext.Current.Apply(this);

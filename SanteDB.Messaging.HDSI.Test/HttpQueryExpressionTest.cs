@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2021, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2022, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  *
@@ -16,19 +16,17 @@
  * the License.
  *
  * User: fyfej
- * Date: 2021-8-27
+ * Date: 2022-5-30
  */
-
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using NUnit.Framework;
 using SanteDB.Core.Model.Constants;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Model.Entities;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Model.Roles;
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 namespace SanteDB.Messaging.HDSI.Test
 {
@@ -40,28 +38,29 @@ namespace SanteDB.Messaging.HDSI.Test
     public class HttpQueryExpressionTest
     {
 
-        /// <summary>
-        /// Turn an array from the builder into a query string
-        /// </summary>
-        /// <param name="query"></param>
-        /// <returns></returns>
-        public static String CreateQueryString(params KeyValuePair<String, Object>[] query)
+
+        [Test]
+        public void TestComposeControlParameters()
         {
-            String queryString = String.Empty;
-            foreach (var kv in query)
+            var query = "dateOfBirth=!null&_someOtherValue=true".ParseQueryString();
+            var linq = QueryExpressionParser.BuildLinqExpression<Patient>(query);
+            Assert.IsTrue(linq.ToString().Contains("WithControl"));
+            Assert.IsTrue((bool)linq.Compile().DynamicInvoke(new Patient() { DateOfBirth = DateTime.Now }));
+
+            query = "dateOfBirth=!null&_sub=$sub.id&_sub=$sub2.id".ParseQueryString();
+            linq = QueryExpressionParser.BuildLinqExpression<Patient>(query, new System.Collections.Generic.Dictionary<string, Func<object>>()
             {
-                List<String> val = kv.Value is List<Object> ? (kv.Value as List<Object>).OfType<String>().ToList() : new List<String>() { kv.Value.ToString() };
-                foreach (var itm in val)
-                {
-                    queryString += String.Format("{0}={1}", kv.Key, Uri.EscapeDataString(itm));
-                    if (!itm.Equals(val.Last()))
-                        queryString += "&";
-                }
-                if (!kv.Equals(query.Last()))
-                    queryString += "&";
-            }
-            return queryString;
+                { "sub", () => new Patient() { Key = Guid.Empty } },
+                { "sub2", () => new Patient() { Key = Guid.Empty } }
+            }, safeNullable: false, lazyExpandVariables: false);
+            Assert.IsTrue((bool)linq.Compile().DynamicInvoke(new Patient() { DateOfBirth = DateTime.Now }));
+
+            // Re-parse
+            var parsedQuery = QueryExpressionBuilder.BuildQuery(linq);
+            var parsedQueryString = parsedQuery.ToHttpString();
+            Assert.AreEqual(parsedQueryString, "dateOfBirth=%21null&_sub=00000000-0000-0000-0000-000000000000&_sub=00000000-0000-0000-0000-000000000000");
         }
+
         /// <summary>
         /// Test query by key
         /// </summary>
@@ -70,7 +69,7 @@ namespace SanteDB.Messaging.HDSI.Test
         {
             Guid id = Guid.Empty;
             var query = QueryExpressionBuilder.BuildQuery<Patient>(o => o.Key == id);
-            var expression = CreateQueryString(query.ToArray());
+            var expression = query.ToHttpString();
             Assert.AreEqual("id=00000000-0000-0000-0000-000000000000", expression);
         }
 
@@ -81,8 +80,9 @@ namespace SanteDB.Messaging.HDSI.Test
         public void TestWriteGuardByUuid()
         {
             Guid id = Guid.Empty;
-            var query = QueryExpressionBuilder.BuildQuery<Patient>(o => o.Relationships.Where(g=>g.RelationshipTypeKey == EntityRelationshipTypeKeys.Mother).Any(r=>r.TargetEntity.StatusConcept.Mnemonic == "ACTIVE"));
-            var expression = CreateQueryString(query.ToArray());
+            var query = QueryExpressionBuilder.BuildQuery<Patient>(o => o.Relationships.Where(g => g.RelationshipTypeKey == EntityRelationshipTypeKeys.Mother).Any(r => r.TargetEntity.StatusConcept.Mnemonic == "ACTIVE"));
+            var expression = query.ToHttpString();
+
             Assert.AreEqual("relationship[29ff64e5-b564-411a-92c7-6818c02a9e48].target.statusConcept.mnemonic=ACTIVE", expression);
         }
 
@@ -94,8 +94,8 @@ namespace SanteDB.Messaging.HDSI.Test
         {
             Guid id = Guid.Empty;
             var qstr = "classConcept.mnemonic=GenderCode&statusConcept.mnemonic=ACTIVE";
-            
-            var query = QueryExpressionParser.BuildLinqExpression<Place>(NameValueCollection.ParseQueryString(qstr));
+
+            var query = QueryExpressionParser.BuildLinqExpression<Place>(qstr.ParseQueryString());
 
 
 
@@ -107,8 +107,9 @@ namespace SanteDB.Messaging.HDSI.Test
         public void TestChainedWriter()
         {
             Guid id = Guid.Empty;
-            var query = QueryExpressionBuilder.BuildQuery<Place>(o => o.ClassConcept.Mnemonic == "GenderCode" && o.StatusConcept.Mnemonic =="ACTIVE");
-            var expression = CreateQueryString(query.ToArray());
+            var query = QueryExpressionBuilder.BuildQuery<Place>(o => o.ClassConcept.Mnemonic == "GenderCode" && o.StatusConcept.Mnemonic == "ACTIVE");
+            var expression = query.ToHttpString();
+
             Assert.AreEqual("classConcept.mnemonic=GenderCode&statusConcept.mnemonic=ACTIVE", expression);
 
 
@@ -120,8 +121,9 @@ namespace SanteDB.Messaging.HDSI.Test
         public void TestChainedWriter2()
         {
             Guid id = Guid.Empty;
-            var query = QueryExpressionBuilder.BuildQuery<Concept>(o => o.ConceptSets.Any(p=>p.Mnemonic == "GenderCode"));
-            var expression = CreateQueryString(query.ToArray());
+            var query = QueryExpressionBuilder.BuildQuery<Concept>(o => o.ConceptSets.Any(p => p.Mnemonic == "GenderCode"));
+            var expression = query.ToHttpString();
+
             Assert.AreEqual("conceptSet.mnemonic=GenderCode", expression);
 
         }
@@ -133,7 +135,8 @@ namespace SanteDB.Messaging.HDSI.Test
         {
             Guid id = Guid.Empty;
             var query = QueryExpressionBuilder.BuildQuery<Patient>(o => o.Key == id && o.GenderConcept.Mnemonic == "Male");
-            var expression = CreateQueryString(query.ToArray());
+            var expression = query.ToHttpString();
+
             Assert.AreEqual("id=00000000-0000-0000-0000-000000000000&genderConcept.mnemonic=Male", expression);
         }
 
@@ -144,7 +147,8 @@ namespace SanteDB.Messaging.HDSI.Test
         public void TestWriteLookupOr()
         {
             var query = QueryExpressionBuilder.BuildQuery<Patient>(o => o.GenderConcept.Mnemonic == "Male" || o.GenderConcept.Mnemonic == "Female");
-            var expression = CreateQueryString(query.ToArray());
+            var expression = query.ToHttpString();
+
             Assert.AreEqual("genderConcept.mnemonic=Male&genderConcept.mnemonic=Female", expression);
         }
 
@@ -156,7 +160,8 @@ namespace SanteDB.Messaging.HDSI.Test
         {
             DateTime dt = DateTime.MinValue;
             var query = QueryExpressionBuilder.BuildQuery<Patient>(o => o.DateOfBirth >= dt);
-            var expression = CreateQueryString(query.ToArray());
+            var expression = query.ToHttpString();
+
             Assert.AreEqual("dateOfBirth=%3E%3D0001-01-01T00%3A00%3A00.0000000", expression);
 
         }
@@ -169,7 +174,8 @@ namespace SanteDB.Messaging.HDSI.Test
         {
             DateTime dt = DateTime.MinValue;
             var query = QueryExpressionBuilder.BuildQuery<Patient>(o => o.DateOfBirth > dt);
-            var expression = CreateQueryString(query.ToArray());
+            var expression = query.ToHttpString();
+
             Assert.AreEqual("dateOfBirth=%3E0001-01-01T00%3A00%3A00.0000000", expression);
 
         }
@@ -182,7 +188,8 @@ namespace SanteDB.Messaging.HDSI.Test
         {
             DateTime dt = DateTime.MinValue;
             var query = QueryExpressionBuilder.BuildQuery<Patient>(o => o.DateOfBirth <= dt);
-            var expression = CreateQueryString(query.ToArray());
+            var expression = query.ToHttpString();
+
             Assert.AreEqual("dateOfBirth=%3C%3D0001-01-01T00%3A00%3A00.0000000", expression);
 
         }
@@ -195,11 +202,12 @@ namespace SanteDB.Messaging.HDSI.Test
         {
             DateTime dt = DateTime.MinValue;
             var query = QueryExpressionBuilder.BuildQuery<Patient>(o => o.DateOfBirth < dt);
-            var expression = CreateQueryString(query.ToArray());
+            var expression = query.ToHttpString();
+
             Assert.AreEqual("dateOfBirth=%3C0001-01-01T00%3A00%3A00.0000000", expression);
 
         }
-       
+
 
         /// <summary>
         /// Test write of lookup greater than equal to
@@ -208,7 +216,8 @@ namespace SanteDB.Messaging.HDSI.Test
         public void TestWriteLookupNotEqual()
         {
             var query = QueryExpressionBuilder.BuildQuery<Patient>(o => o.GenderConcept.Mnemonic != "Male");
-            var expression = CreateQueryString(query.ToArray());
+            var expression = query.ToHttpString();
+
             Assert.AreEqual("genderConcept.mnemonic=%21Male", expression);
         }
 
@@ -220,7 +229,8 @@ namespace SanteDB.Messaging.HDSI.Test
         public void TestWriteLookupApproximately()
         {
             var query = QueryExpressionBuilder.BuildQuery<Patient>(o => o.GenderConcept.Mnemonic.Contains("M"));
-            var expression = CreateQueryString(query.ToArray());
+            var expression = query.ToHttpString();
+
             Assert.AreEqual("genderConcept.mnemonic=~M", expression);
         }
 
@@ -230,8 +240,9 @@ namespace SanteDB.Messaging.HDSI.Test
         [Test]
         public void TestWriteLookupAny()
         {
-            var query = QueryExpressionBuilder.BuildQuery<Patient>(o => o.Names.Any(p=>p.NameUse.Mnemonic == "Legal"));
-            var expression = CreateQueryString(query.ToArray());
+            var query = QueryExpressionBuilder.BuildQuery<Patient>(o => o.Names.Any(p => p.NameUse.Mnemonic == "Legal"));
+            var expression = query.ToHttpString();
+
             Assert.AreEqual("name.use.mnemonic=Legal", expression);
         }
 
@@ -241,8 +252,9 @@ namespace SanteDB.Messaging.HDSI.Test
         [Test]
         public void TestWriteLookupAnyAnd()
         {
-            var query = QueryExpressionBuilder.BuildQuery<Patient>(o => o.Names.Any(p => p.NameUse.Mnemonic == "Legal" && p.Component.Any(n=>n.Value == "Smith")));
-            var expression = CreateQueryString(query.ToArray());
+            var query = QueryExpressionBuilder.BuildQuery<Patient>(o => o.Names.Any(p => p.NameUse.Mnemonic == "Legal" && p.Component.Any(n => n.Value == "Smith")));
+            var expression = query.ToHttpString();
+
             Assert.AreEqual("name.use.mnemonic=Legal&name.component.value=Smith", expression);
         }
 
@@ -253,7 +265,8 @@ namespace SanteDB.Messaging.HDSI.Test
         public void TestWriteLookupWhereAnd()
         {
             var query = QueryExpressionBuilder.BuildQuery<Patient>(o => o.Names.Where(p => p.NameUse.Mnemonic == "Legal").Any(p => p.Component.Any(n => n.Value == "Smith")));
-            var expression = CreateQueryString(query.ToArray());
+            var expression = query.ToHttpString();
+
             Assert.AreEqual("name[Legal].component.value=Smith", expression);
         }
 
@@ -265,7 +278,8 @@ namespace SanteDB.Messaging.HDSI.Test
         public void TestWriteNonSerializedProperty()
         {
             var query = QueryExpressionBuilder.BuildQuery<Patient>(o => o.Extensions.Any(e => e.ExtensionDisplay == "1"));
-            var expression = CreateQueryString(query.ToArray());
+            var expression = query.ToHttpString();
+
             Assert.AreEqual("extension.display=1", expression);
         }
 
@@ -277,7 +291,8 @@ namespace SanteDB.Messaging.HDSI.Test
         {
             QueryFilterExtensions.AddExtendedFilter(new SimpleQueryExtension());
             var query = QueryExpressionBuilder.BuildQuery<Patient>(o => o.Identifiers.Any(i => i.Value.TestExpression() <= 2));
-            var expression = CreateQueryString(query.ToArray());
+            var expression = query.ToHttpString();
+
             Assert.AreEqual("identifier.value=%3A%28test%29%3C%3D2", expression);
         }
 
@@ -291,7 +306,8 @@ namespace SanteDB.Messaging.HDSI.Test
             DateTime other = DateTime.Parse("1980-01-01");
             TimeSpan myTime = new TimeSpan(1, 0, 0, 0);
             var query = QueryExpressionBuilder.BuildQuery<Patient>(o => o.DateOfBirth.Value.TestExpressionEx(other) < myTime);
-            var expression = CreateQueryString(query.ToArray());
+            var expression = query.ToHttpString();
+
             Assert.AreEqual("dateOfBirth=%3A%28testEx%7C1980-01-01T00%3A00%3A00.0000000%29%3C1.00%3A00%3A00", expression);
         }
 
@@ -305,7 +321,8 @@ namespace SanteDB.Messaging.HDSI.Test
             DateTime other = DateTime.Parse("1980-01-01");
             TimeSpan myTime = new TimeSpan(1, 0, 0, 0);
             var query = QueryExpressionBuilder.BuildQuery<Patient>(o => o.DateOfBirth.Value.TestExpressionEx(o.CreationTime.DateTime) < myTime);
-            var expression = CreateQueryString(query.ToArray());
+            var expression = query.ToHttpString();
+
             Assert.AreEqual("dateOfBirth=%3A%28testEx%7C%22%24_.creationTime%22%29%3C1.00%3A00%3A00", expression);
         }
 

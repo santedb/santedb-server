@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<dataset xmlns="http://santedb.org/data" id="Default Materials">
-  <insert skipIfExists="true">
+<dataset xmlns="http://santedb.org/data" id="Core Materials List">
+  <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>a4fc5c93-31c2-4f87-990e-c5a4e5ea2e76</id>
       <isReadonly>false</isReadonly>
@@ -8,8 +8,8 @@
       <statusConcept>C8064CBD-FA06-4530-B430-1A52F1530C27</statusConcept>
       <conceptClass>1EF69347-EF03-4FF7-B3C5-6334448845E6</conceptClass>
     </Concept>
-  </insert>
-  <insert skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Material xmlns="http://santedb.org/model">
       <id>790be5ca-d07d-46c6-8fa0-9d4f5adf388c</id>
       <classConcept>D39073BE-0F8F-440E-B8C8-7034CC138A95</classConcept>
@@ -32,8 +32,8 @@
       <formConcept>66CBCE3A-2E77-401D-95D8-EE0361F4F076</formConcept>
       <quantityConcept>a4fc5c93-31c2-4f87-990e-c5a4e5ea2e76</quantityConcept>
     </Material>
-  </insert>
-  <insert skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Material xmlns="http://santedb.org/model">
       <id>ED144BD2-A334-40A2-9A8F-B767A1397D07</id>
       <classConcept>D39073BE-0F8F-440E-B8C8-7034CC138A95</classConcept>
@@ -56,8 +56,8 @@
       <formConcept>9902267C-8F77-4233-BFD3-E6B068AB326A</formConcept>
       <quantityConcept>a4fc5c93-31c2-4f87-990e-c5a4e5ea2e76</quantityConcept>
     </Material>
-  </insert>
-  <insert  skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Material xmlns="http://santedb.org/model">
       <id>41B008A6-FCF8-40BC-AB96-7567E94BCF8F</id>
       <classConcept>D39073BE-0F8F-440E-B8C8-7034CC138A95</classConcept>
@@ -80,8 +80,8 @@
       <formConcept>9902267C-8F77-4233-BFD3-E6B068AB326A</formConcept>
       <quantityConcept>a4fc5c93-31c2-4f87-990e-c5a4e5ea2e76</quantityConcept>
     </Material>
-  </insert>
-  <insert skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Material xmlns="http://santedb.org/model">
       <id>DD53B8FF-2F4D-4359-A031-9405AD384893</id>
       <classConcept>D39073BE-0F8F-440E-B8C8-7034CC138A95</classConcept>
@@ -104,8 +104,8 @@
       <formConcept>66CBCE3A-2E77-401D-95D8-EE0361F4F076</formConcept>
       <quantityConcept>a4fc5c93-31c2-4f87-990e-c5a4e5ea2e76</quantityConcept>
     </Material>
-  </insert>
-  <insert  skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Material xmlns="http://santedb.org/model">
       <id>6506FA75-9CD9-47DC-9B94-CBD55B6B6C8B</id>
       <classConcept>D39073BE-0F8F-440E-B8C8-7034CC138A95</classConcept>
@@ -128,8 +128,8 @@
       <formConcept>9902267C-8F77-4233-BFD3-E6B068AB326A</formConcept>
       <quantityConcept>a4fc5c93-31c2-4f87-990e-c5a4e5ea2e76</quantityConcept>
     </Material>
-  </insert>
-  <insert  skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Material xmlns="http://santedb.org/model">
       <id>7C5A4FF6-4E81-4C6C-88E9-FC75CE61A4FB</id>
       <classConcept>D39073BE-0F8F-440E-B8C8-7034CC138A95</classConcept>
@@ -152,8 +152,8 @@
       <formConcept>9902267C-8F77-4233-BFD3-E6B068AB326A</formConcept>
       <quantityConcept>a4fc5c93-31c2-4f87-990e-c5a4e5ea2e76</quantityConcept>
     </Material>
-  </insert>
-  <insert  skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Material xmlns="http://santedb.org/model">
       <id>E829C3D1-5243-474E-A2D6-BA35D99610C4</id>
       <classConcept>D39073BE-0F8F-440E-B8C8-7034CC138A95</classConcept>
@@ -177,8 +177,8 @@
       <quantityConcept>a4fc5c93-31c2-4f87-990e-c5a4e5ea2e76</quantityConcept>
     </Material>
   
-  </insert>
-  <insert  skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Material xmlns="http://santedb.org/model">
       <id>D8049BE9-19D7-4DD8-9DC1-7D8F3886FF97</id>
       <classConcept>D39073BE-0F8F-440E-B8C8-7034CC138A95</classConcept>
@@ -201,8 +201,8 @@
       <formConcept>9902267C-8F77-4233-BFD3-E6B068AB326A</formConcept>
       <quantityConcept>a4fc5c93-31c2-4f87-990e-c5a4e5ea2e76</quantityConcept>
     </Material>
-  </insert>
-  <insert  skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Material xmlns="http://santedb.org/model">
       <id>7D80E518-6E04-4091-8D19-7265BB09BC1F</id>
       <classConcept>D39073BE-0F8F-440E-B8C8-7034CC138A95</classConcept>
@@ -225,8 +225,8 @@
       <formConcept>66CBCE3A-2E77-401D-95D8-EE0361F4F076</formConcept>
       <quantityConcept>a4fc5c93-31c2-4f87-990e-c5a4e5ea2e76</quantityConcept>
     </Material>
-  </insert>
-  <insert  skipIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Material xmlns="http://santedb.org/model">
       <id>7D80E518-6E04-4091-8D19-7A3BB2B32C1F</id>
       <classConcept>D39073BE-0F8F-440E-B8C8-7034CC138A95</classConcept>
@@ -249,6 +249,6 @@
       <formConcept>66CBCE3A-2E77-401D-95D8-EE0361F4F076</formConcept>
       <quantityConcept>a4fc5c93-31c2-4f87-990e-c5a4e5ea2e76</quantityConcept>
     </Material>
-  </insert>
+  </update>
 
 </dataset>

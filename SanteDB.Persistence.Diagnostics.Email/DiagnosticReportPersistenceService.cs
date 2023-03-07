@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2021, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2022, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  *
@@ -16,36 +16,29 @@
  * the License.
  *
  * User: fyfej
- * Date: 2021-8-27
+ * Date: 2022-5-30
  */
 using SanteDB.Core;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Event;
-using SanteDB.Core.Model;
 using SanteDB.Core.Model.AMI.Diagnostics;
-using SanteDB.Core.Model.Constants;
+using SanteDB.Core.Model.Query;
 using SanteDB.Core.Model.Security;
+using SanteDB.Core.Model.Serialization;
+using SanteDB.Core.Notifications;
 using SanteDB.Core.Security;
-using SanteDB.Server.Core.Security.Attribute;
+using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using SanteDB.Persistence.Diagnostics.Email.Configuration;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Net;
-using System.Net.Mail;
-using System.Security.Permissions;
 using System.Security.Principal;
-using System.Text;
 using System.Xml.Serialization;
-using SanteDB.Core.Model.Query;
-using SanteDB.Core.Diagnostics;
-using System.Diagnostics.Tracing;
-using SanteDB.Core.Model.Serialization;
-using SanteDB.Core.Notifications;
-using SanteDB.Server.Core.Security.Attribute;
 
 namespace SanteDB.Persistence.Diagnostics.Email
 {
@@ -53,9 +46,20 @@ namespace SanteDB.Persistence.Diagnostics.Email
     /// Persistence service for diagnostics
     /// </summary>
 #pragma warning disable CS0067
+
     [ServiceProvider("E-Mail Diagnostic (Bug) Report Submission")]
+    [ExcludeFromCodeCoverage]
     public class DiagnosticReportPersistenceService : IDataPersistenceService<DiagnosticReport>
     {
+
+        /// <summary>
+        /// Policy enforcement service
+        /// </summary>
+        /// <param name="policyEnforcementService"></param>
+        public DiagnosticReportPersistenceService(IPolicyEnforcementService policyEnforcementService)
+        {
+            this.m_pepService = policyEnforcementService;
+        }
 
         /// <summary>
         /// Gets the service name
@@ -63,7 +67,8 @@ namespace SanteDB.Persistence.Diagnostics.Email
         public string ServiceName => "E-Mail Diagnostic Report Submission";
 
         // Trace source
-        private Tracer m_traceSource = new Tracer("SanteDB.Persistence.Diagnostics.Email");
+        private readonly Tracer m_traceSource = new Tracer("SanteDB.Persistence.Diagnostics.Email");
+        private readonly IPolicyEnforcementService m_pepService;
 
         // Configuration
         private DiagnosticEmailServiceConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<DiagnosticEmailServiceConfigurationSection>();
@@ -71,38 +76,57 @@ namespace SanteDB.Persistence.Diagnostics.Email
         /// Fired when an issue is being inserted
         /// </summary>
         public event EventHandler<DataPersistedEventArgs<DiagnosticReport>> Inserted;
+
         /// <summary>
         /// Fired when the issue is being inserted
         /// </summary>
         public event EventHandler<DataPersistingEventArgs<DiagnosticReport>> Inserting;
+
         /// <summary>
         /// Not supported
         /// </summary>
         public event EventHandler<DataPersistedEventArgs<DiagnosticReport>> Obsoleted;
+
         /// <summary>
         /// Not supported
         /// </summary>
         public event EventHandler<DataPersistingEventArgs<DiagnosticReport>> Obsoleting;
+
+        /// <summary>
+        /// Not supported
+        /// </summary>
+        public event EventHandler<DataPersistedEventArgs<DiagnosticReport>> Deleted;
+
+        /// <summary>
+        /// Not supported
+        /// </summary>
+        public event EventHandler<DataPersistingEventArgs<DiagnosticReport>> Deleting;
+
         /// <summary>
         /// Not supported
         /// </summary>
         public event EventHandler<QueryResultEventArgs<DiagnosticReport>> Queried;
+
         /// <summary>
         /// Not supported
         /// </summary>
         public event EventHandler<QueryRequestEventArgs<DiagnosticReport>> Querying;
+
         /// <summary>
         /// Not supported
         /// </summary>
         public event EventHandler<DataRetrievedEventArgs<DiagnosticReport>> Retrieved;
+
         /// <summary>
         /// Not supported
         /// </summary>
         public event EventHandler<DataRetrievingEventArgs<DiagnosticReport>> Retrieving;
+
         /// <summary>
         /// Not supported
         /// </summary>
         public event EventHandler<DataPersistedEventArgs<DiagnosticReport>> Updated;
+
         /// <summary>
         /// Not supported
         /// </summary>
@@ -119,7 +143,7 @@ namespace SanteDB.Persistence.Diagnostics.Email
         /// <summary>
         /// Not supported
         /// </summary>
-        public DiagnosticReport Get(Guid containerId, Guid? versionId, bool loadFast = false, IPrincipal overrideAuthContext = null)
+        public DiagnosticReport Get(Guid containerId, Guid? versionId, IPrincipal overrideAuthContext = null)
         {
             throw new NotImplementedException();
         }
@@ -127,9 +151,11 @@ namespace SanteDB.Persistence.Diagnostics.Email
         /// <summary>
         /// Inserts the specified diagnostic report
         /// </summary>
-        [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.Login)]
         public DiagnosticReport Insert(DiagnosticReport storageData, TransactionMode mode, IPrincipal overrideAuthContext = null)
         {
+
+            this.m_pepService.Demand(PermissionPolicyIdentifiers.Login, overrideAuthContext ?? AuthenticationContext.Current.Principal);
+
             var persistenceArgs = new DataPersistingEventArgs<DiagnosticReport>(storageData, mode, overrideAuthContext);
             this.Inserting?.Invoke(this, persistenceArgs);
             if (persistenceArgs.Cancel)
@@ -147,11 +173,17 @@ namespace SanteDB.Persistence.Diagnostics.Email
                 var attachments = storageData.Attachments.Select(a =>
                 {
                     if (a is DiagnosticBinaryAttachment bin)
+                    {
                         return new NotificationAttachment(a.FileName ?? a.FileDescription, a.ContentType ?? "application/x-gzip", bin.Content);
+                    }
                     else if (a is DiagnosticTextAttachment txt)
+                    {
                         return new NotificationAttachment(a.FileName ?? a.FileDescription, a.ContentType ?? "text/plain", txt.Content);
+                    }
                     else
+                    {
                         return new NotificationAttachment(a.FileName ?? a.FileDescription, a.ContentType ?? "text/plain", $"Unknown attachment - {a}");
+                    }
                 }).ToList();
 
                 // Attach the application information
@@ -164,7 +196,7 @@ namespace SanteDB.Persistence.Diagnostics.Email
 
                 var notificationService = ApplicationServiceContext.Current.GetService<INotificationService>();
                 var recipients = this.m_configuration?.Recipients.Select(o => o.StartsWith("mailto:") ? o : $"mailto:{o}").ToArray();
-                notificationService?.Send(recipients, subject, body, null,  true, attachments.ToArray());
+                notificationService?.SendNotification(recipients, subject, body, null, true, attachments.ToArray());
 
                 // Invoke
                 this.Inserted?.Invoke(this, new DataPersistedEventArgs<DiagnosticReport>(storageData, mode, overrideAuthContext));
@@ -174,16 +206,15 @@ namespace SanteDB.Persistence.Diagnostics.Email
             }
             catch (Exception ex)
             {
-                this.m_traceSource.TraceEvent(EventLevel.Error,  "Error sending to E-Mail: {0}", ex);
+                this.m_traceSource.TraceEvent(EventLevel.Error, "Error sending to E-Mail: {0}", ex);
                 throw new InvalidOperationException("Error sending diagnostic reports to administrative contacts", ex);
             }
-
         }
 
         /// <summary>
         /// Not supported
         /// </summary>
-        public DiagnosticReport Obsolete(DiagnosticReport storageData, TransactionMode mode, IPrincipal overrideAuthContext = null)
+        public DiagnosticReport Obsolete(Guid storageData, TransactionMode mode, IPrincipal overrideAuthContext = null)
         {
             throw new NotImplementedException();
         }
@@ -191,7 +222,15 @@ namespace SanteDB.Persistence.Diagnostics.Email
         /// <summary>
         /// Not supported
         /// </summary>
-        public IEnumerable<DiagnosticReport> Query(Expression<Func<DiagnosticReport, bool>> query, IPrincipal overrideAuthContext = null)
+        public DiagnosticReport Delete(Guid storageData, TransactionMode mode, IPrincipal overrideAuthContext)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Not supported
+        /// </summary>
+        public IQueryResultSet<DiagnosticReport> Query(Expression<Func<DiagnosticReport, bool>> query, IPrincipal overrideAuthContext = null)
         {
             throw new NotImplementedException();
         }
@@ -211,7 +250,21 @@ namespace SanteDB.Persistence.Diagnostics.Email
         {
             throw new NotImplementedException();
         }
-    }
-    #pragma warning restore CS0067
 
+        /// <summary>
+        /// Not supported - obsoleting DX reports
+        /// </summary>
+        public void ObsoleteAll(Expression<Func<DiagnosticReport, bool>> matching, TransactionMode mode, IPrincipal principal)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        public IQueryResultSet<DiagnosticReport> Query<TExpression>(Expression<Func<TExpression, bool>> query, IPrincipal principal) where TExpression : DiagnosticReport
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+#pragma warning restore CS0067
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" id="Demonstration Concept Dictionary" xmlns="http://santedb.org/data">
-  <insert updateIfExists="true">
+  <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>d13c2c28-78f1-4e37-b368-af4568517b86</id>
       <creationTime>0001-01-01T00:00:00.0000000+00:00</creationTime>
@@ -20,8 +20,8 @@
         <phoneticAlgorithm xsi:nil="true" />
       </name>
     </Concept>
-  </insert>
-  <insert updateIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>c59094ce-3ce5-4fb9-b914-ba274866faf4</id>
       <creationTime>0001-01-01T00:00:00.0000000+00:00</creationTime>
@@ -41,8 +41,8 @@
         <phoneticAlgorithm xsi:nil="true" />
       </name>
     </Concept>
-  </insert>
-  <insert updateIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>1d0041e3-42cc-41de-a9bc-35ec8530b691</id>
       <creationTime>0001-01-01T00:00:00.0000000+00:00</creationTime>
@@ -62,8 +62,8 @@
         <phoneticAlgorithm xsi:nil="true" />
       </name>
     </Concept>
-  </insert>
-  <insert updateIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>1a387084-5c69-4f08-b9ee-92955b09305d</id>
       <creationTime>0001-01-01T00:00:00.0000000+00:00</creationTime>
@@ -83,8 +83,8 @@
         <phoneticAlgorithm xsi:nil="true" />
       </name>
     </Concept>
-  </insert>
-  <insert updateIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>1d3350d2-cb13-486a-895e-fa1055ad9a2d</id>
       <creationTime>0001-01-01T00:00:00.0000000+00:00</creationTime>
@@ -104,8 +104,8 @@
         <phoneticAlgorithm xsi:nil="true" />
       </name>
     </Concept>
-  </insert>
-  <insert updateIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>fd3e6b32-34b3-4bbd-ba55-66ba54049a97</id>
       <creationTime>0001-01-01T00:00:00.0000000+00:00</creationTime>
@@ -125,8 +125,8 @@
         <phoneticAlgorithm xsi:nil="true" />
       </name>
     </Concept>
-  </insert>
-  <insert updateIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>20bb9f46-67ea-4829-abd2-00bd5c3c70e1</id>
       <creationTime>0001-01-01T00:00:00.0000000+00:00</creationTime>
@@ -146,8 +146,8 @@
         <phoneticAlgorithm xsi:nil="true" />
       </name>
     </Concept>
-  </insert>
-  <insert updateIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>7d650cdc-60f7-4516-a043-c54d21ee0e62</id>
       <creationTime>0001-01-01T00:00:00.0000000+00:00</creationTime>
@@ -167,8 +167,8 @@
         <phoneticAlgorithm xsi:nil="true" />
       </name>
     </Concept>
-  </insert>
-  <insert updateIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>40024cbe-079f-465b-a5c7-e1847602c238</id>
       <creationTime>0001-01-01T00:00:00.0000000+00:00</creationTime>
@@ -188,9 +188,9 @@
         <phoneticAlgorithm xsi:nil="true" />
       </name>
     </Concept>
-  </insert>
+  </update>
   
-  <insert updateIfExists="true">
+  <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>31f6fbb8-b510-4624-a639-eb7e93a19b27</id>
       
@@ -210,8 +210,8 @@
         <phoneticAlgorithm xsi:nil="true" />
       </name>
     </Concept>
-  </insert>
-  <insert updateIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <ConceptSet xmlns="http://santedb.org/model">
       <id>02bf0e41-658c-4715-b467-aa2b3466ee66</id>
       <creationTime>0001-01-01T00:00:00.0000000+00:00</creationTime>
@@ -224,8 +224,8 @@
       <concept>1d0041e3-42cc-41de-a9bc-35ec8530b691</concept>
       <concept>1a387084-5c69-4f08-b9ee-92955b09305d</concept>
     </ConceptSet>
-  </insert>
-  <insert updateIfExists="true">
+  </update>
+  <update insertIfNotExists="true">
     <ConceptSet xmlns="http://santedb.org/model">
       <id>a96c3e9e-dccd-4018-815b-1c161828c8ad</id>
       <creationTime>0001-01-01T00:00:00.0000000+00:00</creationTime>
@@ -240,6 +240,6 @@
       <concept>7d650cdc-60f7-4516-a043-c54d21ee0e62</concept>
       <concept>40024cbe-079f-465b-a5c7-e1847602c238</concept>
     </ConceptSet>
-  </insert>
+  </update>
 
 </dataset>

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<dataset xmlns="http://santedb.org/data" id="ActInterpretation Codes">
+<dataset xmlns="http://santedb.org/data" id="Act Interpretation Codes">
 
-  <insert>
+  <update insertIfNotExists="true">
     <CodeSystem xmlns="http://santedb.org/model">
       <id>cecd2e42-588f-4c03-b4b1-077aa2ba97d2</id>
       <name>ObservationInterpretation</name>
@@ -10,8 +10,8 @@
       <url>http://hl7.org/fhir/v3/ObservationInterpretation</url>
       <description>Interpretation codes for observations</description>
     </CodeSystem>
-  </insert>
-  <insert>
+  </update>
+  <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>0350046f-c207-4c20-81bd-2c56d74ace98</id>
       <mnemonic>H</mnemonic>
@@ -21,8 +21,8 @@
         <value>High</value>
       </name>
     </ReferenceTerm>
-  </insert>
-  <insert>
+  </update>
+  <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>fb282370-a51a-4401-a2d7-1a25fe28752d</id>
       <mnemonic>HH</mnemonic>
@@ -32,8 +32,8 @@
         <value>Very High</value>
       </name>
     </ReferenceTerm>
-  </insert>
-  <insert>
+  </update>
+  <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>abb06e88-2d11-4213-bede-0f773df34aa9</id>
       <mnemonic>LL</mnemonic>
@@ -43,8 +43,8 @@
         <value>Very Low</value>
       </name>
     </ReferenceTerm>
-  </insert>
-  <insert>
+  </update>
+  <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>49df2038-e57c-4b7f-b75f-bcdfa559c846</id>
       <mnemonic>L</mnemonic>
@@ -54,8 +54,8 @@
         <value>Low</value>
       </name>
     </ReferenceTerm>
-  </insert>
-  <insert>
+  </update>
+  <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>68fd68cc-c725-4908-917c-7a4cc1ae4902</id>
       <mnemonic>N</mnemonic>
@@ -65,8 +65,8 @@
         <value>Normal</value>
       </name>
     </ReferenceTerm>
-  </insert>
-  <insert property="Concepts">
+  </update>
+  <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>3c4d6579-7496-4b44-aac1-18a714ff7a05</id>
       <isReadonly>true</isReadonly>
@@ -82,8 +82,8 @@
         <value>Abnormal / High</value>
       </name>
     </Concept>
-  </insert>
-  <insert property="Concepts">
+  </update>
+  <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>8b553d58-6c8c-4d01-a534-83ba5780b41a</id>
       <isReadonly>true</isReadonly>
@@ -99,8 +99,8 @@
         <value>Abnormal / Very High</value>
       </name>
     </Concept>
-  </insert>
-  <insert property="Concepts">
+  </update>
+  <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>a7159ba0-a9ec-4565-95b8-ed364794c0b8</id>
       <isReadonly>true</isReadonly>
@@ -117,8 +117,8 @@
       </name>
 
     </Concept>
-  </insert>
-  <insert property="Concepts">
+  </update>
+  <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>6188f821-261f-420c-9520-0de240a05661</id>
       <isReadonly>true</isReadonly>
@@ -135,8 +135,8 @@
       </name>
 
     </Concept>
-  </insert>
-  <insert property="Concepts">
+  </update>
+  <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>41d42abf-17ad-4144-bf97-ec3fd907f57d</id>
       <isReadonly>true</isReadonly>
@@ -153,7 +153,7 @@
       </name>
 
     </Concept>
-  </insert>
+  </update>
   <update insertIfNotExists="true">
     <ConceptSet xmlns="http://santedb.org/model">
       <id>404bf87c-e7a6-4a5a-89cf-02e6804555a0</id>

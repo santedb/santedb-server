@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2021, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2022, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  *
@@ -16,7 +16,7 @@
  * the License.
  *
  * User: fyfej
- * Date: 2021-8-27
+ * Date: 2022-5-30
  */
 using SanteDB.Core.Configuration;
 using SanteDB.Docker.Core;
@@ -25,8 +25,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SanteDB.Messaging.Atna.Docker
 {
@@ -76,7 +74,9 @@ namespace SanteDB.Messaging.Atna.Docker
             // Is the ATNA audit service available?
             var serviceConfiguration = configuration.GetSection<ApplicationServiceContextConfigurationSection>().ServiceProviders;
             if (!serviceConfiguration.Any(s => s.Type == typeof(AtnaAuditService)))
+            {
                 serviceConfiguration.Add(new TypeReferenceConfiguration(typeof(AtnaAuditService)));
+            }
 
             // Configure the ATNA service?
             if (settings.TryGetValue(TargetSetting, out string target))

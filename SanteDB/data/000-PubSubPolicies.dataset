@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="MDM Policies">
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Publish/Subscribe Policies">
   <update insertIfNotExists="true">
     <SecurityPolicy xmlns="http://santedb.org/model">
       <id>34D7E78C-2C48-48AB-A31A-1C50A9F8D20C</id>

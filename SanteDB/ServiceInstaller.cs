@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2021, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2022, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  *
@@ -16,9 +16,10 @@
  * the License.
  *
  * User: fyfej
- * Date: 2021-8-27
+ * Date: 2022-5-30
  */
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SanteDB
 {
@@ -27,32 +28,33 @@ namespace SanteDB
     /// </summary>
     /// <seealso cref="System.Configuration.Install.Installer" />
     [RunInstaller(true)]
+    [ExcludeFromCodeCoverage]
     public class ServiceInstaller : System.Configuration.Install.Installer
     {
 
-		/// <summary>
-		/// The m service process installer.
-		/// </summary>
-		private System.ServiceProcess.ServiceProcessInstaller m_serviceProcessInstaller;
+        /// <summary>
+        /// The m service process installer.
+        /// </summary>
+        private System.ServiceProcess.ServiceProcessInstaller m_serviceProcessInstaller;
 
-		/// <summary>
-		/// The m service installer.
-		/// </summary>
-		private System.ServiceProcess.ServiceInstaller m_serviceInstaller;
+        /// <summary>
+        /// The m service installer.
+        /// </summary>
+        private System.ServiceProcess.ServiceInstaller m_serviceInstaller;
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="ServiceInstaller"/> class.
-		/// </summary>
-		public ServiceInstaller()
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ServiceInstaller"/> class.
+        /// </summary>
+        public ServiceInstaller()
         {
             // This call is required by the Designer.
             InitializeComponent();
         }
 
-		/// <summary>
-		/// Initializes the component.
-		/// </summary>
-		private void InitializeComponent()
+        /// <summary>
+        /// Initializes the component.
+        /// </summary>
+        private void InitializeComponent()
         {
             this.m_serviceProcessInstaller = new System.ServiceProcess.ServiceProcessInstaller();
             this.m_serviceInstaller = new System.ServiceProcess.ServiceInstaller();

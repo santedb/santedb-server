@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" id="Extended Address Use Translations" xmlns="http://santedb.org/data">
+  <update skipIfError="true" insertIfNotExists="true">
+    <ConceptName xmlns="http://santedb.org/model">
+      <source>99f2195c-8095-4cf8-afa8-f7c6dab9baab</source>
+      <language>en</language>
+      <value>Birth</value>
+    </ConceptName>
+
+  </update>
+  <update skipIfError="true" insertIfNotExists="true">
+    <ConceptName xmlns="http://santedb.org/model">
+      <source>092ec914-b8a1-4497-9a98-2f6b7ed97fdc</source>
+      <language>en</language>
+      <value>Country of Origin</value>
+    </ConceptName>
+
+  </update>
+  <update skipIfError="true" insertIfNotExists="true">
+    <ConceptName xmlns="http://santedb.org/model">
+      <source>5519e04f-b808-468f-9301-134390296466</source>
+      <language>en</language>
+      <value>Residence at Birth</value>
+    </ConceptName>
+
+  </update>
+  <update skipIfError="true" insertIfNotExists="true">
+    <ConceptName xmlns="http://santedb.org/model">
+      <source>aef9a9d0-e62b-4907-a394-4b5c4786fa62</source>
+      <language>en</language>
+      <value>Birth Delivery Location</value>
+    </ConceptName>
+
+  </update>
+  <update skipIfError="true" insertIfNotExists="true">
+    <ConceptName xmlns="http://santedb.org/model">
+      <source>cef6ea31-a097-4f59-8723-a38c727c6597</source>
+      <language>en</language>
+      <value>Temporary Address / Temporarily Living At</value>
+    </ConceptName>
+
+  </update>
+  <update skipIfError="true" insertIfNotExists="true">
+    <ConceptName xmlns="http://santedb.org/model">
+      <source>7246e98d-20c6-4ae6-85ad-4aa09649feb7</source>
+      <language>en</language>
+      <value>Mailing Address</value>
+    </ConceptName>
+
+  </update>
+  <update skipIfError="true" insertIfNotExists="true">
+    <ConceptName xmlns="http://santedb.org/model">
+      <source>5724a9b6-24b6-43b7-8075-7a0d61fcb814</source>
+      <language>en</language>
+      <value>Physical Location Address (for Visiting)</value>
+    </ConceptName>
+
+  </update>
+  <update skipIfError="true" insertIfNotExists="true">
+    <ConceptName xmlns="http://santedb.org/model">
+      <source>f3132fc0-aadd-40b7-b875-961c40695389</source>
+      <language>en</language>
+      <value>Bad Address (Don't Use)</value>
+    </ConceptName>
+
+  </update>
+  <update skipIfError="true" insertIfNotExists="true">
+    <ConceptName xmlns="http://santedb.org/model">
+      <source>ec35ea7c-55d2-4619-a56b-f7a986412f7f</source>
+      <language>en</language>
+      <value>Public Address (Listed in Public Directory)</value>
+    </ConceptName>
+
+  </update>
+  <update skipIfError="true" insertIfNotExists="true">
+    <ConceptName xmlns="http://santedb.org/model">
+      <source>d0db6edb-6cdc-4671-8bc2-00f1c808e188</source>
+      <language>en</language>
+      <value>Direct Address</value>
+    </ConceptName>
+
+  </update>
+  <update skipIfError="true" insertIfNotExists="true">
+    <ConceptName xmlns="http://santedb.org/model">
+      <source>eaa6f08e-bb8e-4457-9dc0-3a1555fadf5c</source>
+      <language>en</language>
+      <value>Workplace Address</value>
+    </ConceptName>
+
+  </update>
+  <update skipIfError="true" insertIfNotExists="true">
+    <ConceptName xmlns="http://santedb.org/model">
+      <source>5d69534c-4597-4d11-bb98-56a9918f5238</source>
+      <language>en</language>
+      <value>Vacation / Secondary Residence</value>
+    </ConceptName>
+
+  </update>
+  <update skipIfError="true" insertIfNotExists="true">
+    <ConceptName xmlns="http://santedb.org/model">
+      <source>c4faafd8-fc90-4330-8b4b-e4e64c86b87b</source>
+      <language>en</language>
+      <value>Primary Residence</value>
+    </ConceptName>
+
+  </update>
+  <update skipIfError="true" insertIfNotExists="true">
+    <ConceptName xmlns="http://santedb.org/model">
+      <source>493c3e9d-4f65-4e4d-9582-c9008f4f2eb4</source>
+      <language>en</language>
+      <value>Home Address</value>
+    </ConceptName>
+
+  </update>
+  <update skipIfError="true" insertIfNotExists="true">
+    <ConceptName xmlns="http://santedb.org/model">
+      <source>2b085d38-3308-4664-9f89-48d8ef4daba7</source>
+      <language>en</language>
+      <value>Non-Latin / Phonetic</value>
+    </ConceptName>
+
+  </update>
+  <update skipIfError="true" insertIfNotExists="true">
+    <ConceptName xmlns="http://santedb.org/model">
+      <source>e5794e3b-3025-436f-9417-5886feead55a</source>
+      <language>en</language>
+      <value>Sound-Based Matching</value>
+    </ConceptName>
+
+  </update>
+  <update skipIfError="true" insertIfNotExists="true">
+    <ConceptName xmlns="http://santedb.org/model">
+      <source>b4ca3bf0-a7fc-44f3-87d5-e126beda93ff</source>
+      <language>en</language>
+      <value>Syllabic</value>
+    </ConceptName>
+  </update>
+  <update skipIfError="true" insertIfNotExists="true">
+    <ConceptName xmlns="http://santedb.org/model">
+      <source>09000479-4672-44f8-bb4a-72fb25f7356a</source>
+      <language>en</language>
+      <value>Ideographic</value>
+    </ConceptName>
+  </update>
+  <update skipIfError="true" insertIfNotExists="true">
+    <ConceptName xmlns="http://santedb.org/model">
+      <source>71d1c07c-6ee6-4240-8a95-19f96583512e</source>
+      <language>en</language>
+      <value>Alphabetic</value>
+    </ConceptName>
+  </update>
+</dataset>

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!--
- - Copyright 2021-2021 SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ - Copyright 2021-2022 SanteSuite Contributors (See NOTICE.md for full copyright notices)
  - Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  - Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  -
@@ -17,7 +17,7 @@
  - the License.
  -
  - User: fyfej
- - Date: 2021-8-27
+ - Date: 2022-5-30
  -->
 
 <!-- This is an empty configuration file for a standard SanteDB instance -->
@@ -37,7 +37,7 @@
     <add type="SanteDB.Server.Core.Configuration.AppletConfigurationSection, SanteDB.Server.Core" />
     <add type="SanteDB.Core.Configuration.ApplicationServiceContextConfigurationSection, SanteDB.Core.Api" />
     <add type="SanteDB.Core.Configuration.Data.DataConfigurationSection, SanteDB.Core.Api" />
-    <add type="SanteDB.Authentication.OAuth2.Configuration.OAuthConfigurationSection, SanteDB.Authentication.OAuth2" />
+    <add type="SanteDB.Rest.OAuth.Configuration.OAuthConfigurationSection, SanteDB.Rest.OAuth" />
     <add type="SanteDB.Caching.Memory.Configuration.MemoryCacheConfigurationSection, SanteDB.Caching.Memory" />
     <add type="SanteDB.Caching.Redis.Configuration.RedisConfigurationSection, SanteDB.Caching.Redis" />
     <add type="SanteDB.Server.Core.Configuration.JobConfigurationSection, SanteDB.Server.Core" />
@@ -184,7 +184,7 @@
   <!-- Built-In Diagnostics and Logging Configuration -->
   <section xsi:type="DiagnosticsConfigurationSection">
     <sources>
-      <add name="SanteDB.Authentication.OAuth2" filter="Warning" />
+      <add name="SanteDB.Rest.OAuth" filter="Warning" />
       <add name="SanteDB.Caching.Memory" filter="Warning" />
       <add name="SanteDB.Caching.Memory.Query" filter="Warning" />
       <add name="SanteDB.Caching.Redis" filter="Warning" />
@@ -221,10 +221,10 @@
     </sources>
     <writers>
       <add name="main" initializationData="santedb.log" filter="Warning">
-        <writer>SanteDB.Server.Core.Diagnostics.RolloverTextWriterTraceWriter, SanteDB.Server.Core</writer>
+        <writer type="SanteDB.Core.Diagnostics.RolloverTextWriterTraceWriter, SanteDB.Core.Api"/>
       </add>
       <add name="console" initializationData="santedb.log" filter="Warning">
-        <writer>SanteDB.Server.Core.Diagnostics.ConsoleTraceWriter, SanteDB.Server.Core</writer>
+        <writer type="SanteDB.Core.Diagnostics.ConsoleTraceWriter, SanteDB.Server.Core" />
       </add>
     </writers>
   </section>
@@ -244,7 +244,7 @@
     </service>
     <service name="HDSI">
       <behaviors>
-        <add type="SanteDB.Server.Core.Rest.Security.TokenAuthorizationAccessBehavior, SanteDB.Server.Core" />
+        <add type="SanteDB.Rest.Common.Security.TokenAuthorizationAccessBehavior, SanteDB.Rest.Common" />
       </behaviors>
       <endpoint address="http://0.0.0.0:8080/hdsi" contract="SanteDB.Rest.HDSI.IHdsiServiceContract, SanteDB.Rest.HDSI">
         <behaviors>
@@ -256,7 +256,7 @@
     </service>
     <service name="BIS">
       <behaviors>
-        <add type="SanteDB.Server.Core.Rest.Security.TokenAuthorizationAccessBehavior, SanteDB.Server.Core" />
+        <add type="SanteDB.Rest.Common.Security.TokenAuthorizationAccessBehavior, SanteDB.Rest.Common" />
       </behaviors>
       <endpoint address="http://0.0.0.0:8080/bis" contract="SanteDB.Rest.BIS.IBisServiceContract, SanteDB.Rest.BIS">
         <behaviors>
@@ -267,7 +267,7 @@
     </service>
     <service name="AMI">
       <behaviors>
-        <add type="SanteDB.Server.Core.Rest.Security.TokenAuthorizationAccessBehavior, SanteDB.Server.Core" />
+        <add type="SanteDB.Rest.Common.Security.TokenAuthorizationAccessBehavior, SanteDB.Rest.Common" />
       </behaviors>
       <endpoint address="http://0.0.0.0:8080/ami" contract="SanteDB.Rest.AMI.IAmiServiceContract, SanteDB.Rest.AMI">
         <behaviors>
@@ -280,7 +280,7 @@
 
     <service name="FHIR">
       <behaviors>
-        <add type="SanteDB.Server.Core.Rest.Security.TokenAuthorizationAccessBehavior, SanteDB.Server.Core" />
+        <add type="SanteDB.Rest.Common.Security.TokenAuthorizationAccessBehavior, SanteDB.Rest.Common" />
       </behaviors>
       <endpoint address="http://0.0.0.0:8080/fhir" contract="SanteDB.Messaging.FHIR.Rest.IFhirServiceContract, SanteDB.Messaging.FHIR">
         <behaviors>
@@ -311,7 +311,7 @@
       </endpoint>
     </service>
     <service name="OAuth2">
-      <endpoint address="http://0.0.0.0:8080/auth" contract="SanteDB.Authentication.OAuth2.Rest.IOAuthTokenContract, SanteDB.Authentication.OAuth2" />
+      <endpoint address="http://0.0.0.0:8080/auth" contract="SanteDB.Rest.OAuth.Rest.IOAuthTokenContract, SanteDB.Rest.OAuth" />
     </service>
   </section>
 
@@ -564,8 +564,8 @@
       <add type="SanteDB.Persistence.Data.ADO.Services.AdoPolicyInformationService, SanteDB.Persistence.Data.ADO" />
       <add type="SanteDB.Persistence.Data.ADO.Services.AdoRoleProvider, SanteDB.Persistence.Data.ADO" />
       <add type="SanteDB.Server.Core.Security.Privacy.LocalDataPolicyFilterService, SanteDB.Server.Core" />
-      <add type="SanteDB.Server.Core.Security.SimpleTfaSecretGenerator, SanteDB.Server.Core" />
-      <add type="SanteDB.Server.Core.Security.DefaultTfaRelayService, SanteDB.Server.Core" />
+      <add type="SanteDB.Server.Core.Security.Tfa.Rfc4226TfaCodeProvider, SanteDB.Server.Core" />
+      <add type="SanteDB.Server.Core.Security.DefaultTfaService, SanteDB.Server.Core" />
       <add type="SanteDB.Server.Core.Security.DefaultDataSigningService, SanteDB.Server.Core" />
       <add type="SanteDB.Server.Core.Security.DefaultPasswordValidationService, SanteDB.Server.Core" />
       <add type="SanteDB.Core.Security.DefaultPolicyDecisionService, SanteDB.Core.Api" />
@@ -591,10 +591,10 @@
       <!--<add type="SanteDB.Server.Core.Services.Impl.LocalRepositoryFactoryService, SanteDB.Server.Core" />-->
       <add type="SanteDB.BusinessRules.JavaScript.AppletDataReferenceResolver, SanteDB.BusinessRules.JavaScript" />
 
-      <add type="SanteDB.Server.Core.Services.Impl.LocalRepositoryService, SanteDB.Server.Core" />
-      <add type="SanteDB.Server.Core.Services.Impl.LocalMailMessageRepository, SanteDB.Server.Core" />
-      <add type="SanteDB.Server.Core.Services.Impl.LocalStockManagementRepositoryService, SanteDB.Server.Core" />
-      <add type="SanteDB.Server.Core.Services.Impl.LocalTagPersistenceService, SanteDB.Server.Core" />
+      <add type="SanteDB.Core.Services.Impl.Repository.LocalRepositoryFactory, SanteDB.Core.Api" />
+      <add type="SanteDB.Core.Services.Impl.LocalMailMessageRepository, SanteDB.Core.Api" />
+      <add type="SanteDB.Core.Services.Impl.LocalStockManagementRepositoryService, SanteDB.Core.Api" />
+      <add type="SanteDB.Core.Services.Impl.LocalTagPersistenceService, SanteDB.Core.Api" />
 
       <!-- Subscription Management / Definition Service -->
       <add type="SanteDB.Core.Applets.Services.Impl.AppletSubscriptionRepository, SanteDB.Core.Applets, Version=1.30.0.0, Culture=neutral, PublicKeyToken=null" />
@@ -608,7 +608,7 @@
 
       <!-- Messaging Services-->
       <!-- OAUTH 2.0 Plugin -->
-      <add type="SanteDB.Authentication.OAuth2.OAuthMessageHandler, SanteDB.Authentication.OAuth2" />
+      <add type="SanteDB.Rest.OAuth.OAuthMessageHandler, SanteDB.Rest.OAuth" />
 
       <!-- HL7 FHIR Plugin -->
       <add type="SanteDB.Messaging.FHIR.FhirDataInitializationService, SanteDB.Messaging.FHIR" />

@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2021, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2022, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  *
@@ -16,8 +16,12 @@
  * the License.
  *
  * User: fyfej
- * Date: 2021-8-27
+ * Date: 2022-5-30
  */
+using SanteDB.Configuration.Converters;
+using SanteDB.Configuration.Editors;
+using SanteDB.Core.Configuration;
+using SanteDB.Core.Configuration.Features;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -25,12 +29,6 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing.Design;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SanteDB.Configuration.Converters;
-using SanteDB.Configuration.Editors;
-using SanteDB.Core.Configuration;
-using SanteDB.Core.Configuration.Features;
 
 namespace SanteDB.Configuration.Controls
 {
@@ -61,7 +59,9 @@ namespace SanteDB.Configuration.Controls
             {
                 this.m_value = value;
                 if (this.m_updateTarget != null)
+                {
                     this.m_updateTarget[this.Name] = value;
+                }
             }
         }
 
@@ -75,7 +75,10 @@ namespace SanteDB.Configuration.Controls
         {
             this.Editor = editor;
             if (attribute != null)
+            {
                 this.Attributes = new AttributeCollection(attribute);
+            }
+
             this.Name = name;
             this.ExtensionType = type;
             this.Value = value;
@@ -201,6 +204,7 @@ namespace SanteDB.Configuration.Controls
                 UITypeEditor uiEditor = null;
 
                 if (value is ConfigurationOptionType)
+                {
                     switch ((ConfigurationOptionType)value)
                     {
                         case ConfigurationOptionType.Boolean:
@@ -215,6 +219,9 @@ namespace SanteDB.Configuration.Controls
                         case ConfigurationOptionType.FileName:
                             uiEditor = new System.Windows.Forms.Design.FileNameEditor();
                             break;
+                        case ConfigurationOptionType.Certificate:
+                            uiEditor = new X509Certificate2Editor();
+                            break;
                         case ConfigurationOptionType.Object:
                             attribute = new Attribute[] {
                                         new TypeConverterAttribute(typeof(ExpandableObjectConverter))
@@ -222,19 +229,26 @@ namespace SanteDB.Configuration.Controls
                             type = typeof(Object);
                             break;
                     }
+                }
                 else if (value is IEnumerable)
                 {
                     if ((value as IEnumerable).OfType<Type>().Any())
+                    {
                         attribute = new Attribute[]
                         {
                              new TypeConverterAttribute(typeof(ServiceProviderTypeConverter))
                         };
+                    }
+
                     uiEditor = new DropDownValueEditor(value as IEnumerable);
                 }
 
                 var cat = genericFeatureConfiguration.Categories.FirstOrDefault(c => c.Value.Any(o => o == itm.Key));
                 if (!String.IsNullOrEmpty(cat.Key))
+                {
                     attribute = (attribute ?? new Attribute[0]).Union(new Attribute[] { new CategoryAttribute(cat.Key) }).ToArray();
+                }
+
                 this.Add(itm.Key, type, uiEditor, attribute, genericFeatureConfiguration.Values[itm.Key]);
             }
         }
@@ -262,15 +276,24 @@ namespace SanteDB.Configuration.Controls
             get
             {
                 foreach (var itm in this.List)
+                {
                     if ((itm as DynamicPropertyValue).Name == name)
+                    {
                         return (itm as DynamicPropertyValue).Value;
+                    }
+                }
+
                 return null;
             }
             set
             {
                 foreach (var itm in this.List)
+                {
                     if ((itm as DynamicPropertyValue).Name == name)
+                    {
                         (itm as DynamicPropertyValue).Value = value;
+                    }
+                }
             }
         }
 

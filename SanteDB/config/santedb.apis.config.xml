@@ -1,5 +1,5 @@
 ﻿<!--
- - Copyright 2021-2021 SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ - Copyright 2021-2022 SanteSuite Contributors (See NOTICE.md for full copyright notices)
  - Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  - Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  -
@@ -16,12 +16,12 @@
  - the License.
  -
  - User: fyfej
- - Date: 2021-8-27
+ - Date: 2022-5-30
  -->
 <SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://santedb.org/configuration">
   <sections>
-    <add type="SanteDB.Messaging.AMI.Configuration.AmiConfigurationSection, SanteDB.Messaging.AMI" />
-    <add type="SanteDB.Messaging.HDSI.Configuration.HdsiConfigurationSection, SanteDB.Messaging.HDSI" />
+    <add type="SanteDB.Rest.AMI.Configuration.AmiConfigurationSection, SanteDB.Rest.AMI" />
+    <add type="SanteDB.Rest.HDSI.Configuration.HdsiConfigurationSection, SanteDB.Rest.HDSI" />
   </sections>
   <!-- This section configures the AMI -->
   <section xsi:type="AmiConfigurationSection">

@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2021, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2022, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  *
@@ -16,14 +16,14 @@
  * the License.
  *
  * User: fyfej
- * Date: 2021-8-27
+ * Date: 2022-5-30
  */
 using AtnaApi.Transport;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Security.Configuration;
 using System;
 using System.ComponentModel;
-using System.Net;
+using System.Diagnostics.CodeAnalysis;
 using System.Xml.Serialization;
 
 namespace SanteDB.Messaging.Atna.Configuration
@@ -34,12 +34,24 @@ namespace SanteDB.Messaging.Atna.Configuration
     [XmlType(nameof(AtnaTransportType), Namespace = "http://santedb.org/configuration")]
     public enum AtnaTransportType
     {
+        /// <summary>
+        /// Send audits to the central repository using UDP
+        /// </summary>
         [XmlEnum("udp")]
         Udp,
+        /// <summary>
+        /// Send audits to the central repository using TCP
+        /// </summary>
         [XmlEnum("tcp")]
         Tcp,
+        /// <summary>
+        /// Send audits to the central repository using TLS + TCP
+        /// </summary>
         [XmlEnum("stcp")]
         Stcp,
+        /// <summary>
+        /// Send audits to the central repository via a file share
+        /// </summary>
         [XmlEnum("file")]
         File
     }
@@ -48,6 +60,7 @@ namespace SanteDB.Messaging.Atna.Configuration
     /// Audit configuration
     /// </summary>
     [XmlType(nameof(AtnaConfigurationSection), Namespace = "http://santedb.org/configuration")]
+    [ExcludeFromCodeCoverage]
     public class AtnaConfigurationSection : IConfigurationSection
     {
 
@@ -72,7 +85,7 @@ namespace SanteDB.Messaging.Atna.Configuration
             set
             {
                 this.m_transportType = value;
-                if(this.m_transportType == AtnaTransportType.Stcp)
+                if (this.m_transportType == AtnaTransportType.Stcp)
                 {
                     this.ClientCertificate = this.ClientCertificate ?? new X509ConfigurationElement();
                     this.ServerCertificate = this.ServerCertificate ?? new X509ConfigurationElement();

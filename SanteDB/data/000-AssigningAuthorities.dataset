@@ -1,23 +1,23 @@
 <?xml version="1.0"?>
-<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Assigning Authorities">
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Core Assigning Authorities">
   <update insertIfNotExists="true">
-    <AssigningAuthority xmlns="http://santedb.org/model">
+    <IdentityDomain xmlns="http://santedb.org/model">
       <id>ce5990db-2e2a-467d-a376-2a7b53481e84</id>
       <name>GS1 Global Trade Identification Number (GTIN)</name>
       <domainName>GTIN</domainName>
       <oid>1.3.160</oid>
-    </AssigningAuthority>
+    </IdentityDomain>
   </update>
   <update insertIfNotExists="true">
-    <AssigningAuthority xmlns="http://santedb.org/model">
+    <IdentityDomain xmlns="http://santedb.org/model">
       <id>0F4A86D6-D8E0-423F-9A53-54739F2DA409</id>
       <name>GS1 Global Location Number (GLN)</name>
       <domainName>GLN</domainName>
       <oid>1.3.88</oid>
-    </AssigningAuthority>
+    </IdentityDomain>
   </update>
-  <insert skipIfError="true" skipIfExists="true">
-    <AssigningAuthority xmlns="http://santedb.org/model">
+  <update insertIfNotExists="true">
+    <IdentityDomain xmlns="http://santedb.org/model">
       <id>ff6e7402-8545-48e1-8a70-ebf06f3ee4b8</id>
       <creationTime>2018-08-15T19:35:40.8915561-04:00</creationTime>
       <name>ISO-3166 Country Identifiers</name>
@@ -28,16 +28,16 @@
       <scope>48b2ffb3-07db-47ba-ad73-fc8fb8502471</scope>
       <validation>^[A-Z]{2}$</validation>
       <isUnique>true</isUnique>
-    </AssigningAuthority>
-  </insert>
-  <insert skipIfError="true" skipIfExists="true">
-    <AssigningAuthority xmlns="http://santedb.org/model">
+    </IdentityDomain>
+  </update>
+  <update insertIfNotExists="true">
+    <IdentityDomain xmlns="http://santedb.org/model">
       <id>AF1ECAD7-0E74-4508-8818-ED2E5C021348</id>
       <name>US Social Security Number</name>
       <domainName>SSN</domainName>
       <oid>2.16.840.1.113883.4.1</oid>
       <url>http://hl7.org/fhir/sid/us-ssn</url>
       <isUnique>false</isUnique>
-    </AssigningAuthority>
-  </insert>
+    </IdentityDomain>
+  </update>
 </dataset>

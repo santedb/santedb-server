@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
 <dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" id="BCP 47 Language Codes" xmlns="http://santedb.org/data">
-  <insert>
+  <update insertIfNotExists="true">
     <CodeSystem xmlns="http://santedb.org/model">
       <id>cce854a8-25c5-4f66-9e41-c0f45cdd2f9e</id>
       <name>BCP 47 Language Codes</name>
       <oid>1.3.6.1.4.1.33349.3.1.5.9.3.99</oid>
 	    <url>urn:ietf:bcp:47</url>
     </CodeSystem>
-  </insert>
-  <insert>
+  </update>
+  <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>de73d61f-7d30-4138-8401-8084b9aee57f</id>
       <mnemonic>ar</mnemonic>
@@ -19,8 +19,8 @@
         <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
-  </insert>
-  <insert>
+  </update>
+  <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>5aabae8c-888a-4155-8d8e-0a09860c14f7</id>
       <mnemonic>bn</mnemonic>
@@ -31,8 +31,8 @@
         <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
-  </insert>
-  <insert>
+  </update>
+  <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>65733823-2ff6-454f-b386-1da4ec33cd0b</id>
       <creationTime>2017-04-09T19:39:27.4707244-04:00</creationTime>
@@ -44,8 +44,8 @@
         <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
-  </insert>
-  <insert>
+  </update>
+  <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>624f388d-1d4f-4a4d-9c42-6206e8ff7994</id>
       <mnemonic>zh</mnemonic>
@@ -56,8 +56,8 @@
         <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
-  </insert>
-  <insert>
+  </update>
+  <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>7d15f84c-e118-440b-88d4-d4fbfa1ad306</id>
       <mnemonic>en</mnemonic>
@@ -68,8 +68,8 @@
         <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
-  </insert>
-  <insert>
+  </update>
+  <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>3f75084c-dc4d-4f1e-b14f-6910c742520c</id>
       <mnemonic>fr</mnemonic>
@@ -80,8 +80,8 @@
         <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
-  </insert>
-  <insert>
+  </update>
+  <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>2aed5fc8-5d98-4806-8f5c-99e4768ab183</id>
       <mnemonic>de</mnemonic>
@@ -92,8 +92,8 @@
         <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
-  </insert>
-  <insert>
+  </update>
+  <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>b886beab-3f73-436c-abc5-3ce26521ba4e</id>
       <mnemonic>ja</mnemonic>
@@ -104,8 +104,8 @@
         <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
-  </insert>
-  <insert>
+  </update>
+  <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>bab0febc-69f9-4683-8aa2-ec0830cd6a77</id>
       <mnemonic>ko</mnemonic>
@@ -116,8 +116,8 @@
         <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
-  </insert>
-  <insert>
+  </update>
+  <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>bd488ee8-a604-481c-bdc3-40aa96f55c0c</id>
       <mnemonic>mi</mnemonic>
@@ -128,8 +128,8 @@
         <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
-  </insert>
-  <insert>
+  </update>
+  <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>7b0b8fb8-114f-4258-a263-2b61416683d7</id>
       <mnemonic>es</mnemonic>
@@ -140,8 +140,8 @@
         <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
-  </insert>
-  <insert>
+  </update>
+  <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>95d4dc6e-a325-4c7c-bd45-f32a53a40be4</id>
       <mnemonic>sw</mnemonic>
@@ -152,8 +152,8 @@
         <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
-  </insert>
-  <insert>
+  </update>
+  <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>f617b169-5a74-43ff-813d-8bb6de4651d5</id>
       <mnemonic>ty</mnemonic>
@@ -164,8 +164,8 @@
         <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
-  </insert>
-  <insert>
+  </update>
+  <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>5c41e210-b4e0-4172-a257-43369b299072</id>
       <mnemonic>vi</mnemonic>
@@ -176,7 +176,7 @@
         <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
-  </insert>
+  </update>
   <update skipIfError="false" insertIfNotExists="true">
     <ConceptReferenceTerm xmlns="http://santedb.org/model">
       <id>0f502ffc-f3ab-4006-a841-95f5be64d526</id>

@@ -1,5 +1,5 @@
 ﻿<!--
- - Copyright 2021-2021 SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ - Copyright 2021-2022 SanteSuite Contributors (See NOTICE.md for full copyright notices)
  - Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  - Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  -
@@ -16,13 +16,13 @@
  - the License.
  -
  - User: fyfej
- - Date: 2021-8-27
+ - Date: 2022-5-30
  -->
 <SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://santedb.org/configuration">
   <sections>
     <add type="SanteDB.OrmLite.Configuration.OrmConfigurationSection, SanteDB.OrmLite" />
     <add type="SanteDB.Core.Configuration.Data.DataConfigurationSection, SanteDB.Core.Api" />
-    <add type="SanteDB.Persistence.Data.ADO.Configuration.AdoPersistenceConfigurationSection, SanteDB.Persistence.Data.ADO" />
+    <add type="SanteDB.Persistence.Data.Configuration.AdoPersistenceConfigurationSection, SanteDB.Persistence.Data" />
     <add type="SanteDB.Persistence.Auditing.ADO.Configuration.AdoAuditConfigurationSection, SanteDB.Persistence.Auditing.ADO" />
     <add type="SanteDB.Persistence.PubSub.ADO.Configuration.AdoPubSubConfigurationSection, SanteDB.Persistence.PubSub.ADO" />
   </sections>
@@ -54,27 +54,9 @@
     providerType="npgsql"
     autoUpdateExisting="true"
     autoInsertChildren="true"
-    prepareStatements="true"
-      validationLevel="Warning" />
-  <section xsi:type="AdoPersistenceConfigurationSection"
-           readWriteConnectionString="PSQL"
-           readOnlyConnectionString="PSQL"
-           traceSql="false"
-			     providerType="Npgsql"
-           staOnly="false"
-		       fuzzyTotal="false"
-           autoUpdateExisting="true"
-           autoInsertChildren="true"
-           prepareStatements="true"
-      validationLevel="Warning">
-    <!-- Any corrective handlers should be added here
-    <corrections>
-      <add>value</add>
-    </corrections>
-    To limit the resources that can be persisted in ADO.NET add them here
-    <resources>
-      <add>value</add>
-    </resources>
-    -->
+    prepareStatements="true" />
+  <section xsi:type="AdoPersistenceConfigurationSection" readWriteConnectionString="PSQL" readOnlyConnectionString="PSQL" traceSql="false" providerType="npgsql" versioning="default"  autoUpdateExisting="true" keyValidation="false" autoInsertChildren="true" prepareStatements="true" loadStrategy="SyncLoad" encryptPublicKeys="false" deleteStrategy="LogicalDelete" >
+    <validation unique="loose" scope="strict" authority="strict" format="loose" checkDigit="loose" />
+   
   </section>
 </SanteDBConfiguration>

@@ -69,3 +69,16 @@
 [submodule "santedb-rabbitmq"]
 	path = santedb-rabbitmq
 	url = https://github.com/santedb/santedb-rabbitmq.git
+[submodule "santedb-data"]
+	path = santedb-data
+	url = https://github.com/santedb/santedb-data
+[submodule "santedb-dc-core"]
+	path = santedb-dc-core
+	url = https://github.com/santedb/santedb-dc-core
+[submodule "santedb-tools"]
+	path = santedb-tools
+	url = https://github.com/santedb/santedb-tools
+[submodule "santedb-certs-bc"]
+	path = santedb-certs-bc
+	url = https://github.com/santedb/santedb-certs-bc.git
+

@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2021, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2022, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  *
@@ -16,11 +16,10 @@
  * the License.
  *
  * User: fyfej
- * Date: 2021-8-27
+ * Date: 2022-5-30
  */
 using SanteDB.Core.Configuration;
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Xml.Serialization;
 
 namespace SanteDB.Core.Security.Tfa.Twilio.Configuration
@@ -29,32 +28,32 @@ namespace SanteDB.Core.Security.Tfa.Twilio.Configuration
     /// Represents the configuration for the TFA mecahnism
     /// </summary>
     [XmlType(nameof(TwilioTfaMechanismConfigurationSection), Namespace = "http://santedb.org/configuration")]
-    [ExcludeFromCodeCoverage]
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage] // Serialization class
     public class TwilioTfaMechanismConfigurationSection : IConfigurationSection
-	{
-		/// <summary>
-		/// Creates a new template mechanism configuration
-		/// </summary>
-		public TwilioTfaMechanismConfigurationSection()
-		{
-		}
+    {
+        /// <summary>
+        /// Creates a new configuration instance for a Twilio account.
+        /// </summary>
+        public TwilioTfaMechanismConfigurationSection()
+        {
+        }
 
-		/// <summary>
-		/// Authentication token
-		/// </summary>
+        /// <summary>
+        /// Twilio Auth Token. This value is found in the Twilio Console under the Account Info section.
+        /// </summary>
         [XmlAttribute("auth")]
-		public String Auth { get; set; }
+        public String Auth { get; set; }
 
-		/// <summary>
-		/// From number
-		/// </summary>
+        /// <summary>
+        /// E164 phone number to send text messages or place calls from.
+        /// </summary>
         [XmlAttribute("from")]
-		public String From { get; set; }
+        public String From { get; set; }
 
-		/// <summary>
-		/// SID configuration
-		/// </summary>
+        /// <summary>
+        /// Twilio Account SID. This value is found in the Twilio Console under the Account Info section.
+        /// </summary>
         [XmlAttribute("sid")]
-		public String Sid { get; set; }
-	}
+        public String Sid { get; set; }
+    }
 }

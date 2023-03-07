@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2021, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2022, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  *
@@ -16,31 +16,23 @@
  * the License.
  *
  * User: fyfej
- * Date: 2021-8-27
+ * Date: 2022-5-30
  */
-
 using AtnaApi.Model;
 using AtnaApi.Transport;
 using SanteDB.Core;
-using SanteDB.Core.Model;
-using SanteDB.Core.Configuration;
+using SanteDB.Core.Diagnostics;
+using SanteDB.Core.Model.Audit;
+using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using SanteDB.Messaging.Atna.Configuration;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
-using System.Security.Cryptography.X509Certificates;
-using SdbAudit = SanteDB.Core.Auditing;
-using SanteDB.Core.Exceptions;
-
-using SanteDB.Core.Auditing;
-
-using SanteDB.Core.Model.DataTypes;
-using SanteDB.Core.Diagnostics;
+using SdbAudit = SanteDB.Core.Model.Audit;
 
 namespace SanteDB.Messaging.Atna
 {
@@ -67,23 +59,19 @@ namespace SanteDB.Messaging.Atna
     /// <para>The configuration of this service is described in <see cref="AtnaConfigurationSection"/></para>
     /// </remarks>
     [ServiceProvider("IHE ATNA Audit Dispatcher")]
+    [ExcludeFromCodeCoverage] // This class relies on sending outbound messages which needs a trading partner
     public class AtnaAuditService : IAuditDispatchService
     {
         // Tracer
-        private Tracer m_tracer = Tracer.GetTracer(typeof(AtnaAuditService));
+        private readonly Tracer m_tracer = Tracer.GetTracer(typeof(AtnaAuditService));
 
         /// <summary>
         /// Gets the service name
         /// </summary>
         public string ServiceName => "IHE ATNA Audit Dispatcher";
 
-        /// <summary>
-        /// Is the audit data running
-        /// </summary>
-        private bool m_isRunning = false;
-
         // Configuration
-        protected AtnaConfigurationSection m_configuration;
+        private AtnaConfigurationSection m_configuration;
 
         // Transporter
         private ITransporter m_transporter;
@@ -148,7 +136,7 @@ namespace SanteDB.Messaging.Atna
             {
                 try
                 {
-                    var ad = state as SdbAudit.AuditData;
+                    var ad = state as SdbAudit.AuditEventData;
 
                     // Translate codes to DICOM
                     if (ad.EventTypeCode != null)
@@ -159,9 +147,13 @@ namespace SanteDB.Messaging.Atna
                         {
                             var refTerm = icpcr.GetConceptReferenceTerm(concept.Key.Value, "DCM");
                             if (refTerm != null)
+                            {
                                 ad.EventTypeCode = new AuditCode(refTerm.Mnemonic, "DCM") { DisplayName = refTerm.LoadCollection<ReferenceTermName>("DisplayNames")?.FirstOrDefault()?.Name };
+                            }
                             else
+                            {
                                 ad.EventTypeCode.DisplayName = concept.LoadCollection<ConceptName>("ConceptNames").FirstOrDefault()?.Name;
+                            }
                         }
                         this.m_tracer.TraceVerbose("Mapped Audit Type Code - {0}-{1}-{2}", ad.EventTypeCode.CodeSystem, ad.EventTypeCode.Code, ad.EventTypeCode.DisplayName);
                     }
@@ -174,7 +166,9 @@ namespace SanteDB.Messaging.Atna
                         null
                     );
                     if (ad.EventTypeCode != null)
+                    {
                         am.EventIdentification.EventType.Add(new CodeValue<String>(ad.EventTypeCode.Code, ad.EventTypeCode.CodeSystem) { DisplayName = ad.EventTypeCode.DisplayName });
+                    }
 
                     am.SourceIdentification.Add(new AuditSourceIdentificationType()
                     {
@@ -206,11 +200,16 @@ namespace SanteDB.Messaging.Atna
                         };
 
                         if (adActor.ActorRoleCode != null)
+                        {
                             foreach (var rol in adActor.ActorRoleCode)
+                            {
                                 act.ActorRoleCode.Add(new CodeValue<string>(rol.Code, rol.CodeSystem)
                                 {
                                     DisplayName = rol.DisplayName
                                 });
+                            }
+                        }
+
                         am.Actors.Add(act);
                     }
 
@@ -241,12 +240,17 @@ namespace SanteDB.Messaging.Atna
                         };
                         // TODO: Object Data
                         foreach (var kv in aoPtctpt.ObjectData)
+                        {
                             if (!String.IsNullOrEmpty(kv.Key))
+                            {
                                 atnaAo.ObjectDetail.Add(new ObjectDetailType()
                                 {
                                     Type = kv.Key,
                                     Value = kv.Value
                                 });
+                            }
+                        }
+
                         am.AuditableObjects.Add(atnaAo);
                     }
 
@@ -264,12 +268,16 @@ namespace SanteDB.Messaging.Atna
         /// <summary>
         /// Send an audit to the endpoint
         /// </summary>
-        public void SendAudit(SdbAudit.AuditData ad)
+        public void SendAudit(SdbAudit.AuditEventData ad)
         {
             if (ApplicationServiceContext.Current.IsRunning)
+            {
                 ApplicationServiceContext.Current.GetService<IThreadPoolService>().QueueUserWorkItem(SendAuditAsync, ad);
+            }
             else
+            {
                 SendAuditAsync(ad);
+            }
         }
 
         #endregion IAuditorService Members

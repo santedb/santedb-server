@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2021, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2022, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  *
@@ -16,33 +16,30 @@
  * the License.
  *
  * User: fyfej
- * Date: 2021-8-27
+ * Date: 2022-5-30
  */
 using SanteDB.Core;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Event;
 using SanteDB.Core.Http;
 using SanteDB.Core.Model.AMI.Diagnostics;
 using SanteDB.Core.Model.Constants;
-using SanteDB.Core.Model.Entities;
+using SanteDB.Core.Model.Query;
+using SanteDB.Core.Model.Serialization;
 using SanteDB.Core.Security;
-using SanteDB.Server.Core.Security.Attribute;
+using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using SanteDB.Persistence.Diagnostics.Jira.Configuration;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Security.Permissions;
 using System.Security.Principal;
 using System.Text;
 using System.Xml.Serialization;
-using SanteDB.Core.Model.Query;
-using SanteDB.Core.Diagnostics;
-using System.Diagnostics.Tracing;
-using SanteDB.Core.Model.Serialization;
-using SanteDB.Server.Core.Http;
 
 namespace SanteDB.Persistence.Diagnostics.Jira
 {
@@ -50,8 +47,10 @@ namespace SanteDB.Persistence.Diagnostics.Jira
     /// Diagnostic report persistence service.
     /// </summary>
 #pragma warning disable CS0067
+
     [ServiceProvider("JIRA Based Diagnostic (Bug) Report Submissions")]
-    public class DiagnosticReportPersistenceService : IDataPersistenceService<DiagnosticReport>
+    [ExcludeFromCodeCoverage]
+    public class JiraDiagnosticReportPersistenceService : IDataPersistenceService<DiagnosticReport>
     {
         /// <summary>
         /// Gets the service name
@@ -59,58 +58,81 @@ namespace SanteDB.Persistence.Diagnostics.Jira
         public string ServiceName => "JIRA Diagnostic Report Submission";
 
         // Trace source
-        private Tracer m_traceSource = new Tracer("SanteDB.Persistence.Diagnostics.Jira");
+        private readonly Tracer m_traceSource = new Tracer("SanteDB.Persistence.Diagnostics.Jira");
+        private readonly IPolicyEnforcementService m_pepService;
+        private readonly IRestClientFactory m_restFactory;
 
         // Configuration
         private JiraServiceConfigurationSection m_configuration = ApplicationServiceContext.Current.GetService<IConfigurationManager>().GetSection<JiraServiceConfigurationSection>();
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="DiagnosticReportPersistenceService"/> class.
-		/// </summary>
-		public DiagnosticReportPersistenceService()
+        /// <summary>
+        /// Initializes a new instance of the <see cref="JiraDiagnosticReportPersistenceService"/> class.
+        /// </summary>
+        public JiraDiagnosticReportPersistenceService(IPolicyEnforcementService policyEnforcementService, IRestClientFactory restClientFactory)
         {
+            this.m_pepService = policyEnforcementService;
+            this.m_restFactory = restClientFactory;
         }
 
         /// <summary>
         /// Fired when an issue is being inserted
         /// </summary>
         public event EventHandler<DataPersistedEventArgs<DiagnosticReport>> Inserted;
+
         /// <summary>
         /// Fired when the issue is being inserted
         /// </summary>
         public event EventHandler<DataPersistingEventArgs<DiagnosticReport>> Inserting;
+
         /// <summary>
         /// Not supported
         /// </summary>
         public event EventHandler<DataPersistedEventArgs<DiagnosticReport>> Obsoleted;
+
         /// <summary>
         /// Not supported
         /// </summary>
         public event EventHandler<DataPersistingEventArgs<DiagnosticReport>> Obsoleting;
+
         /// <summary>
         /// Not supported
         /// </summary>
         public event EventHandler<QueryResultEventArgs<DiagnosticReport>> Queried;
+
         /// <summary>
         /// Not supported
         /// </summary>
         public event EventHandler<QueryRequestEventArgs<DiagnosticReport>> Querying;
+
         /// <summary>
         /// Not supported
         /// </summary>
         public event EventHandler<DataRetrievedEventArgs<DiagnosticReport>> Retrieved;
+
         /// <summary>
         /// Not supported
         /// </summary>
         public event EventHandler<DataRetrievingEventArgs<DiagnosticReport>> Retrieving;
+
         /// <summary>
         /// Not supported
         /// </summary>
         public event EventHandler<DataPersistedEventArgs<DiagnosticReport>> Updated;
+
         /// <summary>
         /// Not supported
         /// </summary>
         public event EventHandler<DataPersistingEventArgs<DiagnosticReport>> Updating;
+
+        /// <summary>
+        /// Fired after report is deleted (not used)
+        /// </summary>
+        public event EventHandler<DataPersistedEventArgs<DiagnosticReport>> Deleted;
+
+        /// <summary>
+        /// Fired when report is deleting
+        /// </summary>
+        public event EventHandler<DataPersistingEventArgs<DiagnosticReport>> Deleting;
 
         /// <summary>
         /// Not supported
@@ -123,7 +145,7 @@ namespace SanteDB.Persistence.Diagnostics.Jira
         /// <summary>
         /// Not supported
         /// </summary>
-        public DiagnosticReport Get(Guid containerId, Guid? versionId, bool loadFast = false, IPrincipal overrideAuthContext = null)
+        public DiagnosticReport Get(Guid containerId, Guid? versionId, IPrincipal overrideAuthContext = null)
         {
             throw new NotImplementedException();
         }
@@ -131,9 +153,11 @@ namespace SanteDB.Persistence.Diagnostics.Jira
         /// <summary>
         /// Inserts the specified diagnostic report
         /// </summary>
-        [PolicyPermission(SecurityAction.Demand, PolicyId = PermissionPolicyIdentifiers.Login)]
         public DiagnosticReport Insert(DiagnosticReport storageData, TransactionMode mode, IPrincipal overrideAuthContext = null)
         {
+
+            this.m_pepService.Demand(PermissionPolicyIdentifiers.Login, overrideAuthContext ?? AuthenticationContext.Current.Principal);
+
             var persistenceArgs = new DataPersistingEventArgs<DiagnosticReport>(storageData, mode, overrideAuthContext);
             this.Inserting?.Invoke(this, persistenceArgs);
             if (persistenceArgs.Cancel)
@@ -144,10 +168,9 @@ namespace SanteDB.Persistence.Diagnostics.Jira
 
             try
             {
-                // Send 
-                var serviceClient = new JiraServiceClient(new RestClient(this.m_configuration));
+                // Send
+                var serviceClient = new JiraServiceClient(this.m_restFactory.CreateRestClient(this.m_configuration.ApiConfiguration));
 
-                serviceClient.Authenticate(new Model.JiraAuthenticationRequest(this.m_configuration.UserName, this.m_configuration.Password));
                 var issue = serviceClient.CreateIssue(new Model.JiraIssueRequest()
                 {
                     Fields = new Model.JiraIssueFields()
@@ -166,28 +189,28 @@ namespace SanteDB.Persistence.Diagnostics.Jira
                     e.AdditionalHeaders.Add("X-Atlassian-Token", "nocheck");
                 };
                 // Attachments
-                List<MultipartAttachment> attachments = new List<MultipartAttachment>();
+                List<MultiPartFormData> attachments = new List<MultiPartFormData>();
 
                 foreach (var itm in storageData.Attachments)
                 {
                     if (itm is DiagnosticBinaryAttachment)
                     {
                         var bin = itm as DiagnosticBinaryAttachment;
-                        attachments.Add(new MultipartAttachment(bin.Content, "application/x-gzip", bin.FileDescription, true));
+                        attachments.Add(new MultiPartFormData(bin.FileDescription, bin.Content, "application/x-gzip", bin.FileDescription, true));
                     }
                     else
                     {
                         var txt = itm as DiagnosticTextAttachment;
-                        attachments.Add(new MultipartAttachment(Encoding.UTF8.GetBytes(txt.Content), "text/plain", txt.FileName, true));
+                        attachments.Add(new MultiPartFormData(txt.FileName, Encoding.UTF8.GetBytes(txt.Content), "text/plain", txt.FileName, true));
                     }
                 }
 
                 // Attach the application information
-                using(var ms = new MemoryStream())
+                using (var ms = new MemoryStream())
                 {
                     XmlSerializer xsz = XmlModelSerializerFactory.Current.CreateSerializer(typeof(DiagnosticApplicationInfo));
                     xsz.Serialize(ms, storageData.ApplicationInfo);
-                    attachments.Add(new MultipartAttachment(ms.ToArray(), "text/xml", "appinfo.xml", true));
+                    attachments.Add(new MultiPartFormData("appinfo.xml", ms.ToArray(), "text/xml", "applinfo.xml", true));
                 }
                 serviceClient.CreateAttachment(issue, attachments);
                 storageData.CorrelationId = issue.Key;
@@ -200,16 +223,15 @@ namespace SanteDB.Persistence.Diagnostics.Jira
             }
             catch (Exception ex)
             {
-                this.m_traceSource.TraceEvent(EventLevel.Error,  "Error sending to JIRA: {0}", ex);
+                this.m_traceSource.TraceEvent(EventLevel.Error, "Error sending to JIRA: {0}", ex);
                 throw;
             }
-
         }
 
         /// <summary>
         /// Not supported
         /// </summary>
-        public DiagnosticReport Obsolete(DiagnosticReport storageData, TransactionMode mode, IPrincipal overrideAuthContext = null)
+        public DiagnosticReport Obsolete(Guid storageData, TransactionMode mode, IPrincipal overrideAuthContext = null)
         {
             throw new NotImplementedException();
         }
@@ -217,7 +239,7 @@ namespace SanteDB.Persistence.Diagnostics.Jira
         /// <summary>
         /// Not supported
         /// </summary>
-        public IEnumerable<DiagnosticReport> Query(Expression<Func<DiagnosticReport, bool>> query, IPrincipal overrideAuthContext = null)
+        public IQueryResultSet<DiagnosticReport> Query(Expression<Func<DiagnosticReport, bool>> query, IPrincipal overrideAuthContext = null)
         {
             throw new NotImplementedException();
         }
@@ -237,7 +259,23 @@ namespace SanteDB.Persistence.Diagnostics.Jira
         {
             throw new NotImplementedException();
         }
-    }
-#pragma warning restore CS0067
 
+        /// <summary>
+        /// Deleting from JIRA not supported
+        /// </summary>
+        public DiagnosticReport Delete(Guid key, TransactionMode mode, IPrincipal principal)
+        {
+            throw new NotSupportedException();
+        }
+
+        /// <summary>
+        /// Not supported to query JIRA
+        /// </summary>
+        public IQueryResultSet<DiagnosticReport> Query<TExpression>(Expression<Func<TExpression, bool>> query, IPrincipal principal) where TExpression : DiagnosticReport
+        {
+            throw new NotSupportedException();
+        }
+    }
+
+#pragma warning restore CS0067
 }

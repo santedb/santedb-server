@@ -1,8 +1,21 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(VersionNumber)' == ''">
-    <VersionNumber>2.1.0-debug</VersionNumber>
+    <VersionNumber>3.0-debug</VersionNumber>
   </PropertyGroup>
+  <Choose>
+    <When Condition="$(VersionNumber.Contains('-'))">
+      <PropertyGroup>
+        <VersionNumberInfo>$(VersionNumber.Substring(0, $(VersionNumber.IndexOf('-'))))</VersionNumberInfo>
+      </PropertyGroup>
+    </When>
+    <Otherwise>
+      <PropertyGroup>
+        <VersionNumberInfo>$(VersionNumber)</VersionNumberInfo>
+      </PropertyGroup>
+
+    </Otherwise>
+  </Choose>
   <ItemGroup>
     <PackageReference Include="MSBuildTasks" Version="1.5.0.235">
       <PrivateAssets>all</PrivateAssets>
@@ -62,12 +75,6 @@
     </None>
     <None Include="app.config" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\SanteDB.Core\SanteDB.Server.Core.csproj">
-      <Project>{db9bc05e-45f1-4f96-a161-f36bdecaf566}</Project>
-      <Name>SanteDB.Server.Core</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Choose>
     <When Condition="$(SolutionName.Contains('-ext'))">
       <ItemGroup>
@@ -102,7 +109,7 @@
   </Target>
   -->
   <Target Name="BeforeBuild" Condition="!$(VersionNumber.EndsWith('-debug'))">
-    <AssemblyInfo CodeLanguage="CS" OutputFile="$(MSBuildProjectDirectory)\Properties\Version.cs" AssemblyVersion="$(VersionNumber)" AssemblyFileVersion="$(VersionNumber)" />
+    <AssemblyInfo CodeLanguage="CS" OutputFile="$(MSBuildProjectDirectory)\Properties\Version.cs" AssemblyVersion="$(VersionNumberInfo)" AssemblyFileVersion="$(VersionNumberInfo)" />
   </Target>
   <ItemGroup>
     <Compile Include="Properties\Version.cs" />

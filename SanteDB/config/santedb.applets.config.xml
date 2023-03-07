@@ -1,5 +1,5 @@
 ﻿<!--
- - Copyright 2021-2021 SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ - Copyright 2021-2022 SanteSuite Contributors (See NOTICE.md for full copyright notices)
  - Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  - Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  -
@@ -16,16 +16,12 @@
  - the License.
  -
  - User: fyfej
- - Date: 2021-8-27
+ - Date: 2022-5-30
  -->
 <SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://santedb.org/configuration">
   <sections>
-    <add type="SanteDB.Server.Core.Configuration.AppletConfigurationSection, SanteDB.Server.Core,Version=2.1.0.0, Culture=neutral, PublicKeyToken=null" />
+    <add type="SanteDB.Core.Applets.Configuration.AppletConfigurationSection, SanteDB.Core.Applets" />
   </sections>
   <section xsi:type="AppletConfigurationSection" appletDirectory="applets" allowUnsignedApplets="true">
-    <trustedPublishers>
-      <add>82C63E1E9B87578D0727E871D7613F2F0FAF683B</add>
-      <add>4326A4421216AC254DA93DC61B93160B08925BB1</add>
-    </trustedPublishers>
   </section>
 </SanteDBConfiguration>

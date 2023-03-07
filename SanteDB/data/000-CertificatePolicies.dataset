@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Certificate Management Policies">
+
+  <update insertIfNotExists="true">
+    <SecurityPolicy xmlns="http://santedb.org/model">
+      <id>711F88CF-0D0C-4A3F-AED7-FA9535AA5F24</id>
+      <name>Unrestricted Security Certificate Management</name>
+      <oid>1.3.6.1.4.1.33349.3.1.5.9.2.0.19</oid>
+      <isPublic>true</isPublic>
+      <canOverride>false</canOverride>
+    </SecurityPolicy>
+  </update>
+  
+  <update insertIfNotExists="true">
+    <SecurityPolicy xmlns="http://santedb.org/model">
+      <id>a11F88CF-0D0C-4A3F-AED7-FA9535AA5F24</id>
+      <name>Issue New Certificates</name>
+      <oid>1.3.6.1.4.1.33349.3.1.5.9.2.0.19.1</oid>
+      <isPublic>true</isPublic>
+      <canOverride>false</canOverride>
+    </SecurityPolicy>
+  </update>  
+  <update insertIfNotExists="true">
+    <SecurityPolicy xmlns="http://santedb.org/model">
+      <id>b11F88CF-0D0C-4A3F-AED7-FA9535AA5F24</id>
+      <name>Revoke Certificates</name>
+      <oid>1.3.6.1.4.1.33349.3.1.5.9.2.0.19.2</oid>
+      <isPublic>true</isPublic>
+      <canOverride>false</canOverride>
+    </SecurityPolicy>
+  </update>  
+  <update insertIfNotExists="true">
+    <SecurityPolicy xmlns="http://santedb.org/model">
+      <id>c11F88CF-0D0C-4A3F-AED7-FA9535AA5F24</id>
+      <name>Assign Certificate to Security Identity</name>
+      <oid>1.3.6.1.4.1.33349.3.1.5.9.2.0.19.3</oid>
+      <isPublic>true</isPublic>
+      <canOverride>false</canOverride>
+    </SecurityPolicy>
+  </update>
+  <exec>
+    <service type="SanteDB.Core.Security.Services.IPolicyDecisionService, SanteDB.Core.Api" method="ClearCache">
+      <args>
+        <string>SYSTEM</string>
+      </args>
+    </service>
+  </exec>
+</dataset>

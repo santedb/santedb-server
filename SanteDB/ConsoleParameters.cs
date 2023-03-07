@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2021, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2022, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  *
@@ -16,7 +16,7 @@
  * the License.
  *
  * User: fyfej
- * Date: 2021-8-27
+ * Date: 2022-5-30
  */
 using MohawkCollege.Util.Console.Parameters;
 using System.ComponentModel;
@@ -60,6 +60,13 @@ namespace SanteDB
         [Description("Instructs the host process to perform startup functions and then shut down immediately")]
         [Parameter("test-start")]
         public bool StartupTest { get; set; }
+
+        /// <summary>
+        /// Test configuration files
+        /// </summary>
+        [Description("Instructs the host process to perform a configuration test")]
+        [Parameter("test-config")]
+        public bool ConfigTest { get; set; }
 
         /// <summary>
         /// Generate configuartion

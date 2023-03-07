@@ -2,6 +2,12 @@
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <ItemGroup>
+    <PackageReference Include="FirebirdSql.Data.FirebirdClient">
+      <Version>9.1.0</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Data.Sqlite.Core">
+      <Version>7.0.0</Version>
+    </PackageReference>
     <PackageReference Include="Mono.Posix-4.5">
       <Version>4.5.0</Version>
     </PackageReference>
@@ -11,8 +17,20 @@
     </PackageReference>
   </ItemGroup>
   <PropertyGroup Condition="'$(VersionNumber)' == ''">
-    <VersionNumber>2.1.0-debug</VersionNumber>
+    <VersionNumber>3.0-debug</VersionNumber>
   </PropertyGroup>
+  <Choose>
+    <When Condition="$(VersionNumber.Contains('-'))">
+      <PropertyGroup>
+        <VersionNumberInfo>$(VersionNumber.Substring(0, $(VersionNumber.IndexOf('-'))))</VersionNumberInfo>
+      </PropertyGroup>
+    </When>
+    <Otherwise>
+      <PropertyGroup>
+        <VersionNumberInfo>$(VersionNumber)</VersionNumberInfo>
+      </PropertyGroup>
+    </Otherwise>
+  </Choose>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -21,7 +39,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SanteDB</RootNamespace>
     <AssemblyName>SanteDB</AssemblyName>
-    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetFrameworkProfile />
@@ -37,12 +55,12 @@
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <ApplicationVersion>3.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -53,7 +71,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\bin\Release\</OutputPath>
@@ -82,9 +100,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConsoleParameters.cs" />
-    <None Include="applets\santedb.admin.sln.pak">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <Compile Include="ServerApplicationContext.cs" />
     <None Include="applets\santedb.core.sln.pak">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -158,6 +174,26 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="config\config.skel" />
+    <None Include="data\000-ActClass.dataset">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="data\000-CertificatePolicies.dataset">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="data\000-EntityClass.dataset">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="data\000-ProtocolAdminPolicies.dataset">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="data\000-ProcedureTechniques.dataset">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="data\000-BodySites.dataset">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="data\000-DetectedIssue.dataset">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -172,7 +208,13 @@
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="data\000-AddressUse.dataset">
+    <None Include="data\000-BackupPolicies.dataset">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="data\000-ProviderTypes.dataset">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="data\990-AddressUse.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="data\000-BirthRegistration.dataset">
@@ -184,7 +226,7 @@
     <None Include="data\000-FamilyMembers.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="data\000-GenderConcept.dataset">
+    <None Include="data\990-GenderConceptNames.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="data\000-NamePrefixSuffix.dataset">
@@ -245,9 +287,6 @@
     <None Include="data\000-ISO639-1-Codes.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="data\000-ListActClass.dataset">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="data\000-LivingArrangements.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -263,14 +302,22 @@
     <None Include="data\000-VIPStatus.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="data\demo\990-demo.concepts.dataset" />
-    <None Include="data\demo\991-demo.facilities.dataset" />
-    <None Include="data\demo\992-demo.places.dataset" />
-    <None Include="data\demo\994-demo.manufactured-materials.dataset" />
+    <None Include="data\demo\990-demo.concepts.dataset">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="data\demo\991-demo.facilities.dataset">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="data\demo\992-demo.places.dataset">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="data\demo\994-demo.manufactured-materials.dataset">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="data\SDB_AUDIT.FDB" />
     <None Include="data\SDB_BASE.FDB" />
+    <None Include="SanteDB.iCDR.Runtime.targets" />
     <None Include="SanteDB.nuspec" />
-    <None Include="SanteDB.Server.targets" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\SanteDB.licenseheader">
@@ -295,7 +342,7 @@
     <None Include="data\000-ActReason.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="data\000-ActSite.dataset">
+    <None Include="data\000-AdministrationSite.dataset">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -472,6 +519,10 @@
           <Project>{ece9b280-9647-4092-babf-eb2e25084670}</Project>
           <Name>SanteDB.Core.Model.ViewModelSerializers</Name>
         </ProjectReference>
+        <ProjectReference Include="..\santedb-data\SanteDB.Persistence.Data\SanteDB.Persistence.Data.csproj">
+          <Project>{81bd479f-5dbc-42e9-96c2-40380aac36bc}</Project>
+          <Name>SanteDB.Persistence.Data</Name>
+        </ProjectReference>
       </ItemGroup>
     </When>
     <Otherwise>
@@ -494,6 +545,7 @@
         <PackageReference Include="SanteDB.Rest.HDSI" Version="$(VersionNumber)" />
         <PackageReference Include="SanteDB.Core.Model.ViewModelSerializers" Version="$(VersionNumber)" />
         <PackageReference Include="SanteDB.Queue.Msmq" Version="$(VersionNumber)" />
+        <PackageReference Include="SanteDB.Persistence.Data" Version="$(VersionNumber)" />
       </ItemGroup>
     </Otherwise>
   </Choose>
@@ -503,6 +555,12 @@
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>13.0.1</Version>
+    </PackageReference>
+    <PackageReference Include="Npgsql">
+      <Version>7.0.0</Version>
+    </PackageReference>
+    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlcipher">
+      <Version>2.1.2</Version>
     </PackageReference>
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe">
       <Version>6.0.0</Version>
@@ -514,6 +572,30 @@
     <ProjectReference Include="..\santedb-cache-redis\SanteDB.Caching.Redis\SanteDB.Caching.Redis.csproj">
       <Project>{86672094-25cc-4cd5-b085-240e50ec4a5e}</Project>
       <Name>SanteDB.Caching.Redis</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\santedb-certs-bc\SanteDB.Security.Certs.BouncyCastle\SanteDB.Security.Certs.BouncyCastle.csproj">
+      <Project>{c4f21107-e045-4d8e-bdb3-be67ede5dd5b}</Project>
+      <Name>SanteDB.Security.Certs.BouncyCastle</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\santedb-data\SanteDB.Persistence.Auditing.ADO\SanteDB.Persistence.Auditing.ADO.csproj">
+      <Project>{45ea67a6-48f6-4906-84ec-5c13c80c9cc4}</Project>
+      <Name>SanteDB.Persistence.Auditing.ADO</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\santedb-data\SanteDB.Persistence.Data\SanteDB.Persistence.Data.csproj">
+      <Project>{81bd479f-5dbc-42e9-96c2-40380aac36bc}</Project>
+      <Name>SanteDB.Persistence.Data</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\santedb-data\SanteDB.Persistence.PubSub.ADO\SanteDB.Persistence.PubSub.ADO.csproj">
+      <Project>{b727f549-3b5d-4094-bdfb-55f15756d2d6}</Project>
+      <Name>SanteDB.Persistence.PubSub.ADO</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\santedb-data\SanteDB.Persistence.Synchronization.ADO\SanteDB.Persistence.Synchronization.ADO.csproj">
+      <Project>{b312ffef-fb93-4ba9-895c-597dd238bd4f}</Project>
+      <Name>SanteDB.Persistence.Synchronization.ADO</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\santedb-docker\SanteDB.Docker.Core\SanteDB.Docker.Core.csproj">
+      <Project>{284ce885-78e0-48ea-a2e4-6957ad66eab5}</Project>
+      <Name>SanteDB.Docker.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\santedb-fhir\SanteDB.Messaging.FHIR\SanteDB.Messaging.FHIR.csproj">
       <Project>{33836324-c699-4139-ab9c-7524570a04d5}</Project>
@@ -527,6 +609,10 @@
       <Project>{c1f86ea3-fc84-456f-a9d9-0bf8db0d48d3}</Project>
       <Name>SanteDB.Messaging.HL7</Name>
     </ProjectReference>
+    <ProjectReference Include="..\santedb-i18n\SanteDB.Core.i18n\SanteDB.Core.i18n.csproj">
+      <Project>{ca7b81dc-b789-4af6-a079-ec84259c101a}</Project>
+      <Name>SanteDB.Core.i18n</Name>
+    </ProjectReference>
     <ProjectReference Include="..\santedb-msmq\SanteDB.Queue.Msmq\SanteDB.Queue.Msmq.csproj">
       <Project>{644e4e13-5f6d-45ef-9a82-dedb01790a60}</Project>
       <Name>SanteDB.Queue.Msmq</Name>
@@ -535,9 +621,25 @@
       <Project>{1b690052-ed2e-4389-838d-9b9fb188f541}</Project>
       <Name>SanteDB.Messaging.Metadata</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Authentication.OAuth\SanteDB.Authentication.OAuth2.csproj">
-      <Project>{a3975c6f-4fdb-43be-81ab-3357b86173f1}</Project>
-      <Name>SanteDB.Authentication.OAuth2</Name>
+    <ProjectReference Include="..\santedb-rabbitmq\SanteDB.Queue.RabbitMq\SanteDB.Queue.RabbitMq.csproj">
+      <Project>{4696ce1f-1f0a-4125-98f8-5a2ecb735065}</Project>
+      <Name>SanteDB.Queue.RabbitMq</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\santedb-restsvc\SanteDB.Rest.AppService\SanteDB.Rest.AppService.csproj">
+      <Project>{5044daa9-50a0-42a7-b125-beaa4e9eb386}</Project>
+      <Name>SanteDB.Rest.AppService</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\santedb-restsvc\SanteDB.Rest.OAuth\SanteDB.Rest.OAuth.csproj">
+      <Project>{1e96cd40-c238-44c9-a7e7-72c49e15c8fa}</Project>
+      <Name>SanteDB.Rest.OAuth</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\santedb-restsvc\SanteDB.Rest.WWW\SanteDB.Rest.WWW.csproj">
+      <Project>{09b39a55-466f-4678-a644-fdada2ac5b6a}</Project>
+      <Name>SanteDB.Rest.WWW</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\santedb-tools\SanteDB.DevTools\SanteDB.DevTools.csproj">
+      <Project>{223d4d87-6819-4f38-ae69-a82e249e1879}</Project>
+      <Name>SanteDB.DevTools</Name>
     </ProjectReference>
     <ProjectReference Include="..\SanteDB.Configuration\SanteDB.Configuration.csproj">
       <Project>{032abf00-6c76-47c7-9eca-a840915a17ea}</Project>
@@ -547,29 +649,9 @@
       <Project>{5a60d6e2-72dd-478a-91a6-e928208ca1ba}</Project>
       <Name>SanteDB.Core.Security.Tfa.Twilio</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Core\SanteDB.Server.Core.csproj">
-      <Project>{db9bc05e-45f1-4f96-a161-f36bdecaf566}</Project>
-      <Name>SanteDB.Server.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Messaging.AMI\SanteDB.Messaging.AMI.csproj">
-      <Project>{d882323c-2bc9-4a1d-b70f-d833cf2e91a1}</Project>
-      <Name>SanteDB.Messaging.AMI</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SanteDB.Messaging.Atna\SanteDB.Messaging.Atna.csproj">
       <Project>{976e1627-b0da-4237-977d-9b3020b60dc1}</Project>
       <Name>SanteDB.Messaging.Atna</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Messaging.HDSI\SanteDB.Messaging.HDSI.csproj">
-      <Project>{04e3c581-5a04-4691-82ac-f339947fce75}</Project>
-      <Name>SanteDB.Messaging.HDSI</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Persistence.Auditing.ADO\SanteDB.Persistence.Auditing.ADO.csproj">
-      <Project>{45ea67a6-48f6-4906-84ec-5c13c80c9cc4}</Project>
-      <Name>SanteDB.Persistence.Auditing.ADO</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Persistence.Data.ADO\SanteDB.Persistence.Data.ADO.csproj">
-      <Project>{f38ed54c-e4e4-499a-882e-736289f332c0}</Project>
-      <Name>SanteDB.Persistence.Data.ADO</Name>
     </ProjectReference>
     <ProjectReference Include="..\SanteDB.Persistence.Diagnostics.Email\SanteDB.Persistence.Diagnostics.Email.csproj">
       <Project>{2a5cea66-8bb3-4567-bdfa-9c174fc215f7}</Project>
@@ -579,30 +661,12 @@
       <Project>{18a9f102-023e-4e17-8a70-a91365e1510d}</Project>
       <Name>SanteDB.Persistence.Diagnostics.Jira</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Persistence.PubSub.ADO\SanteDB.Persistence.PubSub.ADO.csproj">
-      <Project>{03052730-be5d-4212-9b71-316c685dd245}</Project>
-      <Name>SanteDB.Persistence.PubSub.ADO</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Server\SanteDB.Server.csproj">
-      <Project>{1d145e2a-c31e-467c-9f4a-6811e1604b67}</Project>
-      <Name>SanteDB.Server</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\SanteDB.Tools.Debug\SanteDB.Tools.Debug.csproj">
-      <Project>{223d4d87-6819-4f38-ae69-a82e249e1879}</Project>
-      <Name>SanteDB.Tools.Debug</Name>
-    </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Services\" />
+    <Folder Include="Util\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Choose>
-    <When Condition="$(SolutionName.Contains('-linux'))">
-    </When>
-    <Otherwise>
-      <PropertyGroup>
-        <PreBuildEvent Condition="'$(NoFirebird)' == ''">"$(SolutionDir)\Solution Items\FirebirdSQL-3.0.3-Embedded.bat" "$(SolutionDir)\Solution Items" "$(TargetDir)"</PreBuildEvent>
-      </PropertyGroup>
-    </Otherwise>
-  </Choose>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
@@ -610,7 +674,8 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <Target Name="BeforeBuild" Condition="!$(VersionNumber.EndsWith('-debug'))">
-    <AssemblyInfo CodeLanguage="CS" OutputFile="$(MSBuildProjectDirectory)\Properties\Version.cs" AssemblyVersion="$(VersionNumber)" AssemblyFileVersion="$(VersionNumber)" />
+  <Import Project="$(SolutionDir)\santedb-data\SanteDB.Core.TestFramework.FirebirdSQL\SanteDB.Core.TestFramework.FirebirdSQL.targets" />
+  <Target Name="BeforeBuild">
+    <AssemblyInfo CodeLanguage="CS" OutputFile="$(MSBuildProjectDirectory)\Properties\Version.cs" AssemblyVersion="$(VersionNumberInfo)" AssemblyFileVersion="$(VersionNumberInfo)" />
   </Target>
 </Project>
