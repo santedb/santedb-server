@@ -281,7 +281,12 @@ Source: ..\bin\Release\SanteDB.Rest.BIS.dll; DestDir: {app}; Components: reporti
 ; Caching 
 Source: ..\bin\Release\SanteDB.Caching.Memory.dll; DestDir: {app}; Components: cache
 Source: ..\bin\Release\SanteDB.Caching.Redis.dll; DestDir: {app}; Components: cache\redis
+
+#ifdef MONO_BUILD
+#else
 Source: ..\bin\Release\Pipelines.Sockets.Unofficial.dll; DestDir: {app}; Components: cache\redis
+#endif
+
 Source: ..\bin\Release\StackExchange.Redis.dll; DestDir: {app}; Components: cache\redis
 
 
