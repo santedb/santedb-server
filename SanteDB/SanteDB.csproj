@@ -217,6 +217,10 @@
     <None Include="data\000-ProviderTypes.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="data\001-MaterialTypes.dataset">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="data\990-AddressUse.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

@@ -69,7 +69,7 @@ Source: ..\santedb-tools\bin\Release\net4.8\sdbac.exe.config; DestDir: {app}
 Source: ..\santedb-tools\bin\Release\net4.8\SanteDB.AdminConsole.Api.dll; DestDir: {app}
 Source: ..\bin\Release\SharpCompress.dll; DestDir: {app}
 Source: ..\bin\Release\System.Buffers.dll; DestDir: {app}
-Source: ..\bin\Release\System.Collections.Concurrent.dll; DestDir: {app}
+;Source: ..\bin\Release\System.Collections.Concurrent.dll; DestDir: {app}
 Source: ..\bin\Release\System.Collections.dll; DestDir: {app}
 Source: ..\bin\Release\System.Memory.dll; DestDir: {app}
 Source: ..\bin\Release\System.Runtime.CompilerServices.Unsafe.dll; DestDir: {app}
