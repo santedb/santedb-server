@@ -172,6 +172,7 @@ namespace SanteDB.Configuration
         /// </summary>
         public ObservableCollection<IConfigurationTask> ConfigurationTasks { get; }
 
+#pragma warning disable CS0067
         /// <summary>
         /// Property has changed
         /// </summary>
@@ -196,6 +197,7 @@ namespace SanteDB.Configuration
         /// Fired when stopped
         /// </summary>
         public event EventHandler Stopped;
+#pragma warning restore
 
         /// <summary>
         /// Private CTOR for singleton
