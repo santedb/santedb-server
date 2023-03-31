@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" id="NUCC Derived Provider Type Codes" xmlns="http://santedb.org/data">
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" id="NUCC Derived Type Codes" xmlns="http://santedb.org/data">
   <update skipIfError="false" insertIfNotExists="true">
     <CodeSystem xmlns="http://santedb.org/model">
       <id>cb6982b5-d07c-43c8-861a-d7da8787c159</id>
@@ -4833,6 +4833,22 @@
         <value>Case Management Agency</value>
       </name>
     </ReferenceTerm>
+  </update>
+  <update skipIfError="true" insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>afb14536-92b5-4f9b-9100-f29d1a1a81c4</id>
+      <_head>false</_head>
+      <version xsi:nil="true" />
+      <sequence xsi:nil="true" />
+      <mnemonic>OrganizationType-Government</mnemonic>
+      <statusConcept xsi:nil="true" />
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Government Agency</value>
+      </name>
+      <conceptSet>485bc177-3e84-4a5a-9f25-466ba30e987e</conceptSet>
+    </Concept>
   </update>
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
