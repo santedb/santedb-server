@@ -27,22 +27,31 @@ using Twilio.Clients;
 
 namespace SanteDB.Security.Tfa.Twilio
 {
+    /// <summary>
+    /// A factor which creates a Twilio client
+    /// </summary>
     public class TwilioClientFactory : IServiceImplementation
     {
+        /// <inheritdoc/>
         public string ServiceName => "Twilio Client Factory";
 
         readonly TwilioTfaMechanismConfigurationSection _Configuration;
 
+        /// <summary>
+        /// DI constructor
+        /// </summary>
         public TwilioClientFactory(IConfigurationManager configurationManager)
         {
             _Configuration = configurationManager.GetSection<TwilioTfaMechanismConfigurationSection>();
         }
 
+        /// <inheritdoc/>
         public ITwilioRestClient GetRestClient()
         {
             return new TwilioRestClient(_Configuration.Sid, _Configuration.Auth);
         }
 
+        /// <inheritdoc/>
         public string FromNumber => _Configuration.From;
     }
 }

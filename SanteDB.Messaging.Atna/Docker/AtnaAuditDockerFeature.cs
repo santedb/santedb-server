@@ -35,9 +35,21 @@ namespace SanteDB.Messaging.Atna.Docker
     public class AtnaAuditDockerFeature : IDockerFeature
     {
 
+        /// <summary>
+        /// Gets the setting for the ATNA audit
+        /// </summary>
         public const string TargetSetting = "TARGET";
+        /// <summary>
+        /// Gets the environment variable name for the mode
+        /// </summary>
         public const string ModeSetting = "MODE";
+        /// <summary>
+        /// Gets the environment variable name fo the site
+        /// </summary>
         public const string SiteSetting = "SITE";
+        /// <summary>
+        /// Gets the environment variable setting for the certificate
+        /// </summary>
         public const string CertificateSetting = "CERT";
 
         /// <summary>

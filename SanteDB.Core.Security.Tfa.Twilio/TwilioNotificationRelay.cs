@@ -27,19 +27,27 @@ using Twlo = global::Twilio;
 
 namespace SanteDB.Security.Tfa.Twilio
 {
+    /// <summary>
+    /// An implementation of the <see cref="INotificationRelay"/>
+    /// </summary>
     public class TwilioNotificationRelay : INotificationRelay
     {
         readonly TwilioClientFactory _ClientFactory;
         readonly Tracer _Tracer;
 
+        /// <summary>
+        /// DI constructor
+        /// </summary>
         public TwilioNotificationRelay(TwilioClientFactory factory)
         {
             _Tracer = new Tracer(nameof(TwilioNotificationRelay));
             _ClientFactory = factory;
         }
 
+        /// <inheritdoc/>
         public IEnumerable<string> SupportedSchemes => new[] { "sms", "tel" };
 
+        /// <inheritdoc/>
         public Guid Send(string[] toAddress, string subject, string body, DateTimeOffset? scheduleDelivery = null, bool ccAdmins = false, params NotificationAttachment[] attachments)
         {
             if (null == toAddress)

@@ -32,6 +32,9 @@ using System.Linq;
 
 namespace SanteDB.Security.Tfa.Twilio
 {
+    /// <summary>
+    /// Represents a <see cref="ITfaMechanism"/> which uses SMS text messages
+    /// </summary>
     public class TfaSmsMechanism : ITfaMechanism
     {
         private static readonly Guid s_TfaMechanismId = Guid.Parse("08124835-6C24-43C9-8650-9D605F6B5BD6");
@@ -41,6 +44,9 @@ namespace SanteDB.Security.Tfa.Twilio
         readonly ITfaCodeProvider _TfaCodeProvider;
         readonly ITfaSecretManager _TfaSecretManager;
 
+        /// <summary>
+        /// DI constructor
+        /// </summary>
         public TfaSmsMechanism(INotificationService notificationService, ITfaCodeProvider tfaCodeProvider, ITfaSecretManager secretManager)
         {
             _NotificationService = notificationService;
@@ -48,10 +54,13 @@ namespace SanteDB.Security.Tfa.Twilio
             _TfaSecretManager = secretManager;
         }
 
+        /// <inheritdoc/>
         public Guid Id => s_TfaMechanismId;
 
+        /// <inheritdoc/>
         public string Name => "org.santedb.tfa.sms";
 
+        /// <inheritdoc/>
         public string Send(IIdentity user)
         {
             if (null == user)
@@ -112,6 +121,7 @@ namespace SanteDB.Security.Tfa.Twilio
             }
         }
 
+        /// <inheritdoc/>
         public bool Validate(IIdentity user, string secret)
         {
             if (null == user)

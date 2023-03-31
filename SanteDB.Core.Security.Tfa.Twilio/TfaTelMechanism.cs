@@ -32,6 +32,9 @@ using System.Linq;
 
 namespace SanteDB.Security.Tfa.Twilio
 {
+    /// <summary>
+    /// Represents an IVR <see cref="ITfaMechanism"/>
+    /// </summary>
     public class TfaTelMechanism : ITfaMechanism
     {
         private static readonly Guid s_TfaMechanismId = Guid.Parse("B94607B4-97A1-48A5-83B0-2F5C348299DC");
@@ -40,16 +43,22 @@ namespace SanteDB.Security.Tfa.Twilio
         readonly INotificationService _NotificationService;
         readonly ITfaCodeProvider _TfaCodeProvider;
 
+        /// <summary>
+        /// DI constructor
+        /// </summary>
         public TfaTelMechanism(INotificationService notificationService, ITfaCodeProvider tfaCodeProvider)
         {
             _NotificationService = notificationService;
             _TfaCodeProvider = tfaCodeProvider;
         }
 
+        /// <inheritdoc/>
         public Guid Id => s_TfaMechanismId;
 
+        /// <inheritdoc/>
         public string Name => "org.santedb.tfa.tel";
 
+        /// <inheritdoc/>
         public string Send(IIdentity user)
         {
             if (null == user)
@@ -99,6 +108,7 @@ namespace SanteDB.Security.Tfa.Twilio
             }
         }
 
+        /// <inheritdoc/>
         public bool Validate(IIdentity user, string secret)
         {
             if (null == user)
