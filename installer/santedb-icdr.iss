@@ -324,22 +324,12 @@ Source: ..\bin\Release\SanteDB.Rest.Common.dll; DestDir: {app}; Components: msg 
 Source: ..\bin\Release\SanteDB.Rest.HDSI.dll; DestDir: {app}; Components: msg\hdsi
 
 ; Common .NET Standard
-Source: ..\bin\Release\Microsoft.AspNetCore.WebUtilities.dll; DestDir: {app};
-Source: ..\bin\Release\Microsoft.Bcl.HashCode.dll; DestDir: {app};
-Source: ..\bin\Release\Microsoft.Extensions.Logging.Abstractions.dll; DestDir: {app};
-Source: ..\bin\Release\Microsoft.Extensions.Primitives.dll; DestDir: {app};
-Source: ..\bin\Release\Microsoft.IdentityModel.Abstractions.dll; DestDir: {app};
-Source: ..\bin\Release\Microsoft.IdentityModel.JsonWebTokens.dll; DestDir: {app};
-Source: ..\bin\Release\Microsoft.IdentityModel.Logging.dll; DestDir: {app};
-Source: ..\bin\Release\Microsoft.IdentityModel.Tokens.dll; DestDir: {app};
-Source: ..\bin\Release\Microsoft.Net.Http.Headers.dll; DestDir: {app};
 Source: ..\bin\Release\MimeMapping.dll; DestDir: {app};
 Source: ..\bin\Release\MimeTypesMap.dll; DestDir: {app};
 Source: ..\bin\Release\Polly.dll; DestDir: {app};
-Source: ..\bin\Release\Microsoft.Bcl.AsyncInterfaces.dll; DestDir: {app}; 
-Source: ..\bin\Release\Microsoft.Win32.Primitives.dll; DestDir: {app}; 
 Source: ..\bin\Release\netstandard.dll; DestDir: {app}; Components: core server
 Source: ..\bin\Release\System.*.dll; DestDir: {app}; 
+Source: ..\bin\Release\Microsoft.*.dll; Excludes: Microsoft.Data.Sqlite.dll; DestDir: {app}; 
 
 [UninstallDelete]
 Type: filesandordirs; Name: "{app}\data\*.completed"
