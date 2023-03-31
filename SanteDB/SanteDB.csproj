@@ -177,6 +177,9 @@
     <None Include="data\000-ActClass.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="data\000-ActEncounterCode.dataset">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="data\000-CertificatePolicies.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
