@@ -1,4 +1,24 @@
-﻿using SanteDB.Core.Notifications;
+﻿/*
+ * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
+ * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you
+ * may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ * User: fyfej
+ * Date: 2023-3-10
+ */
+using SanteDB.Core.Notifications;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Services;
@@ -12,6 +32,9 @@ using System.Linq;
 
 namespace SanteDB.Security.Tfa.Twilio
 {
+    /// <summary>
+    /// Represents an IVR <see cref="ITfaMechanism"/>
+    /// </summary>
     public class TfaTelMechanism : ITfaMechanism
     {
         private static readonly Guid s_TfaMechanismId = Guid.Parse("B94607B4-97A1-48A5-83B0-2F5C348299DC");
@@ -20,16 +43,22 @@ namespace SanteDB.Security.Tfa.Twilio
         readonly INotificationService _NotificationService;
         readonly ITfaCodeProvider _TfaCodeProvider;
 
+        /// <summary>
+        /// DI constructor
+        /// </summary>
         public TfaTelMechanism(INotificationService notificationService, ITfaCodeProvider tfaCodeProvider)
         {
             _NotificationService = notificationService;
             _TfaCodeProvider = tfaCodeProvider;
         }
 
+        /// <inheritdoc/>
         public Guid Id => s_TfaMechanismId;
 
+        /// <inheritdoc/>
         public string Name => "org.santedb.tfa.tel";
 
+        /// <inheritdoc/>
         public string Send(IIdentity user)
         {
             if (null == user)
@@ -79,6 +108,7 @@ namespace SanteDB.Security.Tfa.Twilio
             }
         }
 
+        /// <inheritdoc/>
         public bool Validate(IIdentity user, string secret)
         {
             if (null == user)

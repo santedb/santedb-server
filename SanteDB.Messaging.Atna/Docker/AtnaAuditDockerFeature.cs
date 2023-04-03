@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2022, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  *
@@ -16,7 +16,7 @@
  * the License.
  *
  * User: fyfej
- * Date: 2022-5-30
+ * Date: 2023-3-10
  */
 using SanteDB.Core.Configuration;
 using SanteDB.Docker.Core;
@@ -35,9 +35,21 @@ namespace SanteDB.Messaging.Atna.Docker
     public class AtnaAuditDockerFeature : IDockerFeature
     {
 
+        /// <summary>
+        /// Gets the setting for the ATNA audit
+        /// </summary>
         public const string TargetSetting = "TARGET";
+        /// <summary>
+        /// Gets the environment variable name for the mode
+        /// </summary>
         public const string ModeSetting = "MODE";
+        /// <summary>
+        /// Gets the environment variable name fo the site
+        /// </summary>
         public const string SiteSetting = "SITE";
+        /// <summary>
+        /// Gets the environment variable setting for the certificate
+        /// </summary>
         public const string CertificateSetting = "CERT";
 
         /// <summary>
