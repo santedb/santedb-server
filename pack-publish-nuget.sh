@@ -11,6 +11,10 @@ build_nuget_cwd() {
         	for N in ./bin/publish/*.nupkg; do
                 	dotnet nuget push -s http://oss-baget.fyfesoftware.ca:8080/v3/index.json -k $2 ${N}
                 done
+
+		for N in ./bin/publish/*.snupkg; do
+			dotnet nuget push -s http://oss-baget.fyfesoftware.ca:8080/v3/index.json -k $2 ${N}
+		done
                 rm -rfv ./bin/publish
         fi
 }
