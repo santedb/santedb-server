@@ -11,8 +11,8 @@ sign_all_asms() {
 sign_all_recursive() {
 	if [ -d "Release/netstandard2.0" ]; then
 		sign_all_asms "Release/netstandard2.0"
-	elif [ -d "Release/net48" ]; then
-		sign_all_asms "Release/net48"
+	elif [ -d "Release/net4.8" ]; then
+		sign_all_asms "Release/net4.8"
 	else
 		sign_all_asms "Release"
 	fi
