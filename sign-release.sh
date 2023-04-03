@@ -9,8 +9,13 @@ sign_all_asms() {
 }
 
 sign_all_recursive() {
-	sign_all_asms "Release"
-	sign_all_asms "Release/netstandard2.0"
+	if [ -d "Release/netstandard2.0" ]; then
+		sign_all_asms "Release/netstandard2.0"
+	elif [ -d "Release/net48" ]; then
+		sign_all_asms "Release/net48"
+	else
+		sign_all_asms "Release"
+	fi
 	for D in *; do
 		if [ -d "${D}" ]; then
 			cd "${D}"
