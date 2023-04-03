@@ -9,7 +9,7 @@ build_nuget_cwd() {
         fi
         if [ -d ./bin/publish ]; then
         	for N in ./bin/publish/*.nupkg; do
-                	dotnet nuget push -s http://oss-baget.fyfesoftware.ca:8080/v3/index.json -k $3 ${N}
+                	dotnet nuget push -s http://oss-baget.fyfesoftware.ca:8080/v3/index.json -k $2 ${N}
                 done
                 rm -rfv ./bin/publish
         fi
@@ -17,26 +17,22 @@ build_nuget_cwd() {
 
 if (( $# < 2 ))
 then
-	echo "Use: build-on-linux.sh VERSION_ID BRANCH_NAME"
+	echo "Use: pack-publish-nuget.sh VERSION_ID YOUR_API_KEY"
 	exit -1;
 fi;
 
-if (( $# > 2 ))
-then
 for S in *; do
 	if [ -d "${S}" ]; then
 		echo "Entering ${S}"
 		cd "${S}"
-		build_nuget_cwd $1 $2 $3
+		build_nuget_cwd $1 $2
 		for D in *; do
 			if [ -d "${D}" ]; then
 				cd "${D}"
-				build_nuget_cwd $1 $2 $3
+				build_nuget_cwd $1 $2
 				cd ..
 			fi
 		done
 		cd ..
 	fi
 done
-fi
-
