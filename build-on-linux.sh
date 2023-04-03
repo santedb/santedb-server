@@ -37,6 +37,8 @@ cp -rv ./SanteDB.Persistence.Data.ADO/Data/SQL/* ./bin/Release/data/SQL/
 
 mkdir santedb-server-$1
 cd santedb-server-$1
+cp ../installer/install.sh ./
+chmod 755 installer.sh
 cp ../bin/Release/*.dll ./
 cp ../bin/Release/*.config ./
 cp ../bin/Release/*.xml ./
