@@ -12,10 +12,11 @@ echo "Build in ${build_dir}"
 mkdir -p {./bin/Release/data,./santedb-fhir/bin/Release/data,./santedb-hl7/bin/Release/data,./santedb-gs1/bin/Release/data,./santedb-mdm/bin/Release/data,./bin/Release/config}
 
 # Restore, build and compile 
+git checkout $2
+git pull
 ./submodule-pull.sh $2
 msbuild /t:clean /t:restore santedb-server-ext.sln /p:VersionNumber=$1 /m || exit 911
 msbuild /t:build /p:Configuration=Release santedb-server-ext.sln /p:VersionNumber=$1 /p:NoFirebird=1 /m || exit 911
-
 
 # Build the tarball structure
 if [ -d santedb-server-$1 ]; then
@@ -65,6 +66,6 @@ fi;
 
 # Download the VC++ and NETFX Redist and expand the FireBird reference libraries
 unzip -o ./Solution\ Items/FirebirdSQL-3.0.3-Embedded.zip -d ./bin/Release/
-wget -q -O - https://download.microsoft.com/download/3/2/2/3224B87F-CFA0-4E70-BDA3-3DE650EFEBA5/vcredist_x64.exe > ./installer/vc2010.exe
+wget -q -O - https://aka.ms/vs/17/release/vc_redist.x64.exe > ./installer/vc_redist.x64.exe
 wget -q -O - https://download.visualstudio.microsoft.com/download/pr/014120d7-d689-4305-befd-3cb711108212/1f81f3962f75eff5d83a60abd3a3ec7b/ndp48-web.exe > ./installer/netfx.exe
 /usr/bin/wine /opt/inno/ISCC.exe /o./bin/dist ./installer/santedb-icdr.iss /d"MyAppVersion=$1" /d"UNSIGNED=true" /d"MONO_BUILD"
