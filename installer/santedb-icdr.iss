@@ -327,7 +327,7 @@ Source: ..\bin\Release\SanteDB.Rest.HDSI.dll; DestDir: {app}; Components: msg\hd
 Source: ..\bin\Release\MimeMapping.dll; DestDir: {app};
 Source: ..\bin\Release\MimeTypesMap.dll; DestDir: {app};
 Source: ..\bin\Release\Polly.dll; DestDir: {app};
-Source: ..\bin\Release\net*.dll; DestDir: {app}; Components: core server
+;Source: ..\bin\Release\net*.dll; DestDir: {app}; Components: core server
 Source: ..\bin\Release\System.*.dll; DestDir: {app}; 
 Source: ..\bin\Release\Microsoft.*.dll; Excludes: Microsoft.Data.Sqlite.dll; DestDir: {app}; 
 
