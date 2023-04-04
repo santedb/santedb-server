@@ -45,13 +45,13 @@ cp ../bin/Release/*.config ./
 cp ../bin/Release/*.xml ./
 cp ../bin/Release/*.exe ./
 cp ../bin/Release/*.exe.config ./
-mkdir -p {elbonia/data,applets,data/sql,config,schema}
-cp ../bin/Release/data/*.dataset ./data
-cp ../bin/Release/data/SQL/* ./data/sql -r
+mkdir -p {Elbonia/Data,applets,Data/SQL,config,schema}
+cp ../bin/Release/Data/*.dataset ./Data
+cp ../bin/Release/Data/SQL/* ./Data/sql -r
 cp ../bin/Release/config/* ./config
 cp ../bin/Release/applets/*.pak ./applets
-cp ../SanteDB/data/demo/* elbonia/data
-cp ../SanteDB/data/*.FDB elbonia
+cp ../SanteDB/Data/Demo/* Elbonia/Data
+cp ../SanteDB/data/*.FDB Elbonia
 
 cd ..
 rmdir ./bin/dist -r
