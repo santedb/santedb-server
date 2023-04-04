@@ -150,7 +150,7 @@ Source: ..\bin\Release\SanteDB.Rest.AMI.dll; DestDir: {app}; Components: msg\ami
 Source: ..\bin\release\config\*.*; DestDir: {app}\config; Components: server; 
 Source: "..\bin\release\config\template\Standard SanteDB.xml"; DestDir: {app}\config; Components: server
 ; Data Stuff
-Source: ..\bin\release\data\*.dataset; DestDir: {app}\data; Components: server
+Source: ..\bin\release\Data\*.dataset; DestDir: {app}\data; Components: server
 Source: ..\bin\release\applets\*.pak; DestDir: {app}\applets; Components: server
 
 ; Tools

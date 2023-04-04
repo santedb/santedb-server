@@ -28,13 +28,13 @@ msbuild /t:build /p:Configuration=Release santedb-server-ext.sln /p:VersionNumbe
 
 # MSBUILD on linux doesn't copy over documentation files for dependent projects so we're going to copy them manually
 cp ./santedb-model/bin/Release/*.XML ./bin/Release/ 
-cp -v ./santedb-fhir/SanteDB.Messaging.FHIR/Data/* ./bin/Release/data/
-cp -v ./santedb-hl7/SanteDB.Messaging.HL7/Data/* ./bin/Release/data/
-cp -v ./santedb-gs1/SanteDB.Messaging.GS1/Data/* ./bin/Release/data/
-cp -v ./santedb-mdm/SanteDB.Persistence.MDM/Data/* ./bin/Release/data
+cp -v ./santedb-fhir/SanteDB.Messaging.FHIR/Data/* ./bin/Release/Data/
+cp -v ./santedb-hl7/SanteDB.Messaging.HL7/Data/* ./bin/Release/Data/
+cp -v ./santedb-gs1/SanteDB.Messaging.GS1/Data/* ./bin/Release/Data/
+cp -v ./santedb-mdm/SanteDB.Persistence.MDM/Data/* ./bin/Release/Data
 cp -v ./SanteDB/config/* ./bin/Release/config/
 mkdir -p ./bin/Release/data/SQL
-cp -rv ./SanteDB.Persistence.Data.ADO/Data/SQL/* ./bin/Release/data/SQL/
+cp -rv ./SanteDB.Persistence.Data.ADO/Data/SQL/* ./bin/Release/Data/SQL/
 
 mkdir santedb-server-$1
 cd santedb-server-$1
