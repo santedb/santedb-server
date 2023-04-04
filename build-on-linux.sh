@@ -10,7 +10,7 @@ fi;
 declare build_dir=`pwd`
 echo "Build in ${build_dir}"
 
-mkdir -p {./bin/Release/data,./santedb-fhir/bin/Release/data,./santedb-hl7/bin/Release/data,./santedb-gs1/bin/Release/data,./santedb-mdm/bin/Release/data,./bin/Release/config,./santedb-tools/bin/Release/net4.8/Data}
+mkdir -p {./bin/Release/Data,./santedb-fhir/bin/Release/Data,./santedb-hl7/bin/Release/Data,./santedb-gs1/bin/Release/Data,./santedb-mdm/bin/Release/Data,./bin/Release/config,./santedb-tools/bin/Release/net4.8/Data,./santedb-match/SanteDB.Matcher/bin/Release/Data}
 
 # Build the tarball structure
 if [ -d santedb-server-$1 ]; then
@@ -31,6 +31,7 @@ cp ./santedb-model/bin/Release/*.XML ./bin/Release/
 cp -v ./santedb-fhir/SanteDB.Messaging.FHIR/Data/* ./bin/Release/data/
 cp -v ./santedb-hl7/SanteDB.Messaging.HL7/Data/* ./bin/Release/data/
 cp -v ./santedb-gs1/SanteDB.Messaging.GS1/Data/* ./bin/Release/data/
+cp -v ./santedb-mdm/SanteDB.Persistence.MDM/Data/* ./bin/Release/data
 cp -v ./SanteDB/config/* ./bin/Release/config/
 mkdir -p ./bin/Release/data/SQL
 cp -rv ./SanteDB.Persistence.Data.ADO/Data/SQL/* ./bin/Release/data/SQL/
