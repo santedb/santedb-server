@@ -52,7 +52,7 @@ namespace SanteDB.Messaging.HDSI.Test
             {
                 { "sub", () => new Patient() { Key = Guid.Empty } },
                 { "sub2", () => new Patient() { Key = Guid.Empty } }
-            }, safeNullable: false, lazyExpandVariables: false);
+            }, safeNullable: false, lazyExpandVariables: false, relayControlVariables: true);
             Assert.IsTrue((bool)linq.Compile().DynamicInvoke(new Patient() { DateOfBirth = DateTime.Now }));
 
             // Re-parse
