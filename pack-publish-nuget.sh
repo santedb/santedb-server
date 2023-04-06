@@ -9,11 +9,11 @@ build_nuget_cwd() {
         fi
         if [ -d ./bin/publish ]; then
         	for N in ./bin/publish/*.nupkg; do
-                	dotnet nuget push -s http://$4/v3/index.json -k `cat $2` ${N}
+                	dotnet nuget push -s $4/v3/index.json -k `cat $2` ${N}
                 done
 
 		for N in ./bin/publish/*.snupkg; do
-			dotnet nuget push -s http://$4/v3/index.json -k `cat $2` ${N}
+			dotnet nuget push -s $4/v3/index.json -k `cat $2` ${N}
 		done
                 rm -rfv ./bin/publish
         fi
@@ -21,7 +21,7 @@ build_nuget_cwd() {
 
 if (( $# < 4 ))
 then
-	echo "Use: pack-publish-nuget.sh VERSION_ID YOUR_API_KEY CONFIGURATION SERVER"
+	echo "Use: pack-publish-nuget.sh VERSION_ID API_FILE CONFIGURATION SERVER"
 	exit -1;
 fi;
 
