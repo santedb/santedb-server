@@ -9,11 +9,11 @@ build_nuget_cwd() {
         fi
         if [ -d ./bin/publish ]; then
         	for N in ./bin/publish/*.nupkg; do
-                	dotnet nuget push -s http://$4/v3/index.json -k $2 ${N}
+                	dotnet nuget push -s http://$4/v3/index.json -k `cat $2` ${N}
                 done
 
 		for N in ./bin/publish/*.snupkg; do
-			dotnet nuget push -s http://$4/v3/index.json -k $2 ${N}
+			dotnet nuget push -s http://$4/v3/index.json -k `cat $2` ${N}
 		done
                 rm -rfv ./bin/publish
         fi
