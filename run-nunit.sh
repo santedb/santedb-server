@@ -23,6 +23,14 @@ test_all_recursive() {
 		test_run "bin/Release/net48"
 	elif [ -d "./bin/Release" ]; then
 		test_run "bin/Release"
+	elif [ -d "./bin/Debug/netstandard2.0" ]; then
+                test_run "bin/Debug/netstandard2.0"
+        elif [ -d "./bin/Debug/net4.8" ]; then
+                test_run "bin/Debug/net4.8"
+        elif [ -d "./bin/Debug/net48" ]; then
+                test_run "bin/Release/net48"
+        elif [ -d "./bin/Debug" ]; then
+                test_run "bin/Debug"
 	fi
 	for D in *; do
 		if [ -d "${D}" ]; then
