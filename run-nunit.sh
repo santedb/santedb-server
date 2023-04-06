@@ -7,8 +7,11 @@ test_run() {
 		echo "Discovering Test Projects in `pwd`/$1"
 		for S in $1/*Test*.dll; do
         		if [ -f "${S}" ]; then
-				echo "Executing Tests in `pwd`/${S}"
-				mono /opt/nunit3/nunit3-console.exe "${S}"
+					if [ "${S}" == "NUnit3.TestAdapter.dll" ]; then 
+						echo Skipping
+					else
+						echo "Executing Tests in `pwd`/${S}"
+						mono /opt/nunit3/nunit3-console.exe "${S}"
 	                fi
         	done
 	fi
