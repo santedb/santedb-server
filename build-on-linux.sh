@@ -25,7 +25,7 @@ msbuild /p:Configuration=$3 /t:clean /t:restore santedb-server-ext.sln /p:Versio
 msbuild /t:build /p:Configuration=$3 santedb-server-ext.sln /p:VersionNumber=$1 /p:NoFirebird=1 || exit 911
 
 
-if [ "$3" =~ "Release" ]; then
+if [ "$3" == "Release" ]; then
 	./sign-release.sh
 	# MSBUILD on linux doesn't copy over documentation files for dependent projects so we're going to copy them manually
 	cp ./santedb-model/bin/Release/*.XML ./bin/Release/ 
