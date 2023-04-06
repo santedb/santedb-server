@@ -13,6 +13,7 @@ test_run() {
 						echo "Executing Tests in `pwd`/${S}"
 						mono /opt/nunit3/nunit3-console.exe "${S}"
 	                fi
+				fi
         	done
 	fi
 }
