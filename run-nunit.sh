@@ -17,20 +17,27 @@ test_run() {
 test_all_recursive() {
 	if [ -d "./bin/Release/netstandard2.0" ]; then
 		test_run "bin/Release/netstandard2.0"
-	elif [ -d "./bin/Release/net4.8" ]; then
+	fi 
+	if [ -d "./bin/Release/net4.8" ]; then
 		test_run "bin/Release/net4.8"
-	elif [ -d "./bin/Release/net48" ]; then
+	fi
+	if [ -d "./bin/Release/net48" ]; then
 		test_run "bin/Release/net48"
-	elif [ -d "./bin/Release" ]; then
+	fi 
+	if [ -d "./bin/Release" ]; then
 		test_run "bin/Release"
-	elif [ -d "./bin/Debug/netstandard2.0" ]; then
-                test_run "bin/Debug/netstandard2.0"
-        elif [ -d "./bin/Debug/net4.8" ]; then
-                test_run "bin/Debug/net4.8"
-        elif [ -d "./bin/Debug/net48" ]; then
-                test_run "bin/Release/net48"
-        elif [ -d "./bin/Debug" ]; then
-                test_run "bin/Debug"
+	fi 
+	if [ -d "./bin/Debug/netstandard2.0" ]; then
+		test_run "bin/Debug/netstandard2.0"
+	fi 
+	if [ -d "./bin/Debug/net4.8" ]; then
+		test_run "bin/Debug/net4.8"
+	fi 
+	if [ -d "./bin/Debug/net48" ]; then
+		test_run "bin/Debug/net48"
+	fi
+	if [ -d "./bin/Debug" ]; then
+		test_run "bin/Debug"
 	fi
 	for D in *; do
 		if [ -d "${D}" ]; then
