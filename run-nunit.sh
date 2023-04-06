@@ -5,7 +5,7 @@ declare cwd=`pwd`
 test_run() {
 	if [ -d $1 ]; then
 		echo "Discovering Test Projects in `pwd`/$1"
-		for S in $1/*Test.dll; do
+		for S in {$1/*Test.dll, $1/*Test*.dll}; do
         		if [ -f "${S}" ]; then
 				echo "Executing Tests in `pwd`/${S}"
 				mono /opt/nunit3/nunit3-console.exe "${S}"
