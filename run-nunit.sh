@@ -19,7 +19,7 @@ test_run() {
 }
 
 test_all_recursive() {
-	if [ -f "skip-test-linux"]; then
+	if [ -f "skip-test-linux" ]; then
 		echo "Skipping directory `pwd`"
 	else 
 		if [ -d "./bin/Release/netstandard2.0" ]; then
