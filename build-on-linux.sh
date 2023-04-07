@@ -21,12 +21,11 @@ fi;
 git checkout $2
 git pull
 ./submodule-pull.sh $2
-
-unix2dos santedb-hl7/SanteDB.Messaging.HL7.Test/Resources/*.txt
- 
 msbuild /p:Configuration=$3 /t:clean /t:restore santedb-server-ext.sln /p:VersionNumber=$1 || exit 911
 msbuild /t:build /p:Configuration=$3 santedb-server-ext.sln /p:VersionNumber=$1 /p:NoFirebird=1 || exit 911
 
+ln -s /usr/lib/x86_64-linux-gnu/libfbclient.so ./santedb-data/SanteDB.Persistence.Data.Test/bin/$3/net48/libfbclient.so
+ln -s /usr/lib/x86_64-linux-gnu/libfbclient.so /workspace/santedb-icdr-v3/santedb-mdm/SanteDB.Persistence.MDM.Test/bin/$3/net48/libfbclient.so
 
 if [ "$3" == "Release" ]; then
 	./sign-release.sh
