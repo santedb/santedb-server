@@ -11,7 +11,7 @@ test_run() {
 						echo Skipping
 					else
 						echo "Executing Tests in `pwd`/${S}"
-						mono /opt/nunit3/nunit3-console.exe "${S}"
+						mono /opt/nunit3/nunit3-console.exe "${S}" --inprocess
 	                fi
 				fi
         	done
