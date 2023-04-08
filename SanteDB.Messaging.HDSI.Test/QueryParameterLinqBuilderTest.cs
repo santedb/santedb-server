@@ -60,7 +60,16 @@ namespace SanteDB.Messaging.HDSI.Test
         [Test]
         public void TestBuildGuardMultiUuid()
         {
-            String expected = "o => o.Names.Where(guard => ((guard.NameUseKey == Convert(effe122d-8d30-491d-805d-addcb4466c35)) OrElse (guard.NameUseKey == Convert(95e6843a-26ff-4046-b6f4-eb440d4b85f7)))).Any(name => name.Component.Any(component => (component.Value == \"SMITH\")))";
+
+            String expected = String.Empty;
+            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+            {
+                expected = "o => o.Names.Where(guard => ((guard.NameUseKey == Convert(effe122d-8d30-491d-805d-addcb4466c35)) OrElse (guard.NameUseKey == Convert(95e6843a-26ff-4046-b6f4-eb440d4b85f7)))).Any(name => name.Component.Any(component => (component.Value == \"SMITH\")))";
+            }
+            else // Mono => Mono represents Convert with the type
+            {
+                expected = "o => o.Names.Where(guard => ((guard.NameUseKey == Convert(effe122d-8d30-491d-805d-addcb4466c35, Nullable`1)) OrElse (guard.NameUseKey == Convert(95e6843a-26ff-4046-b6f4-eb440d4b85f7, Nullable`1)))).Any(name => name.Component.Any(component => (component.Value == \"SMITH\")))";
+            }
 
             NameValueCollection httpQueryParameters = new NameValueCollection();
             httpQueryParameters.Add($"name[{NameUseKeys.Legal}|{NameUseKeys.Anonymous}].component.value", "SMITH");
@@ -74,8 +83,16 @@ namespace SanteDB.Messaging.HDSI.Test
         [Test]
         public void TestBuildGuardUuid()
         {
-            String expected = "o => o.Names.Where(guard => (guard.NameUseKey == Convert(effe122d-8d30-491d-805d-addcb4466c35))).Any(name => name.Component.Any(component => (component.Value == \"SMITH\")))";
 
+            String expected = String.Empty;
+            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+            {
+                expected = "o => o.Names.Where(guard => (guard.NameUseKey == Convert(effe122d-8d30-491d-805d-addcb4466c35))).Any(name => name.Component.Any(component => (component.Value == \"SMITH\")))";
+            }
+            else
+            {
+                expected = "o => o.Names.Where(guard => (guard.NameUseKey == Convert(effe122d-8d30-491d-805d-addcb4466c35, Nullable`1))).Any(name => name.Component.Any(component => (component.Value == \"SMITH\")))";
+            }
             NameValueCollection httpQueryParameters = new NameValueCollection();
             httpQueryParameters.Add($"name[{NameUseKeys.Legal}].component.value", "SMITH");
             var expr = QueryExpressionParser.BuildLinqExpression<Patient>(httpQueryParameters);
@@ -374,7 +391,16 @@ namespace SanteDB.Messaging.HDSI.Test
         [Test]
         public void TestExtendedQueryFilterWithParameterVariableComplexPathParse()
         {
-            var expected = "o => ((o.DateOfBirth != null) AndAlso (o.DateOfBirth.Value.TestExpressionEx((Invoke(__xinstance => (((__xinstance.LoadCollection(\"Relationships\", False).Where(guard => ((guard.LoadProperty(\"RelationshipType\", False) ?? new Concept()).Mnemonic == \"Mother\")).FirstOrDefault() ?? new EntityRelationship()).LoadProperty(\"TargetEntity\", False) As Patient) ?? new Patient()).DateOfBirth, Convert(value(SanteDB.Messaging.HDSI.Test.QueryParameterLinqBuilderTest+<>c).<TestExtendedQueryFilterWithParameterVariableComplexPathParse>b__22_0())) ?? default(DateTime))) > 730.12:00:00))";
+            var expected = String.Empty;
+            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+            {
+                expected = "o => ((o.DateOfBirth != null) AndAlso (o.DateOfBirth.Value.TestExpressionEx((Invoke(__xinstance => (((__xinstance.LoadCollection(\"Relationships\", False).Where(guard => ((guard.LoadProperty(\"RelationshipType\", False) ?? new Concept()).Mnemonic == \"Mother\")).FirstOrDefault() ?? new EntityRelationship()).LoadProperty(\"TargetEntity\", False) As Patient) ?? new Patient()).DateOfBirth, Convert(value(SanteDB.Messaging.HDSI.Test.QueryParameterLinqBuilderTest+<>c).<TestExtendedQueryFilterWithParameterVariableComplexPathParse>b__22_0())) ?? default(DateTime))) > 730.12:00:00))";
+            }
+            else // mono represent convert with type
+            {
+                expected = "o => ((o.DateOfBirth != null) AndAlso (o.DateOfBirth.Value.TestExpressionEx((Invoke(__xinstance => (((__xinstance.LoadCollection(\"Relationships\", False).Where(guard => ((guard.LoadProperty(\"RelationshipType\", False) ?? new Concept()).Mnemonic == \"Mother\")).FirstOrDefault() ?? new EntityRelationship()).LoadProperty(\"TargetEntity\", False) As Patient) ?? new Patient()).DateOfBirth, Convert(value(SanteDB.Messaging.HDSI.Test.QueryParameterLinqBuilderTest+<>c).<TestExtendedQueryFilterWithParameterVariableComplexPathParse>b__22_0(), Patient)) ?? default(DateTime))) > 730.12:00:00))";
+
+            }
             QueryFilterExtensions.AddExtendedFilter(new SimpleQueryExtensionEx());
             NameValueCollection httpQueryParameters = new NameValueCollection();
             httpQueryParameters.Add("dateOfBirth", ":(testEx|$input.relationship[Mother].target@Patient.dateOfBirth)>2y");
