@@ -1,4 +1,24 @@
-﻿using SanteDB.Core.Notifications;
+﻿/*
+ * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
+ * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you
+ * may not use this file except in compliance with the License. You may
+ * obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ * User: fyfej
+ * Date: 2023-3-10
+ */
+using SanteDB.Core.Notifications;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Services;
@@ -12,6 +32,9 @@ using System.Linq;
 
 namespace SanteDB.Security.Tfa.Twilio
 {
+    /// <summary>
+    /// Represents a <see cref="ITfaMechanism"/> which uses SMS text messages
+    /// </summary>
     public class TfaSmsMechanism : ITfaMechanism
     {
         private static readonly Guid s_TfaMechanismId = Guid.Parse("08124835-6C24-43C9-8650-9D605F6B5BD6");
@@ -21,6 +44,9 @@ namespace SanteDB.Security.Tfa.Twilio
         readonly ITfaCodeProvider _TfaCodeProvider;
         readonly ITfaSecretManager _TfaSecretManager;
 
+        /// <summary>
+        /// DI constructor
+        /// </summary>
         public TfaSmsMechanism(INotificationService notificationService, ITfaCodeProvider tfaCodeProvider, ITfaSecretManager secretManager)
         {
             _NotificationService = notificationService;
@@ -28,10 +54,13 @@ namespace SanteDB.Security.Tfa.Twilio
             _TfaSecretManager = secretManager;
         }
 
+        /// <inheritdoc/>
         public Guid Id => s_TfaMechanismId;
 
+        /// <inheritdoc/>
         public string Name => "org.santedb.tfa.sms";
 
+        /// <inheritdoc/>
         public string Send(IIdentity user)
         {
             if (null == user)
@@ -92,6 +121,7 @@ namespace SanteDB.Security.Tfa.Twilio
             }
         }
 
+        /// <inheritdoc/>
         public bool Validate(IIdentity user, string secret)
         {
             if (null == user)

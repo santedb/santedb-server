@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2022, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  *
@@ -16,7 +16,7 @@
  * the License.
  *
  * User: fyfej
- * Date: 2022-5-30
+ * Date: 2023-3-10
  */
 using NUnit.Framework;
 using SanteDB.Core.Model.Constants;
@@ -43,7 +43,7 @@ namespace SanteDB.Messaging.HDSI.Test
         public void TestComposeControlParameters()
         {
             var query = "dateOfBirth=!null&_someOtherValue=true".ParseQueryString();
-            var linq = QueryExpressionParser.BuildLinqExpression<Patient>(query);
+            var linq = QueryExpressionParser.BuildLinqExpression<Patient>(query, relayControlVariables: true);
             Assert.IsTrue(linq.ToString().Contains("WithControl"));
             Assert.IsTrue((bool)linq.Compile().DynamicInvoke(new Patient() { DateOfBirth = DateTime.Now }));
 
@@ -52,13 +52,13 @@ namespace SanteDB.Messaging.HDSI.Test
             {
                 { "sub", () => new Patient() { Key = Guid.Empty } },
                 { "sub2", () => new Patient() { Key = Guid.Empty } }
-            }, safeNullable: false, lazyExpandVariables: false);
+            }, safeNullable: false, lazyExpandVariables: false, relayControlVariables: true);
             Assert.IsTrue((bool)linq.Compile().DynamicInvoke(new Patient() { DateOfBirth = DateTime.Now }));
 
             // Re-parse
             var parsedQuery = QueryExpressionBuilder.BuildQuery(linq);
             var parsedQueryString = parsedQuery.ToHttpString();
-            Assert.AreEqual(parsedQueryString, "dateOfBirth=%21null&_sub=00000000-0000-0000-0000-000000000000&_sub=00000000-0000-0000-0000-000000000000");
+            Assert.AreEqual("dateOfBirth=%21null&_sub=00000000-0000-0000-0000-000000000000&_sub=00000000-0000-0000-0000-000000000000", parsedQueryString);
         }
 
         /// <summary>
