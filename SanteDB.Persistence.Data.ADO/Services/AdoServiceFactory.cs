@@ -16,6 +16,7 @@ using SanteDB.Core.Model.Attributes;
 using SanteDB.Persistence.Data.ADO.Data;
 using SanteDB.Persistence.Data.ADO.Services.Persistence;
 using SanteDB.Core.Interfaces;
+using SanteDB.Persistence.Data.ADO.Data.Model.DataType;
 
 namespace SanteDB.Persistence.Data.ADO.Services
 {
@@ -311,6 +312,9 @@ namespace SanteDB.Persistence.Data.ADO.Services
                     }
 
                     this.m_tracer.TraceVerbose("Creating map {0} > {1}", modelClassType, domainClassType);
+
+                    if (domainClassType == typeof(DbIdentifierType))
+                        System.Diagnostics.Debugger.Break();
 
                     if (this.m_persistenceCache.ContainsKey(modelClassType))
                         this.m_tracer.TraceWarning("Duplicate initialization of {0}", modelClassType);
