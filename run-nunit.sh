@@ -11,7 +11,7 @@ test_run() {
 						echo Skipping
 					else
 						echo "Executing Tests in `pwd`/${S}"
-						mono /opt/nunit3/nunit3-console.exe "${S}"
+						mono /opt/nunit3/nunit3-console.exe "${S}" --inprocess
 	                fi
 				fi
         	done
@@ -19,37 +19,41 @@ test_run() {
 }
 
 test_all_recursive() {
-	if [ -d "./bin/Release/netstandard2.0" ]; then
-		test_run "bin/Release/netstandard2.0"
-	fi 
-	if [ -d "./bin/Release/net4.8" ]; then
-		test_run "bin/Release/net4.8"
-	fi
-	if [ -d "./bin/Release/net48" ]; then
-		test_run "bin/Release/net48"
-	fi 
-	if [ -d "./bin/Release" ]; then
-		test_run "bin/Release"
-	fi 
-	if [ -d "./bin/Debug/netstandard2.0" ]; then
-		test_run "bin/Debug/netstandard2.0"
-	fi 
-	if [ -d "./bin/Debug/net4.8" ]; then
-		test_run "bin/Debug/net4.8"
-	fi 
-	if [ -d "./bin/Debug/net48" ]; then
-		test_run "bin/Debug/net48"
-	fi
-	if [ -d "./bin/Debug" ]; then
-		test_run "bin/Debug"
-	fi
-	for D in *; do
-		if [ -d "${D}" ]; then
-			cd "${D}"
-			test_all_recursive
-			cd ..
+	if [ -f "skip-test-linux" ]; then
+		echo "Skipping directory `pwd`"
+	else 
+		if [ -d "./bin/Release/netstandard2.0" ]; then
+			test_run "bin/Release/netstandard2.0"
+		fi 
+		if [ -d "./bin/Release/net4.8" ]; then
+			test_run "bin/Release/net4.8"
 		fi
-	done
+		if [ -d "./bin/Release/net48" ]; then
+			test_run "bin/Release/net48"
+		fi 
+		if [ -d "./bin/Release" ]; then
+			test_run "bin/Release"
+		fi 
+		if [ -d "./bin/Debug/netstandard2.0" ]; then
+			test_run "bin/Debug/netstandard2.0"
+		fi 
+		if [ -d "./bin/Debug/net4.8" ]; then
+			test_run "bin/Debug/net4.8"
+		fi 
+		if [ -d "./bin/Debug/net48" ]; then
+			test_run "bin/Debug/net48"
+		fi
+		if [ -d "./bin/Debug" ]; then
+			test_run "bin/Debug"
+		fi
+		for D in *; do
+			if [ -d "${D}" ]; then
+				cd "${D}"
+				test_all_recursive
+				cd ..
+			fi
+		done
+	fi
 }
 
 test_all_recursive

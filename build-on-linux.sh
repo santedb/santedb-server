@@ -12,6 +12,7 @@ echo "Build in ${build_dir}"
 
 mkdir -p {./bin/Release/Data,./santedb-fhir/bin/Release/Data,./santedb-hl7/bin/Release/Data,./santedb-gs1/bin/Release/Data,./santedb-mdm/bin/Release/Data,./bin/Release/config,./santedb-tools/bin/Release/net4.8/Data,./santedb-match/SanteDB.Matcher/bin/Release/Data}
 
+unix2dos ./santedb-hl7/SanteDB.Messaging.HL7.Test/Resources/*.txt
 # Build the tarball structure
 if [ -d santedb-server-$1 ]; then
         rmdir -r santedb-server-$1;
@@ -21,12 +22,8 @@ fi;
 git checkout $2
 git pull
 ./submodule-pull.sh $2
-
-unix2dos santedb-hl7/SanteDB.Messaging.HL7.Test/Resources/*.txt
- 
 msbuild /p:Configuration=$3 /t:clean /t:restore santedb-server-ext.sln /p:VersionNumber=$1 || exit 911
 msbuild /t:build /p:Configuration=$3 santedb-server-ext.sln /p:VersionNumber=$1 /p:NoFirebird=1 || exit 911
-
 
 if [ "$3" == "Release" ]; then
 	./sign-release.sh
