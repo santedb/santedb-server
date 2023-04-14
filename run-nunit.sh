@@ -9,9 +9,11 @@ test_run() {
         		if [ -f "${S}" ]; then
 					if [ "${S}" == "NUnit3.TestAdapter.dll" ]; then 
 						echo Skipping
+					elif [ "${S}" =~ ^.*TestFramework.*$ ]; then 
+						echo Skipping
 					else
 						echo "Executing Tests in `pwd`/${S}"
-						mono /opt/nunit3/nunit3-console.exe "${S}" --inprocess
+						mono /opt/nunit3/nunit3-console.exe "${S}" --inprocess --skipnontestassemblies
 	                fi
 				fi
         	done
