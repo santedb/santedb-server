@@ -62,6 +62,8 @@ namespace SanteDB.Configuration.Tasks
             typeof(PubSubBroker),
             typeof(AppletBiRepository),
             typeof(LocalBiRenderService),
+            typeof(InMemoryPivotProvider),
+            typeof(DefaultDatamartManager),
             typeof(DefaultNotificationService),
             typeof(LocalTemplateDefinitionRepositoryService),
             typeof(DefaultDataSigningService),
