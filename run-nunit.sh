@@ -7,7 +7,7 @@ test_run() {
 		echo "Discovering Test Projects in `pwd`/$1"
 		for S in $1/*Test*.dll; do
         		if [ -f "${S}" ]; then
-					if [ "${S}" == "NUnit3.TestAdapter.dll" ]; then 
+					if [[ "${S}" =~ ^.*NUnit3.* ]]; then 
 						echo Skipping
 					elif [[ "${S}" =~ ^.*TestFramework.*$ ]]; then 
 						echo Skipping
