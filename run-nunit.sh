@@ -9,7 +9,7 @@ test_run() {
         		if [ -f "${S}" ]; then
 					if [ "${S}" == "NUnit3.TestAdapter.dll" ]; then 
 						echo Skipping
-					elif [ "${S}" =~ ^.*TestFramework.*$ ]; then 
+					elif [[ "${S}" =~ ^.*TestFramework.*$ ]]; then 
 						echo Skipping
 					else
 						echo "Executing Tests in `pwd`/${S}"
