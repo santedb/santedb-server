@@ -7,11 +7,13 @@ test_run() {
 		echo "Discovering Test Projects in `pwd`/$1"
 		for S in $1/*Test*.dll; do
         		if [ -f "${S}" ]; then
-					if [ "${S}" == "NUnit3.TestAdapter.dll" ]; then 
+					if [[ "${S}" =~ ^.*NUnit3.* ]]; then 
+						echo Skipping
+					elif [[ "${S}" =~ ^.*TestFramework.*$ ]]; then 
 						echo Skipping
 					else
 						echo "Executing Tests in `pwd`/${S}"
-						mono --debug /opt/nunit3/nunit3-console.exe "${S}" --inprocess
+						mono /opt/nunit3/nunit3-console.exe "${S}" --inprocess --skipnontestassemblies
 	                fi
 				fi
         	done
