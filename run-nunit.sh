@@ -13,7 +13,7 @@ test_run() {
 						echo Skipping
 					else
 						echo "Executing Tests in `pwd`/${S}"
-						mono /opt/nunit3/nunit3-console.exe "${S}" --inprocess --skipnontestassemblies
+						mono --debug /opt/nunit3/nunit3-console.exe "${S}" --inprocess --skipnontestassemblies
 	                fi
 				fi
         	done
