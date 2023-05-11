@@ -27,7 +27,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Windows.Forms;
-
+using SanteDB.Core;
 namespace SanteDB.Configuration.Tasks
 {
     /// <summary>
@@ -73,7 +73,8 @@ namespace SanteDB.Configuration.Tasks
             }
             
             // Protect the configuration file?
-            if(configuration.Sections.OfType<IEncryptedConfigurationSection>().Any() && 
+
+            if(!configuration.IsMonoRuntime() && configuration.Sections.OfType<IEncryptedConfigurationSection>().Any() && 
                 configuration.ProtectedSectionKey == null && 
                 MessageBox.Show("Would you like to encrypt sensitive parts of the configuration file?", "Protect Configuration", MessageBoxButtons.YesNo) == DialogResult.Yes) 
             {

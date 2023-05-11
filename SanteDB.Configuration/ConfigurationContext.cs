@@ -153,7 +153,18 @@ namespace SanteDB.Configuration
             this.Configuration.AddSection(new OrmConfigurationSection
             {
                 AdoProvider = this.GetAllTypes().Where(t => typeof(DbProviderFactory).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface).Select(t => new ProviderRegistrationConfiguration(t.Namespace.StartsWith("System") ? t.Name : t.Namespace.Split('.')[0], t)).ToList(),
-                Providers = this.GetAllTypes().Where(t => typeof(IDbProvider).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface).Select(t => new ProviderRegistrationConfiguration((Activator.CreateInstance(t) as IDbProvider).Invariant, t)).ToList()
+                Providers = this.GetAllTypes().Where(t => typeof(IDbProvider).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface).Select(t =>
+                {
+                    try
+                    {
+                        return new ProviderRegistrationConfiguration((Activator.CreateInstance(t) as IDbProvider).Invariant, t);
+                    }
+                    catch (Exception e)
+                    {
+                        this.m_tracer.TraceError("Could not create provider {0} due to {1}", t.Name, e.ToHumanReadableString());
+                        return null;
+                    }
+                }).OfType<ProviderRegistrationConfiguration>().ToList()
             });
             this.Started?.Invoke(this, EventArgs.Empty);
         }

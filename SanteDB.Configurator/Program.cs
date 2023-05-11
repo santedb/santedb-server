@@ -73,7 +73,7 @@ namespace SanteDB.Configurator
             splash.Show();
 
             // Load assemblies
-            var fileList = Directory.GetFiles(cwd, "*.dll");
+            var fileList = Directory.GetFiles(cwd, "Sante*.dll");
             int i = 0;
             foreach (var file in fileList)
             {
@@ -146,12 +146,12 @@ namespace SanteDB.Configurator
             }
             catch (TargetInvocationException e)
             {
-                MessageBox.Show(CreateExceptionMessage(e), "Error Starting Config Tool");
+                MessageBox.Show(e.ToHumanReadableString(), "Error Starting Config Tool");
             }
             catch (Exception e)
             {
                 Console.WriteLine("Configuration Tooling Fatal Error: {0}", e);
-                MessageBox.Show(CreateExceptionMessage(e), "Error Starting Config Tool");
+                MessageBox.Show(e.ToHumanReadableString(), "Error Starting Config Tool");
             }
             finally
             {
@@ -159,23 +159,6 @@ namespace SanteDB.Configurator
             }
         }
 
-        /// <summary>
-        /// Create exception message
-        /// </summary>
-        private static string CreateExceptionMessage(Exception e)
-        {
-            var retVal = String.Empty;
-            while(e != null)
-            {
-                retVal += e;
-                e = e.InnerException;
-                if(e != null)
-                {
-                    retVal += " - Cause: ";
-                }
-            }
-            return retVal;
-        }
 
         /// <summary>
         /// Assembly resolution
