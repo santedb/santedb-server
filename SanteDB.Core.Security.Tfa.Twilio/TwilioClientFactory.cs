@@ -20,9 +20,6 @@
  */
 using SanteDB.Core.Security.Tfa.Twilio.Configuration;
 using SanteDB.Core.Services;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Twilio.Clients;
 
 namespace SanteDB.Security.Tfa.Twilio

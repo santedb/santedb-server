@@ -165,11 +165,11 @@ namespace SanteDB.Configurator
         private static string CreateExceptionMessage(Exception e)
         {
             var retVal = String.Empty;
-            while(e != null)
+            while (e != null)
             {
                 retVal += e;
                 e = e.InnerException;
-                if(e != null)
+                if (e != null)
                 {
                     retVal += " - Cause: ";
                 }

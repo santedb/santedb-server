@@ -22,7 +22,6 @@ using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Notifications;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using Twlo = global::Twilio;
 
 namespace SanteDB.Security.Tfa.Twilio

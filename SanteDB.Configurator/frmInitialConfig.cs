@@ -122,7 +122,7 @@ namespace SanteDB.Configurator
             });
 
             // Push the initial configuration features onto the service
-            if(rdoOpen.Checked)
+            if (rdoOpen.Checked)
             {
                 var dlgOpen = new OpenFileDialog()
                 {
