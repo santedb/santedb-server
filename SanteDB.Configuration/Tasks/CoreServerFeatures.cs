@@ -22,6 +22,7 @@ using SanteDB.BI.Services.Impl;
 using SanteDB.Core.Applets.Services.Impl;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Data.Initialization;
+using SanteDB.Core.Diagnostics.Tracing;
 using SanteDB.Core.Notifications;
 using SanteDB.Core.PubSub.Broker;
 using SanteDB.Core.Security;
@@ -56,6 +57,7 @@ namespace SanteDB.Configuration.Tasks
             typeof(DefaultNetworkInformationService),
             typeof(RestServiceFactory),
             typeof(LocalRepositoryFactory),
+            typeof(RolloverLogManagerService),
             typeof(ExemptablePolicyFilterService),
             typeof(LocalMailMessageService),
             typeof(LocalStockManagementRepositoryService),

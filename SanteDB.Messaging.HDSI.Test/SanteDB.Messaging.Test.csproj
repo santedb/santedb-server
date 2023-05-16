@@ -20,8 +20,6 @@
     <When Condition="$(SolutionName.Contains('-ext'))">
       <ItemGroup>
         <ProjectReference Include="..\santedb-model\SanteDB.Core.Model\SanteDB.Core.Model.csproj">
-          <Project>{F1A82A4F-4A57-47D7-AE76-444C8A4FF54A}</Project>
-          <Name>SanteDB.Core.Model</Name>
         </ProjectReference>
       </ItemGroup>
     </When>

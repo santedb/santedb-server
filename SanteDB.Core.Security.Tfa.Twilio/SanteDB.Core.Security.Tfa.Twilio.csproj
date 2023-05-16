@@ -49,16 +49,10 @@
     <When Condition="$(SolutionName.Contains('-ext'))">
       <ItemGroup>
         <ProjectReference Include="..\santedb-api\SanteDB.Core.Api\SanteDB.Core.Api.csproj">
-          <Project>{3A45F695-47A2-464C-ACE6-BDABBFA39FBC}</Project>
-          <Name>SanteDB.Core.Api</Name>
         </ProjectReference>
         <ProjectReference Include="..\santedb-model\SanteDB.Core.Model\SanteDB.Core.Model.csproj">
-          <Project>{F1A82A4F-4A57-47D7-AE76-444C8A4FF54A}</Project>
-          <Name>SanteDB.Core.Model</Name>
         </ProjectReference>
 		    <ProjectReference Include="..\santedb-i18n\SanteDB.Core.i18n\SanteDB.Core.i18n.csproj">
-      <Project>{CA7B81DC-B789-4AF6-A079-EC84259C101A}</Project>
-      <Name>SanteDB.Core.i18n</Name>
     </ProjectReference>
       </ItemGroup>
     </When>
