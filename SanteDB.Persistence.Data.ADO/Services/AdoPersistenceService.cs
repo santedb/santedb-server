@@ -56,6 +56,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
+using SanteDB.OrmLite.Migration;
 
 namespace SanteDB.Persistence.Data.ADO.Services
 {

@@ -72,6 +72,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                     {
                         NameUseKey = o.FirstOrDefault().Object2.UseConceptKey,
                         EffectiveVersionSequenceId = o.FirstOrDefault().Object2.EffectiveVersionSequenceId,
+                        ExternalKey = o.FirstOrDefault().Object2.ExternalKey,
                         Key = o.Key,
                         LoadState = Core.Model.LoadState.PartialLoad,
                         ObsoleteVersionSequenceId = o.FirstOrDefault().Object2.ObsoleteVersionSequenceId,

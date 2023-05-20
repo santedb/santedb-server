@@ -78,5 +78,11 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Entities
         /// </summary>
         [Column("conf")]
         public double? Strength { get; set; }
+
+        /// <summary>
+        /// External reference key
+        /// </summary>
+        [Column("ext_id")]
+        public String ExternalKey { get; set; }
     }
 }
