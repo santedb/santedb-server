@@ -348,7 +348,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             // Identifiers
             if (data.Identifiers != null)
             {
-                    data.Identifiers.RemoveAll(o => o.IsEmpty());
+                    data.Identifiers.RemoveAll(o => o == null || o.IsEmpty());
 
                     this.VerifyIdentities(context, data, assertedCreator);
                 // Assert
@@ -361,7 +361,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             // Relationships
             if (data.Relationships != null)
             {
-                data.Relationships.RemoveAll(o => o.IsEmpty());
+                data.Relationships.RemoveAll(o => o == null || o.IsEmpty());
                 base.UpdateVersionedAssociatedItems<Core.Model.Entities.EntityRelationship, DbEntityRelationship>(
                        data.Relationships.Distinct(new EntityRelationshipPersistenceService.Comparer()).Where(o => o != null && !o.InversionIndicator && !o.IsEmpty()).ToList(),
                         retVal,
@@ -371,7 +371,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             // Telecoms
             if (data.Telecoms != null)
             {
-                data.Telecoms.RemoveAll(o => o.IsEmpty());
+                data.Telecoms.RemoveAll(o => o == null || o.IsEmpty());
 
                 base.UpdateVersionedAssociatedItems<Core.Model.Entities.EntityTelecomAddress, DbTelecomAddress>(
                    data.Telecoms.Where(o => o != null && !o.IsEmpty()),
@@ -382,7 +382,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             // Extensions
             if (data.Extensions != null)
             {
-                data.Extensions.RemoveAll(o => o.IsEmpty());
+                data.Extensions.RemoveAll(o => o == null || o.IsEmpty());
                 base.UpdateVersionedAssociatedItems<Core.Model.DataTypes.EntityExtension, DbEntityExtension>(
                    data.Extensions.Where(o => o != null && !o.IsEmpty()),
                     retVal,
@@ -392,7 +392,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             // Names
             if (data.Names != null)
             {
-                data.Names.RemoveAll(o => o.IsEmpty());
+                data.Names.RemoveAll(o => o == null || o.IsEmpty());
                 base.UpdateVersionedAssociatedItems<Core.Model.Entities.EntityName, DbEntityName>(
                    data.Names.Where(o => o != null && !o.IsEmpty()),
                     retVal,
@@ -402,7 +402,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             // Addresses
             if (data.Addresses != null)
             {
-                data.Addresses.RemoveAll(o => o.IsEmpty());
+                data.Addresses.RemoveAll(o => o == null || o.IsEmpty());
 
                 base.UpdateVersionedAssociatedItems<Core.Model.Entities.EntityAddress, DbEntityAddress>(
                    data.Addresses.Where(o => o != null && !o.IsEmpty()),
@@ -413,7 +413,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             // Notes
             if (data.Notes != null)
             {
-                data.Notes.RemoveAll(o => o.IsEmpty());
+                data.Notes.RemoveAll(o => o == null || o.IsEmpty());
                 base.UpdateVersionedAssociatedItems<Core.Model.DataTypes.EntityNote, DbEntityNote>(
                    data.Notes.Where(o => o != null && !o.IsEmpty()),
                     retVal,
@@ -423,7 +423,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             // Tags
             if (data.Tags != null)
             {
-                data.Tags.RemoveAll(o => o.IsEmpty());
+                data.Tags.RemoveAll(o => o == null || o.IsEmpty());
                 base.UpdateAssociatedItems<Core.Model.DataTypes.EntityTag, DbEntityTag>(
                    data.Tags.Where(o => o != null && !o.IsEmpty() && !o.TagKey.StartsWith("$")),
                     retVal,
@@ -603,7 +603,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             // Identifiers
             if (data.Identifiers != null)
             {
-                data.Identifiers.RemoveAll(o => o.IsEmpty());
+                data.Identifiers.RemoveAll(o => o == null || o.IsEmpty());
 
                 this.VerifyIdentities(context, data, assertedCreator);
 
@@ -617,7 +617,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             // Relationships
             if (data.Relationships != null)
             {
-                data.Relationships.RemoveAll(o => o.IsEmpty());
+                data.Relationships.RemoveAll(o => o == null || o.IsEmpty());
 
                 base.UpdateVersionedAssociatedItems<Core.Model.Entities.EntityRelationship, DbEntityRelationship>(
                    data.Relationships,
@@ -628,7 +628,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             // Telecoms
             if (data.Telecoms != null)
             {
-                data.Telecoms.RemoveAll(o => o.IsEmpty());
+                data.Telecoms.RemoveAll(o => o == null || o.IsEmpty());
 
                 base.UpdateVersionedAssociatedItems<Core.Model.Entities.EntityTelecomAddress, DbTelecomAddress>(
                    data.Telecoms.Where(o => o != null && !o.IsEmpty()),
@@ -639,7 +639,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             // Extensions
             if (data.Extensions != null)
             {
-                data.Extensions.RemoveAll(o => o.IsEmpty());
+                data.Extensions.RemoveAll(o => o == null || o.IsEmpty());
                 base.UpdateVersionedAssociatedItems<Core.Model.DataTypes.EntityExtension, DbEntityExtension>(
                    data.Extensions.Where(o => o != null && !o.IsEmpty()),
                     retVal,
@@ -649,7 +649,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             // Names
             if (data.Names != null)
             {
-                data.Names.RemoveAll(o => o.IsEmpty());
+                data.Names.RemoveAll(o => o == null || o.IsEmpty());
 
                 base.UpdateVersionedAssociatedItems<Core.Model.Entities.EntityName, DbEntityName>(
                    data.Names.Where(o => o != null && !o.IsEmpty()),
@@ -660,7 +660,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             // Addresses
             if (data.Addresses != null)
             {
-                data.Addresses.RemoveAll(o => o.IsEmpty());
+                data.Addresses.RemoveAll(o => o == null || o.IsEmpty());
 
                 base.UpdateVersionedAssociatedItems<Core.Model.Entities.EntityAddress, DbEntityAddress>(
                    data.Addresses.Where(o => o != null && !o.IsEmpty()),
@@ -671,7 +671,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             // Notes
             if (data.Notes != null)
             {
-                data.Notes.RemoveAll(o => o.IsEmpty());
+                data.Notes.RemoveAll(o => o == null || o.IsEmpty());
 
                 base.UpdateVersionedAssociatedItems<Core.Model.DataTypes.EntityNote, DbEntityNote>(
                    data.Notes.Where(o => o != null && !o.IsEmpty()),
@@ -682,7 +682,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
             // Tags
             if (data.Tags != null)
             {
-                data.Tags.RemoveAll(o => o.IsEmpty());
+                data.Tags.RemoveAll(o => o == null || o.IsEmpty());
 
                 base.UpdateAssociatedItems<Core.Model.DataTypes.EntityTag, DbEntityTag>(
                    data.Tags.Where(o => o != null && !o.IsEmpty() && !o.TagKey.StartsWith("$")),
