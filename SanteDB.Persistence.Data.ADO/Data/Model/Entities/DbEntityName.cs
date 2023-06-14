@@ -45,7 +45,13 @@ namespace SanteDB.Persistence.Data.ADO.Data.Model.Entities
 			get;
 			set;
 		}
-	}
+
+        /// <summary>
+        /// External reference key
+        /// </summary>
+        [Column("ext_id")]
+        public String ExternalKey { get; set; }
+    }
 
     /// <summary>
     /// Represents a component of a name

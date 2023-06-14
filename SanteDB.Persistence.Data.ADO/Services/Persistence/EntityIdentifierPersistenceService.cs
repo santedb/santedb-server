@@ -57,7 +57,7 @@ namespace SanteDB.Persistence.Data.ADO.Services.Persistence
                 Key = identifier.Key,
                 SourceEntityKey = identifier.SourceKey,
                 ObsoleteVersionSequenceId = identifier.ObsoleteVersionSequenceId,
-                Value = identifier.Value
+                Value = identifier.Value,
             };
         }
 

@@ -62,10 +62,16 @@ namespace SanteDB.Persistence.Data.ADO.Test
                 Names = new List<EntityName>()
                 {
                     new EntityName(NameUseKeys.OfficialRecord, "Johnson", "William", "P.", "Bear")
+                    {
+                        ExternalKey = "I AM TEST"
+                    }
                 },
                 Addresses = new List<EntityAddress>()
                 {
                     new EntityAddress(AddressUseKeys.HomeAddress, "123 Main Street West", "Hamilton", "ON", "CA", "L8K5N2")
+                    {
+                        ExternalKey = "I AM TEST"
+                    }
                 },
                 Identifiers = new List<EntityIdentifier>()
                 {
@@ -128,12 +134,15 @@ namespace SanteDB.Persistence.Data.ADO.Test
             Assert.AreEqual(1, p.Addresses.Count);
             Assert.AreEqual(1, p.Identifiers.Count);
             Assert.AreEqual(1, p.Telecoms.Count);
-            Assert.AreEqual(1, p.Tags.Count);
+            Assert.AreEqual(1, p.LoadProperty(o=>o.Tags).Count);
             Assert.AreEqual(1, p.Notes.Count);
             Assert.AreEqual(EntityClassKeys.Patient, p.ClassConceptKey);
             Assert.AreEqual(DeterminerKeys.Specific, p.DeterminerConceptKey);
             Assert.AreEqual(StatusKeys.Active, p.StatusConceptKey);
 
+            // Ensure that the load recalls the external keys
+            var afterQuery = base.DoTestQuery(o => o.Key == afterInsert.Key, afterInsert.Key).FirstOrDefault();
+            Assert.AreEqual("I AM TEST", afterQuery.LoadProperty(o => o.Names).First().ExternalKey);
 
         }
 

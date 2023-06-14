@@ -34,6 +34,7 @@ using SanteDB.Core.Model.Map;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
 using SanteDB.OrmLite;
+using SanteDB.OrmLite.Migration;
 using SanteDB.Persistence.Data.ADO.Configuration;
 using SanteDB.Persistence.Data.ADO.Data.Hax;
 
@@ -213,6 +214,9 @@ namespace SanteDB.Persistence.Data.ADO.Services
                 this.m_queryBuilder = new QueryBuilder(this.m_mapper, GetConfiguration().Provider,
                     hax.Where(o => o != null).ToArray()
                 );
+
+                this.GetConfiguration().Provider.UpgradeSchema("SanteDB.Persistence.Data.ADO");
+
 
             }
             catch (ModelMapValidationException ex)
