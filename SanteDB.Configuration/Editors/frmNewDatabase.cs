@@ -59,7 +59,7 @@ namespace SanteDB.Configuration.Editors
             }
             set
             {
-
+                
                 this.m_connectionString = value;
                 this.txtOwner.Text = this.txtUserName.Text = value.GetComponent(this.Provider.Capabilities.UserNameSetting);
                 this.txtPassword.Text = value.GetComponent(this.Provider.Capabilities.PasswordSetting);

@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2021, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  *
@@ -16,20 +16,30 @@
  * the License.
  *
  * User: fyfej
- * Date: 2021-8-27
+ * Date: 2023-3-10
  */
-using SanteDB.Persistence.Data.ADO.Data.Model.DataType;
+using System.Diagnostics.CodeAnalysis;
+using SanteDB.Core;
+using SanteDB.Core.Data;
+using SanteDB.Core.Model.EntityLoader;
+using SanteDB.Core.Services.Impl;
 
-namespace SanteDB.Persistence.Data.ADO.Services.Persistence
+namespace SanteDB
 {
     /// <summary>
-    /// Represents a persistence service for an identifier type.
+    /// Server based application context
     /// </summary>
-    public class IdentifierTypePersistenceService : BaseDataPersistenceService<Core.Model.DataTypes.IdentifierType, DbIdentifierType>
-	{
+    [ExcludeFromCodeCoverage]
+    internal class ServerApplicationContext : SanteDBContextBase
+    {
 
-        public IdentifierTypePersistenceService(IAdoPersistenceSettingsProvider settingsProvider) : base(settingsProvider)
+        /// <summary>
+        /// Server application context
+        /// </summary>
+        public ServerApplicationContext(string configurationFile) : base(SanteDBHostType.Server, new FileConfigurationService(configurationFile, true))
         {
+            EntitySource.Current = new EntitySource(new PersistenceEntitySource());
         }
-	}
+
+    }
 }

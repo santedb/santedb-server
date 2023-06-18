@@ -18,8 +18,8 @@
  * User: fyfej
  * Date: 2023-3-10
  */
-using Newtonsoft.Json;
 using System.Diagnostics.CodeAnalysis;
+using Newtonsoft.Json;
 
 namespace SanteDB.Persistence.Diagnostics.Jira.Model
 {

@@ -18,9 +18,9 @@
  * User: fyfej
  * Date: 2023-3-10
  */
+using System.Diagnostics.CodeAnalysis;
 using MohawkCollege.Util.Console.Parameters;
 using SanteDB.Core;
-using System.Diagnostics.CodeAnalysis;
 using System.ServiceProcess;
 
 namespace SanteDB

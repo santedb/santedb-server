@@ -71,7 +71,7 @@ namespace SanteDB.Configuration.Tasks
             {
                 File.Copy(ConfigurationContext.Current.ConfigurationFile, this.m_backupFile, true);
             }
-
+            
             // Protect the configuration file?
 
             if(!configuration.IsMonoRuntime() && configuration.Sections.OfType<IEncryptedConfigurationSection>().Any() && 
@@ -84,7 +84,7 @@ namespace SanteDB.Configuration.Tasks
                     {
                         store.Open(OpenFlags.ReadOnly);
                         X509Certificate2Collection collection = new X509Certificate2Collection();
-                        foreach (var x509 in store.Certificates)
+                        foreach(var x509 in store.Certificates)
                         {
                             if (x509.HasPrivateKey)
                                 collection.Add(x509);

@@ -97,7 +97,7 @@ namespace SanteDB.Configurator
                 InitializeComponent();
                 this.PopulateConfiguration();
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 MessageBox.Show(e.ToString(), "Error Starting Configuration Tool");
             }

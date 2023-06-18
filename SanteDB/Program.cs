@@ -62,7 +62,6 @@ namespace SanteDB
             Trace.TraceInformation("SanteDB Working Directory : {0}", entryAsm.Location);
             Trace.TraceInformation("Operating System: {0} {1}", Environment.OSVersion.Platform, Environment.OSVersion.VersionString);
             Trace.TraceInformation("CLI Version: {0}", Environment.Version);
-
             AppDomain.CurrentDomain.SetData(
                "DataDirectory",
                Path.GetDirectoryName(typeof(Program).Assembly.Location)
@@ -264,7 +263,7 @@ namespace SanteDB
                             catch { }
                         }
                     }
-
+                 
                 }
                 else
                 {

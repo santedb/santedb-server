@@ -31,7 +31,7 @@
             <expression>dateOfBirth=!null</expression>
           </assert>
           <assert id="dob.future" name="Date of Birth in Future" priority="Warning">
-            <expression>dateOfBirth=&lt;$today</expression>
+            <expression>dateOfBirth=&lt;$now</expression>
           </assert>
           <assert id="address.required" name="Address Required" priority="Warning">
             <expression>address.component.value=!null</expression>

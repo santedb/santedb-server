@@ -22,6 +22,8 @@ using SanteDB.Core;
 using SanteDB.Core.Http;
 using SanteDB.Core.Services;
 using SanteDB.Persistence.Diagnostics.Jira.Model;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 
