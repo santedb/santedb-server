@@ -188,6 +188,26 @@ namespace SanteDB.Configurator
                 }
             }
 
+            // Try based on the file - note: NUGET for large projects sucks at version resolution since it just
+            // overwrites a file (for example System.Text.Json) with the last compiled version instead of the
+            // the newest so you get errors with System.Text.Json 7.0.0 not resolving when 7.0.3 is not available
+            var asmName = args.Name.Substring(0, args.Name.IndexOf(","));
+            var asmVersion = new Version(args.Name.Split(',').FirstOrDefault(o => o.StartsWith(" Version"))?.Substring(9));
+            var asmFile = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), asmName) + ".dll";
+            if(File.Exists(asmFile))
+            {
+                try
+                {
+                    
+                    var reflectionOnly = Assembly.ReflectionOnlyLoadFrom(asmFile);
+                    var reflectionVersion = reflectionOnly.GetName().Version;
+                    if(asmVersion.Major == reflectionVersion.Major && asmVersion.Minor == reflectionVersion.Minor)
+                    {
+                        return Assembly.LoadFrom(asmFile);
+                    }
+                }
+                catch { }
+            }
             return null;
         }
     }

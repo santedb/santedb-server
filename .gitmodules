@@ -17,7 +17,7 @@
 [submodule "santedb-orm"]
 	path = santedb-orm
 	url = https://github.com/santedb/santedb-orm.git
-	branch = master
+	branch = version/3.0
 [submodule "santedb-cdss"]
 	path = santedb-cdss
 	url = https://github.com/santedb/santedb-cdss
@@ -82,3 +82,5 @@
 	path = santedb-certs-bc
 	url = https://github.com/santedb/santedb-certs-bc.git
 
+[submodule "*"]
+	branch = version/3.0
