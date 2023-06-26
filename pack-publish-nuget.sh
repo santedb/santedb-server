@@ -15,7 +15,7 @@ build_nuget_cwd() {
 		for N in ./bin/publish/*.snupkg; do
 			dotnet nuget push -s $4/v3/index.json -k `cat $2` ${N} &
 		done
-                rm -rfv ./bin/publish
+                
         fi
 }
 
