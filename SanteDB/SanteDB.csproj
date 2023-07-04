@@ -165,6 +165,9 @@
     <None Include="data\000-DuplicateRelationshipType.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="data\000-IdentifierTypeRegistrations.dataset">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="data\000-IdentifierTypes.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
