@@ -38,7 +38,7 @@ WizardStyle=modern
 
 #ifndef UNSIGNED
 SignedUninstaller=yes
-SignTool=default /a /n $qFyfe Software$q /d $qSanteDB iCDR Admin Console$q $f
+SignTool=default sign /a /n $qFyfe Software$q /d $qSanteDB iCDR Admin Console$q $f
 #endif
 ; SignTool=default sign $f
 ; SignedUninstaller=yes
