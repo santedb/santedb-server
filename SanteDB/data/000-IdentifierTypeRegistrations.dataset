@@ -1,0 +1,94 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Identifier Type Registrations" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data">
+  <update insertIfNotExists="true">
+    <IdentifierType xmlns="http://santedb.org/model">
+      <id>89a399ce-1a8d-11ee-9ba6-73c5189b9fc9</id>
+      <typeConcept>cb6e4f39-5a78-408e-9b5e-a41018057fb1</typeConcept>
+      <scopeConcept>bacd9c6f-3fa9-481e-9636-37457962804d</scopeConcept>
+    </IdentifierType>
+  </update>
+  <update insertIfNotExists="true">
+    <IdentifierType xmlns="http://santedb.org/model">
+      <id>89a399cf-1a8d-11ee-9ba7-9b32b1257e1b</id>
+      <typeConcept>cb6e4f4a-5a6c-408e-9b5e-a41018057fb1</typeConcept>
+      <scopeConcept>bacd9c6f-3fa9-481e-9636-37457962804d</scopeConcept>
+    </IdentifierType>
+  </update>
+  <update insertIfNotExists="true">
+    <IdentifierType xmlns="http://santedb.org/model">
+      <id>89a3c0de-1a8d-11ee-9ba8-a3d33277102d</id>
+      <typeConcept>cb6e4f4a-5a78-408e-9b5e-a41018057fb1</typeConcept>
+      <scopeConcept>bacd9c6f-3fa9-481e-9636-37457962804d</scopeConcept>
+    </IdentifierType>
+  </update>
+  <update insertIfNotExists="true">
+    <IdentifierType xmlns="http://santedb.org/model">
+      <id>89a3c0df-1a8d-11ee-9ba9-af44ea1816b2</id>
+      <typeConcept>cb6e4f5b-5a78-408e-9b5e-a41018057fb1</typeConcept>
+      <scopeConcept>bacd9c6f-3fa9-481e-9636-37457962804d</scopeConcept>
+    </IdentifierType>
+  </update>
+  <update insertIfNotExists="true">
+    <IdentifierType xmlns="http://santedb.org/model">
+      <id>89a3e7f8-1a8d-11ee-9baa-f74d30c1cfde</id>
+      <typeConcept>cb6e4f7d-5a78-408e-9b5e-a41018057fb1</typeConcept>
+      <scopeConcept>bacd9c6f-3fa9-481e-9636-37457962804d</scopeConcept>
+    </IdentifierType>
+  </update>
+  <update insertIfNotExists="true">
+    <IdentifierType xmlns="http://santedb.org/model">
+      <id>89a3e7f9-1a8d-11ee-9bab-6b7d5165c461</id>
+      <typeConcept>cb6e4f8e-5a78-408e-9b5e-a41018057fb1</typeConcept>
+      <scopeConcept>bacd9c6f-3fa9-481e-9636-37457962804d</scopeConcept>
+    </IdentifierType>
+  </update>
+  <update insertIfNotExists="true">
+    <IdentifierType xmlns="http://santedb.org/model">
+      <id>89a3e7fa-1a8d-11ee-9bac-0f8aa20273bc</id>
+      <typeConcept>cb6e4f9f-5a78-408e-9b5e-a41018057fb1</typeConcept>
+      <scopeConcept>bacd9c6f-3fa9-481e-9636-37457962804d</scopeConcept>
+    </IdentifierType>
+  </update>
+  <update insertIfNotExists="true">
+    <IdentifierType xmlns="http://santedb.org/model">
+      <id>89a40f08-1a8d-11ee-9bad-675ceec4a780</id>
+      <typeConcept>cb6e4fa0-5a78-408e-9b5e-a41018057fb1</typeConcept>
+      <scopeConcept>bacd9c6f-3fa9-481e-9636-37457962804d</scopeConcept>
+    </IdentifierType>
+  </update>
+  <update insertIfNotExists="true">
+    <IdentifierType xmlns="http://santedb.org/model">
+      <id>89a40f09-1a8d-11ee-9bae-236211c4a58f</id>
+      <typeConcept>cb6e4fb1-5a78-408e-9b5e-a41018057fb1</typeConcept>
+      <scopeConcept>bacd9c6f-3fa9-481e-9636-37457962804d</scopeConcept>
+    </IdentifierType>
+  </update>
+  <update insertIfNotExists="true">
+    <IdentifierType xmlns="http://santedb.org/model">
+      <id>89a40f0a-1a8d-11ee-9baf-03a0cbbdd8e5</id>
+      <typeConcept>cb6e4fb2-5a78-408e-9b5e-a41018057fb1</typeConcept>
+      <scopeConcept>bacd9c6f-3fa9-481e-9636-37457962804d</scopeConcept>
+    </IdentifierType>
+  </update>
+  <update insertIfNotExists="true">
+    <IdentifierType xmlns="http://santedb.org/model">
+      <id>89a43618-1a8d-11ee-9bb0-5bb8800ac979</id>
+      <typeConcept>cb6e4fc3-5a78-408e-9b5e-a41018057fb1</typeConcept>
+      <scopeConcept>bacd9c6f-3fa9-481e-9636-37457962804d</scopeConcept>
+    </IdentifierType>
+  </update>
+  <update insertIfNotExists="true">
+    <IdentifierType xmlns="http://santedb.org/model">
+      <id>89a43619-1a8d-11ee-9bb1-9f193ef77f47</id>
+      <typeConcept>cb6e4fd4-5a78-408e-9b5e-a41018057fb1</typeConcept>
+      <scopeConcept>bacd9c6f-3fa9-481e-9636-37457962804d</scopeConcept>
+    </IdentifierType>
+  </update>
+  <update insertIfNotExists="true">
+    <IdentifierType xmlns="http://santedb.org/model">
+      <id>89a4361a-1a8d-11ee-9bb2-47a35e3bb370</id>
+      <typeConcept>cb6e4fe5-5a78-408e-9b5e-a41018057fb1</typeConcept>
+      <scopeConcept>bacd9c6f-3fa9-481e-9636-37457962804d</scopeConcept>
+    </IdentifierType>
+  </update>
+</dataset>
