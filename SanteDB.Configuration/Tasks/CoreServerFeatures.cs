@@ -51,7 +51,7 @@ namespace SanteDB.Configuration.Tasks
         internal static readonly Type[] SERVICE_TYPES =
         {
             typeof(SanteDB.Core.Security.DefaultPolicyEnforcementService),
-            typeof(DefaultOperatingSystemInfoService),
+            typeof(DefaultOperatingSystemService),
             typeof(DataInitializationService),
             typeof(DefaultThreadPoolService),
             typeof(DefaultNetworkInformationService),
