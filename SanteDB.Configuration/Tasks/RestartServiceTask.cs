@@ -82,17 +82,17 @@ namespace SanteDB.Configuration.Tasks
             {
                 Application.DoEvents();
                 Thread.Sleep(1000);
-                this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs((float)sw.ElapsedMilliseconds / 10000f, $"Stopping {this.m_configuration.ServiceName}"));
+                this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs(nameof(RestartServiceTask), (float)sw.ElapsedMilliseconds / 10000f, $"Stopping {this.m_configuration.ServiceName}"));
             } // HACK: wait for stop
-            this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs(0.5f, $"Starting {this.m_configuration.ServiceName}"));
+            this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs(nameof(RestartServiceTask), 0.5f, $"Starting {this.m_configuration.ServiceName}"));
             ServiceTools.ServiceInstaller.StartService(this.m_configuration.ServiceName);
             while (sw.ElapsedMilliseconds < 20000 && ServiceTools.ServiceInstaller.GetServiceStatus(this.m_configuration.ServiceName) == ServiceTools.ServiceState.Starting)
             {
                 Application.DoEvents();
                 Thread.Sleep(1000);
-                this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs(0.5f + ((float)sw.ElapsedMilliseconds / 20000f), $"Starting {this.m_configuration.ServiceName}"));
+                this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs(nameof(RestartServiceTask), 0.5f + ((float)sw.ElapsedMilliseconds / 20000f), $"Starting {this.m_configuration.ServiceName}"));
             } // HACK: wait for stop
-            this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs(1.0f, null));
+            this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs(nameof(RestartServiceTask), 1.0f, null));
             return true;
         }
 

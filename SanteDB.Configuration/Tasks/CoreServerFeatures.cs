@@ -191,7 +191,7 @@ namespace SanteDB.Configuration.Tasks
                 int i = 0;
                 foreach (var svc in SERVICE_TYPES.Reverse())
                 {
-                    this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs((float)i++ / SERVICE_TYPES.Length, $"Installing {svc.Name}"));
+                    this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs(nameof(InstallCoreServicesTask), (float)i++ / SERVICE_TYPES.Length, $"Installing {svc.Name}"));
                     appSection.ServiceProviders.RemoveAll(o => o.Type == svc);
                     appSection.ServiceProviders.Insert(0, new TypeReferenceConfiguration(svc));
                 }
