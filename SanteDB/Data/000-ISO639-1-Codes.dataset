@@ -1,10 +1,11 @@
 <?xml version="1.0"?>
-<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" id="ISO639 Language Codes" xmlns="http://santedb.org/data">
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" id="ISO639 Language Codes v2" xmlns="http://santedb.org/data">
   <update skipIfError="false" insertIfNotExists="true">
     <CodeSystem xmlns="http://santedb.org/model">
       <id>eb04fe20-bbbc-4c70-9eef-045bc4f70982</id>
       <creationTime>2018-08-15T19:35:40.4218205-04:00</creationTime>
       <name>ISO639-1 Codes</name>
+      <description>ISO639-1 Language Codes</description>
       <oid>1.0.639.1</oid>
       <authority>ISO639-1</authority>
       <url>urn:iso:std:iso:639:1</url>
@@ -17,6 +18,7 @@
       <name>ISO639-2 Codes</name>
       <oid>2.16.840.1.113883.6.100</oid>
       <authority>ISO639-2</authority>
+      <description>ISO 639-2 Country Codes</description>
       <url>urn:iso:std:iso:639:2</url>
     </CodeSystem>
   </update>

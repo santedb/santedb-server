@@ -3,7 +3,8 @@
   <update skipIfError="false" insertIfNotExists="true">
     <CodeSystem xmlns="http://santedb.org/model">
       <id>cb6982b5-d07c-43c8-861a-d7da8787c159</id>
-      <name>National Uniform Claim Committe Codes</name>
+      <name>NUCC</name>
+      <description>National Uniform Claim Committe Codes</description>
       <oid>2.16.840.1.113883.1.11.19465</oid>
       <authority>NUCC</authority>
       <url>http://nucc.org/provider-taxonomy</url>

@@ -3,8 +3,8 @@
   <update insertIfNotExists="true">
     <CodeSystem xmlns="http://santedb.org/model">
       <id>5b366752-3254-42f4-9d78-559e75f38b3d</id>
-      
-      <name>PH_DischargeDisposition_HL7_2x</name>
+      <description>HL7 Version 2 Discharge Disposition Codes (table 0112)</description>
+      <name>HL7v2 Discharge Disposition Codes</name>
       <oid>2.16.840.1.113883.12.112</oid>
       <authority>HL70112</authority>
       <description>Discharge Disposition (HL7)</description>

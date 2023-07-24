@@ -1,13 +1,12 @@
-﻿<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Act Reason Codes">
+﻿<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Act Reason Codes v2">
   <update insertIfNotExists="true">
     <CodeSystem xmlns="http://santedb.org/model">
       <id>1137d89e-6c9d-4a30-8edf-891b1ad85fa2</id>
-      <name>HL7AREASON</name>
+      <name>HL7 Reason Codes</name>
       <oid>2.16.840.1.113883.5.8</oid>
-      <authority>HL7AREASON</authority>
-      <description>HL7AREASON</description>
+      <authority>ActReason</authority>
       <url>http://hl7.org/fhir/ValueSet/v3-ActReason</url>
-
+      <description>HL7v3/CDA Act Reason Code</description>
     </CodeSystem>
   </update>
   <update insertIfNotExists="true">

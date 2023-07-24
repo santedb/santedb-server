@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
-<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" id="Null Reason Concept Set" xmlns="http://santedb.org/data">
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" id="Null Reason Concept Set v2" xmlns="http://santedb.org/data">
   <update insertIfNotExists="true">
     <CodeSystem xmlns="http://santedb.org/model">
       <id>f43ac5b1-cef6-44b8-a7e8-eb6d6beaba45</id>
-      
+      <description>Reasons for a value or code not being provided</description>
       <name>NullFlavor</name>
       <oid>2.16.840.1.113883.5.1008</oid>
       <authority>NullFlavor</authority>

@@ -3,7 +3,8 @@
   <update insertIfNotExists="true">
     <CodeSystem xmlns="http://santedb.org/model">
       <id>2f5afc7c-7ad1-11eb-9439-0242ac130002</id>
-      <name>v3.PatientImportance</name>
+      <name>v3 Patient Importance</name>
+      <description>HL7v3 VIP Codes</description>
       <oid>2.16.840.1.113883.5.1075</oid>
       <url>http://terminology.hl7.org/CodeSystem/v3-PatientImportance</url>
       <authority>V3PatientImportance</authority>

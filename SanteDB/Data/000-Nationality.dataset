@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" id="Nationality Codes Dataset" xmlns="http://santedb.org/data">
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" id="Nationality Codes Dataset v2" xmlns="http://santedb.org/data">
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9193fcd0-6983-11ec-90d6-0242ac120003</id>
@@ -19,6 +19,7 @@
     <CodeSystem xmlns="http://santedb.org/model">
       <id>bb06c765-72fe-46ed-beb1-b2a8a41d502b</id>
       <name>ISO3166-2 Alpha Country Codes</name>
+      <description>ISO country codes (2-character codes)</description>
       <oid>1.0.3166.2.2.2</oid>
       <authority>ISO3166-2</authority>
       <url>urn:iso:std:iso:3166</url>
