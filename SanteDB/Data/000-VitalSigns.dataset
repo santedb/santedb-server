@@ -6,6 +6,7 @@
       <name>LOINC</name>
       <oid>2.16.840.1.113883.6.1</oid>
       <authority>LN</authority>
+      <url>http://loinc.org</url>
       <description>Logical Observation Identifiers Names and Codes</description>
     </CodeSystem>
   </update>

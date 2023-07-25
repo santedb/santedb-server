@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Allergy Codes">
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Allergy Codes v2">
   <update insertIfNotExists="true">
     <CodeSystem xmlns="http://santedb.org/model">
       <id>02823B47-C315-4366-8883-442E646D34BE</id>
@@ -7,6 +7,8 @@
       <oid>2.16.840.1.113883.5.4</oid>
       <authority>ActCode</authority>
       <description>ActCode</description>
+      <name>Act Codes</name>
+      <description>HL7v3 &amp; CDA Act Code Set</description>
     </CodeSystem>
   </update>
   <update insertIfNotExists="true">

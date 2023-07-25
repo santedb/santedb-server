@@ -1,12 +1,13 @@
 <?xml version="1.0"?>
-<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Reaction Observation Concepts">
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Reaction Observation Concepts v2">
   <update insertIfNotExists="true">
     <CodeSystem xmlns="http://santedb.org/model">
       <id>B3030751-D4DB-420B-B765-E837607820CD</id>
-      
+      <description>Systematized Nomenclature of Medicine</description>
       <name>SNOMED-CT</name>
       <oid>2.16.840.1.113883.6.96</oid>
       <authority>SNM</authority>
+      <url>http://snomed.info/sct</url>
     </CodeSystem>
   </update>
   <update insertIfNotExists="true">

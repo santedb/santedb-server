@@ -6,9 +6,10 @@
       <id>BAB1D66A-1E98-4BFD-9B4A-7C4BE88F35D1</id>
       <name>ActClass</name>
       <oid>2.16.840.1.113883.5.6</oid>
-      <authority>HL7 International</authority>
-      <url>http://santedb.org/conceptset/v3-ActClassClinicalDocument</url>
-      <description>Classification codes for Acts</description>
+      <authority>ActClass</authority>
+      <url>http://terminology.hl7.org/CodeSystem/v3-ActClass</url>
+      <name>HL7v3 Act Classification</name>
+      <description>Classification codes for Acts defined by HL7v3 and CDA</description>
     </CodeSystem>
   </update>
   <update insertIfNotExists="true">

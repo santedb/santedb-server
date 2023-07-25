@@ -4,6 +4,7 @@
     <CodeSystem xmlns="http://santedb.org/model">
       <id>f7a5cbd8-5425-415e-8308-d14b94f56917</id>
       <name>ICD10</name>
+      <description>International Classification of Disease Version 10</description>
       <oid>2.16.840.1.113883.6.3</oid>
       <authority>I10</authority>
     </CodeSystem>

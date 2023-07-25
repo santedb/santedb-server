@@ -3,7 +3,7 @@
   <update insertIfNotExists="true">
     <CodeSystem xmlns="http://santedb.org/model">
       <id>eba4f94a-2cad-4bb3-aca7-f4e54eaac4bd</id>
-      
+      <description>US CDC Core Vaccine (IIS) type codes</description>
       <name>CDC CVX Codes</name>
       <oid>2.16.840.1.113883.3.88.12.80.22</oid>
       <authority>CVX</authority>

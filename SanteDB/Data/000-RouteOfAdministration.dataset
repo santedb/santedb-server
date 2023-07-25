@@ -5,6 +5,7 @@
       <id>81E40334-12FE-4CB4-90C5-C099E8E51999</id>
       
       <name>Route of administration (HL7v3)</name>
+      <description>HL7v3 and CDA Routes of Administration</description>
       <oid>2.16.840.1.113883.5.112</oid>
       <authority>ROUTE</authority>
       <url>http://hl7.org/fhir/sid/ROUTE</url>

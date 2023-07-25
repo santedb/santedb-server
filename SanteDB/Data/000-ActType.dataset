@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
-<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="SAct Subtypes">
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Act Subtypes v2">
   <update insertIfNotExists="true">
     <CodeSystem xmlns="http://santedb.org/model">
       <id>ED9742E5-FA5B-4644-9FB5-2F935ED08B1E</id>
-
-      <name>ICD10CM</name>
+      <name>ICD10-CM</name>
+      <description>ICD10 Clinical Management Codes</description>
       <oid>2.16.840.1.113883.6.90</oid>
       <authority>I10CM</authority>
     </CodeSystem>

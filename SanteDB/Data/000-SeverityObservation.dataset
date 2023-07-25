@@ -1,10 +1,11 @@
 <?xml version="1.0"?>
-<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" id="Severity Observation Types" xmlns="http://santedb.org/data">
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" id="Severity Observation Types v2" xmlns="http://santedb.org/data">
   <update insertIfNotExists="true">
     <CodeSystem xmlns="http://santedb.org/model">
       <id>150624bf-da3f-49b6-a50a-b3b4cda7dcce</id>
       
-      <name>SeverityObservation</name>
+      <name>Severity Observation</name>
+      <description>HL7v3 Severity of Observation Codes</description>
       <oid>2.16.840.1.113883.5.1063</oid>
       <authority>SeverityObservation</authority>
       <url>http://hl7.org/fhir/v3-SeverityObservation</url>
@@ -13,10 +14,11 @@
   <update insertIfNotExists="true">
     <CodeSystem xmlns="http://santedb.org/model">
       <id>B3030751-D4DB-420B-B765-E837607820CD</id>
-      
+      <description>Systematized Nomenclature of Medicine</description>
       <name>SNOMED-CT</name>
       <oid>2.16.840.1.113883.6.96</oid>
       <authority>SNM</authority>
+      <url>http://snomed.info/sct</url>
     </CodeSystem>
   </update>
   

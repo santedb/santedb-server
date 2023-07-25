@@ -1,9 +1,10 @@
 <?xml version="1.0"?>
-<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Privacy Purpose of Use Concepts">
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Privacy Purpose of Use Concepts v2">
   <update insertIfNotExists="true">
     <CodeSystem xmlns="http://santedb.org/model">
       <id>05410d0c-9169-11ea-bb37-0242ac130002</id>
       <name>Purpose of Use</name>
+      <description>Describes the purposes of use for clinical information (HL7v3)</description>
       <oid>2.16.840.1.113883.1.11.20448</oid>
       <authority>PurposeOfUse</authority>
       <url>http://terminology.hl7.org/ValueSet/v3-GeneralPurposeOfUse</url>
