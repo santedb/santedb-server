@@ -1152,7 +1152,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>CD7FD476-CF97-41E1-AB96-9F06CB92C56B</id>
       <isReadonly>false</isReadonly>
-      <mnemonic>DiagnosisCode-NoenatalTetanus</mnemonic>
+      <mnemonic>DiagnosisCode-NeonatalTetanus</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
       <conceptClass>92cdea39-b9a3-4a5b-bc88-a6646c74240d</conceptClass>
       <referenceTerm>
