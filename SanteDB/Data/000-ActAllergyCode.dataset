@@ -472,6 +472,26 @@
     </Concept>
   </update>
   <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>1b5bf354-2c80-4d62-8012-6ebaa54b185b</id>
+      <previousVersion xsi:nil="true" />
+      <version xsi:nil="true" />
+      <sequence xsi:nil="true" />
+      <isReadonly>true</isReadonly>
+      <mnemonic>UnspecifiedAllergyIntolerance</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <name>
+        <source xsi:nil="true" />
+        <effectiveVersionSequence xsi:nil="true" />
+        <obsoleteVersionSequence xsi:nil="true" />
+        <language>en</language>
+        <value>Unspecified Allergy Intolerance</value>
+        <phoneticAlgorithm xsi:nil="true" />
+      </name>
+    </Concept>
+  </update>
+  <update insertIfNotExists="true">
     <ConceptSet xmlns="http://santedb.org/model">
       <id>4a3952e0-8998-4020-9da2-6d78b292da69</id>
       
@@ -490,6 +510,7 @@
       <concept>62fc0be4-f75f-460b-ab98-4215f4573748</concept>
       <concept>0577d51f-8ff5-4cf7-a2dd-bfc52841fff2</concept>
       <concept>594f0a36-34c1-48b4-b870-883173450ff4</concept>
+      <concept>1b5bf354-2c80-4d62-8012-6ebaa54b185b</concept>
     </ConceptSet>
   </update>
 </dataset>
