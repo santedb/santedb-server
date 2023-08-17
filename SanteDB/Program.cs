@@ -301,6 +301,7 @@ namespace SanteDB
         private static void RotateKeys(string configFile)
         {
             SanteDBConfiguration configuration = null;
+            using(AuthenticationContext.EnterSystemContext())
             try
             {
                 using (var fs = File.OpenRead(configFile))
