@@ -39,14 +39,16 @@ namespace SanteDB.Configurator
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        private static void Main()
+        private static void Main(string[] args)
         {
             // Check whether the user is in Windows Admin mode
             WindowsIdentity identity = WindowsIdentity.GetCurrent();
             WindowsPrincipal principal = new WindowsPrincipal(identity);
+
 #if !DEBUG
                 if (Environment.OSVersion.Platform == PlatformID.Win32NT &&
-                    !principal.IsInRole(WindowsBuiltInRole.Administrator))
+                    !principal.IsInRole(WindowsBuiltInRole.Administrator) &&
+                    args?.Any(a=>a == "--nonadmin") != true)
                 {
                     string cmdLine = Environment.CommandLine.Substring(Environment.CommandLine.IndexOf(".exe") + 4);
                     cmdLine = cmdLine.Contains(' ') ? cmdLine.Substring(cmdLine.IndexOf(" ")) : null;
