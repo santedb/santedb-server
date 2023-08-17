@@ -62,6 +62,13 @@ namespace SanteDB
         public bool StartupTest { get; set; }
 
         /// <summary>
+        /// Rotate the keys used for encryption
+        /// </summary>
+        [Parameter("key-rotate")]
+        [Description("Rotate the encryption keys used by SanteDB ALE and configuration encryption")]
+        public bool KeyRotation { get; set; }
+
+        /// <summary>
         /// Test configuration files
         /// </summary>
         [Description("Instructs the host process to perform a configuration test")]
