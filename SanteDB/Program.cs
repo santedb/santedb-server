@@ -98,15 +98,15 @@ namespace SanteDB
                 {
                     parser.WriteHelp(Console.Out);
                 }
-                else if (parameters.KeyRotation)
+                else if (parameters.ReEncrypt)
                 {
-                    if(ServiceTools.ServiceInstaller.ServiceIsInstalled(serviceName)  &&
+                    if (ServiceTools.ServiceInstaller.ServiceIsInstalled(serviceName) &&
                         ServiceTools.ServiceInstaller.GetServiceStatus(serviceName) != ServiceTools.ServiceState.Stop)
                     {
                         Console.WriteLine("Stopping {0}...", serviceName);
                         ServiceTools.ServiceInstaller.StopService(serviceName);
                     }
-                    RotateKeys(parameters.ConfigFile);
+                    ReEncrypt(parameters.ConfigFile);
                 }
                 else if (parameters.ConfigTest)
                 {
@@ -253,7 +253,7 @@ namespace SanteDB
                             catch { }
                         }
                     }
-                 
+
                 }
                 else
                 {
@@ -298,96 +298,97 @@ namespace SanteDB
         /// <summary>
         /// Rotate the keys 
         /// </summary>
-        private static void RotateKeys(string configFile)
+        private static void ReEncrypt(string configFile)
         {
             SanteDBConfiguration configuration = null;
-            using(AuthenticationContext.EnterSystemContext())
-            try
-            {
-                using (var fs = File.OpenRead(configFile))
+            using (AuthenticationContext.EnterSystemContext())
+                try
                 {
-                    configuration = SanteDBConfiguration.Load(fs);
-                }
-
-                // Rotate the keys - first we want to get the key we're rotating to
-                Console.Write("New Key Thumbprint (enter to disable ALE):");
-                var newKeyThumb = Console.ReadLine();
-
-                // Attempt to get the certificate
-                if (!String.IsNullOrEmpty(newKeyThumb))
-                {
-                    bool isCurrentUser = X509CertificateUtils.GetPlatformServiceOrDefault().TryGetCertificate(X509FindType.FindByThumbprint, newKeyThumb, StoreName.My, out var certificate),
-                        isLocalMachine = X509CertificateUtils.GetPlatformServiceOrDefault().TryGetCertificate(X509FindType.FindByThumbprint, newKeyThumb, StoreName.My, StoreLocation.LocalMachine, out certificate);
-                    if (!isCurrentUser && !isLocalMachine)
+                    using (var fs = File.OpenRead(configFile))
                     {
-                        throw new InvalidOperationException("Cannot find certificate in CurrentUser\\My or LocalMachine\\My");
+                        configuration = SanteDBConfiguration.Load(fs);
                     }
 
-                    // Replace the key
-                    configuration.ProtectedSectionKey = new Core.Security.Configuration.X509ConfigurationElement(isLocalMachine ? StoreLocation.LocalMachine : StoreLocation.CurrentUser, StoreName.My, X509FindType.FindByThumbprint, newKeyThumb);
-                }
-                else
-                {
-                    configuration.ProtectedSectionKey = null;
-                }
+                    // Rotate the keys - first we want to get the key we're rotating to
+                    Console.WriteLine("This command will encrypt your configuration file and your database using ALE (if configured). If the configuration and database are already encrypted, the keys will be rotated.");
+                    Console.Write("New Key Thumbprint (enter to disable):");
+                    var newKeyThumb = Console.ReadLine();
 
-                // If ALE is enabled then we want to recrypt
-                var processedConnections = new List<String>();
-                foreach (var ormConfiguration in configuration.Sections.OfType<OrmConfigurationBase>())
-                {
-                    if (processedConnections.Contains(ormConfiguration.ReadWriteConnectionString) ||
-                        ormConfiguration.AleConfiguration == null)
+                    // Attempt to get the certificate
+                    if (!String.IsNullOrEmpty(newKeyThumb))
                     {
-                        continue;
+                        bool isCurrentUser = X509CertificateUtils.GetPlatformServiceOrDefault().TryGetCertificate(X509FindType.FindByThumbprint, newKeyThumb, StoreName.My, out var certificate),
+                            isLocalMachine = X509CertificateUtils.GetPlatformServiceOrDefault().TryGetCertificate(X509FindType.FindByThumbprint, newKeyThumb, StoreName.My, StoreLocation.LocalMachine, out certificate);
+                        if (!isCurrentUser && !isLocalMachine)
+                        {
+                            throw new InvalidOperationException("Cannot find certificate in CurrentUser\\My or LocalMachine\\My");
+                        }
+
+                        // Replace the key
+                        configuration.ProtectedSectionKey = new Core.Security.Configuration.X509ConfigurationElement(isLocalMachine ? StoreLocation.LocalMachine : StoreLocation.CurrentUser, StoreName.My, X509FindType.FindByThumbprint, newKeyThumb);
+                    }
+                    else
+                    {
+                        configuration.ProtectedSectionKey = null;
                     }
 
-                    processedConnections.Add(ormConfiguration.ReadWriteConnectionString);
-
-                    // Decrypt and recrypt the ALE
-                    try
+                    // If ALE is enabled then we want to recrypt
+                    var processedConnections = new List<String>();
+                    foreach (var ormConfiguration in configuration.Sections.OfType<OrmConfigurationBase>())
                     {
-                        var ormSection = configuration.GetSection<OrmConfigurationSection>();
-                        var connectionString = configuration.GetSection<DataConfigurationSection>()?.ConnectionString.Find(o => o.Name.Equals(ormConfiguration.ReadWriteConnectionString, StringComparison.OrdinalIgnoreCase));
-                        var providerType = ormSection?.Providers.Find(o => o.Invariant == connectionString.Provider).Type;
-                        var provider = Activator.CreateInstance(providerType) as IEncryptedDbProvider;
-
-                        if (provider == null)
+                        if (processedConnections.Contains(ormConfiguration.ReadWriteConnectionString) ||
+                            ormConfiguration.AleConfiguration == null)
                         {
                             continue;
                         }
 
-                        provider.ConnectionString = connectionString.ToString();
+                        processedConnections.Add(ormConfiguration.ReadWriteConnectionString);
 
-                        // Decrypt - 
-                        Console.WriteLine("Rotating keys (this may take several hours)...");
-                        provider.SetEncryptionSettings(ormConfiguration.AleConfiguration);
-
-                        provider.GetEncryptionProvider();
-
-                        ormConfiguration.AleConfiguration = new OrmAleConfiguration()
+                        // Decrypt and recrypt the ALE
+                        try
                         {
-                            AleEnabled = configuration.ProtectedSectionKey != null,
-                            Certificate = configuration.ProtectedSectionKey,
-                            EnableFields = ormConfiguration.AleConfiguration.EnableFields,
-                            SaltSeed = ormConfiguration.AleConfiguration.SaltSeed
-                        };
-                        provider.MigrateEncryption(ormConfiguration.AleConfiguration);
-                    }
-                    catch (Exception e)
-                    {
-                        throw new DataException($"Cannot migrate ALE on {ormConfiguration.ReadWriteConnectionString}", e);
-                    }
-                }
+                            var ormSection = configuration.GetSection<OrmConfigurationSection>();
+                            var connectionString = configuration.GetSection<DataConfigurationSection>()?.ConnectionString.Find(o => o.Name.Equals(ormConfiguration.ReadWriteConnectionString, StringComparison.OrdinalIgnoreCase));
+                            var providerType = ormSection?.Providers.Find(o => o.Invariant == connectionString.Provider).Type;
+                            var provider = Activator.CreateInstance(providerType) as IEncryptedDbProvider;
 
-                using (var fs = File.Create(configFile))
-                {
-                    configuration.Save(fs);
+                            if (provider == null)
+                            {
+                                continue;
+                            }
+
+                            provider.ConnectionString = connectionString.ToString();
+
+                            // Decrypt - 
+                            Console.WriteLine("Rotating keys (this may take several hours)...");
+                            provider.SetEncryptionSettings(ormConfiguration.AleConfiguration);
+
+                            provider.GetEncryptionProvider();
+
+                            ormConfiguration.AleConfiguration = new OrmAleConfiguration()
+                            {
+                                AleEnabled = configuration.ProtectedSectionKey != null,
+                                Certificate = configuration.ProtectedSectionKey,
+                                EnableFields = ormConfiguration.AleConfiguration.EnableFields,
+                                SaltSeed = ormConfiguration.AleConfiguration.SaltSeed
+                            };
+                            provider.MigrateEncryption(ormConfiguration.AleConfiguration);
+                        }
+                        catch (Exception e)
+                        {
+                            throw new DataException($"Cannot migrate ALE on {ormConfiguration.ReadWriteConnectionString}", e);
+                        }
+                    }
+
+                    using (var fs = File.Create(configFile))
+                    {
+                        configuration.Save(fs);
+                    }
                 }
-            }
-            catch(Exception e)
-            {
-                throw new DataException($"Cannot migrate ALE", e);
-            }
+                catch (Exception e)
+                {
+                    throw new DataException($"Cannot migrate ALE", e);
+                }
         }
 
         private static void TestConfiguration(string configFile)

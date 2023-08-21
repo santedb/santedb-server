@@ -64,9 +64,9 @@ namespace SanteDB
         /// <summary>
         /// Rotate the keys used for encryption
         /// </summary>
-        [Parameter("key-rotate")]
-        [Description("Rotate the encryption keys used by SanteDB ALE and configuration encryption")]
-        public bool KeyRotation { get; set; }
+        [Parameter("reencrypt")]
+        [Description("Re-encrypt the database and configuration file using ALE")]
+        public bool ReEncrypt { get; set; }
 
         /// <summary>
         /// Test configuration files
