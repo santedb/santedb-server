@@ -3,8 +3,8 @@
   <update insertIfNotExists="true">
     <CodeSystem xmlns="http://santedb.org/model">
       <id>3173ad32-7cd7-42c9-911f-79f564552ae1</id>
-      
-      <name>AdministrableDrugForm</name>
+      <description>Administerable drug form codes for materials</description>
+      <name>Administrable Drug Form</name>
       <oid>2.16.840.1.113883.5.85</oid>
       <authority>AdministrableDrugForm</authority>
       <url>http://hl7.org/fhir/v3-AdministrableDrugForm</url>

@@ -9,6 +9,14 @@
 #define MyAppVersion "3.0"
 #endif 
 
+#ifndef SignKey
+#define SignKey "8185304d2f840a371d72a21d8780541bf9f0b5d2"
+#endif 
+
+#ifndef SignOpts
+#define SignOpts ""
+#endif 
+
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
 ; Do not use the same AppId value in installers for other applications.
@@ -43,7 +51,7 @@ WizardStyle=modern
 
 #ifndef UNSIGNED
 SignedUninstaller=yes
-SignTool=default sign /a /n $qFyfe Software$q /d $qSanteDB iCDR Server$q $f
+SignTool=default /sha1 {#SignKey} {#SignOpts} /d $qSanteDB iCDR Server$q $f
 #endif
 ; SignTool=default sign $f
 ; SignedUninstaller=yes
@@ -154,9 +162,9 @@ Source: ..\bin\release\Data\*.dataset; DestDir: {app}\data; Components: server
 Source: ..\bin\release\applets\*.pak; DestDir: {app}\applets; Components: server
 
 ; Tools
-Source: ..\santedb-tools\bin\Release\net4.8\sdbac.exe; DestDir: {app}; Components: tools
-Source: ..\santedb-tools\bin\Release\net4.8\sdbac.exe.config; DestDir: {app}; Components: tools
-Source: ..\santedb-tools\bin\Release\net4.8\SanteDB.AdminConsole.Api.dll; DestDir: {app}; Components: tools
+Source: ..\santedb-tools\bin\Release\sdbac.exe; DestDir: {app}; Components: tools
+Source: ..\santedb-tools\bin\Release\sdbac.exe.config; DestDir: {app}; Components: tools
+Source: ..\santedb-tools\bin\Release\SanteDB.AdminConsole.Api.dll; DestDir: {app}; Components: tools
 Source: ..\bin\Release\SanteDB.exe.config; DestDir: {app}; DestName: sdbac.exe.config; Components: tools
 Source: ..\bin\Release\Mono.Posix.dll; DestDir: {app}; Components: core
 

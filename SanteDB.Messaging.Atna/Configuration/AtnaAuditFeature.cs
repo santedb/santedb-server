@@ -150,7 +150,7 @@ namespace SanteDB.Messaging.Atna.Configuration
         {
             var dispatcherConfiguration = configuration.GetSection<AtnaConfigurationSection>();
             configuration.GetSection<ApplicationServiceContextConfigurationSection>().ServiceProviders.RemoveAll(r => r.Type == typeof(AtnaAuditService));
-            this.ProgressChanged?.Invoke(this, new SanteDB.Core.Services.ProgressChangedEventArgs(1.0f, "Complete"));
+            this.ProgressChanged?.Invoke(this, new SanteDB.Core.Services.ProgressChangedEventArgs(nameof(UninstallFhirAuditDispatcher), 1.0f, "Complete"));
 
             return true;
         }
@@ -217,7 +217,7 @@ namespace SanteDB.Messaging.Atna.Configuration
 
             configuration.GetSection<ApplicationServiceContextConfigurationSection>().ServiceProviders.RemoveAll(r => typeof(IAuditDispatchService).IsAssignableFrom(r.Type));
             configuration.GetSection<ApplicationServiceContextConfigurationSection>().ServiceProviders.Add(new TypeReferenceConfiguration(typeof(AtnaAuditService)));
-            this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs(1.0f, String.Empty));
+            this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs(nameof(InstallFhirAuditDispatcher), 1.0f, String.Empty));
             return true;
         }
 

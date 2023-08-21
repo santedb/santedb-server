@@ -20,14 +20,21 @@
  */
 using MohawkCollege.Util.Console.Parameters;
 using Mono.Unix;
+using NHapi.Model.V26.Segment;
 using SanteDB.Core;
 using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Configuration;
+using SanteDB.Core.Configuration.Data;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
+using SanteDB.OrmLite;
+using SanteDB.OrmLite.Configuration;
+using SanteDB.OrmLite.Providers.Postgres;
 using System;
+using System.CodeDom;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -85,42 +92,25 @@ namespace SanteDB
                 var parameters = parser.Parse(args);
 
                 var instanceSuffix = !String.IsNullOrEmpty(parameters.InstanceName) ? $"-{parameters.InstanceName}" : null;
-
+                var serviceName = $"SanteDB{instanceSuffix}";
                 // What to do?
                 if (parameters.ShowHelp)
                 {
                     parser.WriteHelp(Console.Out);
                 }
+                else if (parameters.ReEncrypt)
+                {
+                    if (ServiceTools.ServiceInstaller.ServiceIsInstalled(serviceName) &&
+                        ServiceTools.ServiceInstaller.GetServiceStatus(serviceName) != ServiceTools.ServiceState.Stop)
+                    {
+                        Console.WriteLine("Stopping {0}...", serviceName);
+                        ServiceTools.ServiceInstaller.StopService(serviceName);
+                    }
+                    ReEncrypt(parameters.ConfigFile);
+                }
                 else if (parameters.ConfigTest)
                 {
-                    IEnumerable<String> configFilesToTest = null;
-                    if (String.IsNullOrEmpty(parameters.ConfigFile))
-                    {
-                        configFilesToTest = Directory.GetFiles(Path.Combine(Path.GetDirectoryName(typeof(Program).Assembly.Location), "config"), "*.xml", SearchOption.AllDirectories);
-                    }
-                    else
-                    {
-                        configFilesToTest = new String[] { parameters.ConfigFile };
-                    }
-                    Console.WriteLine("Testing configuration files");
-                    foreach (var file in configFilesToTest)
-                    {
-                        try
-                        {
-                            Console.WriteLine("Testing {0}...", file);
-                            using (var stream = File.OpenRead(file))
-                            {
-                                foreach (DetectedIssue itm in SanteDBConfiguration.Validate(stream))
-                                {
-                                    Console.WriteLine("\t{0} - {1}", itm.Priority, itm.Text);
-                                }
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine("\tFAIL: {0}", e);
-                        }
-                    }
+                    TestConfiguration(parameters.ConfigFile);
                 }
                 else if (parameters.InstallCerts)
                 {
@@ -129,7 +119,7 @@ namespace SanteDB
                 }
                 else if (parameters.Install)
                 {
-                    if (!ServiceTools.ServiceInstaller.ServiceIsInstalled($"SanteDB{instanceSuffix}"))
+                    if (!ServiceTools.ServiceInstaller.ServiceIsInstalled(serviceName))
                     {
                         Console.WriteLine("Installing Service...");
                         if (!String.IsNullOrEmpty(instanceSuffix))
@@ -144,7 +134,7 @@ namespace SanteDB
                                 configFile = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), configFile);
                             }
 
-                            ServiceTools.ServiceInstaller.Install($"SanteDB{instanceSuffix}", $"SanteDB Host Process - {parameters.InstanceName}", $"{Assembly.GetEntryAssembly().Location} --name={parameters.InstanceName} --config={configFile}", null, null, ServiceTools.ServiceBootFlag.AutoStart);
+                            ServiceTools.ServiceInstaller.Install(serviceName, $"SanteDB Host Process - {parameters.InstanceName}", $"{Assembly.GetEntryAssembly().Location} --name={parameters.InstanceName} --config={configFile}", null, null, ServiceTools.ServiceBootFlag.AutoStart);
                         }
                         else
                         {
@@ -154,11 +144,11 @@ namespace SanteDB
                 }
                 else if (parameters.UnInstall)
                 {
-                    if (ServiceTools.ServiceInstaller.ServiceIsInstalled($"SanteDB{instanceSuffix}"))
+                    if (ServiceTools.ServiceInstaller.ServiceIsInstalled(serviceName))
                     {
                         Console.WriteLine("Un-Installing Service...");
-                        ServiceTools.ServiceInstaller.StopService($"SanteDB{instanceSuffix}");
-                        ServiceTools.ServiceInstaller.Uninstall($"SanteDB{instanceSuffix}");
+                        ServiceTools.ServiceInstaller.StopService(serviceName);
+                        ServiceTools.ServiceInstaller.Uninstall(serviceName);
                     }
                 }
                 else if (parameters.GenConfig)
@@ -263,7 +253,7 @@ namespace SanteDB
                             catch { }
                         }
                     }
-                 
+
                 }
                 else
                 {
@@ -302,6 +292,134 @@ namespace SanteDB
                     Trace.TraceWarning("Could not emit the error to the EventLog - {0}", e1);
                 }
                 Environment.Exit(911);
+            }
+        }
+
+        /// <summary>
+        /// Rotate the keys 
+        /// </summary>
+        private static void ReEncrypt(string configFile)
+        {
+            SanteDBConfiguration configuration = null;
+            using (AuthenticationContext.EnterSystemContext())
+                try
+                {
+                    using (var fs = File.OpenRead(configFile))
+                    {
+                        configuration = SanteDBConfiguration.Load(fs);
+                    }
+
+                    // Rotate the keys - first we want to get the key we're rotating to
+                    Console.WriteLine("This command will encrypt your configuration file and your database using ALE (if configured). If the configuration and database are already encrypted, the keys will be rotated.");
+                    Console.Write("New Key Thumbprint (enter to disable):");
+                    var newKeyThumb = Console.ReadLine();
+
+                    // Attempt to get the certificate
+                    if (!String.IsNullOrEmpty(newKeyThumb))
+                    {
+                        bool isCurrentUser = X509CertificateUtils.GetPlatformServiceOrDefault().TryGetCertificate(X509FindType.FindByThumbprint, newKeyThumb, StoreName.My, out var certificate),
+                            isLocalMachine = X509CertificateUtils.GetPlatformServiceOrDefault().TryGetCertificate(X509FindType.FindByThumbprint, newKeyThumb, StoreName.My, StoreLocation.LocalMachine, out certificate);
+                        if (!isCurrentUser && !isLocalMachine)
+                        {
+                            throw new InvalidOperationException("Cannot find certificate in CurrentUser\\My or LocalMachine\\My");
+                        }
+
+                        // Replace the key
+                        configuration.ProtectedSectionKey = new Core.Security.Configuration.X509ConfigurationElement(isLocalMachine ? StoreLocation.LocalMachine : StoreLocation.CurrentUser, StoreName.My, X509FindType.FindByThumbprint, newKeyThumb);
+                    }
+                    else
+                    {
+                        configuration.ProtectedSectionKey = null;
+                    }
+
+                    // If ALE is enabled then we want to recrypt
+                    var processedConnections = new List<String>();
+                    foreach (var ormConfiguration in configuration.Sections.OfType<OrmConfigurationBase>())
+                    {
+                        if (processedConnections.Contains(ormConfiguration.ReadWriteConnectionString) ||
+                            ormConfiguration.AleConfiguration == null)
+                        {
+                            continue;
+                        }
+
+                        processedConnections.Add(ormConfiguration.ReadWriteConnectionString);
+
+                        // Decrypt and recrypt the ALE
+                        try
+                        {
+                            var ormSection = configuration.GetSection<OrmConfigurationSection>();
+                            var connectionString = configuration.GetSection<DataConfigurationSection>()?.ConnectionString.Find(o => o.Name.Equals(ormConfiguration.ReadWriteConnectionString, StringComparison.OrdinalIgnoreCase));
+                            var providerType = ormSection?.Providers.Find(o => o.Invariant == connectionString.Provider).Type;
+                            var provider = Activator.CreateInstance(providerType) as IEncryptedDbProvider;
+
+                            if (provider == null)
+                            {
+                                continue;
+                            }
+
+                            provider.ConnectionString = connectionString.ToString();
+
+                            // Decrypt - 
+                            Console.WriteLine("Rotating keys (this may take several hours)...");
+                            provider.SetEncryptionSettings(ormConfiguration.AleConfiguration);
+
+                            provider.GetEncryptionProvider();
+
+                            ormConfiguration.AleConfiguration = new OrmAleConfiguration()
+                            {
+                                AleEnabled = configuration.ProtectedSectionKey != null,
+                                Certificate = configuration.ProtectedSectionKey,
+                                EnableFields = ormConfiguration.AleConfiguration.EnableFields,
+                                SaltSeed = ormConfiguration.AleConfiguration.SaltSeed
+                            };
+                            provider.MigrateEncryption(ormConfiguration.AleConfiguration);
+                        }
+                        catch (Exception e)
+                        {
+                            throw new DataException($"Cannot migrate ALE on {ormConfiguration.ReadWriteConnectionString}", e);
+                        }
+                    }
+
+                    using (var fs = File.Create(configFile))
+                    {
+                        configuration.Save(fs);
+                    }
+                }
+                catch (Exception e)
+                {
+                    throw new DataException($"Cannot migrate ALE", e);
+                }
+        }
+
+        private static void TestConfiguration(string configFile)
+        {
+            IEnumerable<String> configFilesToTest = null;
+            if (String.IsNullOrEmpty(configFile))
+            {
+                configFilesToTest = Directory.GetFiles(Path.Combine(Path.GetDirectoryName(typeof(Program).Assembly.Location), "config"), "*.xml", SearchOption.AllDirectories);
+            }
+            else
+            {
+                configFilesToTest = new String[] { configFile };
+            }
+            Console.WriteLine("Testing configuration files");
+            foreach (var file in configFilesToTest)
+            {
+                try
+                {
+                    Console.WriteLine("Testing {0}...", file);
+                    using (var stream = File.OpenRead(file))
+                    {
+                        foreach (DetectedIssue itm in SanteDBConfiguration.Validate(stream))
+                        {
+                            Console.WriteLine("\t{0} - {1}", itm.Priority, itm.Text);
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("\tFAIL: {0}", e);
+                }
             }
         }
 

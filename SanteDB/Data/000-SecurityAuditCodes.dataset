@@ -8,7 +8,7 @@
       <oid>2.16.840.1.113883.4.642.3.457</oid>
       <url>http://dicom.nema.org/resources/ontology/DCM</url>
       <authority>DCM</authority>
-      <description>DCM</description>
+      <description>NEMA DICOM Codes</description>
     </CodeSystem>
   </update>
   <update insertIfNotExists="true">

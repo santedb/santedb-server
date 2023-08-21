@@ -12,7 +12,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Allows the shipping of audit using IETF RFC3881 or DICOM format audits from SanteDB</description>
     <releaseNotes></releaseNotes>
-    <copyright>Copyright (C) 2015-2020 SanteSuite Contributors (See: NOTICES)</copyright>
+    <copyright>Copyright (C) 2015-2023 SanteSuite Contributors (See: NOTICES)</copyright>
     <tags>atna santedb server</tags>
     <dependencies>
       <dependency id="AtnaApi" version="1.1.4.0" />

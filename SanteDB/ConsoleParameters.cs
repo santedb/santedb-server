@@ -62,6 +62,13 @@ namespace SanteDB
         public bool StartupTest { get; set; }
 
         /// <summary>
+        /// Rotate the keys used for encryption
+        /// </summary>
+        [Parameter("reencrypt")]
+        [Description("Re-encrypt the database and configuration file using ALE")]
+        public bool ReEncrypt { get; set; }
+
+        /// <summary>
         /// Test configuration files
         /// </summary>
         [Description("Instructs the host process to perform a configuration test")]

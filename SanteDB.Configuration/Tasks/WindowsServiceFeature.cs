@@ -196,7 +196,7 @@ namespace SanteDB.Configuration.Tasks
             {
                 try
                 {
-                    this.ProgressChanged?.Invoke(this, new SanteDB.Core.Services.ProgressChangedEventArgs(0.0f, $"Installing Windows Service {this.m_options.ServiceName}..."));
+                    this.ProgressChanged?.Invoke(this, new SanteDB.Core.Services.ProgressChangedEventArgs(nameof(InstallTask), 0.0f, $"Installing Windows Service {this.m_options.ServiceName}..."));
                     if (!ServiceTools.ServiceInstaller.ServiceIsInstalled(this.m_options.ServiceName))
                     {
                         ServiceTools.ServiceInstaller.Install(this.m_options.ServiceName, "SanteDB Host Process",
@@ -206,7 +206,7 @@ namespace SanteDB.Configuration.Tasks
                             this.m_options.StartBehavior);
                         configuration.GetSection<ApplicationServiceContextConfigurationSection>().InstanceName =  this.m_options.ServiceName;
                     }
-                    this.ProgressChanged?.Invoke(this, new SanteDB.Core.Services.ProgressChangedEventArgs(1.0f, null));
+                    this.ProgressChanged?.Invoke(this, new SanteDB.Core.Services.ProgressChangedEventArgs(nameof(InstallTask), 1.0f, null));
                     return true;
                 }
                 catch (Exception e)
@@ -295,14 +295,14 @@ namespace SanteDB.Configuration.Tasks
             {
                 try
                 {
-                    this.ProgressChanged?.Invoke(this, new SanteDB.Core.Services.ProgressChangedEventArgs(0.0f, $"Removing Windows Service {this.m_options.ServiceName}..."));
+                    this.ProgressChanged?.Invoke(this, new SanteDB.Core.Services.ProgressChangedEventArgs(nameof(UninstallTask), 0.0f, $"Removing Windows Service {this.m_options.ServiceName}..."));
                     if (ServiceTools.ServiceInstaller.ServiceIsInstalled(this.m_options.ServiceName))
                     {
                         ServiceTools.ServiceInstaller.StopService(this.m_options.ServiceName);
                         ServiceTools.ServiceInstaller.Uninstall(this.m_options.ServiceName);
                         configuration.GetSection<ApplicationServiceContextConfigurationSection>().AppSettings.RemoveAll(o => o.Key == "w32instance.name");
                     }
-                    this.ProgressChanged?.Invoke(this, new SanteDB.Core.Services.ProgressChangedEventArgs(1.0f, null));
+                    this.ProgressChanged?.Invoke(this, new SanteDB.Core.Services.ProgressChangedEventArgs(nameof(UninstallTask), 1.0f, null));
                     return true;
                 }
                 catch (Exception e)

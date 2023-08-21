@@ -93,7 +93,7 @@
   <update insertIfNotExists="true">
     <Place xmlns="http://santedb.org/model">
       <id>aa98add3-cc1d-4476-b758-43d55a480864</id>
-      <classConcept>d9489d56-ddac-4596-b5c6-8f41d73d8dc5</classConcept>
+      <classConcept>6eefee7d-dff5-46d3-a6a7-171ef93879c7</classConcept>
       <determinerConcept>f29f08de-78a7-4a5e-aeaf-7b545ba19a09</determinerConcept>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
       <typeConcept>1d3350d2-cb13-486a-895e-fa1055ad9a2d</typeConcept>

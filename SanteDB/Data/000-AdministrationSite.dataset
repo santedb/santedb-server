@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" id="Administration Site Codes" xmlns="http://santedb.org/data">
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" id="Administration Site Codes v2" xmlns="http://santedb.org/data">
   <update insertIfNotExists="true">
     <CodeSystem xmlns="http://santedb.org/model">
       <id>53D0B263-A72D-4372-BFEA-73617BD3F922</id>
-      
-      <name>ActSite</name>
+      <description>Site of an action performed</description>
+      <name>Act Site</name>
       <oid>2.16.840.1.113883.5.1052</oid>
       <authority>ActSite</authority>
       <url>http://hl7.org/fhir/ValueSet/v3-ActSite</url>

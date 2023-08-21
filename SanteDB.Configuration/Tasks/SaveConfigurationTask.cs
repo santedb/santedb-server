@@ -111,7 +111,7 @@ namespace SanteDB.Configuration.Tasks
                 configuration.Save(fs);
             }
 
-            this.ProgressChanged?.Invoke(this, new SanteDB.Core.Services.ProgressChangedEventArgs(1.0f, "Complete"));
+            this.ProgressChanged?.Invoke(this, new SanteDB.Core.Services.ProgressChangedEventArgs(nameof(SaveConfigurationTask), 1.0f, "Complete"));
 
             return true;
         }

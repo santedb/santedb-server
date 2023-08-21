@@ -6,7 +6,7 @@
       <name>UCUM</name>
       <oid>2.16.840.1.113883.6.8</oid>
       <authority>UCUM</authority>
-	  <url>http://hl7.org/fhir/sid/ucum</url>
+	    <url>http://unitsofmeasure.org</url>
       <description>Universal Codes for Units of Measure</description>
     </CodeSystem>
   </update>
