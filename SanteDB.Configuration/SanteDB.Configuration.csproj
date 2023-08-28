@@ -76,6 +76,7 @@
     <Compile Include="Converters\StringCollectionRenderConverter.cs" />
     <Compile Include="Converters\DataProviderConverter.cs" />
     <Compile Include="Converters\TypeDisplayConverter.cs" />
+    <Compile Include="Editors\AleFieldSelectorEditor.cs" />
     <Compile Include="Editors\ConnectionStringEditor.cs" />
     <Compile Include="Editors\TimespanPickerEditor.cs" />
     <Compile Include="Editors\DateTimePickerEditor.cs" />
