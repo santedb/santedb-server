@@ -77,11 +77,11 @@
       <url>http://santedb.org/conceptsets/contrib/MaterialTypes</url>
       <compose>
         <operation>include</operation>
-        <targetConceptSet>ab16722f-dcf5-4f5a-9957-8f87dbb390d5</targetConceptSet>
+        <target>ab16722f-dcf5-4f5a-9957-8f87dbb390d5</target>
       </compose>
       <compose>
         <operation>include</operation>
-        <targetConceptSet>17331147-6e27-4adb-84b4-da105bf41094</targetConceptSet>
+        <target>17331147-6e27-4adb-84b4-da105bf41094</target>
       </compose>
     </ConceptSet>
   </update>
