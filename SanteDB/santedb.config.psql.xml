@@ -100,7 +100,7 @@
 
       <!-- Data Migration & Management -->
       <add type="SanteDB.Server.Core.Persistence.DataInitializationService, SanteDB.Server.Core" />
-      <add type="SanteDB.Core.Protocol.SimpleCarePlanService, SanteDB.Core.Api" />
+      <add type="SanteDB.Core.Cdss.SimpleCarePlanService, SanteDB.Core.Api" />
       <!--<add type="SanteDB.Persistence.MDM.Services.MdmDaemonService, SanteDB.Persistence.MDM" />-->
 
       <!-- Messaging Services-->
