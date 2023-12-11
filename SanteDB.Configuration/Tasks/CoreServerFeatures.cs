@@ -19,6 +19,7 @@
  * Date: 2023-3-10
  */
 using SanteDB.BI.Services.Impl;
+using SanteDB.Cdss.Xml;
 using SanteDB.Core.Applets.Services.Impl;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Data.Initialization;
@@ -76,6 +77,7 @@ namespace SanteDB.Configuration.Tasks
             typeof(AppletLocalizationService),
             typeof(CachedResourceCheckoutService),
             typeof(AppletDatasetProvider),
+            typeof(AppletClinicalProtocolInstaller),
             typeof(FileSystemDatasetProvider),
             typeof(DataInitializationService)
         };
