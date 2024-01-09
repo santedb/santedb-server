@@ -5,7 +5,7 @@ Version 3.0: [![Build Status](https://jenkins.fyfesoftware.ca/job/public-project
 
 ## Releases 
 
-You can get the most recent builds from our [Jenkins server](https://jenkins.fyfesoftware.ca/job/santedb-icdr-master). The most recent releases can be found in the Workspace/bin/dist folder.
+You can get the most recent builds from our [Jenkins server](https://jenkins.fyfesoftware.ca/job/public-projects/job/santedb-icdr-v3). The most recent releases can be found in the Workspace/bin/dist folder.
 
 ## Issue Tracker & Release Tracker
 
