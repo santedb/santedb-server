@@ -1,11 +1,11 @@
 # SanteDB iCDR Central Server
 
-Master: ![](https://jenkins.fyfesoftware.ca/buildStatus/icon?job=santedb-icdr-master&style=flat)
-Version 3.0: [![Build Status](https://jenkins.fyfesoftware.ca/job/santedb-icdr-v3/badge/icon)](https://jenkins.fyfesoftware.ca/job/santedb-icdr-v3/)
+Master: ![](https://jenkins.fyfesoftware.ca/buildStatus/icon?job=public-projects/santedb-icdr-master&style=flat)
+Version 3.0: [![Build Status](https://jenkins.fyfesoftware.ca/job/public-projects/job/santedb-icdr-v3/badge/icon)](https://jenkins.fyfesoftware.ca/job/public-projects/job/santedb-icdr-v3/)
 
 ## Releases 
 
-You can get the most recent builds from our [Jenkins server](https://jenkins.fyfesoftware.ca/job/santedb-icdr-master). The most recent releases can be found in the Workspace/bin/dist folder.
+You can get the most recent builds from our [Jenkins server](https://jenkins.fyfesoftware.ca/job/public-projects/job/santedb-icdr-v3). The most recent releases can be found in the Workspace/bin/dist folder.
 
 ## Issue Tracker & Release Tracker
 
