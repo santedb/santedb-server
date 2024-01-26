@@ -169,7 +169,7 @@ namespace SanteDB.Persistence.Diagnostics.Email
                 var issueId = DateTimeOffset.Now.ToString("yyyy-MM-dd-HHmmss");
 
                 var subject = $"SANTEDB ISSUE MAILER #{issueId}";
-                var body = $"<html><body><p>{storageData.LoadProperty<SecurityUser>("CreatedBy")?.UserName ?? storageData?.Submitter?.LoadProperty<SecurityUser>("SecurityUser")?.UserName ?? overrideAuthContext?.Identity.Name} has reported a bug</p><pre>{storageData.Note}</pre><p>You can reply directly to the reporter by pressing the Reply button in your mail client</p></body></html>";
+                var body = $"<html><body><p>{storageData.LoadProperty<SecurityUser>("CreatedBy")?.UserName ?? storageData?.Submitter?.LoadProperty<SecurityUser>("SecurityUser")?.UserName ?? overrideAuthContext?.Identity.Name} has reported a bug</p><pre>{storageData.Note}</pre><p>You can reply directly to the reporter by pressing the Reply button in your mail client</p><pre>{String.Join("\r\n",storageData.Tags?.Select(o=>$"{o.TagKey} = {o.Value}"))}</pre></body></html>";
                 var attachments = storageData.Attachments.Select(a =>
                 {
                     if (a is DiagnosticBinaryAttachment bin)
