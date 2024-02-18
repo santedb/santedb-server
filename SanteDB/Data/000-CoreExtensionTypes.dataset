@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<dataset xmlns="http://santedb.org/data" id="Core Extension Types v3.1">
+<dataset xmlns="http://santedb.org/data" id="Core Extension Types v3.2">
   <update insertIfNotExists="true">
     <ExtensionType xmlns="http://santedb.org/model">
       <id>77B53CBA-C32F-442B-B7A7-ED08184A0FA5</id>
@@ -34,6 +34,13 @@
       <id>6DE54C16-8D1C-48E4-B750-7A2F4552E86D</id>
       <handlerClass>SanteDB.Core.Extensions.DictionaryExtensionHandler, SanteDB.Core.Model</handlerClass>
       <name>http://santedb.org/extensions/core/detectedIssue</name>
+    </ExtensionType>
+  </update>
+  <update insertIfNotExists="true">
+    <ExtensionType xmlns="http://santedb.org/model">
+      <id>210DAD97-4F14-447B-962C-0AD6B5FC1933</id>
+      <handlerClass>SanteDB.Core.Extensions.DictionaryExtensionHandler, SanteDB.Core.Model</handlerClass>
+      <name>http://santedb.org/extensions/core/userPreferences</name>
     </ExtensionType>
   </update>
 
