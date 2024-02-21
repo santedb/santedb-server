@@ -31,8 +31,7 @@ INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_de
 		'2BBF068B-9121-4081-BF3C-AB62C01362EE', CD_ID, CD_ID, 'PROBABLE DUPLICATE / DUPLICATE'
 	FROM CD_SET_MEM_ASSOC_TBL WHERE SET_ID = '4e6da567-0094-4f23-8555-11da499593af'
   ON CONFLICT DO NOTHING;
-
-SELECT REG_PATCH('MDM-RELATIONSHIP');
+SELECT REG_PATCH('SIM-RELATIONSHIP');
       ]]>
     </exec>
     <exec invariant="fbsql">
@@ -42,8 +41,7 @@ INSERT INTO ent_rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, er
 	SELECT 
 		char_to_uuid('2BBF068B-9121-4081-BF3C-AB62C01362EE'), CD_ID, CD_ID, 'PROBABLE DUPLICATE / DUPLICATE'
 	FROM CD_SET_MEM_ASSOC_TBL WHERE SET_ID = char_to_uuid('4e6da567-0094-4f23-8555-11da499593af');
-
-SELECT REG_PATCH('MDM-RELATIONSHIP') FROM rdb$database;
+SELECT REG_PATCH('SIM-RELATIONSHIP') FROM rdb$database;
       ]]>
     </exec>
   </sql>

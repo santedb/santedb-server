@@ -14,7 +14,6 @@
       <name>http://santedb.org/extensions/ext/raceCode</name>
     </ExtensionType>
   </update>
-
   <update insertIfNotExists="true">
     <ExtensionType xmlns="http://santedb.org/model">
       <id>B944E7A9-8225-4E33-BB5B-3C3BC3DFA802</id>
@@ -43,7 +42,6 @@
       <name>http://santedb.org/extensions/core/userPreferences</name>
     </ExtensionType>
   </update>
-
   <update insertIfNotExists="true">
     <ExtensionType xmlns="http://santedb.org/model">
       <id>E8F05D38-60E2-4C8B-B3BE-08286148F077</id>

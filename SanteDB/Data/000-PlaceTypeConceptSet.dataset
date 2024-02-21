@@ -13,20 +13,13 @@
     <Concept xmlns="http://santedb.org/model">
       <id>fa3041e3-42cc-41de-a9bc-35ec8530b691</id>
       <creationTime>0001-01-01T00:00:00.0000000+00:00</creationTime>
-      <previousVersion xsi:nil="true" />
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Facility-CommunityHospital</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <name>
-        <source xsi:nil="true" />
-        <effectiveVersionSequence xsi:nil="true" />
-        <obsoleteVersionSequence xsi:nil="true" />
         <language>en</language>
         <value>Community Hospital</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
       <conceptSet>C65719EC-0795-47EC-8AAF-DCB867C5CA56</conceptSet>
     </Concept>
@@ -35,20 +28,13 @@
     <Concept xmlns="http://santedb.org/model">
       <id>fa487084-5c69-4f08-b9ee-92955b09305d</id>
       <creationTime>0001-01-01T00:00:00.0000000+00:00</creationTime>
-      <previousVersion xsi:nil="true" />
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Facility-GovernmentHospital</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <name>
-        <source xsi:nil="true" />
-        <effectiveVersionSequence xsi:nil="true" />
-        <obsoleteVersionSequence xsi:nil="true" />
         <language>en</language>
         <value>Government Hospital</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
       <conceptSet>C65719EC-0795-47EC-8AAF-DCB867C5CA56</conceptSet>
     </Concept>
@@ -57,20 +43,13 @@
     <Concept xmlns="http://santedb.org/model">
       <id>fa587084-5c69-4f08-b9ee-92955b09305d</id>
       <creationTime>0001-01-01T00:00:00.0000000+00:00</creationTime>
-      <previousVersion xsi:nil="true" />
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Facility-LocalHealthCenter</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <name>
-        <source xsi:nil="true" />
-        <effectiveVersionSequence xsi:nil="true" />
-        <obsoleteVersionSequence xsi:nil="true" />
         <language>en</language>
         <value>Local Community Health Center</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
       <conceptSet>C65719EC-0795-47EC-8AAF-DCB867C5CA56</conceptSet>
     </Concept>
@@ -79,20 +58,13 @@
     <Concept xmlns="http://santedb.org/model">
       <id>fa687084-5c69-4f08-b9ee-92955b09305d</id>
       <creationTime>0001-01-01T00:00:00.0000000+00:00</creationTime>
-      <previousVersion xsi:nil="true" />
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Facility-RuralHealthCenter</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <name>
-        <source xsi:nil="true" />
-        <effectiveVersionSequence xsi:nil="true" />
-        <obsoleteVersionSequence xsi:nil="true" />
         <language>en</language>
         <value>Rural Health Center</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
       <conceptSet>C65719EC-0795-47EC-8AAF-DCB867C5CA56</conceptSet>
     </Concept>
@@ -101,20 +73,13 @@
     <Concept xmlns="http://santedb.org/model">
       <id>fa787084-5c69-4f08-b9ee-92955b09305d</id>
       <creationTime>0001-01-01T00:00:00.0000000+00:00</creationTime>
-      <previousVersion xsi:nil="true" />
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Facility-VaccinationClinic</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <name>
-        <source xsi:nil="true" />
-        <effectiveVersionSequence xsi:nil="true" />
-        <obsoleteVersionSequence xsi:nil="true" />
         <language>en</language>
         <value>Vaccination Clinic</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
       <conceptSet>C65719EC-0795-47EC-8AAF-DCB867C5CA56</conceptSet>
     </Concept>
@@ -123,20 +88,13 @@
     <Concept xmlns="http://santedb.org/model">
       <id>fa887084-5c69-4f08-b9ee-92955b09305d</id>
       <creationTime>0001-01-01T00:00:00.0000000+00:00</creationTime>
-      <previousVersion xsi:nil="true" />
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Facility-PrivatePractice</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <name>
-        <source xsi:nil="true" />
-        <effectiveVersionSequence xsi:nil="true" />
-        <obsoleteVersionSequence xsi:nil="true" />
         <language>en</language>
         <value>Private Practice</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
       <conceptSet>C65719EC-0795-47EC-8AAF-DCB867C5CA56</conceptSet>
     </Concept>

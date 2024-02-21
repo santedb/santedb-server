@@ -3,11 +3,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9193fcd0-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Andorra</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -47,11 +44,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9193ffbe-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-UnitedArabEmirates</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -81,11 +75,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>919400f4-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Afghanistan</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -115,11 +106,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91940202-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-AntiguaAndBarbuda</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -149,11 +137,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194054a-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Anguilla</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -183,11 +168,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91940644-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Albania</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -217,11 +199,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91940748-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Armenia</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -251,11 +230,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91940842-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-NetherlandsAntilles</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -285,11 +261,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91940946-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Angola</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -319,11 +292,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91940f04-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Argentina</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -353,11 +323,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91941058-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-AmericanSamoa</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -387,11 +354,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194115c-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Austria</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -421,11 +385,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194127e-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Australia</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -455,11 +416,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194136e-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Aruba</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -489,11 +447,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91941576-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Azerbaijan</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -523,11 +478,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91941684-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-BosniaAndHerzegovina</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -557,11 +509,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91941936-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Barbados</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -591,11 +540,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91941a3a-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Bangladesh</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -625,11 +571,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91941b52-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Belgium</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -659,11 +602,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91941c6a-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-BurkinaFaso</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -693,11 +633,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91941d78-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Bulgaria</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -727,11 +664,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91941e72-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Bahrain</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -761,11 +695,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91941f76-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Burundi</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -795,11 +726,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91942318-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Benin</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -829,11 +757,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194252a-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Bermuda</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -863,11 +788,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194264c-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Brunei</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -897,11 +819,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>919427be-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Bolivia</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -931,11 +850,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91942944-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-BritishAntarcticTerritory</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -965,11 +881,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91942af2-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Brazil</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -999,11 +912,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91942ca0-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Bahamas</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -1033,11 +943,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91943092-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Bhutan</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -1067,11 +974,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>919434de-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Botswana</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -1101,11 +1005,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91943678-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Belarus</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -1135,11 +1036,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194383a-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Belize</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -1169,11 +1067,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>919439ca-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Canada</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -1203,11 +1098,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91943b3c-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-CocosKeelingIslands</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -1237,11 +1129,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91943cae-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-CongoKinshasa</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -1271,11 +1160,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91944096-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-CentralAfricanRepublic</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -1305,11 +1191,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>919441cc-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-CongoBrazzaville</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -1339,11 +1222,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>919442da-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Switzerland</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -1373,11 +1253,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>919443f2-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-CoTeDIvoire</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -1407,11 +1284,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>919444f6-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-CookIslands</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -1441,11 +1315,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194460e-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Chile</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -1475,11 +1346,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91944ac8-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Cameroon</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -1509,11 +1377,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91944e7e-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-China</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -1543,11 +1408,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91944fbe-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Colombia</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -1577,11 +1439,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>919450d6-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-CostaRica</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -1611,11 +1470,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91945202-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-SerbiaAndMontenegro</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -1645,11 +1501,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194543c-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Cuba</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -1679,11 +1532,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91945540-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-CapeVerde</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -1713,11 +1563,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91945662-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Curasao</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -1747,11 +1594,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91945914-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-ChristmasIsland</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -1781,11 +1625,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91945a40-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Cyprus</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -1815,11 +1656,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91945b8a-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-CzechRepublic</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -1849,11 +1687,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91945d10-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Germany</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -1883,11 +1718,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91945e3c-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Djibouti</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -1917,11 +1749,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91945f4a-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Denmark</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -1951,11 +1780,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91946062-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Dominica</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -1985,11 +1811,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194615c-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-DominicanRepublic</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -2019,11 +1842,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>919464c2-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Algeria</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -2053,11 +1873,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>919465da-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Ecuador</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -2087,11 +1904,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>919466fc-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Estonia</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -2121,11 +1935,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91946814-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Egypt</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -2155,11 +1966,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91946918-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-WesternSahara</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -2189,11 +1997,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91946a1c-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Eritrea</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -2223,11 +2028,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91946b3e-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Spain</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -2257,11 +2059,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91946c56-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Ethiopia</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -2291,11 +2090,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91946fee-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Finland</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -2325,11 +2121,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91947106-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Fiji</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -2359,11 +2152,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194721e-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-FalklandIslands</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -2393,11 +2183,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194734a-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Micronesia</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -2427,11 +2214,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91947458-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-FaroeIslands</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -2461,11 +2245,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91947674-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-France</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -2495,11 +2276,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91947ba6-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Gabon</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -2529,11 +2307,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91947cb4-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-UnitedKingdom</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -2563,11 +2338,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91947dd6-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Grenada</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -2597,11 +2369,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91947eda-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Georgia</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -2631,11 +2400,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194811e-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Guernsey</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -2665,11 +2431,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194822c-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Ghana</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -2699,11 +2462,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91948510-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Gibraltar</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -2733,11 +2493,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91948628-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Greenland</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -2767,11 +2524,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91948754-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Gambia</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -2801,11 +2555,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194886c-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Guinea</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -2835,11 +2586,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91948984-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Guadeloupe</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -2869,11 +2617,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91948aa6-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-EquatorialGuinea</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -2903,11 +2648,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91948bbe-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Greece</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -2937,11 +2679,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91948ccc-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-SouthGeorgiaAndTheSouthSandwichIslands</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -2971,11 +2710,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91949208-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Guatemala</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -3005,11 +2741,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91949334-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Guam</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -3039,11 +2772,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91949460-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-GuineaBissau</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -3073,11 +2803,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194956e-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Guyana</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -3107,11 +2834,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194967c-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-HongKongSARChina</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -3141,11 +2865,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194978a-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-HeardIslandAndMcDonaldIslands</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -3175,11 +2896,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91949898-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Honduras</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -3209,11 +2927,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>919499a6-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Croatia</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -3243,11 +2958,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91949d7a-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Haiti</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -3277,11 +2989,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91949ec4-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Hungary</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -3311,11 +3020,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91949fe6-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Indonesia</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -3345,11 +3051,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194a108-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Ireland</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -3379,11 +3082,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194a22a-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Israel</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -3413,11 +3113,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194a34c-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-IsleOfMan</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -3447,11 +3144,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194a464-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-India</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -3481,11 +3175,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194a586-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-BritishIndianOceanTerritory</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -3515,11 +3206,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194a8a6-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Iraq</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -3549,11 +3237,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194a9c8-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Iran</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -3583,11 +3268,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194aae0-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Iceland</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -3617,11 +3299,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194abee-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Italy</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -3651,11 +3330,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194ad1a-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Jersey</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -3685,11 +3361,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194ae32-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Jamaica</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -3719,11 +3392,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194af40-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Jordan</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -3753,11 +3423,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194b04e-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Japan</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -3787,11 +3454,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194b472-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Kenya</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -3821,11 +3485,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194b580-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Kyrgyzstan</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -3855,11 +3516,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194b684-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Cambodia</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -3889,11 +3547,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194b7a6-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Kiribati</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -3923,11 +3578,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194b8b4-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Comoros</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -3957,11 +3609,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194b9c2-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-SaintKittsAndNevis</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -3991,11 +3640,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194bad0-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-NorthKorea</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -4025,11 +3671,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194be22-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-SouthKorea</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -4059,11 +3702,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194bf58-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Kuwait</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -4093,11 +3733,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194c070-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-CaymanIslands</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -4127,11 +3764,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194c188-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Kazakhstan</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -4161,11 +3795,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194c296-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Laos</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -4195,11 +3826,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194c3a4-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Lebanon</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -4229,11 +3857,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194c4b2-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-SaintLucia</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -4263,11 +3888,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194c5c0-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Liechtenstein</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -4297,11 +3919,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194c96c-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-SriLanka</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -4331,11 +3950,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194caa2-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Liberia</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -4365,11 +3981,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194cbb0-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Lesotho</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -4399,11 +4012,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194ccbe-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Lithuania</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -4433,11 +4043,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194cdd6-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Luxembourg</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -4467,11 +4074,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194ceda-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Latvia</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -4501,11 +4105,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194cfe8-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Libya</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -4535,11 +4136,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194d10a-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Morocco</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -4569,11 +4167,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194d470-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Monaco</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -4603,11 +4198,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194d588-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Moldova</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -4637,11 +4229,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194d6a0-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Montenegro</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -4671,11 +4260,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194d7ae-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-SaintMartin</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -4705,11 +4291,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194d8c6-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Madagascar</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -4739,11 +4322,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194d9d4-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-MarshallIslands</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -4773,11 +4353,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194de8e-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Macedonia</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -4807,11 +4384,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194dfc4-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Mali</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -4841,11 +4415,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194e0d2-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-MyanmarBurma</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -4875,11 +4446,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194e1fe-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Mongolia</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -4909,11 +4477,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194e500-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-MacauSARChina</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -4943,11 +4508,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194e686-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-NorthernMarianaIslands</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -4977,11 +4539,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194e852-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Martinique</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -5011,11 +4570,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194e9ce-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Mauritania</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -5045,11 +4601,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194ed7a-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Montserrat</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -5079,11 +4632,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194eea6-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Malta</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -5113,11 +4663,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194efbe-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Mauritius</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -5147,11 +4694,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194f0cc-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Maldives</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -5181,11 +4725,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194f1e4-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Malawi</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -5215,11 +4756,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194f2fc-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Mexico</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -5249,11 +4787,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194f41e-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Malaysia</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -5283,11 +4818,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194f52c-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Mozambique</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -5317,11 +4849,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194f7fc-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Namibia</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -5351,11 +4880,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194f90a-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-NewCaledonia</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -5385,11 +4911,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194fa2c-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Niger</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -5419,11 +4942,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194fb30-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-NorfolkIsland</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -5453,11 +4973,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194fc48-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Nigeria</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -5487,11 +5004,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194fd56-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Nicaragua</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -5521,11 +5035,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9194fe5a-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Netherlands</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -5555,11 +5066,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91950152-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Norway</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -5589,11 +5097,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9195044a-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Nepal</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -5623,11 +5128,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9195067a-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Nauru</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -5657,11 +5159,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91950882-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Niue</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -5691,11 +5190,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>919509a4-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-NewZealand</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -5725,11 +5221,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91950ac6-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Oman</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -5759,11 +5252,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91950dd2-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Panama</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -5793,11 +5283,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91950ff8-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Peru</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -5827,11 +5314,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91951110-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-FrenchPolynesia</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -5861,11 +5345,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91951232-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-PapuaNewGuinea</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -5895,11 +5376,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>919514f8-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Philippines</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -5929,11 +5407,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9195161a-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Pakistan</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -5963,11 +5438,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9195173c-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Poland</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -5997,11 +5469,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91951854-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-SaintPierreAndMiquelon</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -6031,11 +5500,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9195196c-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-PitcairnIslands</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -6065,11 +5531,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91951a84-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-PuertoRico</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -6099,11 +5562,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91951b92-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-PalestinianTerritories</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -6133,11 +5593,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91951ee4-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Portugal</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -6167,11 +5624,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91952132-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Palau</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -6201,11 +5655,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9195224a-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Paraguay</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -6235,11 +5686,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9195245c-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Qatar</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -6269,11 +5717,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9195256a-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Raunion</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -6303,11 +5748,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91952682-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Romania</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -6337,11 +5779,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>919529d4-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Serbia</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -6371,11 +5810,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91952b00-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Russia</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -6405,11 +5841,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91952c22-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Rwanda</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -6439,11 +5872,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91952d26-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-SaudiArabia</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -6473,11 +5903,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91952e34-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-SolomonIslands</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -6507,11 +5934,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91952f42-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Seychelles</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -6541,11 +5965,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91953050-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Sudan</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -6575,11 +5996,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91953348-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Sweden</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -6609,11 +6027,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9195346a-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Singapore</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -6643,11 +6058,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91953578-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-SaintHelena</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -6677,11 +6089,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91953686-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Slovenia</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -6711,11 +6120,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91953794-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-SvalbardAndJanMayen</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -6745,11 +6151,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>919538a2-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Slovakia</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -6779,11 +6182,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>919539b0-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-SierraLeone</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -6813,11 +6213,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91953abe-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-SanMarino</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -6847,11 +6244,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91953db6-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Senegal</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -6881,11 +6275,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91953ec4-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Somalia</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -6915,11 +6306,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91953fd2-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Suriname</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -6949,11 +6337,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>919540cc-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-SaoTomeaAndPriNcipe</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -6983,11 +6368,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>919542de-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-ElSalvador</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -7017,11 +6399,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>919543e2-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Syria</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -7051,11 +6430,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>919546f8-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Swaziland</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -7085,11 +6461,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91954810-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-TurksAndCaicosIslands</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -7119,11 +6492,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91954928-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Chad</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -7153,11 +6523,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91954b8a-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-FrenchSouthernTerritories</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -7187,11 +6554,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91954cd4-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Togo</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -7221,11 +6585,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91954dec-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Thailand</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -7255,11 +6616,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91954ef0-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Tajikistan</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -7289,11 +6647,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91954ffe-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Tokelau</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -7323,11 +6678,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>919554a4-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-TimorLeste</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -7357,11 +6709,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>919555c6-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Turkmenistan</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -7391,11 +6740,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>919556d4-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Tunisia</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -7425,11 +6771,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>919557f6-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Tonga</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -7459,11 +6802,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91955922-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Turkey</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -7493,11 +6833,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91955a30-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-TrinidadAndTobago</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -7527,11 +6864,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91955b34-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Tuvalu</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -7561,11 +6895,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91955e72-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Taiwan</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -7595,11 +6926,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91955f94-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Tanzania</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -7629,11 +6957,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>919560a2-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Ukraine</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -7663,11 +6988,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>919561c4-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Uganda</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -7697,11 +7019,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>919562d2-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-USMinorOutlyingIslands</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -7731,11 +7050,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>919563f4-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-UnitedStates</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -7765,11 +7081,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>919564f8-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Uruguay</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -7799,11 +7112,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>91956606-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Uzbekistan</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -7833,11 +7143,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9195aa6c-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-VaticanCity</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -7867,11 +7174,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9195ab98-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-SaintVincentAndTheGrenadines</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -7901,11 +7205,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9195ac9c-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Venezuela</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -7935,11 +7236,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9195adaa-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-BritishVirginIslands</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -7969,11 +7267,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9195aeb8-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-USVirginIslands</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -8003,11 +7298,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9195afc6-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Vietnam</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -8037,11 +7329,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9195b2a0-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Vanuatu</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -8071,11 +7360,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9195b3b8-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-WallisAndFutuna</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -8105,11 +7391,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9195b4bc-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Samoa</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -8139,11 +7422,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9195b5b6-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Yemen</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -8173,11 +7453,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9195b6ba-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Mayotte</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -8207,11 +7484,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9195b7fa-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-SouthAfrica</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -8241,11 +7515,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9195b912-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Zambia</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>
@@ -8275,11 +7546,8 @@
   <update skipIfError="true" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>9195ba3e-6983-11ec-90d6-0242ac120003</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Country-Zimbabwe</mnemonic>
-      <statusConcept xsi:nil="true" />
      <conceptClass>0D6B3439-C9BE-4480-AF39-EEB457C052D0</conceptClass>
       <name>
         <language>en</language>

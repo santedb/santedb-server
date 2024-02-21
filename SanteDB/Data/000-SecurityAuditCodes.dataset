@@ -20,7 +20,6 @@
       <name>
         <language>en</language>
         <value>Application Activity</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
   </update>
@@ -28,8 +27,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>388e3145-735d-4614-9bd3-61c8b5770cb6</id>
       <creationTime>2017-04-10T08:57:25.0000000-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>SecurityAuditCode-ApplicationActivity</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -53,7 +50,6 @@
       <name>
         <language>en</language>
         <value>Audit Log Used</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
   </update>
@@ -61,8 +57,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>e9917033-807a-4408-8ccb-2e71a0f220a0</id>
       <creationTime>2017-04-10T08:57:25.0000000-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>SecurityAuditCode-AuditLogUsed</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -86,7 +80,6 @@
       <name>
         <language>en</language>
         <value>Begin Transferring DICOM Instances</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
   </update>
@@ -94,8 +87,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>d3e5bba8-462d-4fe8-b787-821c38b4b011</id>
       <creationTime>2017-04-10T08:57:25.0000000-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>SecurityAuditCode-BeginTransferringDICOMInstances</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -119,7 +110,6 @@
       <name>
         <language>en</language>
         <value>DICOM Instances Accessed</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
   </update>
@@ -127,8 +117,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>5eceb3da-b5cd-434d-b045-8ce07635ac81</id>
       <creationTime>2017-04-10T08:57:25.0000000-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>SecurityAuditCode-DICOMInstancesAccessed</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -147,8 +135,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>5eceb3da-b5cd-fd3d-b045-8ce07635ac99</id>
       <creationTime>2017-04-10T08:57:25.0000000-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>SecurityAuditCode-SecondaryUseQuery</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -168,7 +154,6 @@
       <name>
         <language>en</language>
         <value>DICOM Instances Transferred</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
   </update>
@@ -176,8 +161,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>b7ec2f59-c0a7-4479-8f02-0f2a20857f43</id>
       <creationTime>2017-04-10T08:57:25.0000000-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>SecurityAuditCode-DICOMInstancesTransferred</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -201,7 +184,6 @@
       <name>
         <language>en</language>
         <value>DICOM Study Deleted</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
   </update>
@@ -209,8 +191,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>8991812b-c7ef-4b93-a745-28931d3740b9</id>
       <creationTime>2017-04-10T08:57:25.0000000-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>SecurityAuditCode-DICOMStudyDeleted</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -234,7 +214,6 @@
       <name>
         <language>en</language>
         <value>Export</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
   </update>
@@ -242,8 +221,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>5f6a7ec9-037e-4fca-9065-89b5aa9db3bc</id>
       <creationTime>2017-04-10T08:57:25.0000000-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>SecurityAuditCode-Export</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -267,7 +244,6 @@
       <name>
         <language>en</language>
         <value>Import</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
   </update>
@@ -275,8 +251,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>7f36848a-fd03-42aa-86b6-7e9ffd2d8d00</id>
       <creationTime>2017-04-10T08:57:25.0000000-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>SecurityAuditCode-Import</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -300,7 +274,6 @@
       <name>
         <language>en</language>
         <value>Network Activity</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
   </update>
@@ -308,8 +281,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>bd147cbe-822b-4e03-b12d-ec26469c5453</id>
       <creationTime>2017-04-10T08:57:25.0000000-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>SecurityAuditCode-NetworkActivity</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -333,7 +304,6 @@
       <name>
         <language>en</language>
         <value>Order Record</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
   </update>
@@ -341,8 +311,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>5482ebf2-a4c9-4f92-8da6-7642d66077a5</id>
       <creationTime>2017-04-10T08:57:25.0000000-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>SecurityAuditCode-OrderRecord</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -366,7 +334,6 @@
       <name>
         <language>en</language>
         <value>Patient Record</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
   </update>
@@ -374,8 +341,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>43d13253-7d44-4dd7-aaeb-dc7bc4bd3bea</id>
       <creationTime>2017-04-10T08:57:25.0000000-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>SecurityAuditCode-PatientRecord</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -399,7 +364,6 @@
       <name>
         <language>en</language>
         <value>Procedure Record</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
   </update>
@@ -407,8 +371,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>d918ce7f-8d1e-4d45-b1d1-a043deaef36f</id>
       <creationTime>2017-04-10T08:57:25.0000000-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>SecurityAuditCode-ProcedureRecord</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -432,7 +394,6 @@
       <name>
         <language>en</language>
         <value>Query</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
   </update>
@@ -440,8 +401,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>1658a4d5-100b-4357-9125-7a11068803a2</id>
       <creationTime>2017-04-10T08:57:25.0000000-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>SecurityAuditCode-Query</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -465,7 +424,6 @@
       <name>
         <language>en</language>
         <value>Security Alert</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
   </update>
@@ -473,8 +431,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>7e8708ca-27ec-41a5-87ad-456ab841cf78</id>
       <creationTime>2017-04-10T08:57:25.0000000-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>SecurityAuditCode-SecurityAlert</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -498,7 +454,6 @@
       <name>
         <language>en</language>
         <value>User Authentication</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
   </update>
@@ -506,8 +461,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>c49ef67f-2bfe-4fcf-9fc8-d242e480a8b3</id>
       <creationTime>2017-04-10T08:57:25.0000000-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>SecurityAuditCode-UserAuthentication</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -531,7 +484,6 @@
       <name>
         <language>en</language>
         <value>Application Start</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
   </update>
@@ -539,8 +491,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>3887f09c-d150-4bac-9d9c-bfde39b3a843</id>
       <creationTime>2017-04-10T08:57:25.0000000-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>SecurityAuditCode-ApplicationStart</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -564,7 +514,6 @@
       <name>
         <language>en</language>
         <value>Application Stop</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
   </update>
@@ -572,8 +521,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>b4366500-9691-4a28-ae29-36df950f0e18</id>
       <creationTime>2017-04-10T08:57:25.0000000-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>SecurityAuditCode-ApplicationStop</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -597,7 +544,6 @@
       <name>
         <language>en</language>
         <value>Login</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
   </update>
@@ -605,8 +551,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>b598b35a-2dda-49ad-b7a7-3b21122c55b0</id>
       <creationTime>2017-04-10T08:57:25.0000000-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>SecurityAuditCode-Login</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -630,7 +574,6 @@
       <name>
         <language>en</language>
         <value>Logout</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
   </update>
@@ -638,8 +581,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>e207e584-de07-433c-960a-ff9af96bce1c</id>
       <creationTime>2017-04-10T08:57:25.0000000-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>SecurityAuditCode-Logout</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -663,7 +604,6 @@
       <name>
         <language>en</language>
         <value>Attach</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
   </update>
@@ -671,8 +611,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>4aa6d206-17f4-43b4-9adc-821bfadf2e04</id>
       <creationTime>2017-04-10T08:57:25.0000000-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>SecurityAuditCode-Attach</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -696,7 +634,6 @@
       <name>
         <language>en</language>
         <value>Detach</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
   </update>
@@ -704,8 +641,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>c36a7b3a-1068-4805-986c-07764f515905</id>
       <creationTime>2017-04-10T08:57:25.0000000-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>SecurityAuditCode-Detach</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -729,7 +664,6 @@
       <name>
         <language>en</language>
         <value>Node Authentication</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
   </update>
@@ -737,8 +671,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>aff3bcb8-a0f0-49f1-bc43-b60b17a651da</id>
       <creationTime>2017-04-10T08:57:25.0000000-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>SecurityAuditCode-NodeAuthentication</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -762,7 +694,6 @@
       <name>
         <language>en</language>
         <value>Emergency Override Started</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
   </update>
@@ -770,8 +701,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>b8f579c6-196b-4bdb-8326-8ac3edafd94d</id>
       <creationTime>2017-04-10T08:57:25.0000000-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>SecurityAuditCode-EmergencyOverrideStarted</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -795,7 +724,6 @@
       <name>
         <language>en</language>
         <value>Use of a restricted function</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
   </update>
@@ -803,8 +731,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>058ed06d-9fd8-4ebd-a709-e00736218c63</id>
       <creationTime>2017-04-10T08:57:25.0000000-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>SecurityAuditCode-Useofarestrictedfunction</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -828,7 +754,6 @@
       <name>
         <language>en</language>
         <value>Security attributes changed</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
   </update>
@@ -836,8 +761,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>d06e36ff-2fc3-445b-a497-1ae9f1624387</id>
       <creationTime>2017-04-10T08:57:25.0000000-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>SecurityAuditCode-Securityattributeschanged</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -861,7 +784,6 @@
       <name>
         <language>en</language>
         <value>Security roles changed</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
   </update>
@@ -869,8 +791,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>cea9df32-2012-4ca0-9b0d-4fc69b837c1b</id>
       <creationTime>2017-04-10T08:57:25.0000000-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>SecurityAuditCode-Securityroleschanged</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -885,7 +805,6 @@
       </name>
     </Concept>
   </update>
-  
   <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>19e890c1-7f1f-4022-8f75-973b6b69a3ed</id>
@@ -895,7 +814,6 @@
       <name>
         <language>en</language>
         <value>User security attribute changed</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
   </update>
@@ -903,8 +821,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>b25f9223-0da1-440c-8362-aec1c07bbdf8</id>
       <creationTime>2017-04-10T08:57:25.0000000-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>SecurityAuditCode-Usersecurityattributechanged</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -919,7 +835,6 @@
       </name>
     </Concept>
   </update>
-
   <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>29e890c1-7f1f-4022-8f75-973b6b69a3ff</id>
@@ -929,7 +844,6 @@
       <name>
         <language>en</language>
         <value>Audit Recording Stopped</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
   </update>
@@ -937,8 +851,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>c25f9223-0da1-440c-8362-aec1c07bbdff</id>
       <creationTime>2017-04-10T08:57:25.0000000-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>SecurityAuditCode-AuditLoggingStopped</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -953,7 +865,6 @@
       </name>
     </Concept>
   </update>
-
   <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>39e890c1-7f1f-4022-8f75-973b6b69a3ff</id>
@@ -963,7 +874,6 @@
       <name>
         <language>en</language>
         <value>Audit Recording Started</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
   </update>
@@ -971,8 +881,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>d25f9223-0da1-440c-8362-aec1c07bbdff</id>
       <creationTime>2017-04-10T08:57:25.0000000-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>SecurityAuditCode-AuditLoggingStarted</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -987,13 +895,10 @@
       </name>
     </Concept>
   </update>
-
   <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>b25f9223-0fd1-440c-8362-aec1c07bbdf8</id>
       <creationTime>2017-04-10T08:57:25.0000000-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>SecurityAuditCode-SecurityObjectChanged</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -1004,8 +909,6 @@
       </name>
     </Concept>
   </update>
-  
-  
   <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>4947af42-e20c-4c41-a357-4a6f9753ff00</id>
@@ -1015,7 +918,6 @@
       <name>
         <language>en</language>
         <value>Session Start</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
   </update>
@@ -1023,8 +925,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>388e3145-735d-4614-9bd3-61c8b577ff00</id>
       <creationTime>2017-04-10T08:57:25.0000000-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>SecurityAuditCode-SessionStarted</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -1048,7 +948,6 @@
       <name>
         <language>en</language>
         <value>Session Stopped</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
   </update>
@@ -1056,8 +955,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>388e3145-735d-4614-9bd3-61c8b577ff01</id>
       <creationTime>2017-04-10T08:57:25.0000000-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>SecurityAuditCode-SessionStopped</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -1081,7 +978,6 @@
       <name>
         <language>en</language>
         <value>Access Control Decision</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
   </update>
@@ -1089,8 +985,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>388e3145-735d-4614-9bd3-61c8b577ff02</id>
       <creationTime>2017-04-10T08:57:25.0000000-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>SecurityAuditCode-AccessControlDecision</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -1105,7 +999,6 @@
       </name>
     </Concept>
   </update>
-
   <update insertIfNotExists="true">
     <ConceptSet xmlns="http://santedb.org/model">
       <id>043974d5-5032-452e-8ba9-b3a022f592eb</id>

@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Certificate Management Policies">
-
   <update insertIfNotExists="true">
     <SecurityPolicy xmlns="http://santedb.org/model">
       <id>711F88CF-0D0C-4A3F-AED7-FA9535AA5F24</id>
@@ -10,7 +9,6 @@
       <canOverride>false</canOverride>
     </SecurityPolicy>
   </update>
-  
   <update insertIfNotExists="true">
     <SecurityPolicy xmlns="http://santedb.org/model">
       <id>a11F88CF-0D0C-4A3F-AED7-FA9535AA5F24</id>

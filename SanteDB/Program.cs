@@ -337,11 +337,7 @@ namespace SanteDB
                     var processedConnections = new List<String>();
                     foreach (var ormConfiguration in configuration.Sections.OfType<OrmConfigurationBase>())
                     {
-                        if (processedConnections.Contains(ormConfiguration.ReadWriteConnectionString) ||
-                            ormConfiguration.AleConfiguration == null)
-                        {
-                            continue;
-                        }
+                        
 
                         processedConnections.Add(ormConfiguration.ReadWriteConnectionString);
 
@@ -361,7 +357,7 @@ namespace SanteDB
                             provider.ConnectionString = connectionString.ToString();
 
                             // Decrypt - 
-                            Console.WriteLine("Rotating keys (this may take several hours)...");
+                            Console.WriteLine("Rotating keys for {0} (this may take several hours)...", ormConfiguration.GetType().Name);
                             provider.SetEncryptionSettings(ormConfiguration.AleConfiguration);
 
                             provider.GetEncryptionProvider();
