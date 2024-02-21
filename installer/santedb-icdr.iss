@@ -231,7 +231,7 @@ Source: ..\bin\Release\SanteDB.PakMan.Common.dll; DestDir: {app}; Components: de
 
 
 ; Common BRE
-Source: ..\bin\Release\Antlr3.Runtime.dll; DestDir: {app}; Components: core\bre core\protocol core
+Source: ..\bin\Release\Antlr*.dll; DestDir: {app}; Components: core\bre core\protocol core
 Source: ..\bin\Release\DynamicExpresso.Core.dll; DestDir: {app}; Components: core\bre core\protocol                              
 Source: ..\bin\Release\Jint.dll; DestDir: {app}; Components: core\bre
 Source: ..\bin\Release\Esprima.dll; DestDir: {app}; Components: core\bre

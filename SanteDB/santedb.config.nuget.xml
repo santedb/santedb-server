@@ -604,7 +604,7 @@
       <add type="SanteDB.Server.Core.Persistence.DataInitializationService, SanteDB.Server.Core" />
 
       <!-- Care Planning Services -->
-      <add type="SanteDB.Core.Protocol.SimpleCarePlanService, SanteDB.Core.Api" />
+      <add type="SanteDB.Core.Cdss.SimpleCarePlanService, SanteDB.Core.Api" />
 
       <!-- Messaging Services-->
       <!-- OAUTH 2.0 Plugin -->

@@ -477,7 +477,7 @@
       
       <name>Allergies and Intolerance Types</name>
       <mnemonic>AllergyIntoleranceCode</mnemonic>
-      <oid>1.3.6.1.4.1.33349.3.1.5.9.1.39</oid>
+      <oid>1.3.6.1.4.1.33349.3.1.5.9.3.39</oid>
       <url>http://santedb.org/conceptsets/contrib/AllergyIntoleranceCode</url>
       <concept>d001f69c-118c-4080-a675-51be0ec51f86</concept>
       <concept>d0962d26-2230-41fd-a67c-02ce905c5d1f</concept>

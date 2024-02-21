@@ -29,6 +29,8 @@ using System.Security.Principal;
 using System.Text;
 using Twilio.TwiML.Voice;
 using System.Linq;
+using SanteDB.Core;
+using SanteDB.Core.Security.Tfa;
 
 namespace SanteDB.Security.Tfa.Twilio
 {
@@ -61,6 +63,17 @@ namespace SanteDB.Security.Tfa.Twilio
         public string Name => "org.santedb.tfa.sms";
 
         /// <inheritdoc/>
+        public SanteDBHostType[] HostTypes => new SanteDBHostType[] {
+            SanteDBHostType.Server
+        };
+
+        /// <inheritdoc/>
+        public TfaMechanismClassification Classification => TfaMechanismClassification.Message;
+
+        /// <inheritdoc/>
+        public string SetupHelpText => "org.santedb.tfa.sms.setup";
+
+        /// <inheritdoc/>
         public string Send(IIdentity user)
         {
             if (null == user)
@@ -70,33 +83,43 @@ namespace SanteDB.Security.Tfa.Twilio
 
             if (user is IClaimsIdentity ci)
             {
-                var tonumber = ci.GetFirstClaimValue(SanteDBClaimTypes.Telephone);
+                var tonumber = this.GetTelephoneNumberOrThrow(ci);
+                string secret =  _TfaCodeProvider.GenerateTfaCode(ci);
+                return this.SendNotification(tonumber, secret, user.Name);
+            }
+            else
+            {
+                throw new InvalidOperationException("Cannot send notification to non-claims identity.");
+            }
+        }
 
-                if (string.IsNullOrWhiteSpace(tonumber))
-                {
-                    throw new InvalidOperationException("SMS TFA requires telephone registered");
-                }
-                else if (!tonumber.StartsWith("sms:", StringComparison.OrdinalIgnoreCase))
-                {
-                    tonumber = "sms:" + tonumber;
-                }
+        /// <summary>
+        /// Get the telephone number from <paramref name="claimsIdentity"/> or throw <see cref="InvalidOperationException"/>
+        /// </summary>
+        private string GetTelephoneNumberOrThrow(IClaimsIdentity claimsIdentity)
+        {
+            var tonumber = claimsIdentity.GetFirstClaimValue(SanteDBClaimTypes.Telephone);
 
+            if (string.IsNullOrWhiteSpace(tonumber))
+            {
+                throw new InvalidOperationException("SMS TFA requires telephone registered");
+            }
+            else if (!tonumber.StartsWith("sms:", StringComparison.OrdinalIgnoreCase))
+            {
+                return "sms:" + tonumber;
+            }
+            return tonumber;
+        }
 
-                string secret = null; 
-                try
-                {
-                    secret = _TfaCodeProvider.GenerateTfaCode(ci);
-                }
-                catch (ArgumentException)
-                {
-                    secret = _TfaSecretManager.StartTfaRegistration(ci, 6, Core.Security.Tfa.Rfc4226Mode.HotpIncrementOnGenerate, AuthenticationContext.SystemPrincipal);
-                    _TfaSecretManager.FinishTfaRegistration(ci, secret, AuthenticationContext.SystemPrincipal);
-                    secret = _TfaCodeProvider.GenerateTfaCode(ci);
-                }
+        /// <summary>
+        /// Send the SMS message
+        /// </summary>
+        private string SendNotification(string tonumber, string secret, string userName)
+        {
 
-                var templatemodel = new Dictionary<string, object>
+            var templatemodel = new Dictionary<string, object>
                 {
-                    {"user", user },
+                    {"user", userName },
                     { "tfa", secret },
                     {"secret", secret },
                     { "code", secret },
@@ -104,20 +127,14 @@ namespace SanteDB.Security.Tfa.Twilio
                     { "principal", AuthenticationContext.Current.Principal }
                 };
 
-                try
-                {
-                    _NotificationService.SendTemplatedNotification(new[] { tonumber }, s_TemplateName, CultureInfo.CurrentCulture.TwoLetterISOLanguageName, templatemodel, null, false);
-
-                    return $"Code sent to ******{tonumber.Substring(tonumber.Length - 4, 4)}";
-                }
-                catch (Exception ex) when (!(ex is StackOverflowException || ex is OutOfMemoryException))
-                {
-                    throw new Exception("Error sending notification for tfa sms.", ex);
-                }
-            }
-            else
+            try
             {
-                throw new InvalidOperationException("Cannot send notification to non-claims identity.");
+                _NotificationService.SendTemplatedNotification(new[] { tonumber }, s_TemplateName, CultureInfo.CurrentCulture.TwoLetterISOLanguageName, templatemodel, null, false);
+                return $"Code sent to ******{tonumber.Substring(tonumber.Length - 4, 4)}";
+            }
+            catch (Exception ex) when (!(ex is StackOverflowException || ex is OutOfMemoryException))
+            {
+                throw new Exception("Error sending notification for tfa sms.", ex);
             }
         }
 
@@ -135,6 +152,36 @@ namespace SanteDB.Security.Tfa.Twilio
             }
 
             return _TfaCodeProvider.VerifyTfaCode(user, secret, DateTimeOffset.UtcNow);
+        }
+
+        /// <inheritdoc/>
+        public string BeginSetup(IIdentity user)
+        {
+            if (user is IClaimsIdentity ci)
+            {
+                this._TfaSecretManager.RemoveTfaRegistration(ci, AuthenticationContext.Current.Principal);
+                var telephone = this.GetTelephoneNumberOrThrow(ci);
+                var secret = _TfaSecretManager.StartTfaRegistration(ci, 6, Rfc4226Mode.TotpTenMinuteInterval, AuthenticationContext.SystemPrincipal);
+                return this.SendNotification(telephone, secret, ci.Name);
+            }
+            else
+            {
+                throw new InvalidOperationException("Cannot send notification to non-claims identity.");
+            }
+        }
+
+        /// <inheritdoc/>
+        public bool EndSetup(IIdentity user, string verificationCode)
+        {
+            if (user is IClaimsIdentity ci)
+            {
+                var telephone = this.GetTelephoneNumberOrThrow(ci);
+                return _TfaSecretManager.FinishTfaRegistration(ci, verificationCode, AuthenticationContext.SystemPrincipal);
+            }
+            else
+            {
+                throw new InvalidOperationException("Cannot send notification to non-claims identity.");
+            }
         }
     }
 }
