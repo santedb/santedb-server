@@ -213,7 +213,7 @@ namespace SanteDB.Messaging.Atna
                         am.Actors.Add(act);
                     }
 
-                    foreach (var aoPtctpt in ad.AuditableObjects)
+                    foreach (var aoPtctpt in ad.AuditableObjects ?? new List<SdbAudit.AuditableObject>())
                     {
                         var atnaAo = new AtnaApi.Model.AuditableObject()
                         {
