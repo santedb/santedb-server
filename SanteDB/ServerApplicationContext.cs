@@ -18,11 +18,11 @@
  * User: fyfej
  * Date: 2023-3-10
  */
-using System.Diagnostics.CodeAnalysis;
 using SanteDB.Core;
 using SanteDB.Core.Data;
 using SanteDB.Core.Model.EntityLoader;
 using SanteDB.Core.Services.Impl;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SanteDB
 {

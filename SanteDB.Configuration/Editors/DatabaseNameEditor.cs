@@ -118,7 +118,7 @@ namespace SanteDB.Configuration.Editors
                     if (list.SelectedItem.ToString() == "New...")
                     {
                         var frmNewDatabase = new frmNewDatabase(this.m_connectionString, this.m_provider);
-                        
+
                         if (frmNewDatabase.ShowDialog() == DialogResult.OK)
                         {
                             return frmNewDatabase.ConnectionString.GetComponent(this.m_provider.Capabilities.NameSetting);

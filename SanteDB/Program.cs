@@ -20,19 +20,15 @@
  */
 using MohawkCollege.Util.Console.Parameters;
 using Mono.Unix;
-using NHapi.Model.V26.Segment;
 using SanteDB.Core;
 using SanteDB.Core.BusinessRules;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Configuration.Data;
 using SanteDB.Core.Security;
 using SanteDB.Core.Services;
-using SanteDB.OrmLite;
 using SanteDB.OrmLite.Configuration;
 using SanteDB.OrmLite.Providers;
-using SanteDB.OrmLite.Providers.Postgres;
 using System;
-using System.CodeDom;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
@@ -303,6 +299,7 @@ namespace SanteDB
         {
             SanteDBConfiguration configuration = null;
             using (AuthenticationContext.EnterSystemContext())
+            {
                 try
                 {
                     using (var fs = File.OpenRead(configFile))
@@ -337,7 +334,7 @@ namespace SanteDB
                     var processedConnections = new List<String>();
                     foreach (var ormConfiguration in configuration.Sections.OfType<OrmConfigurationBase>())
                     {
-                        
+
 
                         processedConnections.Add(ormConfiguration.ReadWriteConnectionString);
 
@@ -386,6 +383,7 @@ namespace SanteDB
                 {
                     throw new DataException($"Cannot migrate ALE", e);
                 }
+            }
         }
 
         private static void TestConfiguration(string configFile)
@@ -455,7 +453,6 @@ namespace SanteDB
                         }
                         else
                         {
-                            // TODO : Choice
                             var defaultValue = GetDefaultValue(prop.PropertyType, prop.Name);
                             if (defaultValue != null)
                             {

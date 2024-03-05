@@ -18,6 +18,7 @@
  * User: fyfej
  * Date: 2023-3-10
  */
+using SanteDB.Core;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Configuration.Features;
 using SanteDB.Core.Services;
@@ -27,7 +28,6 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Windows.Forms;
-using SanteDB.Core;
 namespace SanteDB.Configuration.Tasks
 {
     /// <summary>
@@ -71,12 +71,12 @@ namespace SanteDB.Configuration.Tasks
             {
                 File.Copy(ConfigurationContext.Current.ConfigurationFile, this.m_backupFile, true);
             }
-            
+
             // Protect the configuration file?
 
-            if(!configuration.IsMonoRuntime() && configuration.Sections.OfType<IEncryptedConfigurationSection>().Any() && 
-                configuration.ProtectedSectionKey == null && 
-                MessageBox.Show("Would you like to encrypt sensitive parts of the configuration file?", "Protect Configuration", MessageBoxButtons.YesNo) == DialogResult.Yes) 
+            if (!configuration.IsMonoRuntime() && configuration.Sections.OfType<IEncryptedConfigurationSection>().Any() &&
+                configuration.ProtectedSectionKey == null &&
+                MessageBox.Show("Would you like to encrypt sensitive parts of the configuration file?", "Protect Configuration", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
                 try
                 {
@@ -84,10 +84,12 @@ namespace SanteDB.Configuration.Tasks
                     {
                         store.Open(OpenFlags.ReadOnly);
                         X509Certificate2Collection collection = new X509Certificate2Collection();
-                        foreach(var x509 in store.Certificates)
+                        foreach (var x509 in store.Certificates)
                         {
                             if (x509.HasPrivateKey)
+                            {
                                 collection.Add(x509);
+                            }
                         }
 
                         configuration.ProtectedSectionKey = new Core.Security.Configuration.X509ConfigurationElement(

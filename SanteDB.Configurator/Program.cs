@@ -202,14 +202,14 @@ namespace SanteDB.Configurator
             }
 
             var asmFile = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), asmName) + ".dll";
-            if(File.Exists(asmFile))
+            if (File.Exists(asmFile))
             {
                 try
                 {
-                    
+
                     var reflectionOnly = Assembly.ReflectionOnlyLoadFrom(asmFile);
                     var reflectionVersion = reflectionOnly.GetName().Version;
-                    if(asmVersion.Major == reflectionVersion.Major && asmVersion.Minor == reflectionVersion.Minor)
+                    if (asmVersion.Major == reflectionVersion.Major && asmVersion.Minor == reflectionVersion.Minor)
                     {
                         return Assembly.LoadFrom(asmFile);
                     }

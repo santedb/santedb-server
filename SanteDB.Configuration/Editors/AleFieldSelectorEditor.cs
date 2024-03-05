@@ -1,21 +1,14 @@
-﻿using SanteDB.Core.Configuration;
-using SanteDB.Core.Model.Serialization;
-using SanteDB.Core.Model;
+﻿using SanteDB.Core.Model.Serialization;
+using SanteDB.OrmLite.Attributes;
+using SanteDB.OrmLite.Configuration;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms.Design;
 using System.Windows.Forms;
-using System.Xml.Serialization;
-using SanteDB.OrmLite.Attributes;
-using DocumentFormat.OpenXml.Wordprocessing;
-using SanteDB.OrmLite.Configuration;
+using System.Windows.Forms.Design;
 
 namespace SanteDB.Configuration.Editors
 {
