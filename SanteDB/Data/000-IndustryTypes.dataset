@@ -1,11 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Industry Type Codes" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data">
   <update insertIfNotExists="true">
-
     <Concept xmlns="http://santedb.org/model">
       <id>33b40c3c-c0c0-48b6-be74-0881d9c00ee6</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Industry-Manufacturing</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -18,11 +15,8 @@
     </Concept>
   </update>
   <update insertIfNotExists="true">
-
     <Concept xmlns="http://santedb.org/model">
       <id>87269826-c0c3-4c22-abb1-3572f6679c3f</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Industry-OtherUnknown</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -35,11 +29,8 @@
     </Concept>
   </update>
   <update insertIfNotExists="true">
-
     <Concept xmlns="http://santedb.org/model">
       <id>ef0b2e4e-9e02-4ce3-ab69-cece5f598e20</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Industry-HealthDelivery</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -52,11 +43,8 @@
     </Concept>
   </update>
   <update insertIfNotExists="true">
-
     <Concept xmlns="http://santedb.org/model">
       <id>ef0b2e4e-9e02-4ce3-ab69-cece5ffdee20</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Industry-Education</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -71,8 +59,6 @@
   <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>fdeb2e4e-9e02-4ce3-ab69-cece5ffdee20</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Industry-Insurance</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -87,8 +73,6 @@
   <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>fde32e4e-9e02-4ce3-ab69-cece5ffdee20</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Industry-BankingFinancial</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -103,8 +87,6 @@
   <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>fde32e4e-fde4-4ce3-ab69-cece5ffdee20</id>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>Industry-InfoTechnology</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>

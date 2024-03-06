@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  *
@@ -16,21 +16,19 @@
  * the License.
  *
  * User: fyfej
- * Date: 2023-3-10
+ * Date: 2023-6-21
  */
+using SanteDB.Core;
 using SanteDB.Core.Notifications;
-using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security;
+using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Services;
+using SanteDB.Core.Security.Tfa;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Security.Principal;
-using System.Text;
-using Twilio.TwiML.Voice;
 using System.Linq;
-using SanteDB.Core;
-using SanteDB.Core.Security.Tfa;
+using System.Security.Principal;
 
 namespace SanteDB.Security.Tfa.Twilio
 {
@@ -84,7 +82,7 @@ namespace SanteDB.Security.Tfa.Twilio
             if (user is IClaimsIdentity ci)
             {
                 var tonumber = this.GetTelephoneNumberOrThrow(ci);
-                string secret =  _TfaCodeProvider.GenerateTfaCode(ci);
+                string secret = _TfaCodeProvider.GenerateTfaCode(ci);
                 return this.SendNotification(tonumber, secret, user.Name);
             }
             else

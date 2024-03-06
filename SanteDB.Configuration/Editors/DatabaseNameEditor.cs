@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  *
@@ -16,7 +16,7 @@
  * the License.
  *
  * User: fyfej
- * Date: 2023-3-10
+ * Date: 2023-6-21
  */
 using SanteDB.Core.Configuration.Data;
 using System;
@@ -118,7 +118,7 @@ namespace SanteDB.Configuration.Editors
                     if (list.SelectedItem.ToString() == "New...")
                     {
                         var frmNewDatabase = new frmNewDatabase(this.m_connectionString, this.m_provider);
-                        
+
                         if (frmNewDatabase.ShowDialog() == DialogResult.OK)
                         {
                             return frmNewDatabase.ConnectionString.GetComponent(this.m_provider.Capabilities.NameSetting);

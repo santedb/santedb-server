@@ -37,7 +37,6 @@
       </name>
     </Concept>
   </update>
-  
   <update insertIfNotExists="true">
     <ConceptSet xmlns="http://santedb.org/model">
       <id>023855d6-1867-11eb-adc1-0242ac120002</id>
@@ -75,7 +74,6 @@
       </name>
     </Concept>
   </update>
-  
   <update insertIfNotExists="true">
     <ConceptSet xmlns="http://santedb.org/model">
       <id>023856da-1867-11eb-adc1-0242ac120002</id>
@@ -127,7 +125,6 @@
       </name>
     </Concept>
   </update>
-  
   <!-- Observation Types for codified birth observations -->
   <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
@@ -168,7 +165,6 @@
       </name>
     </Concept>
   </update>
-
   <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>d2528758-1869-11eb-adc1-0242ac120002</id>
@@ -197,7 +193,6 @@
       </name>
     </Concept>
   </update>
-
   <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>a2ab2302-1887-11eb-adc1-0242ac120002</id>
@@ -226,7 +221,6 @@
       </name>
     </Concept>
   </update>
-
   <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>54906eaa-1889-11eb-adc1-0242ac120002</id>
@@ -255,5 +249,4 @@
       </name>
     </Concept>
   </update>
-  
 </dataset>

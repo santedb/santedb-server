@@ -34,10 +34,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>15b44b86-c9b3-41cc-a41e-6d8ac8874541</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-Multi-Specialty</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>a601796f-be9c-4949-8caa-41515f6bcc43</term>
@@ -65,10 +62,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>c80266a6-a1cc-4d09-8dcf-b90437169b24</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-SingleSpecialty</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>725f0ca3-5d23-4f16-b473-bd2b3b05a5d5</term>
@@ -96,10 +90,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>b1d4d16c-1c8f-4143-9bfc-fbe97d41d3a6</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-AllergyImmunology</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>7efaf6a6-5d64-458b-bd42-8562acc661ce</term>
@@ -127,10 +118,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>13163c04-7ed1-4b0f-8184-285ca870d658</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-Anesthesiology</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>6be4bae0-70ee-4f00-b16c-953cae64ad38</term>
@@ -158,10 +146,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>38dbe5f3-c41a-4d2d-86a6-e69c9f97b247</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-ClinicalPharmacology</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>6929cc49-72fc-4fc9-83b7-3bd32854a447</term>
@@ -189,10 +174,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>7d9079e6-6206-49d2-9737-cca9d960b51c</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-ColonRectalSurgery</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>430b29c8-0234-408f-bb85-aab821b74e5a</term>
@@ -220,10 +202,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>651b85e8-5f8f-409c-a9d0-e6d437f700c2</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-Dermatology</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>e049c3c3-c568-4ec2-87e5-7699d599d29a</term>
@@ -251,10 +230,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>1abd4ae4-68bf-4eea-be3e-c1a37ad76983</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-ElectrodiagnosticMedicine</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>8e184773-9a60-4767-973f-9a12512e73e2</term>
@@ -282,10 +258,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>579feb38-b504-4a94-9f92-c6466033951d</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-EmergencyMedicine</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>7794b043-93cf-46ba-aafa-5c2994641f7e</term>
@@ -313,10 +286,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>4ebeb88f-0389-4c91-9c66-e3a06cd5f65d</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-FamilyMedicine</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>9c732351-05b5-4a60-95d2-b176ea0fe789</term>
@@ -344,10 +314,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>ed354ed8-c1e2-4bf0-ad0a-3112551b0934</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-GeneralPractice</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>4a122980-0024-472a-98cb-cc55e7fb1a89</term>
@@ -375,10 +342,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>426bade1-a469-4d1a-a121-a23be7fb049f</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-Hospitalist</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>cfef5bce-47c2-4145-96d1-3569dad0e68f</term>
@@ -406,10 +370,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>b0bb6849-e92c-4118-b2fb-a1448001aedb</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-IndependentMedicalExaminer</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>1e6e0465-4f1a-499f-a3f8-5179681a4f97</term>
@@ -437,10 +398,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>e16eae18-9c92-4523-80aa-35b87dfbf531</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-IntegrativeMedicine</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>e50e9b25-26c0-4e66-b1d8-c31c897a8401</term>
@@ -468,10 +426,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>450708b4-ed74-4974-809b-05c3900fe559</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-InternalMedicine</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>8304b05b-f5bd-490c-800c-1ab26a2ef535</term>
@@ -499,10 +454,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>b6bcc341-5193-4322-99de-e11081a12a4d</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-LegalMedicine</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>e3021edf-e38d-46ee-a596-b859ce5922b8</term>
@@ -530,10 +482,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>7d32667e-3c5e-4946-8a48-9d126827db9f</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-NeurologicalSurgery</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>b456029c-624d-40f9-97d4-532da95dd318</term>
@@ -561,10 +510,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>e6183caf-378a-404d-939b-0a5bdfc23d91</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-NeuromusculoskeletalMedicineOMM</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>1fa1e8c3-6fe6-4bf1-9b3e-2c19bd4ec0fb</term>
@@ -592,10 +538,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>63ba3490-72cf-4164-9769-f8fd05ce36b8</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-NMSM</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>f20ad817-c6a9-474e-a3d4-cfb82623f69a</term>
@@ -623,10 +566,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>1bb11572-5bc7-492b-86f2-0546973b2684</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-NuclearMedicine</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>7351f313-92f5-4ac9-aedb-53823ee95c78</term>
@@ -654,10 +594,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>d91a117b-f124-4ff1-a4f3-536da28c0608</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-ObstetricsGynecology</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>8fb032c9-e803-4e5c-bc37-df9152d428c7</term>
@@ -685,10 +622,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>0fba8c30-3591-42c3-999e-11799c98b306</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-Ophthalmology</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>ffd31472-d8b9-4c0a-aa6c-1531e30c9a0c</term>
@@ -716,10 +650,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>b50886be-97f6-4ded-9bb8-3abc61be27f7</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-OralMaxillofacialSurgery</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>fe330a6f-1bd8-47d4-a2ca-b48c767ac3a4</term>
@@ -747,10 +678,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>31cd7e17-11c2-48a0-bfb3-47c65cd48cae</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-OrthopaedicSurgery</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>1f3b4314-2967-40e4-8a1e-d3afb472a30c</term>
@@ -778,10 +706,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>74fc39c0-4e49-4e93-9239-902708999bb6</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-Otolaryngology</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>62cb9f0c-2d35-4b1d-be71-aab475d7f834</term>
@@ -809,10 +734,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>0a7b7751-b973-4be7-889f-ae5c83f8cee3</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-Pediatrics</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>4478b7f9-1c64-4d5f-b1fb-f328a1d034e2</term>
@@ -840,10 +762,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>b7486720-177e-4482-8cbb-277336c7809f</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-Phlebology</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>84bb8a1a-28f7-40d8-8d61-b42ef609a082</term>
@@ -871,10 +790,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>d748afc4-ab75-48fc-9aed-289d7cd27812</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-PhysicalMedicineRehabilitation</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>a00dfe53-1939-4dcc-a361-16a1dd5131b5</term>
@@ -902,10 +818,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>ce13e534-9c90-421b-bded-40cb424654d8</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-PlasticSurgery</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>a98575f3-79e6-4837-b07d-1a09f23bec2d</term>
@@ -933,10 +846,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>a3505bbb-7f20-4d58-96ab-c6608614ff9f</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-Surgery</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>94baea69-272f-4b67-be55-dcc5c4c0b861</term>
@@ -964,10 +874,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>dc5b2fd8-305c-4d51-be64-912c6553749f</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-TSCVS</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>217d95ea-9197-4793-9943-261bcf538929</term>
@@ -995,10 +902,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>b57fea34-7abc-48e1-b9fd-cccf01312d42</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-TransplantSurgery</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>662a21ce-7db9-43aa-b2d4-ffa41263aba7</term>
@@ -1026,10 +930,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>99213a75-32a1-4803-9c86-ae6001759d96</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-Urology</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>7311520d-e0a6-4157-bb2e-1987af4ff4c4</term>
@@ -1057,10 +958,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>46a391be-e463-4715-8bfa-2432407fd3d9</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-AssistantBehaviorAnalyst</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>710b71a2-0afb-48af-8b21-68d4fd1af426</term>
@@ -1088,10 +986,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>ed877bac-67ac-4624-954f-3566ad0a8556</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-BehaviorTechnician</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>759ecee8-d500-466d-b8e3-8c98f2b9ba6f</term>
@@ -1119,10 +1014,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>c4ca2762-a38f-4c44-9a14-4a8b28d743a0</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-BehaviorAnalyst</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>e8afbd18-485e-43ec-98c5-ada61ec1939b</term>
@@ -1150,10 +1042,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>6f380e43-9bdd-4f05-93a6-e53adc0b74b3</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-ClinicalNeuropsychologist</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>e771f988-ad07-4dd8-97fe-8c72ea9190f3</term>
@@ -1181,10 +1070,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>cf080929-df6d-4f0c-8517-dfae524a6e4f</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-Counselor</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>d23bdb74-7e61-4f70-99a1-2c05a494ad17</term>
@@ -1212,10 +1098,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>8ac3ea67-b5bc-49a9-b284-480797b8a080</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-DramaTherapist</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>06558e5c-389d-4914-ad31-e8f4ac1fcea9</term>
@@ -1243,10 +1126,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>54ac4c89-73b2-4598-8f27-ccf7b5d670d3</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-MarriageFamilyTherapist</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>48885384-aaaf-4316-9139-385ab06224e1</term>
@@ -1274,10 +1154,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>2afa6109-708d-4f58-8f81-e4c254733f94</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-PoetryTherapist</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>4597255f-fdf4-400c-a7f0-c3d4ab61a713</term>
@@ -1305,10 +1182,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>b4c74d86-d842-4228-b44a-087689a6cb3b</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-Psychoanalyst</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>93d85b81-0e17-41e0-b0e2-32b2b8d9b826</term>
@@ -1336,10 +1210,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>7585383e-6396-439a-86be-0df6448e33fd</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-Psychologist</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>d6636acd-e2c2-4ffe-9cd3-2055f7a19a30</term>
@@ -1367,10 +1238,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>c5bd973d-5436-4cde-a3cb-0ceb95765401</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-SocialWorker</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>3011c9e9-edc6-4b7d-9512-62346bbc7016</term>
@@ -1398,10 +1266,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>3e8786c8-cb02-453e-b117-0465d47fa9be</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-Chiropractor</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>d26a0bd4-a31f-4fe2-9646-43b09edb46c9</term>
@@ -1429,10 +1294,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>3248c051-80f0-4667-879e-76975549b69a</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-AdvancedPracticeDentalTherapist</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>1671056f-8cb0-4184-b346-e82a2ba09d83</term>
@@ -1460,10 +1322,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>2bcfe5ba-5e2f-4f48-9c0e-7b0fe5e8fe91</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-DentalAssistant</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>65088da3-e20a-4acf-9d28-bec0dc8878fe</term>
@@ -1491,10 +1350,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>95f67035-43d3-484a-97fb-49f49364631c</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-DentalHygienist</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>a6d62f84-c8ce-4400-94c3-d533d4213eee</term>
@@ -1522,10 +1378,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>c43143aa-2e8c-494b-a512-d1dcb90bc3a0</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-DentalLaboratoryTechnician</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>5e9c2017-008a-4c73-8faa-414294a29c69</term>
@@ -1553,10 +1406,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>75e91adf-a915-4b1f-9c8b-e4a3f68f2462</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-DentalTherapist</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>249941cf-af87-4134-a1a9-2ada0e59fd3a</term>
@@ -1584,10 +1434,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>5e4b60af-d207-478e-9f97-2be5402c2a8e</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-Dentist</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>31205914-b24d-4429-a8cb-c896d75991db</term>
@@ -1615,10 +1462,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>d0fff22d-767a-4eb3-bfdd-e3b6b291b246</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-Denturist</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>fea39bcf-05bf-42b1-8f51-c5b8153318d0</term>
@@ -1646,10 +1490,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>ca7e91ce-5e1e-4756-8271-3b3ac80ec5fc</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-OralMedicinist</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>a3b8b4e2-1e13-435c-9bae-f9dbad1d77e7</term>
@@ -1677,10 +1518,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>8960cc03-fa71-478b-98a1-6b22df1c6ead</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-DietaryManager</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>a7837849-24ff-4a09-9f98-25faddf4f0b5</term>
@@ -1708,10 +1546,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>db8fee4b-87a3-4f88-a56b-e4926fc1b2d5</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-DieteticTechnicianRegistered</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>0bdf9a2e-ec74-4a49-969f-bc2f720f8690</term>
@@ -1739,10 +1574,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>a2e7c30f-b7b5-496f-89ab-f5350d58c006</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-DietitianRegistered</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>2f21c7e6-ed4a-4a3b-9a0e-026ec9233e71</term>
@@ -1770,10 +1602,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>70f7fcea-f10a-4a70-a890-128d33c83d05</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-Nutritionist</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>d1b21eed-b3b1-4283-896a-2dad47ded9c0</term>
@@ -1801,10 +1630,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>7a24f897-c979-4b04-a452-cd247be9706b</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-EmergencyMedicalTechnicianBasic</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>a2996df4-4dc6-4490-acca-3a82055b7898</term>
@@ -1832,10 +1658,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>899a1297-027d-4491-b57b-7f64849058f1</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-EMTI</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>efcbc20f-6ec2-418d-bfab-6171b303c56a</term>
@@ -1863,10 +1686,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>267756ff-235c-45be-93c1-17ac637375bd</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-EmergencyMedicalTechnicianParamedic</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>0a85ecb0-b661-4b63-acd0-50eb3c1a94d2</term>
@@ -1894,10 +1714,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>97ed76f0-333f-4258-b21b-afeca6282707</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-PersonalEmergencyResponseAttendant</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>825e9bf9-dee9-49af-a341-41a76812e86d</term>
@@ -1925,10 +1742,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>70ef4014-7f59-4ddb-b158-395e7d2c00be</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-Optometrist</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>c4385a1c-66e4-45ec-8d3d-167af40ae3ba</term>
@@ -1956,10 +1770,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>fb3cbb12-2356-4458-bcc3-e5ce4545eff3</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-TechnicianTechnologist</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>356b87b5-4eca-4e7c-ab0f-166c2f34bf42</term>
@@ -1987,10 +1798,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>aa2cd11b-9302-416c-b6f1-90955dd27efe</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-LicensedPracticalNurse</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>f1ca24c7-11e0-460f-a925-ec91ecc8c814</term>
@@ -2018,10 +1826,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>fcdc4fb0-3410-43fc-b6f1-2726020e0224</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-LicensedPsychiatricTechnician</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>0a492836-521c-467f-a6ff-223103cc15d5</term>
@@ -2049,10 +1854,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>ea2ae760-7251-4707-893f-1bcbf5143eb0</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-LicensedVocationalNurse</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>9cceae90-5621-4097-ab01-a7fefca72a33</term>
@@ -2080,10 +1882,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>68b13816-7425-499f-a6db-b7610937e85d</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-RegisteredNurse</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>673afa93-d691-41b0-a6d1-93feee1ab711</term>
@@ -2111,10 +1910,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>c6cd7e98-501a-489f-9235-1d4d11a35d83</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-AdultCompanion</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>285481bb-eb6e-4aaa-afc0-5f28ae0e823d</term>
@@ -2142,10 +1938,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>68c6dc74-c27b-4631-bcad-09be39a3fe8f</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-ChoreProvider</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>ab22c2f3-5c34-41f4-89ed-d3854c9cd84b</term>
@@ -2173,10 +1966,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>0783b764-6cb8-4722-b3db-b64a7ec598d1</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-DayTrainingHabilitationSpecialist</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>b17be4c5-2bcc-4ac4-9dfa-e04049d88663</term>
@@ -2204,10 +1994,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>7e403ac7-40bc-43a5-9603-3343d02d7181</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-Doula</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>87e0039c-f1dd-4b77-962b-d27215305bfd</term>
@@ -2235,10 +2022,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>8a9eeaca-cfd1-4fb4-90b6-9d62f2891ca9</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-HomeHealthAide</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>941c75b3-2639-4b98-b3d0-676e8e599f0b</term>
@@ -2266,10 +2050,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>87ee293f-3a45-45f4-8f80-d5e965d86ad2</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-Homemaker</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>7e31c18b-b017-4156-be3e-3a7f863ba0a3</term>
@@ -2297,10 +2078,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>010230e5-2849-4ce8-9c4d-0f8409baf90d</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-Nurse'sAide</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>205e9a6b-7f4e-4e20-956a-f628a7d2eeed</term>
@@ -2328,10 +2106,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>c03de463-78f6-4301-8942-4c3e2dd34e4c</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-NursingHomeAdministrator</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>21b10ae3-8488-4e12-989b-76766017e332</term>
@@ -2359,10 +2134,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>23437257-8062-46e8-b62d-87f8bf45382d</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-ReligiousNonmedicalNursingPersonnel</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>a6592079-4634-4abb-9c90-06d19c872488</term>
@@ -2390,10 +2162,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>033916ec-354f-4a49-9373-c0ae28df1f06</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-ReligiousNonmedicalPractitioner</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>48003669-055e-456e-b79a-7f637877a30a</term>
@@ -2421,10 +2190,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>843888cb-1e87-4275-8d59-9afebe366f8a</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-Technician</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>93dfdaae-3e27-48ae-af4a-94d496aa377e</term>
@@ -2452,10 +2218,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>333cdfd6-e34e-427d-9c44-b5eafbacb876</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-Acupuncturist</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>9d370288-d888-475a-b04e-7d99419c6edb</term>
@@ -2483,10 +2246,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>71a379ba-f0f3-4e2e-b886-51180ef68314</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-CaseManagerCareCoordinator</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>306105e8-72b0-4fb5-bece-98085d1de564</term>
@@ -2514,10 +2274,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>77bf12bc-4ce1-444f-b148-bf6f1988de8a</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-ClinicalEthicist</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>85205368-023a-4b4d-9e65-d6fc6f7c9bbe</term>
@@ -2545,10 +2302,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>da947a88-5e9c-45a4-81b7-53b1b2c2fc8e</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-CommunityHealthWorker</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>40936e8d-970f-47d9-827b-d25b6a3f88d1</term>
@@ -2576,10 +2330,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>60e2b5fc-e909-4666-a96d-a40d9691f522</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-Contractor</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>da1e3da3-758b-4e70-bcb9-adf00f6df7bc</term>
@@ -2607,10 +2358,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>45ffe614-b9c4-4f15-9585-6c5a3b766272</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-Driver</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>56824453-08a4-4cbc-93bd-c1a91e7c1998</term>
@@ -2638,10 +2386,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>b20e239c-7132-45b5-9a2f-53e8d70c3b7c</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-FuneralDirector</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>aad0d151-37a8-43b2-8578-503ef6aafe7b</term>
@@ -2669,10 +2414,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>e2759fce-10c3-49dd-9bda-38a65288f2de</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-GeneticCounselorMS</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>1a835c3e-4e76-4889-89d2-8a232745ae04</term>
@@ -2700,10 +2442,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>572c96fc-9225-4c89-8cb2-8f985f0b9439</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-HealthWellnessCoach</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>bb5ea100-10a9-4118-9fb6-38aad02241df</term>
@@ -2731,10 +2470,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>9d5bd7d1-f2e8-4ae9-ab93-6ee43dfbc13d</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-HealthEducator</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>084aa6f8-4025-4081-bd6b-7bb5118da0ff</term>
@@ -2762,10 +2498,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>8dad5367-bff0-4856-a9ec-a9070264017d</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-Homeopath</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>7bc5c5d8-0a95-4e36-a4df-a4086cad32c9</term>
@@ -2793,10 +2526,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>7fa68ea3-b815-43fe-9672-a1e225e715f6</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-Interpreter</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>21094533-dd25-482b-ba82-e8ec104da08c</term>
@@ -2824,10 +2554,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>274c427a-cf9d-4f42-8e34-f91bf480dfe5</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-LactationConsultantNon-RN</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>f4906c29-921c-4459-ab86-5c409df3f1b1</term>
@@ -2855,10 +2582,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>514a7284-3d1c-4da6-97bc-803627058c08</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-MidwifeLay</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>f86e2767-600c-4e9d-92ff-08f283e3e04a</term>
@@ -2886,10 +2610,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>c866ecf6-28ab-4b06-80e1-82dc07d008c7</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-Mechanotherapist</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>6452579c-1aab-46d6-9bcd-53471f2a0286</term>
@@ -2917,10 +2638,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>3473fd0b-275a-434b-b2ba-1d22034b1ba3</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-Midwife</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>10da011a-ce4d-48ee-ab2d-283aa6332b77</term>
@@ -2948,10 +2666,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>88051291-0d76-40de-9438-1859bd9514e0</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-MilitaryHealthCareProvider</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>41a1d304-5dd8-4970-9659-477763c44ea6</term>
@@ -2979,10 +2694,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>58e355ce-47e6-4a35-b7eb-8572441196c2</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-Naprapath</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>661a5625-779f-4687-9c54-05f996d5078e</term>
@@ -3010,10 +2722,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>b317d22c-8f9d-4281-958c-a469ea2d20de</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-Naturopath</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>b7e4e3a1-913f-4bb3-a7c2-8c7ba9c1894f</term>
@@ -3041,10 +2750,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>e4b9083b-8edf-428a-9738-a916abd9ff4d</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-PeerSpecialist</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>219a77ce-d91f-4936-b8da-be6377c2e287</term>
@@ -3072,10 +2778,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>3efc1309-2329-4997-837d-d17628507785</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-MedicalGeneticsPh.D.MedicalGenetics</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>4b6af402-7dae-47b4-ac22-33340b2b43fe</term>
@@ -3103,10 +2806,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>99650ee5-0938-49c7-9fdd-17174ef97a5e</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-PreventionProfessional</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>b31e183e-b807-42f4-a398-ccc9a353ab83</term>
@@ -3134,10 +2834,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>83672d6b-7fcc-4ebc-a038-0ab49d23b524</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-Reflexologist</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>899fb879-7705-4ec8-af18-ca6872882910</term>
@@ -3165,10 +2862,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>9d0d2d9a-6cd8-46df-821d-ede99c07342b</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-SleepSpecialistPhD</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>1d9cf157-b26c-4214-82bd-ca8a0a897aab</term>
@@ -3196,10 +2890,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>3f2fd47e-607e-42e8-976f-c9b466d6777f</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-Specialist</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>142deb8e-ab37-41bb-8873-6b2a5848754a</term>
@@ -3227,10 +2918,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>51cb41c0-2e39-4b3c-b912-ed46cd90996e</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-Veterinarian</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>9bed4a9e-2453-4207-aaa1-849e8a98b2f3</term>
@@ -3258,10 +2946,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>c3045726-8fc0-4c54-8f2f-d66b1a38e923</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-Pharmacist</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>c824cdd4-ad29-44a1-9a6a-493bbc602816</term>
@@ -3289,10 +2974,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>74a5b1c1-3ba9-46a9-985d-a6bc4d99916f</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-PharmacyTechnician</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>6b5794f8-a455-45e8-ba22-c41cf0087789</term>
@@ -3320,10 +3002,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>247ef76b-a1e1-4da9-ba97-e448aa08e9cf</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-AdvancedPracticeMidwife</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>d4c4c5a6-d1e4-4551-8df1-0318117851e9</term>
@@ -3351,10 +3030,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>435ed7ef-5c92-4268-8b98-7c5f1d3ef10b</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-AnesthesiologistAssistant</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>3943949e-7e2e-4d99-a8c5-c0633a96ca36</term>
@@ -3382,10 +3058,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>a927f50c-934c-44c5-8150-19b5c20e2de5</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-ClinicalNurseSpecialist</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>e8d261af-fa36-4cca-aa15-40dc58321607</term>
@@ -3413,10 +3086,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>c2e7b554-24e9-4f14-802b-fd8d2d1f5b89</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-NurseAnesthetistCertifiedRegistered</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>f3ec090c-323e-4cb6-8531-cebd60c98392</term>
@@ -3444,10 +3114,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>c9aad78b-9b14-4485-a613-d3f6d8d327e6</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-NursePractitioner</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>fc8226fe-c792-49bb-a069-f49f1a10b019</term>
@@ -3475,10 +3142,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>4db396f4-f7b0-4408-a170-093a9a3205f3</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-PhysicianAssistant</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>5158f3c2-16b9-43fd-ba40-30047853bdb4</term>
@@ -3506,10 +3170,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>40ec6816-5fbc-4804-b756-253a7150cbc2</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-AssistantPodiatric</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>2f170887-a8c5-44b4-9d8f-ebfaeebfea5e</term>
@@ -3537,10 +3198,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>a3326519-7db3-4cd5-9017-9f7165ba925f</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-Podiatrist</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>0c759cb2-d3ad-4c34-83c9-f8ea00fef589</term>
@@ -3568,10 +3226,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>1d5e83b9-902d-45d8-a3d4-3e0a96422d7f</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-Anaplastologist</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>31c00549-2866-4ebc-9040-34b6958d2bdf</term>
@@ -3599,10 +3254,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>f48f28b6-a593-40bb-99e0-b64c120ecae2</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-ArtTherapist</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>35b834b8-e447-4053-83ab-b316e7f454e5</term>
@@ -3630,10 +3282,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>d1c69ef1-00f7-4699-b137-799ff6e71d82</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-ClinicalExercisePhysiologist</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>64f49123-8e1b-4679-a833-84fe04e85d4b</term>
@@ -3661,10 +3310,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>c31031ae-7166-441d-9204-882d1f5bdf5d</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-DanceTherapist</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>f239701f-ba8c-47c1-9fa7-6f1143fd80c1</term>
@@ -3692,10 +3338,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>37c38cf5-1d09-46a6-abdd-3cd557dd836b</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-DevelopmentalTherapist</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>6c83327f-9416-486d-bdf2-a95c1d41052f</term>
@@ -3723,10 +3366,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>678a27bc-74e0-4c1f-99c5-3fbfe3e81322</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-Kinesiotherapist</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>205fac0b-1538-4706-b377-0c517d9bd9ef</term>
@@ -3754,10 +3394,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>be68e02a-c878-41c6-889d-f30b209b68cf</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-MassageTherapist</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>4065d8c9-27b9-4972-a524-1571af41242f</term>
@@ -3785,10 +3422,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>4991d5df-29a6-4778-b95a-4f3b505083b0</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-MastectomyFitter</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>9989821b-22ac-4e5e-b3ee-87050cf7f0dd</term>
@@ -3816,10 +3450,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>5fdcb1ac-2870-4f7d-a712-aa31e0c7b178</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-MusicTherapist</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>a3dcc1f0-b8da-4616-bf5e-144329a76658</term>
@@ -3847,10 +3478,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>dbfb8a2b-271f-4b51-bf11-d777545c7e40</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-OccupationalTherapist</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>72b36a62-812d-49aa-aabc-691d67856cb5</term>
@@ -3878,10 +3506,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>9279262b-0390-448a-addf-9f1194fea048</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-OccupationalTherapyAssistant</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>0c5bd582-3da9-4a7d-a8b4-b28018801464</term>
@@ -3909,10 +3534,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>ed1636a1-2b0e-416c-be77-809dfcbbde82</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-OrthoticFitter</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>51b4e1b4-b428-422e-aa20-269c45f7f50e</term>
@@ -3940,10 +3562,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>64846b90-f870-41a2-9dcb-efc5be0272a6</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-Orthotist</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>b73f5330-2f42-4b74-8f3a-8e8a67198743</term>
@@ -3971,10 +3590,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>4eddcb56-a5d6-4d7a-8e77-47966567f99e</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-Pedorthist</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>3154fb4c-0e11-4cb9-a45a-365d87b728f6</term>
@@ -4002,10 +3618,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>edf6ef5f-37ed-4459-9f6f-e32dfe09f82a</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-PhysicalTherapist</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>b812ca7c-9408-4d2f-94bd-7cb71a5fbb7e</term>
@@ -4033,10 +3646,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>55102ba8-39ad-470f-a36b-f88c805550d5</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-PhysicalTherapyAssistant</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>4451d4c0-5496-40ec-b575-acf158ec9ee9</term>
@@ -4064,10 +3674,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>d4fd483b-e7ff-4c8a-9016-26a887cb6d72</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-Prosthetist</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>f0f9d37c-d2c7-4974-b60f-7fb6a362ba6d</term>
@@ -4095,10 +3702,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>363d8c5b-ed57-4c8b-9c0a-4aaf0b163470</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-PulmonaryFunctionTechnologist</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>5ed2699f-c90f-4ffb-a4d8-4147fec2c3a6</term>
@@ -4126,10 +3730,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>e2bafbf9-367b-4c29-83c2-52db95a85be1</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-RecreationTherapist</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>5f6b7096-a017-4434-8c3d-97379beb0eb1</term>
@@ -4157,10 +3758,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>dab56b5d-ce45-4b84-b04e-825a89062ce4</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-RecreationalTherapistAssistant</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>9395f101-f81e-47f0-8e14-7050af18e04e</term>
@@ -4188,10 +3786,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>e14f071d-0189-41d4-bb3a-3ed76a8c9d01</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-RehabilitationCounselor</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>c2dfc5fd-cf9e-4918-8cea-8a913fee4c9c</term>
@@ -4219,10 +3814,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>ee982227-5872-403a-bcaf-3765f75d2bcc</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-RehabilitationPractitioner</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>dc906cc5-bf8a-4506-8700-1181cda6ceb2</term>
@@ -4250,10 +3842,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>9ea46e1e-7a01-4cae-a49a-861f36236df9</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-RespiratoryTherapistCertified</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>d7f75c38-03e1-49c6-8d99-715c8502a816</term>
@@ -4281,10 +3870,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>cc4dd10d-5677-44f6-9cb1-7e1cea77664f</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-RespiratoryTherapistRegistered</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>00aec2c2-fa15-41ca-bb9b-505caf30a76a</term>
@@ -4312,10 +3898,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>cc019802-dc12-49a1-8440-1090ef95d8f7</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-SpecialistTechnologist</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>1afe1e05-9fa8-4a92-818c-2958f0776aa2</term>
@@ -4343,10 +3926,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>bdf9a9ef-6a90-4b72-b276-22caf42b1c1f</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-Audiologist</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>ae4ee35d-8004-4815-b218-ba08b81de18e</term>
@@ -4374,10 +3954,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>0e3bca33-43f4-4655-beb7-b9421da06994</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-Audiologist-HearingAidFitter</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>580295cc-8946-43c0-88b2-ff942f234f83</term>
@@ -4405,10 +3982,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>60c372fa-6cbc-451b-b7f3-91089ca8eb62</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-HearingInstrumentSpecialist</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>7439e1c7-8e9b-4e1b-b0b9-a974db1fa743</term>
@@ -4436,10 +4010,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>c9d372ca-61b7-4330-a953-47d454fa5b67</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-Speech-LanguagePathologist</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>58607c8a-5c1a-4d71-b011-40a41d54998f</term>
@@ -4467,10 +4038,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>a94161cb-02f3-4277-811c-3e940bcb93c9</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-SOHCETP</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>d01438d5-e271-4ce4-ae89-988b92905900</term>
@@ -4498,10 +4066,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>753bb75e-be1e-4505-b802-73df7a49d36c</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-Perfusionist</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>d3f0d876-fc64-4433-a7ff-a77df6c0ee98</term>
@@ -4529,10 +4094,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>0f380521-b0f4-4a1e-9a32-1b0b99235593</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-RadiologicTechnologist</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>a29c58d1-1ac3-4b06-9a7b-615da452df00</term>
@@ -4560,10 +4122,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>50b4b48d-3968-4246-a135-c4dc80abb922</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-RadiologyPractitionerAssistant</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>0d5b0c51-ccab-4d9c-bddf-a7debd3c6065</term>
@@ -4591,10 +4150,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>ca7e5be3-fe22-4986-a19a-7c55296a747f</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-STC</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>b0b323d3-f5ce-4957-9163-e7c31fc4370e</term>
@@ -4622,10 +4178,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>434224ca-df7a-4bde-9021-e910e2f96b40</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-STHI</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>f6f62006-22da-4853-9d51-2ce269bf5707</term>
@@ -4653,10 +4206,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>cd2dadb5-9f30-4d87-b4a9-bf55d7db4860</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-SpecialistTechnologistOther</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>d76a0833-a22c-4628-bada-8d556b0a5297</term>
@@ -4684,10 +4234,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>ee2589e0-a652-42b7-b21a-fb60358bff49</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-SpecialistTechnologistPathology</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>f1dc6e24-4da8-49c8-9c81-e378fedfb700</term>
@@ -4715,10 +4262,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>f20551a3-2860-46df-932f-bc362b2dac34</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-TechnicianCardiology</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>6339b164-3023-4c79-b1d8-5826b23e7a70</term>
@@ -4746,10 +4290,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>4f2cdac8-6489-45d5-8ae2-96ab637243b0</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-TechnicianHealthInformation</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>181ec46e-397c-44cb-ae9c-6bb767ca0d46</term>
@@ -4777,10 +4318,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>610b6c06-82ef-405e-af42-58e80a34212f</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-TechnicianOther</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>f6769d17-6fd8-4ca3-a8bc-cf092e9acaf9</term>
@@ -4808,10 +4346,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>d643d4aa-3e76-4347-a899-6294d1c0fd2f</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>ProviderType-TechnicianPathology</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>a3a2b738-13bd-4d69-a20d-4f066e73234d</term>
@@ -4839,10 +4374,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>afb14536-92b5-4f9b-9100-f29d1a1a81c4</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-Government</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <name>
         <language>en</language>
@@ -4855,10 +4387,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>41b14536-92b5-4f9b-9100-f29d1a1a81c4</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-CaseManagement</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>f28f86bc-a032-4f3a-9704-f71a266df8c5</term>
@@ -4886,10 +4415,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>eba4ddf5-9bc0-49e5-80f3-d5929e34b3a3</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-CommunityBehavioralHealth</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>1a01d0ce-19c1-473a-9190-bf20d33fdbe0</term>
@@ -4917,10 +4443,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>a206ebac-a739-4901-95df-563dc525b92f</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-DTDDS</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>5a56d330-f310-4b44-a060-5371891511ad</term>
@@ -4948,10 +4471,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>51dff051-0c38-4c15-947a-e0da5e1d1fa4</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-EarlyInterventionProviderAgency</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>f05b3567-9595-4b37-89cc-5a13e08880ad</term>
@@ -4979,10 +4499,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>3d7c93c9-f0ec-4799-a89c-82ab9c347538</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-FosterCareAgency</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>169e80ae-9a52-4eb0-b3aa-ebb2e068e0e9</term>
@@ -5010,10 +4527,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>32c6efec-3229-4682-a6d9-124dd86fb0dd</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-HomeHealth</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>73e316f2-cb6c-425b-b589-c3feef8235a0</term>
@@ -5041,10 +4555,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>45d1e9aa-41ff-4216-a1d4-0e626fd76461</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-HomeInfusion</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>41c8fa0f-51ee-47d8-8aaf-b5df7ba6ace0</term>
@@ -5072,10 +4583,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>e5550578-33e1-4533-ad5a-32ef0ec14931</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-HospiceCareCommunityBased</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>ac841fe5-01f9-4956-a7e5-39dc965df250</term>
@@ -5103,10 +4611,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>cf5d220d-74f4-4ae8-b082-7d25ce657bb3</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-InHomeSupportiveCare</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>938e697a-76ee-4513-8190-a178febb3a4f</term>
@@ -5134,10 +4639,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>38562b26-5055-4149-a0ba-baf3767304da</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-LocalEducationAgencyLEA</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>53389483-1d08-48b1-8472-755e4a8941dd</term>
@@ -5165,10 +4667,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>0b081670-bb08-4cf8-846e-ec611c2b9eee</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-NursingCare</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>fdc02f47-98db-4d18-814b-c9b1210b9649</term>
@@ -5196,10 +4695,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>624b2aa1-090d-4cd4-8190-05a2695c74e5</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-PA-ICEPACEPO</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>5056fa01-bf19-4479-8107-745d61d5e849</term>
@@ -5227,10 +4723,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>bc9a595a-4ea4-4e70-a002-cf25ad3a0837</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-PublicHealthorWelfare</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>f2ba21f1-f2ef-424a-8191-400aecc7d1ef</term>
@@ -5258,10 +4751,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>21dfc9d3-755e-4ee5-bad6-63115e7308d3</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-SupportsBrokerage</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>9f0c150d-11ea-4c28-a323-e873ea0dc9f2</term>
@@ -5289,10 +4779,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>bab2623b-f6eb-4bd3-b32c-0422e2bae9cc</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-VoluntaryorCharitable</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>10233c34-8417-4e9c-8f2d-e5bd56c48876</term>
@@ -5320,10 +4807,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>2d3c2107-d682-4c9b-b020-b686e7629017</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-ClinicCenter</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>a0214d29-d29a-4df6-a8c1-ab3a3a65fadf</term>
@@ -5351,10 +4835,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>ea35a734-3ed2-4a83-ba4d-ec45484bdcb5</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-EpilepsyUnit</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>29522f01-debe-4210-ac5d-f91ade13d111</term>
@@ -5382,10 +4863,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>c57423e4-3f5d-4a96-9259-6b5ee665279d</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-MedicareDefinedSwingBedUnit</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>e8ffb4df-9322-48d6-b5c9-fcdb99e14a0c</term>
@@ -5413,10 +4891,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>7a86bca6-98dd-452e-b0a9-9ebc2abaffc4</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-PsychiatricUnit</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>5054033a-09bb-4a86-ae77-4e2bb667e6fa</term>
@@ -5444,10 +4919,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>75c71dd3-a67f-4928-b94a-d8060edee93d</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-RehabilitationUnit</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>eedf810b-74ab-433d-989f-67ff2ce17d40</term>
@@ -5475,10 +4947,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>eb546d94-94e0-4ebf-af84-0ed01d9fc6ee</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-RSUDU</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>fd550c64-475a-4553-aa93-f37b7fe134c7</term>
@@ -5506,10 +4975,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>d1b51199-4baf-424b-9b1a-043a22b8ba61</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-ChristianScienceSanitorium</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>8d106794-fd12-4e3e-a006-f81c61398655</term>
@@ -5537,10 +5003,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>b04ab496-09ed-4cc7-9e9c-b7afc3c5562a</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-ChronicDiseaseHospital</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>c9442fe1-be8d-48cb-abdf-006297be9d64</term>
@@ -5568,10 +5031,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>48ae7be6-000d-4081-82b2-16ea00617bc7</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-GeneralAcuteCareHospital</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>b9d785e3-6216-4247-b694-1bbd19855218</term>
@@ -5599,10 +5059,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>49b44e9b-0324-45d3-a41d-102c7ebdb80d</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-LongTermCareHospital</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>1fde64df-21d2-49f3-93ed-31de57daac59</term>
@@ -5630,10 +5087,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>871cac23-6417-4627-a919-aeb7a59d0a3e</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-MilitaryHospital</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>92fe2783-2fce-4cba-bf7d-361cff01cdca</term>
@@ -5661,10 +5115,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>7d6d72da-cf8e-439f-a748-dd543fcbe4ed</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-PsychiatricHospital</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>2b4ea5dc-16cc-4ff3-919e-94e7234f827d</term>
@@ -5692,10 +5143,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>8e2a60d0-0cc6-4418-b120-09176b4f16d4</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-RehabilitationHospital</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>0ade9e69-47ac-4b5c-ad49-e589e46f5969</term>
@@ -5723,10 +5171,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>c9a4817f-bc01-4331-964b-b935193a3fd3</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-RNHCI</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>1e190069-485e-4ccc-9f67-ef181a755629</term>
@@ -5754,10 +5199,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>98a6a3d2-0d57-4337-a63c-d1a507f8a352</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-SpecialHospital</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>fea2e952-de10-4401-8f7e-a0bceda5bfa5</term>
@@ -5785,10 +5227,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>b7fcda23-d867-417b-9b39-fb6c3a40e7e8</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-ClinicalMedicalLaboratory</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>b43e51f0-c653-483e-9f09-b465267f6367</term>
@@ -5816,10 +5255,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>3e314009-acd4-45be-a929-a1342d2f555b</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-DentalLaboratory</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>dff59e28-5b5b-4cb1-a86d-7bce1fd9643b</term>
@@ -5847,10 +5283,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>aef64ddd-7239-4526-bf70-72bf11ad6f01</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-MCML</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>fc398f16-fd21-4e1c-b60b-99f1ec27ce30</term>
@@ -5878,10 +5311,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>88d9edc0-b6d3-480a-a989-88a0455074d2</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-PhysiologicalLaboratory</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>43ffa82f-8099-4f1d-9256-19fea947ecab</term>
@@ -5909,10 +5339,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>ced50087-e784-4838-9ae0-9bff06f6ebcb</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-ExclusiveProviderOrganization</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>c921691c-495e-4c47-b15c-789eba88bc70</term>
@@ -5940,10 +5367,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>eadef323-7a1a-4ef4-8f63-88d52f162b33</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-HealthMaintenanceOrganization</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>3beb9d44-76b4-42e3-b5bb-363955a2efe8</term>
@@ -5971,10 +5395,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>9b60451e-13f2-4b8a-8a45-78642dbbc797</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-PointofService</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>41385b8d-c8e0-4277-ba58-bc8ce475d83b</term>
@@ -6002,10 +5423,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>7d898d99-76b4-4c9a-baa6-edf155c9ea8c</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-PreferredProviderOrganization</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>b0eb16a0-09e0-4e64-a1ef-cea861f9d623</term>
@@ -6033,10 +5451,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>b8ec39a1-2ee1-4a6a-80c7-d707b6fc72f4</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-AlzheimerCenterDementiaCenter</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>029782ab-5302-450c-be8f-defdf09c4847</term>
@@ -6064,10 +5479,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>f10f2d42-087b-4dc6-b3a1-afbd209b454f</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-AssistedLivingFacility</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>1bd476b9-0cf1-4f81-a426-989f2ea82f0e</term>
@@ -6095,10 +5507,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>83164a16-fd2b-4204-b57f-4ba103001901</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-ChristianScienceFacility</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>72220ca6-4d3f-4849-820b-0733235ba7b2</term>
@@ -6126,10 +5535,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>eb1e1cf1-3542-4367-bd04-f59bc2648d72</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-CustodialCareFacility</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>48085c12-8303-4b17-86d1-c4c26e984350</term>
@@ -6157,10 +5563,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>ddf5b199-641e-4de9-b961-4b3e7be84b48</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-HospiceInpatient</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>8a625608-ca28-4b8e-b407-a93bbcdcc289</term>
@@ -6188,10 +5591,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>004675b7-d25e-4017-b848-e5a47e45807c</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-ICFID</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>b37a760e-d0d1-4d82-a261-a24ebd798c97</term>
@@ -6219,10 +5619,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>144ab295-af40-45d2-b3ba-6309e5871892</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-ICFMI</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>b99bc75e-0cba-4943-9ed5-171fa0500d10</term>
@@ -6250,10 +5647,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>0dd8ee17-7502-4e88-bf79-5d942c712f4f</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-NFICF</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>50af0449-e17e-42df-a28b-10a27f34b1bd</term>
@@ -6281,10 +5675,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>093d70f2-2fa4-4174-9b91-3a50462867cd</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-SkilledNursingFacility</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>dc32298f-e686-4868-8e5b-7c36cd93482e</term>
@@ -6312,10 +5703,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>6f0163a3-cddd-40ac-846c-75801e33db68</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-Lodging</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>b91321cf-5c79-4cee-8281-dbb1e8e11d75</term>
@@ -6343,10 +5731,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>98deac01-ed3f-428a-a602-1c85d34347ba</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-Meals</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>a4951266-3cb2-43ad-8039-df82184deb5a</term>
@@ -6374,10 +5759,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>cef0c504-354e-4cd4-a164-c7cdd114030d</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-CBRTFMI</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>7e70c6cb-f028-42af-ad05-b87cf32dffe3</term>
@@ -6405,10 +5787,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>043d95a6-b132-48dc-a8d4-04cd9d1b0d70</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-CBRTFIDD</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>6244a1a5-d0dc-4f5e-aa74-3af8e702c726</term>
@@ -6436,10 +5815,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>046f8be7-7e45-45ae-a86e-2446b45a13c7</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-PRTF</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>14d46461-0058-400b-a530-d46e04c494eb</term>
@@ -6467,10 +5843,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>67a7ddb9-e88f-4362-9061-0e67e6de28f2</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-RTFEDC</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>e0704394-de95-4782-9438-cd023b3b5525</term>
@@ -6498,10 +5871,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>f1b4c9a0-f0d5-4795-94cb-bad4523d77f6</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-RTFIDD</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>05d44a76-edf3-4209-97cd-1aabd6451106</term>
@@ -6529,10 +5899,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>f1432003-720e-40d7-a54f-f78214d886d9</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-RTFPD</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>bb8f4a4e-0897-450e-a45a-094aee8d761f</term>
@@ -6560,10 +5927,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>b99ff7e7-6303-4110-90ee-f90204e09bf2</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-SARF</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>1e7a52ae-445f-4eab-beb0-48e9d1d8554a</term>
@@ -6591,10 +5955,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>593bdc32-2584-49fa-9f8a-b26b03807d6b</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-RespiteCare</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>3109fa1a-364a-4cde-a614-43d6e731a951</term>
@@ -6622,10 +5983,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>a9acf944-06ef-40bc-9aa9-2898fd22c96f</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-BloodBank</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>4227a1c7-a4b8-4fcd-9dfd-0fe55683e55d</term>
@@ -6653,10 +6011,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>6c8c3b62-87b1-4b73-8564-3cc6e8b44300</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-DVAVAP</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>03ec015f-614e-423e-b265-e1ae5221f866</term>
@@ -6684,10 +6039,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>7b9f6b5d-dc1f-4c8a-a5e0-b0bf09a89761</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-DMEMS</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>a12661e3-5c6c-4cb2-9863-0fc6c934c237</term>
@@ -6715,10 +6067,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>c44342ff-a75f-436b-9c3d-1bb42ef3119d</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-ERSC</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>563a8620-48c4-4db7-be75-648e59d43a4f</term>
@@ -6746,10 +6095,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>83ab2cda-e5e8-4cd7-809d-6e7ae129b5b0</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-EyeBank</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>0b04a714-1223-48cd-8566-cf7b3a710abf</term>
@@ -6777,10 +6123,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>c1227c03-905c-4d6c-87de-80ba0d0a27ac</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-EyewearSupplier</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>625678b8-f380-4dff-a216-9680f27ee0c8</term>
@@ -6808,10 +6151,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>2118e72d-ea68-4066-b13a-29ac93128b27</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-HearingAidEquipment</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>bcdbf3e5-277e-465b-87a4-3f28130c565a</term>
@@ -6839,10 +6179,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>d7ddfed8-7dc7-44b9-b5ab-0229306b4aee</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-HomeDeliveredMeals</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>1eb6d154-77fe-4ff9-b895-d67c48d71f82</term>
@@ -6870,10 +6207,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>a41d87e6-6806-4dd8-9a8a-c90897be5f13</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-IHSTUIHITUP</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>623792e4-1184-42fb-943b-5f4091b2ab64</term>
@@ -6901,10 +6235,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>f8947935-6650-49e4-b7b4-0d7acaa0e923</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-MedicalFoodsSupplier</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>a898ff23-6fa9-4ad0-a5ae-b42773700703</term>
@@ -6932,10 +6263,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>a446773a-baf2-4ebe-b0b2-7edeb3d23d90</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-MilitaryU.S.CoastGuardPharmacy</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>f4e76582-3c85-416c-8a88-a7598ebe62f9</term>
@@ -6963,10 +6291,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>0e414e2f-52a4-4771-95c9-2f8d0662c744</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-Non-PharmacyDispensingSite</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>b581b9e0-7c0a-4596-8244-06352b6ab43a</term>
@@ -6994,10 +6319,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>25348870-4fdb-42ae-b793-8384eb12e301</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-OrganProcurementOrganization</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>c76ed3fb-eb10-4a28-8a58-8cedd29d4612</term>
@@ -7025,10 +6347,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>37607810-4a3e-4cb3-ab40-6de1946efd62</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-Pharmacy</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>c936a89e-6b3c-4102-8a2f-927b64dd0f82</term>
@@ -7056,10 +6375,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>566dfcbf-495a-4f54-a49d-acf50be8a323</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-PX-OPDIS</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>f2819321-bd66-4137-9b39-53ae15b05cfe</term>
@@ -7087,10 +6403,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>2cabff7a-c30a-46e9-8b14-11211d7cb65b</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-ProstheticOrthoticSupplier</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>450b839b-89d3-498d-a48d-cf78fa05c3c5</term>
@@ -7118,10 +6431,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>e5627055-18ef-4614-bc9a-8f33b5310883</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-AirCarrier</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>8ebdfa98-2169-4d6f-9717-799726b90182</term>
@@ -7149,10 +6459,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>b7445cfa-7022-48a7-9627-1c944f12fbb8</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-Ambulance</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>d2eeb6f1-3fb9-445e-833d-caba80bd5517</term>
@@ -7180,10 +6487,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>106b1624-b0f6-41fb-9f56-6e0c746a08b4</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-Bus</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>a9df9ea8-5a71-448c-a88e-2c1fe3a60355</term>
@@ -7211,10 +6515,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>f1c1ce7b-1023-4bfb-814b-2ce7113c6bbb</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-MilitaryU.S.CoastGuardTransport</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>0577cbe6-074b-40d1-a2ca-411aa6e3b83a</term>
@@ -7242,10 +6543,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>97f77c8b-5d12-47be-a6a0-e842ebbf7e68</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-N-MTVAN</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>f6b4f920-e677-44c6-b873-8298936f3b4d</term>
@@ -7273,10 +6571,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>f5d93f74-7900-49a9-995d-ec921d310763</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-PrivateVehicle</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>7b38ea7a-47ca-4aa0-acab-b553b4a4f31b</term>
@@ -7304,10 +6599,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>945a465e-a5fe-4b48-9245-84ce69904369</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-SecuredMedicalTransportVAN</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>a7acf5f4-6eb4-4763-9339-8bdfa5610bb0</term>
@@ -7335,10 +6627,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>6cdd54be-5437-46fa-bfff-a0aa627b6952</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-Taxi</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>70b0560a-2873-4ec8-a0ba-a199d978ea09</term>
@@ -7366,10 +6655,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>e8a957ed-40d3-4865-a836-f0eb229f79d3</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-Train</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>4d1bff87-0bd8-44b7-bcdb-980f3a99f840</term>
@@ -7397,10 +6683,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>70bd285a-2b98-45a1-9d2b-6c8fb465329a</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-TransportationBroker</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>33ab6e65-4806-4617-8258-f4b365b2074b</term>
@@ -7428,10 +6711,7 @@
     <Concept xmlns="http://santedb.org/model">
       <id>c523b421-e7db-4f4b-8002-cf3475d84e49</id>
       <_head>false</_head>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <mnemonic>OrganizationType-TransportationNetworkCompany</mnemonic>
-      <statusConcept xsi:nil="true" />
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <referenceTerm>
         <term>118fa8ac-9726-49e0-b89c-c30ad59f4cc7</term>
