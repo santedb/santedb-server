@@ -17,6 +17,9 @@
  *
  * User: fyfej
  * Date: 2023-3-10
+ * 
+ * This code appears to be part of an answer from Stack Overflow. See https://stackoverflow.com/a/38406395/4687242
+ * 
  */
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
@@ -28,6 +31,7 @@ namespace SanteDB.Configuration.Controls
     [ExcludeFromCodeCoverage]
     public class PropertyGridEx : PropertyGrid
     {
+        /// <inheritdoc />
         protected override bool ProcessTabKey(bool forward)
         {
             var grid = this.Controls[2];
@@ -47,3 +51,4 @@ namespace SanteDB.Configuration.Controls
         }
     }
 }
+
