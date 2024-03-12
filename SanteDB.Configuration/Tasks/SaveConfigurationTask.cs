@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  *
@@ -16,8 +16,9 @@
  * the License.
  *
  * User: fyfej
- * Date: 2023-3-10
+ * Date: 2023-6-21
  */
+using SanteDB.Core;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Configuration.Features;
 using SanteDB.Core.Services;
@@ -27,7 +28,6 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Windows.Forms;
-using SanteDB.Core;
 namespace SanteDB.Configuration.Tasks
 {
     /// <summary>
@@ -71,12 +71,12 @@ namespace SanteDB.Configuration.Tasks
             {
                 File.Copy(ConfigurationContext.Current.ConfigurationFile, this.m_backupFile, true);
             }
-            
+
             // Protect the configuration file?
 
-            if(!configuration.IsMonoRuntime() && configuration.Sections.OfType<IEncryptedConfigurationSection>().Any() && 
-                configuration.ProtectedSectionKey == null && 
-                MessageBox.Show("Would you like to encrypt sensitive parts of the configuration file?", "Protect Configuration", MessageBoxButtons.YesNo) == DialogResult.Yes) 
+            if (!configuration.IsMonoRuntime() && configuration.Sections.OfType<IEncryptedConfigurationSection>().Any() &&
+                configuration.ProtectedSectionKey == null &&
+                MessageBox.Show("Would you like to encrypt sensitive parts of the configuration file?", "Protect Configuration", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
                 try
                 {
@@ -84,10 +84,12 @@ namespace SanteDB.Configuration.Tasks
                     {
                         store.Open(OpenFlags.ReadOnly);
                         X509Certificate2Collection collection = new X509Certificate2Collection();
-                        foreach(var x509 in store.Certificates)
+                        foreach (var x509 in store.Certificates)
                         {
                             if (x509.HasPrivateKey)
+                            {
                                 collection.Add(x509);
+                            }
                         }
 
                         configuration.ProtectedSectionKey = new Core.Security.Configuration.X509ConfigurationElement(

@@ -8,7 +8,6 @@
       <oid>2.16.840.1.113883.1.11.20448</oid>
       <authority>PurposeOfUse</authority>
       <url>http://terminology.hl7.org/ValueSet/v3-GeneralPurposeOfUse</url>
-
     </CodeSystem>
   </update>
   <update insertIfNotExists="true">
@@ -49,7 +48,6 @@
       </name>
     </Concept>
   </update>
-
   <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>6af9821e-9169-11ea-bb37-0242ac130002</id>
@@ -79,7 +77,6 @@
       </name>
     </Concept>
   </update>
-
   <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>6af983cc-9169-11ea-bb37-0242ac130002</id>
@@ -109,7 +106,6 @@
       </name>
     </Concept>
   </update>
-
   <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>6af988fd-9169-11ea-bb37-0242ac130002</id>
@@ -139,7 +135,6 @@
       </name>
     </Concept>
   </update>
-
   <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>6af989d0-9169-11ea-bb37-0242ac130002</id>
@@ -169,7 +164,6 @@
       </name>
     </Concept>
   </update>
-
   <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>8b18c02c-916a-11ea-bb37-0242ac130002</id>
@@ -199,7 +193,6 @@
       </name>
     </Concept>
   </update>
-
   <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>8b18c1ee-916a-11ea-bb37-0242ac130002</id>
@@ -229,7 +222,6 @@
       </name>
     </Concept>
   </update>
-
   <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>8b18c586-916a-11ea-bb37-0242ac130002</id>
@@ -259,7 +251,6 @@
       </name>
     </Concept>
   </update>
-
   <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>8b18c75c-916a-11ea-bb37-0242ac130002</id>
@@ -289,7 +280,6 @@
       </name>
     </Concept>
   </update>
-
   <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>8b18c8ce-916a-11ea-bb37-0242ac130002</id>
@@ -304,5 +294,4 @@
       </name>
     </Concept>
   </update>
-  
 </dataset>

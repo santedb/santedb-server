@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  *
@@ -16,7 +16,7 @@
  * the License.
  *
  * User: fyfej
- * Date: 2023-3-10
+ * Date: 2023-6-21
  */
 using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
@@ -169,7 +169,7 @@ namespace SanteDB.Persistence.Diagnostics.Email
                 var issueId = DateTimeOffset.Now.ToString("yyyy-MM-dd-HHmmss");
 
                 var subject = $"SANTEDB ISSUE MAILER #{issueId}";
-                var body = $"<html><body><p>{storageData.LoadProperty<SecurityUser>("CreatedBy")?.UserName ?? storageData?.Submitter?.LoadProperty<SecurityUser>("SecurityUser")?.UserName ?? overrideAuthContext?.Identity.Name} has reported a bug</p><pre>{storageData.Note}</pre><p>You can reply directly to the reporter by pressing the Reply button in your mail client</p><pre>{String.Join("\r\n",storageData.Tags?.Select(o=>$"{o.TagKey} = {o.Value}"))}</pre></body></html>";
+                var body = $"<html><body><p>{storageData.LoadProperty<SecurityUser>("CreatedBy")?.UserName ?? storageData?.Submitter?.LoadProperty<SecurityUser>("SecurityUser")?.UserName ?? overrideAuthContext?.Identity.Name} has reported a bug</p><pre>{storageData.Note}</pre><p>You can reply directly to the reporter by pressing the Reply button in your mail client</p><pre>{String.Join("\r\n", storageData.Tags?.Select(o => $"{o.TagKey} = {o.Value}"))}</pre></body></html>";
                 var attachments = storageData.Attachments.Select(a =>
                 {
                     if (a is DiagnosticBinaryAttachment bin)

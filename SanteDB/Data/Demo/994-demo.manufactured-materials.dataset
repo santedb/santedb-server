@@ -8,15 +8,15 @@
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
 	  <industryConcept>33b40c3c-c0c0-48b6-be74-0881d9c00ee6</industryConcept>
       <name>
-        <source xsi:nil="true" />
-        <effectiveVersionSequence xsi:nil="true" />
-        <obsoleteVersionSequence xsi:nil="true" />
+        
+        
+        
         <use>1ec9583a-b019-4baa-b856-b99caf368656</use>
         <component>
-          <source xsi:nil="true" />
-          <type xsi:nil="true" />
+          
+          
           <value>Dilbert Vaccine Manufacturers</value>
-          <phoneticAlgorithm xsi:nil="true" />
+          
         </component>
       </name>
     </Organization>
@@ -29,15 +29,15 @@
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
       <typeConcept>6549730D-EBBE-4700-8052-3DD3F390213F</typeConcept>
       <identifier>
-        <source xsi:nil="true" />
-        <effectiveVersionSequence xsi:nil="true" />
-        <obsoleteVersionSequence xsi:nil="true" />
+        
+        
+        
         <value>DB30940343</value>
         <authority>
           <name>GS1 Global Trade Identification Number (GTIN)</name>
           <domainName>GTIN</domainName>
           <oid>1.3.160</oid>
-          <assigningDevice xsi:nil="true" />
+          
         </authority>
       </identifier>
       <relationship>
@@ -52,13 +52,13 @@
         <relationshipType>6780DF3B-AFBD-44A3-8627-CBB3DC2F02F6</relationshipType>
       </relationship>
       <name>
-        <source xsi:nil="true" />
-        <effectiveVersionSequence xsi:nil="true" />
-        <obsoleteVersionSequence xsi:nil="true" />
+        
+        
+        
         <use>a87a6d21-2ca6-4aea-88f3-6135cceb58d1</use>
         <component>
-          <source xsi:nil="true" />
-          <type xsi:nil="true" />
+          
+          
           <value>MeasleGuard MR (Dilbert Vaccine Manufacturers)</value>
         </component>
       </name>
@@ -75,15 +75,15 @@
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
       <typeConcept>1185DEF1-6AD4-4995-B67A-406DB08945B5</typeConcept>
       <identifier>
-        <source xsi:nil="true" />
-        <effectiveVersionSequence xsi:nil="true" />
-        <obsoleteVersionSequence xsi:nil="true" />
+        
+        
+        
         <value>DB450983209</value>
         <authority>
           <name>GS1 Global Trade Identification Number (GTIN)</name>
           <domainName>GTIN</domainName>
           <oid>1.3.160</oid>
-          <assigningDevice xsi:nil="true" />
+          
         </authority>
       </identifier>
       <relationship>
@@ -98,13 +98,13 @@
         <relationshipType>6780DF3B-AFBD-44A3-8627-CBB3DC2F02F6</relationshipType>
       </relationship>
       <name>
-        <source xsi:nil="true" />
-        <effectiveVersionSequence xsi:nil="true" />
-        <obsoleteVersionSequence xsi:nil="true" />
+        
+        
+        
         <use>a87a6d21-2ca6-4aea-88f3-6135cceb58d1</use>
         <component>
-          <source xsi:nil="true" />
-          <type xsi:nil="true" />
+          
+          
           <value>PCV13 (Dilbert Vaccine Manufacturers)</value>
         </component>
       </name>
@@ -126,7 +126,7 @@
           <name>GS1 Global Trade Identification Number (GTIN)</name>
           <domainName>GTIN</domainName>
           <oid>1.3.160</oid>
-          <assigningDevice xsi:nil="true" />
+          
         </authority>
       </identifier>
       <relationship>
@@ -141,13 +141,13 @@
         <relationshipType>6780DF3B-AFBD-44A3-8627-CBB3DC2F02F6</relationshipType>
       </relationship>
       <name>
-        <source xsi:nil="true" />
-        <effectiveVersionSequence xsi:nil="true" />
-        <obsoleteVersionSequence xsi:nil="true" />
+        
+        
+        
         <use>a87a6d21-2ca6-4aea-88f3-6135cceb58d1</use>
         <component>
-          <source xsi:nil="true" />
-          <type xsi:nil="true" />
+          
+          
           <value>OPV (Dilbert Vaccine Manufacturers)</value>
         </component>
       </name>
@@ -169,7 +169,7 @@
           <name>GS1 Global Trade Identification Number (GTIN)</name>
           <domainName>GTIN</domainName>
           <oid>1.3.160</oid>
-          <assigningDevice xsi:nil="true" />
+          
         </authority>
       </identifier>
       <relationship>
@@ -184,13 +184,13 @@
         <relationshipType>6780DF3B-AFBD-44A3-8627-CBB3DC2F02F6</relationshipType>
       </relationship>
       <name>
-        <source xsi:nil="true" />
-        <effectiveVersionSequence xsi:nil="true" />
-        <obsoleteVersionSequence xsi:nil="true" />
+        
+        
+        
         <use>a87a6d21-2ca6-4aea-88f3-6135cceb58d1</use>
         <component>
-          <source xsi:nil="true" />
-          <type xsi:nil="true" />
+          
+          
           <value>BCG (Dilbert Vaccine Manufacturers)</value>
         </component>
       </name>
@@ -212,7 +212,7 @@
           <name>GS1 Global Trade Identification Number (GTIN)</name>
           <domainName>GTIN</domainName>
           <oid>1.3.160</oid>
-          <assigningDevice xsi:nil="true" />
+          
         </authority>
       </identifier>
       <relationship>
@@ -227,13 +227,13 @@
         <relationshipType>6780DF3B-AFBD-44A3-8627-CBB3DC2F02F6</relationshipType>
       </relationship>
       <name>
-        <source xsi:nil="true" />
-        <effectiveVersionSequence xsi:nil="true" />
-        <obsoleteVersionSequence xsi:nil="true" />
+        
+        
+        
         <use>a87a6d21-2ca6-4aea-88f3-6135cceb58d1</use>
         <component>
-          <source xsi:nil="true" />
-          <type xsi:nil="true" />
+          
+          
           <value>PentaMax DTP-HepB-Hib (Dilbert Vaccine Manufacturers)</value>
         </component>
       </name>
@@ -255,7 +255,7 @@
           <name>GS1 Global Trade Identification Number (GTIN)</name>
           <domainName>GTIN</domainName>
           <oid>1.3.160</oid>
-          <assigningDevice xsi:nil="true" />
+          
         </authority>
       </identifier>
       <relationship>
@@ -270,13 +270,13 @@
         <relationshipType>6780DF3B-AFBD-44A3-8627-CBB3DC2F02F6</relationshipType>
       </relationship>
       <name>
-        <source xsi:nil="true" />
-        <effectiveVersionSequence xsi:nil="true" />
-        <obsoleteVersionSequence xsi:nil="true" />
+        
+        
+        
         <use>a87a6d21-2ca6-4aea-88f3-6135cceb58d1</use>
         <component>
-          <source xsi:nil="true" />
-          <type xsi:nil="true" />
+          
+          
           <value>RotaGuard (Dilbert Vaccine Manufacturers)</value>
         </component>
       </name>

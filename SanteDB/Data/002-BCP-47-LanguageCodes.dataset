@@ -17,7 +17,6 @@
       <name>
         <language>en</language>
         <value>Arabic</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
   </update>
@@ -29,7 +28,6 @@
       <name>
         <language>en</language>
         <value>Bengali</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
   </update>
@@ -42,7 +40,6 @@
       <name>
         <language>en</language>
         <value>Chichewa</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
   </update>
@@ -54,7 +51,6 @@
       <name>
         <language>en</language>
         <value>Chinese</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
   </update>
@@ -66,7 +62,6 @@
       <name>
         <language>en</language>
         <value>English</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
   </update>
@@ -78,7 +73,6 @@
       <name>
         <language>en</language>
         <value>French</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
   </update>
@@ -90,7 +84,6 @@
       <name>
         <language>en</language>
         <value>German</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
   </update>
@@ -102,7 +95,6 @@
       <name>
         <language>en</language>
         <value>Japanese</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
   </update>
@@ -114,7 +106,6 @@
       <name>
         <language>en</language>
         <value>Korean</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
   </update>
@@ -126,7 +117,6 @@
       <name>
         <language>en</language>
         <value>Maori</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
   </update>
@@ -138,7 +128,6 @@
       <name>
         <language>en</language>
         <value>Spanish</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
   </update>
@@ -150,7 +139,6 @@
       <name>
         <language>en</language>
         <value>Swahili</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
   </update>
@@ -162,7 +150,6 @@
       <name>
         <language>en</language>
         <value>Tahitian</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
   </update>
@@ -174,7 +161,6 @@
       <name>
         <language>en</language>
         <value>Vietnamese</value>
-        <phoneticAlgorithm xsi:nil="true" />
       </name>
     </ReferenceTerm>
   </update>

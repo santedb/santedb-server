@@ -4,8 +4,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>494572ce-58a2-4376-8a7c-51da073cb8c6</id>
       <creationTime>2018-08-17T07:22:41.5788886-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-ChristianAmericanBaptistChurch</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -21,8 +19,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>18d758d9-956e-4a3f-a8fa-3b7b6b736515</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-Agnostic</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -38,8 +34,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>b95acb46-a7a6-4fb4-92a1-5e4ffae6be9c</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-ChristianAfricanMethodistEpiscopalZion</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -55,8 +49,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>387ffe57-3f8c-41bb-9daf-d90331640974</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-ChristianAfricanMethodistEpiscopal</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -72,8 +64,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>f45c5e4a-db56-4567-b1f5-ab9f9915be32</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-ChristianAnglican</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -89,8 +79,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>b9d67119-772a-4562-89e0-04112d057a9c</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-ChristianAssemblyofGod</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -106,8 +94,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>27e4752c-7afd-4963-843b-db0a3e3cde82</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-Atheist</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -123,8 +109,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>56096e63-921f-41ee-b114-c04127b31287</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-Bahai</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -140,8 +124,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>c60dc139-f653-4c53-acc9-28ca397d8c80</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-ChristianBaptist</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -157,8 +139,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>4ffb45c7-1b9a-47e1-a6e6-7c905e2ba9bc</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-BuddhistMahayana</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -174,8 +154,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>75dfbfb9-88c7-47bb-bda7-cda7cf05eea1</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-BuddhistOther</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -191,8 +169,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>8c202afc-aba9-4b40-865d-879a68cf8d55</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-Brethren</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -208,8 +184,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>0de1a474-e9bf-418e-8d27-053b0cb63e04</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-BuddhistTantrayana</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -225,8 +199,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>b3a4313d-5008-49b8-8eb9-0b0a84880eac</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-BuddhistTheravada</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -242,8 +214,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>79e348cd-4c64-42b7-80d0-bab7c831a257</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-Buddhist</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -259,8 +229,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>235701e7-f625-4172-9e50-1b31ea23773b</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-ChristianRomanCatholic</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -276,8 +244,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>2d1c24dd-7615-4da3-91a3-8f0d4ba8d900</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-ChineseFolkReligionist</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -293,8 +259,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>e0c64b0b-b52d-42f7-9860-45785cfdd988</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-Christian</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -310,8 +274,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>dd3465b5-cb0b-401a-939c-f47f442c8a04</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-ChristianChristianScience</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -327,8 +289,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>f3cc2ba3-086d-4ccd-bbee-5947b8ae3530</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-ChristianChristianMissionaryAlliance</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -344,8 +304,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>47f30732-5fdd-4a57-b534-b43d202a6c4c</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-Confucian</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -361,8 +319,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>8830538b-a793-4f51-a159-47f7ae61020c</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-ChristianChurchofChrist</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -378,8 +334,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>72006b54-52d0-41bd-875d-3d671f0ca5cf</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-ChristianChurchofGod</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -395,8 +349,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>42a27ea5-db67-4ea7-bb93-8c689248bb94</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-ChristianChurchofGodinChrist</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -412,8 +364,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>d5393e44-02be-4346-b0dd-4898ad224f7a</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-ChristianCongregational</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -429,8 +379,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>b9729ed8-c5d0-436a-8f9b-46c5b8acca73</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-ChristianCommunity</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -446,8 +394,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>69fbd44c-bf4f-454d-b01b-5e3c7fd44460</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-ChristianOtherPentecostal</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -463,8 +409,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>84bc96cf-d91c-4d01-952b-e0d64afee615</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-ChristianOther</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -480,8 +424,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>2b8359e8-9847-4f7f-8c00-f02903397021</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-ChristianChristianReformed</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -497,8 +439,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>40d1474f-8e07-463e-969d-ebb798763345</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-DisciplesofChrist</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -514,8 +454,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>77b9e822-f5b1-4966-a4af-0ec3991c112b</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-ChristianEasternOrthodox</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -531,8 +469,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>494ae814-7665-4f65-8ef2-e601e9d9a486</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-ChristianEpiscopalian</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -548,8 +484,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>6b3ccb79-313a-4f5c-805a-9f26947d6344</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-EthnicReligionist</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -565,8 +499,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>864f61f2-fef6-4eb7-a938-85520377999f</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-ChristianEvangelicalChurch</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -582,8 +514,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>cae0bf0d-018f-482d-b7b2-fcce0b43093c</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-ChristianFriends</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -599,8 +529,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>35584c29-552c-4a03-b392-a00717c52d13</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-ChristianFullGospel</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -616,8 +544,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>044f9c20-c1ca-4bc9-8343-2a57ef9fcf00</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-ChristianFreeWillBaptist</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -633,8 +559,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>b9933282-88f5-4747-8a73-ad51faa3a3f1</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-ChristianGreekOrthodox</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -650,8 +574,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>10c939f4-692b-4e55-a1d0-c170cbc082df</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-Hindu</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -667,8 +589,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>75571a53-8724-4ace-a3b0-479ebd8a9a1d</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-HinduOther</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -684,8 +604,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>05a95293-cadd-4aaa-a5cf-ad895fdabbd1</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-HinduShaivites</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -701,8 +619,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>13e38a53-0b7c-4979-bbaf-655c62507f76</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-HinduVaishnavites</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -718,8 +634,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>044b5ab9-2e55-472d-bc35-5fd89b70dcc4</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-Jain</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -735,8 +649,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>fdef34b6-96d4-426f-b453-77b196feb894</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-JewishConservative</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -752,8 +664,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>a640cc95-c426-41db-addd-445b723ef100</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-Jewish</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -769,8 +679,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>67f20e39-894b-4d5a-b86b-7396b5d2c2c4</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-JewishOrthodox</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -786,8 +694,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>69d1a1b6-8b01-4597-a63e-8e113b24b1e3</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-JewishOther</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -803,8 +709,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>8ca5ef79-fb9b-4b22-9837-4dfa8d462765</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-JewishReconstructionist</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -820,8 +724,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>f5cc41c3-7b61-41af-8e35-323e0572f925</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-JewishReform</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -837,8 +739,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>d9df2119-0662-410c-973a-dddf3a16cca6</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-JewishRenewal</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -854,8 +754,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>77a73de2-556e-4c09-92e8-9b6bb1520772</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-ChristianJehovahsWitness</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -871,8 +769,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>11cfb9d8-6ffb-4ac9-82c5-0154f98b4cec</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-ChristianLutheranMissouriSynod</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -888,8 +784,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>a4d2ff00-0458-45fc-8df4-3a8325ef53e4</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-ChristianLutheran</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -905,8 +799,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>08fc7b53-11e6-4290-8b96-e1aad44adfeb</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-ChristianMennonite</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -922,8 +814,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>663b1e37-9794-4e6d-b88b-85833de49a7c</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-ChristianMethodist</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -939,8 +829,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>9b02c365-0a2d-4252-8a8c-67f6be3dbc93</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-ChristianLatter-daySaints</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -956,8 +844,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>572bde23-b7ac-42ac-91f9-414b739c2e22</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-Muslim</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -973,8 +859,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>8cf43589-6dbb-4212-a540-58d8a5111ce4</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-MuslimOther</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -990,8 +874,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>38ec0b5e-f054-4914-93d0-a7229bd29053</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-MuslimShiite</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -1007,8 +889,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>8aee85ad-53f2-41b2-b07d-b7b862c185d6</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-MuslimSunni</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -1024,8 +904,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>0961a1ad-0780-4b36-80ce-c303479bd0a3</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-NativeAmerican</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -1041,8 +919,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>a1b9289b-5e48-4ee3-8419-197c7f26db13</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-ChristianChurchoftheNazarene</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -1058,8 +934,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>e4987458-227f-4bb0-866b-f32ce382f558</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-Nonreligious</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -1075,8 +949,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>193a334f-b76e-46f6-816b-31ecc47f03a2</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-NewReligionist</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -1092,8 +964,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>e75c6fd5-4e40-492d-bee4-d7625648aa8a</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-ChristianOrthodox</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -1109,8 +979,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>640274e3-75d8-4606-b98e-000a94288034</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-Other</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -1126,8 +994,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>ddc0e974-78f7-4d67-9092-ef5daba064aa</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-ChristianPentecostal</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -1143,8 +1009,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>4c970628-98bb-4a59-aab3-2543b07151ee</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-ChristianOtherProtestant</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -1160,8 +1024,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>a6b2c296-022b-4001-aff6-a0f1e2dcb74e</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-ChristianPresbyterian</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -1177,8 +1039,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>f3768ce2-bea3-4c02-899f-d29d672cf6d0</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-ChristianProtestant</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -1194,8 +1054,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>0710c2b7-fc54-41a5-9f3f-37866f3196fd</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-ChristianReformedChurch</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -1211,8 +1069,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>9922a48d-a92f-48a5-ae13-eeb330ecd34c</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-ChristianReorganizedChurchofJesusChrist-LDS</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -1228,8 +1084,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>b649f446-d430-4883-aa67-14f20a3ea170</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-ChristianSalvationArmy</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -1245,8 +1099,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>8720fb7b-0325-48e6-824a-f628e184012f</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-ChristianSeventhDayAdventist</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -1262,8 +1114,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>59589336-c06f-40b8-bf0f-711d62a8d154</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-Shintoist</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -1279,8 +1129,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>392c0de7-9dce-4e50-bb0c-9fe60360994e</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-Sikh</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -1296,8 +1144,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>dbee8058-0b6f-4641-b3cf-37cb41970dd8</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-ChristianSouthernBaptist</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -1313,8 +1159,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>5d0c7708-714b-4368-9e60-3779ff125eea</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-Spiritist</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -1330,8 +1174,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>dd3ca520-c99c-43e0-846c-73325c25ee13</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-ChristianUnitedChurchofChrist</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -1347,8 +1189,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>8d06804d-0638-435c-8efe-e721be919078</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-ChristianUnitedMethodist</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -1364,8 +1204,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>7db19768-4917-4987-986f-bf8e14b9aa56</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-ChristianUnitarian</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -1381,8 +1219,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>ee16ac82-1b1b-478a-8617-19bbfd9fbab1</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-ChristianUnitarianUniversalist</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -1398,8 +1234,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>f30f1461-7631-4297-8977-e7c48c72f665</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-ChristianWesleyan</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
@@ -1415,8 +1249,6 @@
     <Concept xmlns="http://santedb.org/model">
       <id>601e4bed-1dcc-4b5b-aaed-cd2be33c024d</id>
       <creationTime>2018-08-17T07:22:41.5798652-04:00</creationTime>
-      <version xsi:nil="true" />
-      <sequence xsi:nil="true" />
       <isReadonly>false</isReadonly>
       <mnemonic>RELIGION-ChristianWesleyanMethodist</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
