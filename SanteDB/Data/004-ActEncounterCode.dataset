@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<dataset id="v3-ActEncounterCode" xmlns="http://santedb.org/data">
+  <update insertIfNotExists="true">
+    <ConceptSet xmlns="http://santedb.org/model">
+      <id>C4F0DC8B-6BEB-4B88-9D25-D2C79D339A70</id>
+      <name>ActEncounterCode</name>
+      <mnemonic>v3-ActEncounterCode</mnemonic>
+      <oid>2.16.840.1.113883.1.11.13955</oid>
+      <url>http://terminology.hl7.org/ValueSet/v3-ActEncounterCode</url>
+      <concept>73a70eea-06cd-4865-a5f7-f010e33ba4f3</concept>
+      <concept>b47f044d-a9c8-4a65-9f84-d99d913beb97</concept>
+      <concept>21a61f18-1fc5-47c0-a235-721d2f965e33</concept>
+      <concept>f38f409f-3e92-4e6b-b8fd-b2abc7e6c177</concept>
+      <concept>fdae49aa-6fcb-40ae-9653-744e87fdd692</concept>
+      <concept>9613f16a-f962-4c27-8489-b78aebd7e2ec</concept>
+      <concept>90c2f40c-784e-4260-8b91-66bb032d3652</concept>
+      <concept>1a76e650-0242-4b40-9267-bf3a5b386c96</concept>
+      <concept>5a5023c9-9a53-4f4f-a9b2-5938c71041e7</concept>
+      <concept>42765002-17BE-11EB-ADC1-0242AC120002</concept>
+      <concept>427650FC-17BE-11EB-ADC1-0242AC120002</concept>
+      <concept>427652C8-17BE-11EB-ADC1-0242AC120002</concept>
+      <concept>427653EA-17BE-11EB-ADC1-0242AC120002</concept>
+      <concept>427654B2-17BE-11EB-ADC1-0242AC120002</concept>
+      <concept>4276573C-17BE-11EB-ADC1-0242AC120002</concept>
+      <concept>42765804-17BE-11EB-ADC1-0242AC120002</concept>
+    </ConceptSet>
+  </update>
+</dataset>
