@@ -39,7 +39,7 @@ namespace SanteDB.Configuration.Editors
     /// Resource collection editor
     /// </summary>
     [ExcludeFromCodeCoverage]
-    public class ResourceCollectionEditor : UITypeEditor
+    public class ResourceTypePicker : UITypeEditor
     {
         /// <summary>
         /// Edit the value

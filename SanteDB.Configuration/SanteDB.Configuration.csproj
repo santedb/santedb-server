@@ -97,7 +97,7 @@
     <Compile Include="Editors\frmNewDatabase.Designer.cs">
       <DependentUpon>frmNewDatabase.cs</DependentUpon>
     </Compile>
-    <Compile Include="Editors\ResourceCollectionEditor.cs" />
+    <Compile Include="Editors\ResourceTypePicker.cs" />
     <Compile Include="Features\IEnhancedConfigurationFeature.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServiceTool.cs" />
