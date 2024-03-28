@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<dataset xmlns="http://santedb.org/data" id="Core Materials List">
+<dataset xmlns="http://santedb.org/data" id="Core Materials List v3.0">
   <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>a4fc5c93-31c2-4f87-990e-c5a4e5ea2e76</id>
@@ -97,7 +97,7 @@
       <name>
         <use>A87A6D21-2CA6-4AEA-88F3-6135CCEB58D1</use>
         <component>
-          <value>ROTA</value>
+          <value>ROTA Vaccine</value>
         </component>
       </name>
       <quantity>1</quantity>
@@ -200,6 +200,55 @@
       <formConcept>9902267C-8F77-4233-BFD3-E6B068AB326A</formConcept>
       <quantityConcept>a4fc5c93-31c2-4f87-990e-c5a4e5ea2e76</quantityConcept>
     </Material>
+  </update>
+  <update insertIfNotExists="true">
+    <Material xmlns="http://santedb.org/model">
+      <id>15b42b90-17fa-48cd-8121-f909c9d00ccc</id>
+      <classConcept>D39073BE-0F8F-440E-B8C8-7034CC138A95</classConcept>
+      <determinerConcept>AD28A7AC-A66B-42C4-91B4-DE40A2B11980</determinerConcept>
+      <statusConcept>C8064CBD-FA06-4530-B430-1A52F1530C27</statusConcept>
+      <typeConcept>2967fbc0-0ae7-4057-aafb-1f47d201913b</typeConcept>
+      <name>
+        <use>1EC9583A-B019-4BAA-B856-B99CAF368656</use>
+        <component>
+          <value>Human Papillomavirus Vaccine</value>
+        </component>
+      </name>
+      <name>
+        <use>A87A6D21-2CA6-4AEA-88F3-6135CCEB58D1</use>
+        <component>
+          <value>HPV</value>
+        </component>
+      </name>
+      <quantity>1</quantity>
+      <formConcept>9902267C-8F77-4233-BFD3-E6B068AB326A</formConcept>
+      <quantityConcept>a4fc5c93-31c2-4f87-990e-c5a4e5ea2e76</quantityConcept>
+      <conceptSet>17331147-6e27-4adb-84b4-da105bf41094</conceptSet>
+    </Material>
+  </update>
+  <update insertIfNotExists="true">
+    <Material xmlns="http://santedb.org/model">
+      <id>800b8fc3-a2f9-4f24-a119-6e98b76119a1</id>
+      <classConcept>D39073BE-0F8F-440E-B8C8-7034CC138A95</classConcept>
+      <determinerConcept>AD28A7AC-A66B-42C4-91B4-DE40A2B11980</determinerConcept>
+      <statusConcept>C8064CBD-FA06-4530-B430-1A52F1530C27</statusConcept>
+      <typeConcept>6e40a33c-46ec-4fae-8f53-ea53e7447d11</typeConcept>
+      <name>
+        <use>1EC9583A-B019-4BAA-B856-B99CAF368656</use>
+        <component>
+          <value>Inactivated Poliovirus Vaccine</value>
+        </component>
+      </name>
+      <name>
+        <use>A87A6D21-2CA6-4AEA-88F3-6135CCEB58D1</use>
+        <component>
+          <value>IPV</value>
+        </component>
+      </name>
+      <quantity>1</quantity>
+      <formConcept>9902267C-8F77-4233-BFD3-E6B068AB326A</formConcept>
+      <quantityConcept>a4fc5c93-31c2-4f87-990e-c5a4e5ea2e76</quantityConcept>
+    </Material>   
   </update>
   <update insertIfNotExists="true">
     <Material xmlns="http://santedb.org/model">

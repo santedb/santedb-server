@@ -1,0 +1,195 @@
+﻿<?xml version="1.0"?>
+<dataset xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Export ConceptSet - 202403281428SS" xmlns="http://santedb.org/data">
+  <update skipIfError="false" insertIfNotExists="true">
+    <ConceptSet xmlns="http://santedb.org/model">
+      <id>9e1834ca-ed30-11ee-9771-7fbb587ec725</id>
+      <creationTime>2024-03-28T18:25:56.1613740+00:00</creationTime>
+      <createdBy>bc197e12-cc99-421f-b83b-1cbc866a7df2</createdBy>
+      <name>HIV Status Codes</name>
+      <mnemonic>HIVStatus</mnemonic>
+      <oid>1.3.6.1.4.1.33349.3.1.5.9.3.91</oid>
+      <url>http://santedb.org/concept-set/hiv-status</url>
+      <concept>09919a72-808c-44c4-8b44-86fd3725f100</concept>
+      <concept>21b0ffc8-ca4e-408d-a104-41fc924d3a39</concept>
+      <concept>e7fb387e-854d-44a7-9e62-9e1b5001e6bb</concept>
+    </ConceptSet>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>1c69e851-71d8-4372-98df-6147abe5f63f</id>
+      <creationTime>2024-03-28T18:21:28.3371530+00:00</creationTime>
+      <createdBy>24ab5b06-cbd5-432f-bfc4-5fc554482012</createdBy>
+      <mnemonic>165816009</mnemonic>
+      <codeSystem>b3030751-d4db-420b-b765-e837607820cd</codeSystem>
+      <name>
+        <id>fe767490-ed2f-11ee-a2e0-3f573f3f694c</id>
+        <creationTime>2024-03-28T18:21:28.3371530+00:00</creationTime>
+        <createdBy>24ab5b06-cbd5-432f-bfc4-5fc554482012</createdBy>
+        <language>en</language>
+        <value>Human immunodeficiency virus not detected</value>
+        <source>1c69e851-71d8-4372-98df-6147abe5f63f</source>
+      </name>
+      <name>
+        <id>fe767491-ed2f-11ee-a2e1-43c803f14ddd</id>
+        <creationTime>2024-03-28T18:21:28.3485840+00:00</creationTime>
+        <createdBy>24ab5b06-cbd5-432f-bfc4-5fc554482012</createdBy>
+        <language>en</language>
+        <value>HIV Negative</value>
+        <source>1c69e851-71d8-4372-98df-6147abe5f63f</source>
+      </name>
+    </ReferenceTerm>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>dd3a4ad8-ec64-44a5-a3aa-8dad28a49d25</id>
+      <creationTime>2024-03-28T18:26:11.0221800+00:00</creationTime>
+      <createdBy>319ccc60-174f-480e-8fbe-56731ad884f1</createdBy>
+      <version>d3d33d4b-05af-46ae-8e5c-a8224f0c28c5</version>
+      <sequence>2976</sequence>
+      <mnemonic>PatientHivStatus-Negative</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <referenceTerm>
+        <id>fe786c48-ed2f-11ee-a2e4-8721bb253afd</id>
+        <source>dd3a4ad8-ec64-44a5-a3aa-8dad28a49d25</source>
+        <effectiveVersionSequence>2974</effectiveVersionSequence>
+        <term>1c69e851-71d8-4372-98df-6147abe5f63f</term>
+        <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+      </referenceTerm>
+      <name>
+        <id>fe786c46-ed2f-11ee-a2e2-f3d97990f900</id>
+        <source>dd3a4ad8-ec64-44a5-a3aa-8dad28a49d25</source>
+        <effectiveVersionSequence>2974</effectiveVersionSequence>
+        <language>en</language>
+        <value>Human immunodeficiency virus not detected</value>
+      </name>
+      <name>
+        <id>fe786c47-ed2f-11ee-a2e3-df783a1f3785</id>
+        <source>dd3a4ad8-ec64-44a5-a3aa-8dad28a49d25</source>
+        <effectiveVersionSequence>2974</effectiveVersionSequence>
+        <language>en</language>
+        <value>HIV Negative</value>
+      </name>
+      <conceptSet>9e1834ca-ed30-11ee-9771-7fbb587ec725</conceptSet>
+    </Concept>
+  </update>
+  
+  <update skipIfError="false" insertIfNotExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>40673c08-82cf-4912-bc93-c26d08e6f499</id>
+      <creationTime>2024-03-28T18:22:20.4492720+00:00</creationTime>
+      <createdBy>37e57eef-997b-4575-ae72-55487426f3d3</createdBy>
+      <mnemonic>165816005</mnemonic>
+      <codeSystem>b3030751-d4db-420b-b765-e837607820cd</codeSystem>
+      <name>
+        <id>1d8463b0-ed30-11ee-9835-6f039b0dc6c6</id>
+        <creationTime>2024-03-28T18:22:20.4492720+00:00</creationTime>
+        <createdBy>37e57eef-997b-4575-ae72-55487426f3d3</createdBy>
+        <language>en</language>
+        <value>Human immunodeficiency virus detected</value>
+        <source>40673c08-82cf-4912-bc93-c26d08e6f499</source>
+      </name>
+      <name>
+        <id>1d865fbc-ed30-11ee-9836-dbeb5b507dd7</id>
+        <creationTime>2024-03-28T18:22:20.4617900+00:00</creationTime>
+        <createdBy>37e57eef-997b-4575-ae72-55487426f3d3</createdBy>
+        <language>en</language>
+        <value>HIV Positive</value>
+        <source>40673c08-82cf-4912-bc93-c26d08e6f499</source>
+      </name>
+      <name>
+        <id>1d865fbd-ed30-11ee-9837-d79c29c0260b</id>
+        <creationTime>2024-03-28T18:22:20.4622780+00:00</creationTime>
+        <createdBy>37e57eef-997b-4575-ae72-55487426f3d3</createdBy>
+        <language>en</language>
+        <value>HIV Detected</value>
+        <source>40673c08-82cf-4912-bc93-c26d08e6f499</source>
+      </name>
+    </ReferenceTerm>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>f36f692d-798b-4883-8d83-3ecf6c1571d0</id>
+      <creationTime>2024-03-28T18:27:45.0368770+00:00</creationTime>
+      <createdBy>c828c59d-16e2-415d-a065-67e6da8e8f23</createdBy>
+      <version>80f51b9b-da31-4831-a4bb-16d3c3c0382f</version>
+      <sequence>2981</sequence>
+      <mnemonic>PatientHivStatus-Positive</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <referenceTerm>
+        <id>1d8840fc-ed30-11ee-983b-57b406cc7b00</id>
+        <source>f36f692d-798b-4883-8d83-3ecf6c1571d0</source>
+        <effectiveVersionSequence>2975</effectiveVersionSequence>
+        <term>40673c08-82cf-4912-bc93-c26d08e6f499</term>
+        <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+      </referenceTerm>
+      <name>
+        <id>1d865fbe-ed30-11ee-9838-0f7fd0a535ae</id>
+        <source>f36f692d-798b-4883-8d83-3ecf6c1571d0</source>
+        <effectiveVersionSequence>2975</effectiveVersionSequence>
+        <language>en</language>
+        <value>Human immunodeficiency virus detected</value>
+      </name>
+      <name>
+        <id>1d865fbf-ed30-11ee-9839-4b1baa3c3b29</id>
+        <source>f36f692d-798b-4883-8d83-3ecf6c1571d0</source>
+        <effectiveVersionSequence>2975</effectiveVersionSequence>
+        <language>en</language>
+        <value>HIV Positive</value>
+      </name>
+      <name>
+        <id>1d865fc0-ed30-11ee-983a-3fd76be1ae53</id>
+        <source>f36f692d-798b-4883-8d83-3ecf6c1571d0</source>
+        <effectiveVersionSequence>2975</effectiveVersionSequence>
+        <language>en</language>
+        <value>HIV Detected</value>
+      </name>
+      <conceptSet>9e1834ca-ed30-11ee-9771-7fbb587ec725</conceptSet>
+      <conceptSet>d6cbe607-51e3-49cc-9b20-cb2a2d3c586e</conceptSet>
+    </Concept>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>71f3d357-cd76-4567-b169-9526aa8188a2</id>
+      <creationTime>2024-03-28T18:20:12.9789470+00:00</creationTime>
+      <createdBy>7274c215-07ac-4987-a923-99bd8eda137b</createdBy>
+      <mnemonic>365866002</mnemonic>
+      <codeSystem>b3030751-d4db-420b-b765-e837607820cd</codeSystem>
+      <name>
+        <id>d18be258-ed2f-11ee-92de-ef6aa89f0b58</id>
+        <creationTime>2024-03-28T18:20:12.9915480+00:00</creationTime>
+        <createdBy>7274c215-07ac-4987-a923-99bd8eda137b</createdBy>
+        <language>en</language>
+        <value>HIV Status (Finding)</value>
+        <source>71f3d357-cd76-4567-b169-9526aa8188a2</source>
+      </name>
+    </ReferenceTerm>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>8a07a21f-50ff-4631-8e51-c54690fb1127</id>
+      <creationTime>2024-03-28T18:28:17.2107210+00:00</creationTime>
+      <createdBy>80301096-03ee-45b2-ab1b-8ce7bc404dd0</createdBy>
+      <version>6aee5bf5-7d7d-43e0-a0b1-568601a861d5</version>
+      <sequence>2982</sequence>
+      <mnemonic>Observation-HivStatus</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <referenceTerm>
+        <id>d18fd9f8-ed2f-11ee-92e0-fb423e8a1cde</id>
+        <source>8a07a21f-50ff-4631-8e51-c54690fb1127</source>
+        <effectiveVersionSequence>2973</effectiveVersionSequence>
+        <term>71f3d357-cd76-4567-b169-9526aa8188a2</term>
+        <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+      </referenceTerm>
+      <name>
+        <id>d18de134-ed2f-11ee-92df-2f554e0f2f08</id>
+        <source>8a07a21f-50ff-4631-8e51-c54690fb1127</source>
+        <effectiveVersionSequence>2973</effectiveVersionSequence>
+        <language>en</language>
+        <value>HIV Status (Finding)</value>
+      </name>
+    </Concept>
+  </update>
+</dataset>
