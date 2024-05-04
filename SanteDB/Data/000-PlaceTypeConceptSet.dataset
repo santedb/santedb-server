@@ -8,6 +8,13 @@
       <oid>1.3.6.1.4.1.33349.3.1.5.9.3.54</oid>
       <url>http://santedb.org/valueset/PlaceTypeConcept</url>
     </ConceptSet>
+    <ConceptSet xmlns="http://santedb.org/model">
+      <id>D65719EC-0795-47EC-8AAF-DCB867C5CA56</id>
+      <name>Facility Type Concepts (Sub-Classes)</name>
+      <mnemonic>FacilityTypeConcept</mnemonic>
+      <oid>1.3.6.1.4.1.33349.3.1.5.9.3.54.1</oid>
+      <url>http://santedb.org/valueset/FacilityTypeConcept</url>
+    </ConceptSet>
   </update>
   <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
@@ -21,7 +28,7 @@
         <language>en</language>
         <value>Community Hospital</value>
       </name>
-      <conceptSet>C65719EC-0795-47EC-8AAF-DCB867C5CA56</conceptSet>
+      <conceptSet>D65719EC-0795-47EC-8AAF-DCB867C5CA56</conceptSet>
     </Concept>
   </update>
   <update insertIfNotExists="true">
@@ -36,7 +43,7 @@
         <language>en</language>
         <value>Government Hospital</value>
       </name>
-      <conceptSet>C65719EC-0795-47EC-8AAF-DCB867C5CA56</conceptSet>
+      <conceptSet>D65719EC-0795-47EC-8AAF-DCB867C5CA56</conceptSet>
     </Concept>
   </update>
     <update insertIfNotExists="true">
@@ -51,7 +58,7 @@
         <language>en</language>
         <value>Local Community Health Center</value>
       </name>
-      <conceptSet>C65719EC-0795-47EC-8AAF-DCB867C5CA56</conceptSet>
+      <conceptSet>D65719EC-0795-47EC-8AAF-DCB867C5CA56</conceptSet>
     </Concept>
   </update>
     <update insertIfNotExists="true">
@@ -66,7 +73,7 @@
         <language>en</language>
         <value>Rural Health Center</value>
       </name>
-      <conceptSet>C65719EC-0795-47EC-8AAF-DCB867C5CA56</conceptSet>
+      <conceptSet>D65719EC-0795-47EC-8AAF-DCB867C5CA56</conceptSet>
     </Concept>
   </update>
     <update insertIfNotExists="true">
@@ -81,7 +88,7 @@
         <language>en</language>
         <value>Vaccination Clinic</value>
       </name>
-      <conceptSet>C65719EC-0795-47EC-8AAF-DCB867C5CA56</conceptSet>
+      <conceptSet>D65719EC-0795-47EC-8AAF-DCB867C5CA56</conceptSet>
     </Concept>
   </update>
     <update insertIfNotExists="true">
@@ -96,7 +103,7 @@
         <language>en</language>
         <value>Private Practice</value>
       </name>
-      <conceptSet>C65719EC-0795-47EC-8AAF-DCB867C5CA56</conceptSet>
+      <conceptSet>D65719EC-0795-47EC-8AAF-DCB867C5CA56</conceptSet>
     </Concept>
   </update>
     <update insertIfNotExists="true">
