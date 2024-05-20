@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" id="Place Type Concept Set v3.0" xmlns="http://santedb.org/data">
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" id="Place Type Concept Set v3.01" xmlns="http://santedb.org/data">
   <update insertIfNotExists="true">
     <ConceptSet xmlns="http://santedb.org/model">
       <id>C65719EC-0795-47EC-8AAF-DCB867C5CA56</id>
@@ -48,7 +48,7 @@
       <conceptSet>D65719EC-0795-47EC-8AAF-DCB867C5CA56</conceptSet>
     </Concept>
   </update>
-    <update insertIfNotExists="true">
+  <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>fa587084-5c69-4f08-b9ee-92955b09305d</id>
       <creationTime>0001-01-01T00:00:00.0000000+00:00</creationTime>
@@ -63,7 +63,38 @@
       <conceptSet>D65719EC-0795-47EC-8AAF-DCB867C5CA56</conceptSet>
     </Concept>
   </update>
-    <update insertIfNotExists="true">
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>fe687085-5c69-4f08-b9ee-92955b09305d</id>
+      <creationTime>0001-01-01T00:00:00.0000000+00:00</creationTime>
+      <isReadonly>false</isReadonly>
+      <mnemonic>Facility-NationalStockDistributor</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>National Stock Distributor</value>
+      </name>
+      <conceptSet>D65719EC-0795-47EC-8AAF-DCB867C5CA56</conceptSet>
+    </Concept>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>fe687184-5c69-4f08-b9ee-92955b09305d</id>
+      <creationTime>0001-01-01T00:00:00.0000000+00:00</creationTime>
+      <isReadonly>false</isReadonly>
+      <mnemonic>Facility-RegionalStockDistributor</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Sub-National Stock Distributor</value>
+      </name>
+      <conceptSet>D65719EC-0795-47EC-8AAF-DCB867C5CA56</conceptSet>
+    </Concept>
+  </update>
+
+  <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>fa687084-5c69-4f08-b9ee-92955b09305d</id>
       <creationTime>0001-01-01T00:00:00.0000000+00:00</creationTime>
@@ -78,7 +109,7 @@
       <conceptSet>D65719EC-0795-47EC-8AAF-DCB867C5CA56</conceptSet>
     </Concept>
   </update>
-    <update insertIfNotExists="true">
+  <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>fa787084-5c69-4f08-b9ee-92955b09305d</id>
       <creationTime>0001-01-01T00:00:00.0000000+00:00</creationTime>
@@ -93,7 +124,7 @@
       <conceptSet>D65719EC-0795-47EC-8AAF-DCB867C5CA56</conceptSet>
     </Concept>
   </update>
-    <update insertIfNotExists="true">
+  <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>fa887084-5c69-4f08-b9ee-92955b09305d</id>
       <creationTime>0001-01-01T00:00:00.0000000+00:00</creationTime>
@@ -108,7 +139,7 @@
       <conceptSet>D65719EC-0795-47EC-8AAF-DCB867C5CA56</conceptSet>
     </Concept>
   </update>
-    <update insertIfNotExists="true">
+  <update insertIfNotExists="true">
     <ConceptSet xmlns="http://santedb.org/model">
       <id>91DEC343-1324-4FA4-8CEA-4A1D0439908A</id>
       <name>Place Entity Class Code Concepts</name>
