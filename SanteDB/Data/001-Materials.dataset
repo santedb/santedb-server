@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<dataset xmlns="http://santedb.org/data" id="Core Materials List">
+<dataset xmlns="http://santedb.org/data" id="Core Materials List v3.1">
   <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>a4fc5c93-31c2-4f87-990e-c5a4e5ea2e76</id>
@@ -16,6 +16,7 @@
       <determinerConcept>AD28A7AC-A66B-42C4-91B4-DE40A2B11980</determinerConcept>
       <statusConcept>C8064CBD-FA06-4530-B430-1A52F1530C27</statusConcept>
       <typeConcept>c7f4980b-e338-4363-83f7-2b3d38933e7e</typeConcept>
+      <isAdministrable>true</isAdministrable>
       <name>
         <use>1EC9583A-B019-4BAA-B856-B99CAF368656</use>
         <component>
@@ -40,6 +41,7 @@
       <determinerConcept>AD28A7AC-A66B-42C4-91B4-DE40A2B11980</determinerConcept>
       <statusConcept>C8064CBD-FA06-4530-B430-1A52F1530C27</statusConcept>
       <typeConcept>19afe679-ef94-48b4-9d6a-3c9827c4c8e2</typeConcept>
+      <isAdministrable>true</isAdministrable>
       <name>
         <use>1EC9583A-B019-4BAA-B856-B99CAF368656</use>
         <component>
@@ -64,6 +66,7 @@
       <determinerConcept>AD28A7AC-A66B-42C4-91B4-DE40A2B11980</determinerConcept>
       <statusConcept>C8064CBD-FA06-4530-B430-1A52F1530C27</statusConcept>
       <typeConcept>C20CE9A2-57FD-4FFB-9C12-04A3957D732A</typeConcept>
+      <isAdministrable>true</isAdministrable>
       <name>
         <use>1EC9583A-B019-4BAA-B856-B99CAF368656</use>
         <component>
@@ -88,6 +91,7 @@
       <determinerConcept>AD28A7AC-A66B-42C4-91B4-DE40A2B11980</determinerConcept>
       <statusConcept>C8064CBD-FA06-4530-B430-1A52F1530C27</statusConcept>
       <typeConcept>9606ACF1-8A70-4664-944B-87B3750CA7CC</typeConcept>
+      <isAdministrable>true</isAdministrable>
       <name>
         <use>1EC9583A-B019-4BAA-B856-B99CAF368656</use>
         <component>
@@ -97,7 +101,7 @@
       <name>
         <use>A87A6D21-2CA6-4AEA-88F3-6135CCEB58D1</use>
         <component>
-          <value>ROTA</value>
+          <value>ROTA Vaccine</value>
         </component>
       </name>
       <quantity>1</quantity>
@@ -112,6 +116,7 @@
       <determinerConcept>AD28A7AC-A66B-42C4-91B4-DE40A2B11980</determinerConcept>
       <statusConcept>C8064CBD-FA06-4530-B430-1A52F1530C27</statusConcept>
       <typeConcept>6549730D-EBBE-4700-8052-3DD3F390213F</typeConcept>
+      <isAdministrable>true</isAdministrable>
       <name>
         <use>1EC9583A-B019-4BAA-B856-B99CAF368656</use>
         <component>
@@ -136,6 +141,7 @@
       <determinerConcept>AD28A7AC-A66B-42C4-91B4-DE40A2B11980</determinerConcept>
       <statusConcept>C8064CBD-FA06-4530-B430-1A52F1530C27</statusConcept>
       <typeConcept>519AD6CD-2E07-4734-91C0-175242B387B8</typeConcept>
+      <isAdministrable>true</isAdministrable>
       <name>
         <use>1EC9583A-B019-4BAA-B856-B99CAF368656</use>
         <component>
@@ -160,6 +166,7 @@
       <determinerConcept>AD28A7AC-A66B-42C4-91B4-DE40A2B11980</determinerConcept>
       <statusConcept>C8064CBD-FA06-4530-B430-1A52F1530C27</statusConcept>
       <typeConcept>1185DEF1-6AD4-4995-B67A-406DB08945B5</typeConcept>
+      <isAdministrable>true</isAdministrable>
       <name>
         <use>1EC9583A-B019-4BAA-B856-B99CAF368656</use>
         <component>
@@ -184,6 +191,7 @@
       <determinerConcept>AD28A7AC-A66B-42C4-91B4-DE40A2B11980</determinerConcept>
       <statusConcept>C8064CBD-FA06-4530-B430-1A52F1530C27</statusConcept>
       <typeConcept>7B73529C-4C3D-4720-BB14-FDF8688F7D3B</typeConcept>
+      <isAdministrable>true</isAdministrable>
       <name>
         <use>1EC9583A-B019-4BAA-B856-B99CAF368656</use>
         <component>
@@ -203,11 +211,63 @@
   </update>
   <update insertIfNotExists="true">
     <Material xmlns="http://santedb.org/model">
+      <id>15b42b90-17fa-48cd-8121-f909c9d00ccc</id>
+      <classConcept>D39073BE-0F8F-440E-B8C8-7034CC138A95</classConcept>
+      <determinerConcept>AD28A7AC-A66B-42C4-91B4-DE40A2B11980</determinerConcept>
+      <statusConcept>C8064CBD-FA06-4530-B430-1A52F1530C27</statusConcept>
+      <typeConcept>2967fbc0-0ae7-4057-aafb-1f47d201913b</typeConcept>
+      <isAdministrable>true</isAdministrable>
+      <name>
+        <use>1EC9583A-B019-4BAA-B856-B99CAF368656</use>
+        <component>
+          <value>Human Papillomavirus Vaccine</value>
+        </component>
+      </name>
+      <name>
+        <use>A87A6D21-2CA6-4AEA-88F3-6135CCEB58D1</use>
+        <component>
+          <value>HPV</value>
+        </component>
+      </name>
+      <quantity>1</quantity>
+      <formConcept>9902267C-8F77-4233-BFD3-E6B068AB326A</formConcept>
+      <quantityConcept>a4fc5c93-31c2-4f87-990e-c5a4e5ea2e76</quantityConcept>
+      <conceptSet>17331147-6e27-4adb-84b4-da105bf41094</conceptSet>
+    </Material>
+  </update>
+  <update insertIfNotExists="true">
+    <Material xmlns="http://santedb.org/model">
+      <id>800b8fc3-a2f9-4f24-a119-6e98b76119a1</id>
+      <classConcept>D39073BE-0F8F-440E-B8C8-7034CC138A95</classConcept>
+      <determinerConcept>AD28A7AC-A66B-42C4-91B4-DE40A2B11980</determinerConcept>
+      <statusConcept>C8064CBD-FA06-4530-B430-1A52F1530C27</statusConcept>
+      <typeConcept>6e40a33c-46ec-4fae-8f53-ea53e7447d11</typeConcept>
+      <isAdministrable>true</isAdministrable>
+      <name>
+        <use>1EC9583A-B019-4BAA-B856-B99CAF368656</use>
+        <component>
+          <value>Inactivated Poliovirus Vaccine</value>
+        </component>
+      </name>
+      <name>
+        <use>A87A6D21-2CA6-4AEA-88F3-6135CCEB58D1</use>
+        <component>
+          <value>IPV</value>
+        </component>
+      </name>
+      <quantity>1</quantity>
+      <formConcept>9902267C-8F77-4233-BFD3-E6B068AB326A</formConcept>
+      <quantityConcept>a4fc5c93-31c2-4f87-990e-c5a4e5ea2e76</quantityConcept>
+    </Material>   
+  </update>
+  <update insertIfNotExists="true">
+    <Material xmlns="http://santedb.org/model">
       <id>7D80E518-6E04-4091-8D19-7265BB09BC1F</id>
       <classConcept>D39073BE-0F8F-440E-B8C8-7034CC138A95</classConcept>
       <determinerConcept>AD28A7AC-A66B-42C4-91B4-DE40A2B11980</determinerConcept>
       <statusConcept>C8064CBD-FA06-4530-B430-1A52F1530C27</statusConcept>
       <typeConcept>3023bad7-8c16-49ea-81fc-eee6232b80e7</typeConcept>
+      <isAdministrable>true</isAdministrable>
       <name>
         <use>1EC9583A-B019-4BAA-B856-B99CAF368656</use>
         <component>
@@ -232,6 +292,7 @@
       <determinerConcept>AD28A7AC-A66B-42C4-91B4-DE40A2B11980</determinerConcept>
       <statusConcept>C8064CBD-FA06-4530-B430-1A52F1530C27</statusConcept>
       <typeConcept>1ee21592-da84-4253-a65f-84681aeae1b6</typeConcept>
+      <isAdministrable>true</isAdministrable>
       <name>
         <use>1EC9583A-B019-4BAA-B856-B99CAF368656</use>
         <component>
@@ -249,4 +310,34 @@
       <quantityConcept>a4fc5c93-31c2-4f87-990e-c5a4e5ea2e76</quantityConcept>
     </Material>
   </update>
+  <sql>
+    <exec invariant="sqlite">
+      <![CDATA[
+      -- MATERIAL GENERALIZATION
+INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) 
+  VALUES (x'9A929FBFEBE75B4EB82ECF44384F0A3B',x'BE7390D38F0F0E44B8C87034CC138A95',x'BE7390D38F0F0E44B8C87034CC138A95','Material=[HasGeneralization]=>Material');
+INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) 
+  VALUES (x'9A929FBFEBE75B4EB82ECF44384F0A3B',x'86C2FEFAD5890B429085054ACA9D1EEF',x'BE7390D38F0F0E44B8C87034CC138A95','ManufacturedMaterial=[HasGeneralization]=>Material');
+
+     ]]>
+    </exec>
+    <exec invariant="npgsql">
+      <![CDATA[
+-- MATERIAL GENERALIZATION
+INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) 
+  VALUES ('BF9F929A-E7EB-4E5B-B82E-CF44384F0A3B','d39073be-0f8f-440e-b8c8-7034cc138a95','d39073be-0f8f-440e-b8c8-7034cc138a95','Material=[HasGeneralization]=>Material') ON CONFLICT DO NOTHING;
+INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) 
+  VALUES ('BF9F929A-E7EB-4E5B-B82E-CF44384F0A3B','fafec286-89d5-420b-9085-054aca9d1eef','d39073be-0f8f-440e-b8c8-7034cc138a95','ManufacturedMaterial=[HasGeneralization]=>Material') ON CONFLICT DO NOTHING;
+      ]]>
+    </exec>
+    <exec invariant="FirebirdSQL">
+      <![CDATA[
+-- MATERIAL GENERALIZATION
+INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) 
+  VALUES (char_to_uuid('BF9F929A-E7EB-4E5B-B82E-CF44384F0A3B'),char_to_uuid('d39073be-0f8f-440e-b8c8-7034cc138a95'),char_to_uuid('d39073be-0f8f-440e-b8c8-7034cc138a95'),'Material=[HasGeneralization]=>Material');
+INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) 
+  VALUES (char_to_uuid('BF9F929A-E7EB-4E5B-B82E-CF44384F0A3B'),char_to_uuid('fafec286-89d5-420b-9085-054aca9d1eef'),char_to_uuid('d39073be-0f8f-440e-b8c8-7034cc138a95'),'ManufacturedMaterial=[HasGeneralization]=>Material');
+      ]]>
+    </exec>
+  </sql>
 </dataset>

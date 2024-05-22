@@ -272,11 +272,21 @@ namespace SanteDB.Messaging.HDSI.Test
         public void TestNullGuardCondition()
         {
             var dtString = DateTime.Now;
-            String expected = "o => o.Names.Where(guard => ((guard.NameUse ?? new Concept()).Mnemonic == \"L\")).Any(name => name.Component.Where(guard => (guard.ComponentTypeKey == Convert(null))).Any(component => (component.Value == \"John\")))";
+            String expectedDotNet = "o => o.Names.Where(guard => ((guard.NameUse ?? new Concept()).Mnemonic == \"L\")).Any(name => name.Component.Where(guard => (guard.ComponentTypeKey == Convert(null))).Any(component => (component.Value == \"John\")))";
+            String expectedMono = "o => o.Names.Where(guard => ((guard.NameUse ?? new Concept()).Mnemonic == \"L\")).Any(name => name.Component.Where(guard => (guard.ComponentTypeKey == Convert(null, Nullable`1))).Any(component => (component.Value == \"John\")))";
             NameValueCollection httpQueryParameters = new NameValueCollection();
             httpQueryParameters.Add("name[L].component[null].value", "John");
             var expr = QueryExpressionParser.BuildLinqExpression<Patient>(httpQueryParameters);
-            Assert.AreEqual(expected, expr.ToString());
+
+            var result = expr.ToString();
+            if (string.Equals(expectedMono, result))
+            {
+                Assert.AreEqual(expectedMono, result);
+            }
+            else
+            {
+                Assert.AreEqual(expectedDotNet, result);
+            }
         }
 
         /// <summary>

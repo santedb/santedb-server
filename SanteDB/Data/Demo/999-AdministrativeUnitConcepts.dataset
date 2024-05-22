@@ -1,0 +1,119 @@
+<?xml version="1.0"?>
+<dataset xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Export ConceptSet - 202405040016SS" xmlns="http://santedb.org/data">
+  <update skipIfError="false" insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>0b3735b6-b0e7-442e-a423-36de7611e873</id>
+      <creationTime>2024-05-04T00:14:45.0000000-04:00</creationTime>
+      <createdBy>b785df8b-92fc-4d9c-850c-bd2a0e930851</createdBy>
+      <version>77b7dfe2-7ec1-43a6-8f82-f707f3c94c70</version>
+      <sequence>2920</sequence>
+      <mnemonic>PlaceType-ZoneOrRegion</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <name>
+        <id>620de62b-60a1-d6b3-ebe5-c905783f19a1</id>
+        <source>0b3735b6-b0e7-442e-a423-36de7611e873</source>
+        <effectiveVersionSequence>2920</effectiveVersionSequence>
+        <language>en</language>
+        <value>Zone/Region</value>
+      </name>
+      <conceptSet>c65719ec-0795-47ec-8aaf-dcb867c5ca56</conceptSet>
+    </Concept>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>b104f977-0e6f-47eb-8033-3015dcaedfa3</id>
+      <creationTime>2024-05-04T00:15:23.0000000-04:00</creationTime>
+      <createdBy>c93d7b9b-3238-4471-acb9-81c54b1c0a80</createdBy>
+      <version>b665c1af-f5dc-4d10-9de3-5e7f3f23e8d5</version>
+      <sequence>2921</sequence>
+      <mnemonic>PlaceType-IslandOrDivision</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <name>
+        <id>aa970b18-de83-8007-11be-c75f87dfcd74</id>
+        <source>b104f977-0e6f-47eb-8033-3015dcaedfa3</source>
+        <effectiveVersionSequence>2921</effectiveVersionSequence>
+        <language>en</language>
+        <value>Island/Division</value>
+      </name>
+      <conceptSet>c65719ec-0795-47ec-8aaf-dcb867c5ca56</conceptSet>
+    </Concept>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>e11c7c5b-695f-4f7e-8794-180a691ab251</id>
+      <creationTime>2024-05-04T00:15:48.0000000-04:00</creationTime>
+      <createdBy>805e978c-2699-43ac-9f39-67800a193153</createdBy>
+      <version>2378dfa6-7c79-4471-a57f-005682eff1ba</version>
+      <sequence>2922</sequence>
+      <mnemonic>PlaceType-CountyOrParish</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <name>
+        <id>d44d0da8-2ff5-cb40-94a6-320109591b1f</id>
+        <source>e11c7c5b-695f-4f7e-8794-180a691ab251</source>
+        <effectiveVersionSequence>2922</effectiveVersionSequence>
+        <language>en</language>
+        <value>County/Parish</value>
+      </name>
+      <conceptSet>c65719ec-0795-47ec-8aaf-dcb867c5ca56</conceptSet>
+    </Concept>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>ddc296c7-65eb-4544-b90d-02d2e2da5a3f</id>
+      <creationTime>2024-05-04T00:16:03.0000000-04:00</creationTime>
+      <createdBy>4eda4998-ffee-46d5-9693-f427ed457f67</createdBy>
+      <version>ce6b3b28-6966-4001-8406-9b721069a2c2</version>
+      <sequence>2923</sequence>
+      <mnemonic>PlaceType-VillageSettlement</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <name>
+        <id>c48832ea-0354-ff98-cd9a-b79df2c6ee4d</id>
+        <source>ddc296c7-65eb-4544-b90d-02d2e2da5a3f</source>
+        <effectiveVersionSequence>2923</effectiveVersionSequence>
+        <language>en</language>
+        <value>Village/Settlement</value>
+      </name>
+      <conceptSet>c65719ec-0795-47ec-8aaf-dcb867c5ca56</conceptSet>
+    </Concept>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>8d62d8d9-39cf-493a-8a0f-35283283ea5c</id>
+      <creationTime>2024-05-04T00:16:12.0000000-04:00</creationTime>
+      <createdBy>5783b37a-12a6-4eee-92a7-d13cf9e52b10</createdBy>
+      <version>6d1e20da-1c3c-496c-bf87-f4a2f089065f</version>
+      <sequence>2924</sequence>
+      <mnemonic>PlaceType-Community</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <name>
+        <id>23ac2552-2aa7-2c2e-95dc-c284d92d238f</id>
+        <source>8d62d8d9-39cf-493a-8a0f-35283283ea5c</source>
+        <effectiveVersionSequence>2924</effectiveVersionSequence>
+        <language>en</language>
+        <value>Community</value>
+      </name>
+      <conceptSet>c65719ec-0795-47ec-8aaf-dcb867c5ca56</conceptSet>
+    </Concept>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <ConceptSet xmlns="http://santedb.org/model">
+      <id>c65719ec-0795-47ec-8aaf-dcb867c5ca56</id>
+      <creationTime>2024-05-04T00:12:48.0000000-04:00</creationTime>
+      <createdBy>fadca076-3690-4a6e-af9e-f1cd68e8c7e8</createdBy>
+      <name>Place Type Concepts (Sub-Classes)</name>
+      <mnemonic>PlaceTypeConcept</mnemonic>
+      <oid>1.3.6.1.4.1.33349.3.1.5.9.3.54</oid>
+      <url>http://santedb.org/valueset/PlaceTypeConcept</url>
+      <concept>e11c7c5b-695f-4f7e-8794-180a691ab251</concept>
+      <concept>b104f977-0e6f-47eb-8033-3015dcaedfa3</concept>
+      <concept>0b3735b6-b0e7-442e-a423-36de7611e873</concept>
+      <concept>ddc296c7-65eb-4544-b90d-02d2e2da5a3f</concept>
+      <concept>8d62d8d9-39cf-493a-8a0f-35283283ea5c</concept>
+    </ConceptSet>
+  </update>
+</dataset>

@@ -180,6 +180,7 @@
     <None Include="Data\004-ActEncounterCode.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Data\009-HIVStatus.dataset" />
     <None Include="Data\099-ActEncounterCode.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
