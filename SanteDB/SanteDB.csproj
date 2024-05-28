@@ -6,7 +6,7 @@
       <Version>9.1.1</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Data.Sqlite.Core">
-      <Version>7.0.5</Version>
+      <Version>7.0.20</Version>
     </PackageReference>
     <PackageReference Include="Mono.Posix-4.5">
       <Version>4.5.0</Version>
@@ -571,9 +571,12 @@
       <Version>13.0.3</Version>
     </PackageReference>
     <PackageReference Include="Npgsql">
-      <Version>7.0.4</Version>
+      <Version>7.0.7</Version>
     </PackageReference>
-    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlcipher">
+    <PackageReference Include="SQLitePCLRaw.provider.e_sqlite3mc">
+      <Version>2.1.8</Version>
+    </PackageReference>
+    <PackageReference Include="SQLiteSpellfix.lib.e_sqlite3mc">
       <Version>2.1.8</Version>
     </PackageReference>
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe">
