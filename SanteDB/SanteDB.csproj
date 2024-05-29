@@ -573,7 +573,7 @@
     <PackageReference Include="Npgsql">
       <Version>7.0.7</Version>
     </PackageReference>
-    <PackageReference Include="SQLitePCLRaw.provider.e_sqlite3mc">
+    <PackageReference Include="SQLitePCLRaw.provider.dynamic_cdecl">
       <Version>2.1.8</Version>
     </PackageReference>
     <PackageReference Include="SQLiteSpellfix.lib.e_sqlite3mc">
