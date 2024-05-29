@@ -339,6 +339,19 @@
   </update>
   <update skipIfError="false" insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
+      <id>49974584-7c48-457e-a79c-031cdd62714a</id>
+      <sequence xsi:nil="true" />
+      <mnemonic>UnitOfMeasure-Pounds</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>1ef69347-ef03-4ff7-b3c5-6334448845e6</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Pounds</value>
+      </name>
+    </Concept>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
       <id>1cb42a6c-6cbd-483b-bd01-482a0c11c8ea</id>
       <version>d4c31f4b-5659-4e97-acb4-8cd739220f4f</version>
       <sequence xsi:nil="true" />
@@ -402,19 +415,24 @@
     </Concept>
   </update>
   <update skipIfError="false" insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>93424b4a-36f2-4376-b374-1c086c5ebf52</id>
+      <sequence xsi:nil="true" />
+      <mnemonic>UnitOfMeasure-Gram</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>1ef69347-ef03-4ff7-b3c5-6334448845e6</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Grams</value>
+      </name>
+    </Concept>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
     <ConceptReferenceTerm xmlns="http://santedb.org/model">
       <id>c0e073da-8ed2-11ee-ac7e-b304cac2f5d4</id>
       <source>b9424b4a-36f2-4376-b374-1c086c5ebf52</source>
       
       <term>86f3893c-cc89-4905-8929-388d4ee164eb</term>
-      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
-    </ConceptReferenceTerm>
-  </update>
-  <update skipIfError="false" insertIfNotExists="true">
-    <ConceptReferenceTerm xmlns="http://santedb.org/model">
-      <id>288c1040-1388-11ef-8954-43a1dc261b6a</id>
-      <source>a4fc5c93-31c2-4f87-990e-c5a4e5ea2e76</source>
-      <term>1dbfb8d5-1659-40d9-9e4c-828b4047c58e</term>
       <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
     </ConceptReferenceTerm>
   </update>
@@ -542,6 +560,8 @@
       <concept>30f1b233-6e6e-4e69-bf24-12736455560f</concept>
       <concept>eeefb6bb-18b1-478d-9cc5-575325b947a8</concept>
       <concept>b4fc5c93-31c2-4f87-990e-c5a4e5ea2e76</concept>
+      <concept>49974584-7c48-457e-a79c-031cdd62714a</concept>
+      <concept>93424b4a-36f2-4376-b374-1c086c5ebf52</concept>
     </ConceptSet>
   </update>
   <update skipIfError="false" insertIfNotExists="true">
@@ -554,6 +574,7 @@
       <concept>30f1b233-6e6e-4e69-bf24-12736455560f</concept>
       <concept>a4fc5c93-31c2-4f87-990e-c5a4e5ea2e76</concept>
       <concept>b9424b4a-36f2-4376-b374-1c086c5ebf52</concept>
+      <concept>2cedfe61-4549-4d93-a936-79c942e683cc</concept>
     </ConceptSet>
   </update>
 </dataset>
