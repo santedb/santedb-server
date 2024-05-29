@@ -319,15 +319,18 @@
     <None Include="Data\Demo\990-demo.concepts.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Data\Demo\991-AdministrativeUnitConcepts.dataset" />
     <None Include="Data\Demo\991-demo.facilities.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Data\Demo\991-DemolandFacilities.dataset" />
     <None Include="Data\Demo\992-demo.places.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Data\Demo\994-demo.manufactured-materials.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Data\Demo\999-DemolandAdminAreas.dataset" />
     <None Include="data\SDB_AUDIT.FDB" />
     <None Include="data\SDB_BASE.FDB" />
     <None Include="SanteDB.iCDR.Runtime.targets" />
@@ -366,7 +369,7 @@
     <None Include="Data\000-AdministrableDrugForm.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Data\000-CoreExtensionTypes.dataset">
+    <None Include="Data\001-CoreExtensionTypes.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Data\000-DiagnosisCodes.dataset">
