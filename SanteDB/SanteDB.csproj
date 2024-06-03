@@ -177,6 +177,7 @@
     <None Include="Data\000-ActClass.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Data\001-CoreExtensionTypes.dataset" />
     <None Include="Data\004-ActEncounterCode.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -367,9 +368,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Data\000-AdministrableDrugForm.dataset">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Data\000-CoreExtensionTypes.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Data\000-DiagnosisCodes.dataset">
