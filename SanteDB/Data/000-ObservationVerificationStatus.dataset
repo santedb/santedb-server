@@ -51,7 +51,6 @@
       </name>
     </Concept>
   </update>
-
   <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>97513cbe-188f-11eb-adc1-0242ac120002</id>

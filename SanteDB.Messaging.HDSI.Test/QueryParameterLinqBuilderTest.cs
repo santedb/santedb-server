@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  *
@@ -16,7 +16,7 @@
  * the License.
  *
  * User: fyfej
- * Date: 2023-3-10
+ * Date: 2023-6-21
  */
 using NUnit.Framework;
 using SanteDB.Core.Model.Acts;
@@ -52,6 +52,19 @@ namespace SanteDB.Messaging.HDSI.Test
             httpQueryParameters.Add("name.use.mnemonic", "L");
             var expr = QueryExpressionParser.BuildLinqExpression<Patient>(httpQueryParameters);
             Assert.AreEqual(expected.ToString(), expr.ToString());
+        }
+
+
+        /// <summary>
+        /// Test that building a sub-expression guard works
+        /// </summary>
+        [Test]
+        public void TestGuardSubExpression()
+        {
+            var filterQuery = "relationship[relationshipType.conceptSet.mnemonic%3dFamilyMember].target@Person.identifier.value=3049";
+            var expr = QueryExpressionParser.BuildLinqExpression<Patient>(filterQuery);
+            var expected = "o => o.Relationships.Where(guard => guard.RelationshipType.ConceptSets.Any(conceptSet => (conceptSet.Mnemonic == \"FamilyMember\"))).Any(relationship => ((relationship.TargetEntity As Person) ?? new Person()).Identifiers.Any(identifier => (identifier.Value == \"3049\")))";
+            Assert.AreEqual(expected, expr.ToString());
         }
 
         /// <summary>
@@ -181,7 +194,7 @@ namespace SanteDB.Messaging.HDSI.Test
         public void TestEntityIdentifierChain()
         {
             var dtString = DateTime.Now;
-            Expression<Func<Entity, bool>> expected = (o => o.Identifiers.Any(identifier => identifier.IdentityDomain.Oid == "1.2.3.4" && identifier.Value == "123"));
+            Expression<Func<Entity, bool>> expected = o => o.Identifiers.Any(identifier => identifier.IdentityDomain.Oid == "1.2.3.4" && identifier.Value == "123");
 
             NameValueCollection httpQueryParameters = new NameValueCollection();
             httpQueryParameters.Add("identifier.domain.oid", "1.2.3.4");
@@ -259,11 +272,21 @@ namespace SanteDB.Messaging.HDSI.Test
         public void TestNullGuardCondition()
         {
             var dtString = DateTime.Now;
-            String expected = "o => o.Names.Where(guard => ((guard.NameUse ?? new Concept()).Mnemonic == \"L\")).Any(name => name.Component.Where(guard => (guard.ComponentType == null)).Any(component => (component.Value == \"John\")))";
+            String expectedDotNet = "o => o.Names.Where(guard => ((guard.NameUse ?? new Concept()).Mnemonic == \"L\")).Any(name => name.Component.Where(guard => (guard.ComponentTypeKey == Convert(null))).Any(component => (component.Value == \"John\")))";
+            String expectedMono = "o => o.Names.Where(guard => ((guard.NameUse ?? new Concept()).Mnemonic == \"L\")).Any(name => name.Component.Where(guard => (guard.ComponentTypeKey == Convert(null, Nullable`1))).Any(component => (component.Value == \"John\")))";
             NameValueCollection httpQueryParameters = new NameValueCollection();
             httpQueryParameters.Add("name[L].component[null].value", "John");
             var expr = QueryExpressionParser.BuildLinqExpression<Patient>(httpQueryParameters);
-            Assert.AreEqual(expected, expr.ToString());
+
+            var result = expr.ToString();
+            if (string.Equals(expectedMono, result))
+            {
+                Assert.AreEqual(expectedMono, result);
+            }
+            else
+            {
+                Assert.AreEqual(expectedDotNet, result);
+            }
         }
 
         /// <summary>
@@ -394,11 +417,11 @@ namespace SanteDB.Messaging.HDSI.Test
             var expected = String.Empty;
             if (Environment.OSVersion.Platform == PlatformID.Win32NT)
             {
-                expected = "o => ((o.DateOfBirth != null) AndAlso (o.DateOfBirth.Value.TestExpressionEx((Invoke(__xinstance => (((__xinstance.LoadCollection(\"Relationships\", False).Where(guard => ((guard.LoadProperty(\"RelationshipType\", False) ?? new Concept()).Mnemonic == \"Mother\")).FirstOrDefault() ?? new EntityRelationship()).LoadProperty(\"TargetEntity\", False) As Patient) ?? new Patient()).DateOfBirth, Convert(value(SanteDB.Messaging.HDSI.Test.QueryParameterLinqBuilderTest+<>c).<TestExtendedQueryFilterWithParameterVariableComplexPathParse>b__22_0())) ?? default(DateTime))) > 730.12:00:00))";
+                expected = "o => ((o.DateOfBirth != null) AndAlso (o.DateOfBirth.Value.TestExpressionEx((Invoke(__xinstance => (((__xinstance.LoadCollection(\"Relationships\", False).Where(guard => ((guard.LoadProperty(\"RelationshipType\", False) ?? new Concept()).Mnemonic == \"Mother\")).FirstOrDefault() ?? new EntityRelationship()).LoadProperty(\"TargetEntity\", False) As Patient) ?? new Patient()).DateOfBirth, Convert(value(SanteDB.Messaging.HDSI.Test.QueryParameterLinqBuilderTest+<>c).<TestExtendedQueryFilterWithParameterVariableComplexPathParse>b__23_0())) ?? default(DateTime))) > 730.12:00:00))";
             }
             else // mono represent convert with type
             {
-                expected = "o => ((o.DateOfBirth != null) AndAlso (o.DateOfBirth.Value.TestExpressionEx((Invoke(__xinstance => (((__xinstance.LoadCollection(\"Relationships\", False).Where(guard => ((guard.LoadProperty(\"RelationshipType\", False) ?? new Concept()).Mnemonic == \"Mother\")).FirstOrDefault() ?? new EntityRelationship()).LoadProperty(\"TargetEntity\", False) As Patient) ?? new Patient()).DateOfBirth, Convert(value(SanteDB.Messaging.HDSI.Test.QueryParameterLinqBuilderTest+<>c).<TestExtendedQueryFilterWithParameterVariableComplexPathParse>b__22_0(), Patient)) ?? default(DateTime))) > 730.12:00:00))";
+                expected = "o => ((o.DateOfBirth != null) AndAlso (o.DateOfBirth.Value.TestExpressionEx((Invoke(__xinstance => (((__xinstance.LoadCollection(\"Relationships\", False).Where(guard => ((guard.LoadProperty(\"RelationshipType\", False) ?? new Concept()).Mnemonic == \"Mother\")).FirstOrDefault() ?? new EntityRelationship()).LoadProperty(\"TargetEntity\", False) As Patient) ?? new Patient()).DateOfBirth, Convert(value(SanteDB.Messaging.HDSI.Test.QueryParameterLinqBuilderTest+<>c).<TestExtendedQueryFilterWithParameterVariableComplexPathParse>b__23_0(), Patient)) ?? default(DateTime))) > 730.12:00:00))";
 
             }
             QueryFilterExtensions.AddExtendedFilter(new SimpleQueryExtensionEx());

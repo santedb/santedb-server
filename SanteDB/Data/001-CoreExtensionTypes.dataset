@@ -1,47 +1,69 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<dataset xmlns="http://santedb.org/data" id="Core Extension Types v3.1">
+<dataset xmlns="http://santedb.org/data" id="Core Extension Types v3.3">
   <update insertIfNotExists="true">
     <ExtensionType xmlns="http://santedb.org/model">
       <id>77B53CBA-C32F-442B-B7A7-ED08184A0FA5</id>
       <handlerClass>SanteDB.Core.Extensions.BinaryExtensionHandler, SanteDB.Core.Model</handlerClass>
-      <name>http://santedb.org/extensions/core/jpegPhoto</name>
+      <name>Photograph</name>
+      <uri>http://santedb.org/extensions/core/jpegPhoto</uri>
     </ExtensionType>
   </update>
   <update insertIfNotExists="true">
     <ExtensionType xmlns="http://santedb.org/model">
       <id>07B1A3CD-4A22-49DD-B2EC-9E4DEC234B10</id>
       <handlerClass>SanteDB.Core.Extensions.ReferenceExtensionHandler, SanteDB.Core.Model</handlerClass>
-      <name>http://santedb.org/extensions/ext/raceCode</name>
+      <name>Race</name>
+      <scope>bacd9c6f-3fa9-481e-9636-37457962804d</scope>
+      <uri>http://santedb.org/extensions/ext/raceCode</uri>
     </ExtensionType>
   </update>
-
   <update insertIfNotExists="true">
     <ExtensionType xmlns="http://santedb.org/model">
       <id>B944E7A9-8225-4E33-BB5B-3C3BC3DFA802</id>
       <handlerClass>SanteDB.Core.Extensions.DateExtensionHandler, SanteDB.Core.Model</handlerClass>
-      <name>http://santedb.org/extensions/core/originalDate</name>
+      <name>Original Date</name>
+      <uri>http://santedb.org/extensions/core/originalDate</uri>
     </ExtensionType>
   </update>
   <update insertIfNotExists="true">
     <ExtensionType xmlns="http://santedb.org/model">
       <id>5d91d3d5-783d-4024-bb20-d50bc101f7fc</id>
       <handlerClass>SanteDB.Core.Extensions.ReferenceExtensionHandler, SanteDB.Core.Model</handlerClass>
-      <name>http://santedb.org/extensions/core/contactRole</name>
+      <name>Contact Role</name>
+      <uri>http://santedb.org/extensions/core/contactRole</uri>
     </ExtensionType>
   </update>
   <update insertIfNotExists="true">
     <ExtensionType xmlns="http://santedb.org/model">
       <id>6DE54C16-8D1C-48E4-B750-7A2F4552E86D</id>
       <handlerClass>SanteDB.Core.Extensions.DictionaryExtensionHandler, SanteDB.Core.Model</handlerClass>
-      <name>http://santedb.org/extensions/core/detectedIssue</name>
+      <name>Detected Issues</name>
+      <uri>http://santedb.org/extensions/core/detectedIssue</uri>
     </ExtensionType>
   </update>
-
+  <update insertIfNotExists="true">
+    <ExtensionType xmlns="http://santedb.org/model">
+      <id>210DAD97-4F14-447B-962C-0AD6B5FC1933</id>
+      <handlerClass>SanteDB.Core.Extensions.DictionaryExtensionHandler, SanteDB.Core.Model</handlerClass>
+      <name>User Preferences</name>
+      <scope>6a2b00ba-501b-4523-b57c-f96d8ae44684</scope>
+      <uri>http://santedb.org/extensions/core/userPreferences</uri>
+    </ExtensionType>
+  </update>
   <update insertIfNotExists="true">
     <ExtensionType xmlns="http://santedb.org/model">
       <id>E8F05D38-60E2-4C8B-B3BE-08286148F077</id>
       <handlerClass>SanteDB.Core.Extensions.DictionaryExtensionHandler, SanteDB.Core.Model</handlerClass>
-      <name>http://santedb.org/extensions/core/safetyConcernIssue</name>
+      <name>Safety/Concern Issues</name>
+      <uri>http://santedb.org/extensions/core/safetyConcernIssue</uri>
+    </ExtensionType>
+  </update>
+  <update insertIfNotExists="true">
+    <ExtensionType xmlns="http://santedb.org/model">
+      <id>FD005D38-60E2-4C8B-B3BE-08286148F077</id>
+      <handlerClass>SanteDB.Core.Extensions.ReferenceExtensionHandler, SanteDB.Core.Model</handlerClass>
+      <name>Treatment For Condition</name>
+      <uri>http://santedb.org/extensions/core/targetCondition</uri>
     </ExtensionType>
   </update>
 </dataset>

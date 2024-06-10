@@ -1,11 +1,11 @@
 # SanteDB iCDR Central Server
 
-Master: [![Build Status](https://jenkins.fyfesoftware.ca/job/public-projects/job/santedb-icdr-master/badge/icon)](https://jenkins.fyfesoftware.ca/job/public-projects/job/santedb-icdr-master/)
+Master: ![](https://jenkins.fyfesoftware.ca/buildStatus/icon?job=public-projects/santedb-icdr-master&style=flat)
 Version 3.0: [![Build Status](https://jenkins.fyfesoftware.ca/job/public-projects/job/santedb-icdr-v3/badge/icon)](https://jenkins.fyfesoftware.ca/job/public-projects/job/santedb-icdr-v3/)
 
 ## Releases 
 
-You can get the most recent builds from our [Jenkins server](https://jenkins.fyfesoftware.ca/job/public-projects/job/santedb-icdr-master). The most recent releases can be found in the Workspace/bin/dist folder.
+You can get the most recent builds from our [Jenkins server](https://jenkins.fyfesoftware.ca/job/public-projects/job/santedb-icdr-v3). The most recent releases can be found in the Workspace/bin/dist folder.
 
 ## Issue Tracker & Release Tracker
 
@@ -45,10 +45,9 @@ There are two solution files of note on Windows:
 The process for compilation is as follows:
 
 1. After cloning the solution, create a new NUGET Local repository which points to ```%localappdata%\NugetStaging```. This will be where the built nuget packages from the build process will be placed.
-2. Run the `msbuild /p:Configuration=Debug /p:VersionNumber=3.0 /t:Clean /t:Restore /t:Build santedb-server-ext.sln` command from the command line, this will build the source code in santedb-server-ext.sln file
+2. Run the `build-nuget-symbols version` command from the command line, this will build the source code in santedb-server-ext.sln file
 3. Check the bin\Debug directory
 
-**Note:** If you are planning on building in release mode you must sign all `SanteDB.*` assemblies with an authenticode certificate.
 
 ### On Linux
 
@@ -61,8 +60,8 @@ To build on Linux you will need to install the following packages on your linux 
 You can manually build the project using msbuild:
 
 ```
-./build-on-linux 3.0 version/3.0 Debug
-./run-nunit.sh
+./submodule-pull.sh develop
+msbuild /t:clean /t:restore /t:build /p:Configuration=Debug /p:VersionNumber=`cat release-version` /p:NoFirebird=1 santedb-server-linux-ext.sln
 ```
 
 If you would like to build the installers and tarballs:

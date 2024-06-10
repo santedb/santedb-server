@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  *
@@ -16,7 +16,7 @@
  * the License.
  *
  * User: fyfej
- * Date: 2023-3-10
+ * Date: 2023-6-21
  */
 using NUnit.Framework;
 using SanteDB.Core.Model.Constants;
@@ -27,6 +27,7 @@ using SanteDB.Core.Model.Roles;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace SanteDB.Messaging.HDSI.Test
 {
@@ -37,7 +38,12 @@ namespace SanteDB.Messaging.HDSI.Test
     [TestFixture(Category = "REST API")]
     public class HttpQueryExpressionTest
     {
-
+        [Test]
+        public void TestComposeComplexGuards()
+        {
+            var http = QueryExpressionBuilder.BuildQuery<Patient>(o => o.Relationships.Where(guard => guard.RelationshipType.Mnemonic == "Father" && guard.NegationIndicator == false).Any(patient => patient.TargetEntity.Identifiers.Any(identifier => identifier.Value == "FOO-30493")));
+            Assert.AreEqual("relationship[relationshipType.mnemonic%3DFather%26negationInd%3Dfalse].target.identifier.value=FOO-30493", http.ToHttpString());
+        }
 
         [Test]
         public void TestComposeControlParameters()

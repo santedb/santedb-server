@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Configuration Policies v3">
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Configuration Policies v3.1">
   <update insertIfNotExists="true">
     <SecurityPolicy xmlns="http://santedb.org/model">
       <id>d194b4b2-3672-11ec-8d3d-0242ac130003</id>
@@ -27,6 +27,80 @@
       <canOverride>false</canOverride>
     </SecurityPolicy>
   </update>
+  <update insertIfNotExists="true">
+    <SecurityPolicy xmlns="http://santedb.org/model">
+      <id>bc44b4b2-3672-11ec-8d3d-0242ac130003</id>
+      <name>Unrestricted Access to Service Logs</name>
+      <oid>1.3.6.1.4.1.33349.3.1.5.9.2.0.21</oid>
+      <isPublic>true</isPublic>
+      <canOverride>false</canOverride>
+    </SecurityPolicy>
+  </update>
+  <update insertIfNotExists="true">
+    <SecurityPolicy xmlns="http://santedb.org/model">
+      <id>cc44b4b2-3672-11ec-8d3d-0242ac130003</id>
+      <name>Read Service Logs</name>
+      <oid>1.3.6.1.4.1.33349.3.1.5.9.2.0.21.1</oid>
+      <isPublic>true</isPublic>
+      <canOverride>false</canOverride>
+    </SecurityPolicy>
+  </update>
+  <update insertIfNotExists="true">
+    <SecurityPolicy xmlns="http://santedb.org/model">
+      <id>dc44b4b2-3672-11ec-8d3d-0242ac130003</id>
+      <name>Delete Service Logs</name>
+      <oid>1.3.6.1.4.1.33349.3.1.5.9.2.0.21.2</oid>
+      <isPublic>true</isPublic>
+      <canOverride>false</canOverride>
+    </SecurityPolicy>
+  </update>
+  <update insertIfNotExists="true">
+    <SecurityPolicy xmlns="http://santedb.org/model">
+      <id>A749FE9C-452A-4D36-A50D-B7C04BF346E4</id>
+      <name>Unrestricted Job Management</name>
+      <oid>1.3.6.1.4.1.33349.3.1.5.9.2.0.22</oid>
+      <isPublic>true</isPublic>
+      <canOverride>false</canOverride>
+    </SecurityPolicy>
+  </update>
+  <update insertIfNotExists="true">
+    <SecurityPolicy xmlns="http://santedb.org/model">
+      <id>B749FE9C-452A-4D36-A50D-B7C04BF346E4</id>
+      <name>Read System Jobs</name>
+      <oid>1.3.6.1.4.1.33349.3.1.5.9.2.0.22.0</oid>
+      <isPublic>true</isPublic>
+      <canOverride>false</canOverride>
+    </SecurityPolicy>
+  </update>
+  <update insertIfNotExists="true">
+    <SecurityPolicy xmlns="http://santedb.org/model">
+      <id>C749FE9C-452A-4D36-A50D-B7C04BF346E4</id>
+      <name>Start/Run System Job</name>
+      <oid>1.3.6.1.4.1.33349.3.1.5.9.2.0.22.1</oid>
+      <isPublic>true</isPublic>
+      <canOverride>false</canOverride>
+    </SecurityPolicy>
+  </update>
+  <update insertIfNotExists="true">
+    <SecurityPolicy xmlns="http://santedb.org/model">
+      <id>D749FE9C-452A-4D36-A50D-B7C04BF346E4</id>
+      <name>Alter System Job Schedule</name>
+      <oid>1.3.6.1.4.1.33349.3.1.5.9.2.0.22.2</oid>
+      <isPublic>true</isPublic>
+      <canOverride>false</canOverride>
+    </SecurityPolicy>
+  </update>
+
+  <update insertIfNotExists="true">
+    <SecurityPolicy xmlns="http://santedb.org/model">
+      <id>E749FE9C-452A-4D36-A50D-B7C04BF346E4</id>
+      <name>Register New System Job</name>
+      <oid>1.3.6.1.4.1.33349.3.1.5.9.2.0.22.3</oid>
+      <isPublic>true</isPublic>
+      <canOverride>false</canOverride>
+    </SecurityPolicy>
+  </update>
+  
   <exec>
     <service type="SanteDB.Core.Security.Services.IPolicyDecisionService, SanteDB.Core.Api" method="ClearCache">
       <args>

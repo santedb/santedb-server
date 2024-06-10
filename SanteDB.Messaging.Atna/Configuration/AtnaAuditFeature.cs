@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  *
@@ -16,7 +16,7 @@
  * the License.
  *
  * User: fyfej
- * Date: 2023-3-10
+ * Date: 2023-6-21
  */
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Services;
@@ -76,7 +76,7 @@ namespace SanteDB.Messaging.Atna.Configuration
         /// </summary>
         public IEnumerable<IConfigurationTask> CreateInstallTasks()
         {
-            yield return new InstallFhirAuditDispatcher(this, this.m_configuration);
+            yield return new InstallAtnaDispatcher(this, this.m_configuration);
         }
 
         /// <summary>
@@ -173,14 +173,14 @@ namespace SanteDB.Messaging.Atna.Configuration
     /// Install the FHIR dispatcher configured in this service
     /// </summary>
     [ExcludeFromCodeCoverage]
-    internal class InstallFhirAuditDispatcher : IConfigurationTask
+    internal class InstallAtnaDispatcher : IConfigurationTask
     {
         private AtnaConfigurationSection m_configuration;
 
         /// <summary>
         /// Creates a new installation task
         /// </summary>
-        public InstallFhirAuditDispatcher(IFeature hostFeature, AtnaConfigurationSection configuration)
+        public InstallAtnaDispatcher(IFeature hostFeature, AtnaConfigurationSection configuration)
         {
             this.Feature = hostFeature;
             this.m_configuration = configuration;
@@ -217,7 +217,7 @@ namespace SanteDB.Messaging.Atna.Configuration
 
             configuration.GetSection<ApplicationServiceContextConfigurationSection>().ServiceProviders.RemoveAll(r => typeof(IAuditDispatchService).IsAssignableFrom(r.Type));
             configuration.GetSection<ApplicationServiceContextConfigurationSection>().ServiceProviders.Add(new TypeReferenceConfiguration(typeof(AtnaAuditService)));
-            this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs(nameof(InstallFhirAuditDispatcher), 1.0f, String.Empty));
+            this.ProgressChanged?.Invoke(this, new ProgressChangedEventArgs(nameof(InstallAtnaDispatcher), 1.0f, String.Empty));
             return true;
         }
 

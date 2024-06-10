@@ -6,7 +6,7 @@
       <Version>9.1.1</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Data.Sqlite.Core">
-      <Version>7.0.5</Version>
+      <Version>7.0.20</Version>
     </PackageReference>
     <PackageReference Include="Mono.Posix-4.5">
       <Version>4.5.0</Version>
@@ -177,6 +177,18 @@
     <None Include="Data\000-ActClass.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Data\000-FamilyMemberSet.dataset">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\001-CoreExtensionTypes.dataset">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\004-ActEncounterCode.dataset">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\009-HIVStatus.dataset">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Data\099-ActEncounterCode.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -312,17 +324,29 @@
     <None Include="Data\000-VIPStatus.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Data\Demo\990-demo.concepts.dataset">
+    <None Include="Data\001-ContactRole.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Demo\990-demo.concepts.dataset">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Demo\991-AdministrativeUnitConcepts.dataset">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Data\Demo\991-demo.facilities.dataset">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Demo\991-DemolandFacilities.dataset">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Data\Demo\992-demo.places.dataset">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Data\Demo\994-demo.manufactured-materials.dataset">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\Demo\999-DemolandAdminAreas.dataset">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="data\SDB_AUDIT.FDB" />
     <None Include="data\SDB_BASE.FDB" />
@@ -360,9 +384,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Data\000-AdministrableDrugForm.dataset">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Data\000-CoreExtensionTypes.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Data\000-DiagnosisCodes.dataset">
@@ -567,10 +588,13 @@
       <Version>13.0.3</Version>
     </PackageReference>
     <PackageReference Include="Npgsql">
-      <Version>7.0.4</Version>
+      <Version>7.0.7</Version>
     </PackageReference>
-    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlcipher">
-      <Version>2.1.4</Version>
+    <PackageReference Include="SQLitePCLRaw.provider.dynamic_cdecl">
+      <Version>2.1.8</Version>
+    </PackageReference>
+    <PackageReference Include="SQLiteSpellfix.lib.e_sqlite3mc">
+      <Version>2.1.8</Version>
     </PackageReference>
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe">
       <Version>6.0.0</Version>
