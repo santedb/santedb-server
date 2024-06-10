@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" id="Family Member Concept Set" xmlns="http://santedb.org/data">
+  <update skipIfError="false" insertIfNotExists="true">
+    <ConceptSet xmlns="http://santedb.org/model">
+      <id>bdfa274a-4192-4612-b6b5-0c67dcf75855</id>
+      <name>Spousal Family Members</name>
+      <mnemonic>SpousalFamilyMember</mnemonic>
+      <oid>1.3.6.1.4.1.33349.3.1.5.9.3.24</oid>
+      <url>http://santedb.org/conceptset/SpousalFamilyMember</url>
+      <concept>2eab5298-bc83-492c-9004-ed3499246afe</concept>
+      <concept>62aca44c-b57c-44fd-9703-fcdff97c04b6</concept>
+      <concept>89bdc57b-d85c-4e85-94e8-c17049540a0d</concept>
+      <concept>a3ff423e-81d5-4571-8edf-03c295189a23</concept>
+    </ConceptSet>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <ConceptSet xmlns="http://santedb.org/model">
+      <id>1285ec57-5969-46c7-897d-37c169d34029</id>
+      <name>Family members of children</name>
+      <mnemonic>ChildFamilyMember</mnemonic>
+      <oid>1.3.6.1.4.1.33349.3.1.5.9.3.23</oid>
+      <url>http://santedb.org/conceptset/ChildFamilyMember</url>
+      <concept>0ff2ab03-6e0a-40d1-8947-04c4937b4cc4</concept>
+      <concept>1c0f931c-9c49-4a52-8fbf-5217c52ea778</concept>
+      <concept>24380d53-ea22-4820-9f06-8671f774f133</concept>
+      <concept>29ff64e5-b564-411a-92c7-6818c02a9e48</concept>
+      <concept>38d66ec7-0cc8-4609-9675-b6ff91ede605</concept>
+      <concept>3b8e2334-4ccc-4f24-8aae-37341ea03d3e</concept>
+      <concept>40d18ecc-8ff8-4e03-8e58-97a980f04060</concept>
+      <concept>48c59444-fec0-43b8-aa2c-7aedb70733ad</concept>
+      <concept>b630ba2c-8a00-46d8-bf64-870d381d8917</concept>
+      <concept>bfcbb345-86db-43ba-b47e-e7411276ac7c</concept>
+      <concept>cd1e8904-31dc-4374-902d-c91f1de23c46</concept>
+      <concept>cdd99260-107c-4a4e-acaf-d7c9c7e90fdd</concept>
+      <concept>f172eee7-7f4b-4022-81d0-76393a1200ae</concept>
+      <concept>fa646df9-7d64-4d1f-ae9a-6261fd5fd6ae</concept>
+    </ConceptSet>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <ConceptSet xmlns="http://santedb.org/model">
+      <id>d3692f40-1033-48ea-94cb-31fc0f352a4e</id>
+      <name>FamilyMember</name>
+      <mnemonic>FamilyMember</mnemonic>
+      <oid>2.16.840.1.113883.5.111</oid>
+      <url>http://santedb.org/conceptset/v3-FamilyMember</url>
+      <concept>0a50962a-60b4-44d8-a7f6-1eb2aa5967cc</concept>
+      <concept>0ff2ab03-6e0a-40d1-8947-04c4937b4cc4</concept>
+      <concept>1c0f931c-9c49-4a52-8fbf-5217c52ea778</concept>
+      <concept>24380d53-ea22-4820-9f06-8671f774f133</concept>
+      <concept>29ff64e5-b564-411a-92c7-6818c02a9e48</concept>
+      <concept>2eab5298-bc83-492c-9004-ed3499246afe</concept>
+      <concept>38d66ec7-0cc8-4609-9675-b6ff91ede605</concept>
+      <concept>3b8e2334-4ccc-4f24-8aae-37341ea03d3e</concept>
+      <concept>40d18ecc-8ff8-4e03-8e58-97a980f04060</concept>
+      <concept>48c59444-fec0-43b8-aa2c-7aedb70733ad</concept>
+      <concept>5c5af1d2-0e6d-458f-9574-3ad61c393a90</concept>
+      <concept>62aca44c-b57c-44fd-9703-fcdff97c04b6</concept>
+      <concept>739457d0-835a-4a9c-811c-42b5e92ed1ca</concept>
+      <concept>89bdc57b-d85c-4e85-94e8-c17049540a0d</concept>
+      <concept>8fa25b69-c9c2-4c40-84c1-0ea9641a12ec</concept>
+      <concept>a3ff423e-81d5-4571-8edf-03c295189a23</concept>
+      <concept>abfe2637-d338-4090-b3a5-3ec19a47be6a</concept>
+      <concept>b630ba2c-8a00-46d8-bf64-870d381d8917</concept>
+      <concept>bfcbb345-86db-43ba-b47e-e7411276ac7c</concept>
+      <concept>cd1e8904-31dc-4374-902d-c91f1de23c46</concept>
+      <concept>cdd99260-107c-4a4e-acaf-d7c9c7e90fdd</concept>
+      <concept>decd6250-7e8b-4b77-895d-31953cf1387a</concept>
+      <concept>e81d6773-97e3-4b2d-b6a3-a4624ba5c6a9</concept>
+      <concept>f172eee7-7f4b-4022-81d0-76393a1200ae</concept>
+      <concept>fa646df9-7d64-4d1f-ae9a-6261fd5fd6ae</concept>
+    </ConceptSet>
+  </update>
+</dataset>

@@ -1,11 +1,13 @@
 <?xml version="1.0"?>
-<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Core Assigning Authorities">
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Core Assigning Authorities v3.0">
   <update insertIfNotExists="true">
     <IdentityDomain xmlns="http://santedb.org/model">
       <id>ce5990db-2e2a-467d-a376-2a7b53481e84</id>
       <name>GS1 Global Trade Identification Number (GTIN)</name>
       <domainName>GTIN</domainName>
       <oid>1.3.160</oid>
+      <scope>d39073be-0f8f-440e-b8c8-7034cc138a95</scope>
+      <scope>fafec286-89d5-420b-9085-054aca9d1eef</scope>
     </IdentityDomain>
   </update>
   <update insertIfNotExists="true">
@@ -14,6 +16,7 @@
       <name>GS1 Global Location Number (GLN)</name>
       <domainName>GLN</domainName>
       <oid>1.3.88</oid>
+      <scope>ff34dfa7-c6d3-4f8b-bc9f-14bcdc13ba6c</scope>
     </IdentityDomain>
   </update>
   <update insertIfNotExists="true">
@@ -38,6 +41,9 @@
       <oid>2.16.840.1.113883.4.1</oid>
       <url>http://hl7.org/fhir/sid/us-ssn</url>
       <isUnique>false</isUnique>
+      <scope>bacd9c6f-3fa9-481e-9636-37457962804d</scope>
+      <scope>9de2a846-ddf2-4ebc-902e-84508c5089ea</scope>
+      <scope>6b04fed8-c164-469c-910b-f824c2bda4f0</scope>
     </IdentityDomain>
   </update>
 </dataset>

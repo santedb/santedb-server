@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <dataset xmlns="http://santedb.org/data" id="SanteDB Core ActClass Codes v2">
-
   <update insertIfNotExists="true">
     <CodeSystem xmlns="http://santedb.org/model">
       <id>BAB1D66A-1E98-4BFD-9B4A-7C4BE88F35D1</id>
@@ -41,7 +40,6 @@
       <conceptSet>62C5FDE0-A3AA-45DF-94E9-242F4451644A</conceptSet>
     </Concept>
   </update>
-
   <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>80242F45-C915-47F9-A90C-1B80F7D6AF71</id>
@@ -71,7 +69,6 @@
       <conceptSet>62C5FDE0-A3AA-45DF-94E9-242F4451644A</conceptSet>
     </Concept>
   </update>
-
   <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>08F44C29-1348-48DC-B426-C9FB2826A895</id>
@@ -101,7 +98,6 @@
       <conceptSet>62C5FDE0-A3AA-45DF-94E9-242F4451644A</conceptSet>
     </Concept>
   </update>
-
   <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>f42232b9-a694-42e0-9708-f387393a6c80</id>
@@ -131,74 +127,55 @@
       <conceptSet>62C5FDE0-A3AA-45DF-94E9-242F4451644A</conceptSet>
     </Concept>
   </update>
-
   <sql>
     <exec invariant="sqlite">
         <![CDATA[
-      		
 -- DOCUMENT HAS COMPONENT DOCUMENT SECTION
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
 	VALUES((randomblob(16)), (x'0F54B9788B436F4B8D83AAF4979DBC64'), (x'F744697A3789984EAE0D452B1D8124F4'), (x'35A76EE843F2F441BF33AA78EB2E8466'), 'Document=[HasComponent]=>DocumentSection', 2);--#!
-
 -- DOCUMENT DOCUMENTS ANY ACT
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
 	VALUES ((randomblob(16)), (x'34A64B0F0751AB4E965825BE293CD831'), (x'F744697A3789984EAE0D452B1D8124F4'), null, 'Document=[Documents]=>*', 2);--#!
 -- DOCUMENT SECTION DOCUMENTS ANY ACT
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
 	VALUES((randomblob(16)), (x'34A64B0F0751AB4E965825BE293CD831'), (x'35A76EE843F2F441BF33AA78EB2E8466'), NULL, 'DocumentSection=[Documents]=>*', 2);--#!
-
 -- DOCUMENT SECTION IS DERIVED FROM 
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
 	VALUES((randomblob(16)), (x'F8A0B6816AB85F499D5D8A4073FDD882'), (x'35A76EE843F2F441BF33AA78EB2E8466'), NULL, 'DocumentSection=[IsDerivedFrom]=>*', 2);--#!
-
 -- DOCUMENT SECTION IS EXCERPT OF ANY
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
 	VALUES((randomblob(16)), (x'05E9C6FF1D160B4C8CDEA04E9E9D0CD5'), (x'35A76EE843F2F441BF33AA78EB2E8466'), NULL, 'DocumentSection=[IsExcerptOf]=>*', 2);--#!
-
-
 -- CARE PLAN HAS COMPONENT ANY
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
 	VALUES((randomblob(16)), (x'0F54B9788B436F4B8D83AAF4979DBC64'), (x'B932220494A6E0429708F387393A6C80'), null, 'CarePlan=[HasComponent]=>*', 2);--#!
-
-
 -- LIST HAS COMPONENT ANY
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
 	VALUES((randomblob(16)), (x'0F54B9788B436F4B8D83AAF4979DBC64'), (x'893432B0099A1A41BB55FF283830EA1A'), NULL, 'List=[HasComponent]=>*', 2);--#!
-
       ]]>
     </exec>
     <exec invariant="npgsql">
       <![CDATA[
-      		
 -- DOCUMENT HAS COMPONENT DOCUMENT SECTION
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
 	VALUES(uuid_generate_v1(), ('78B9540F-438B-4B6F-8D83-AAF4979DBC64'), ('7a6944f7-8937-4e98-ae0d-452b1d8124f4'), ('e86ea735-f243-41f4-bf33-aa78eb2e8466'), 'Document=[HasComponent]=>DocumentSection', 2);--#!
-
 -- DOCUMENT DOCUMENTS ANY ACT
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
 	VALUES (uuid_generate_v1(), ('0F4BA634-5107-4EAB-9658-25BE293CD831'), ('7a6944f7-8937-4e98-ae0d-452b1d8124f4'), null, 'Document=[Documents]=>*', 2);--#!
 -- DOCUMENT SECTION DOCUMENTS ANY ACT
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
 	VALUES(uuid_generate_v1(), ('0F4BA634-5107-4EAB-9658-25BE293CD831'), ('e86ea735-f243-41f4-bf33-aa78eb2e8466'), NULL, 'DocumentSection=[Documents]=>*', 2);--#!
-
 -- DOCUMENT SECTION IS DERIVED FROM 
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
 	VALUES(uuid_generate_v1(), ('81B6A0F8-B86A-495F-9D5D-8A4073FDD882'), ('e86ea735-f243-41f4-bf33-aa78eb2e8466'), NULL, 'DocumentSection=[IsDerivedFrom]=>*', 2);--#!
-
 -- DOCUMENT SECTION IS EXCERPT OF ANY
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
 	VALUES(uuid_generate_v1(), ('FFC6E905-161D-4C0B-8CDE-A04E9E9D0CD5'), ('e86ea735-f243-41f4-bf33-aa78eb2e8466'), NULL, 'DocumentSection=[IsExcerptOf]=>*', 2);--#!
-
-
 -- CARE PLAN HAS COMPONENT ANY
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
 	VALUES(uuid_generate_v1(), ('78B9540F-438B-4B6F-8D83-AAF4979DBC64'), ('042232b9-a694-42e0-9708-f387393a6c80'), null, 'CarePlan=[HasComponent]=>*', 2);--#!
-
-
 -- LIST HAS COMPONENT ANY
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
 	VALUES(uuid_generate_v1(), ('78B9540F-438B-4B6F-8D83-AAF4979DBC64'), ('b0323489-9a09-411a-bb55-ff283830ea1a'), NULL, 'List=[HasComponent]=>*', 2);--#!
-
       ]]>
     </exec>
     <exec invariant="FirebirdSQL">
@@ -206,7 +183,6 @@ INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_
 -- DOCUMENT HAS COMPONENT DOCUMENT SECTION
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
 	VALUES(gen_uuid(), char_to_uuid('78B9540F-438B-4B6F-8D83-AAF4979DBC64'), char_to_uuid('7a6944f7-8937-4e98-ae0d-452b1d8124f4'), char_to_uuid('e86ea735-f243-41f4-bf33-aa78eb2e8466'), 'Document=[HasComponent]=>DocumentSection', 2);--#!
-
 	]]>
     </exec>
     <exec invariant="FirebirdSQL">

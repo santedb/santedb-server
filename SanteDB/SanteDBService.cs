@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  *
@@ -16,11 +16,11 @@
  * the License.
  *
  * User: fyfej
- * Date: 2023-3-10
+ * Date: 2023-6-21
  */
-using System.Diagnostics.CodeAnalysis;
 using MohawkCollege.Util.Console.Parameters;
 using SanteDB.Core;
+using System.Diagnostics.CodeAnalysis;
 using System.ServiceProcess;
 
 namespace SanteDB
@@ -32,6 +32,8 @@ namespace SanteDB
     [ExcludeFromCodeCoverage]
     public partial class SanteDBService : ServiceBase
     {
+        private ConsoleParameters _CommandLineParameters;
+
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SanteDBService"/> class.
@@ -43,15 +45,28 @@ namespace SanteDB
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="SanteDBService"/> class with the specified parameters from the command line.
+        /// </summary>
+        /// <param name="commandLineParameters">The command line parameters to use when starting the service.</param>
+        public SanteDBService(ConsoleParameters commandLineParameters)
+        {
+            _CommandLineParameters = commandLineParameters;
+        }
+
+        /// <summary>
         /// When implemented in a derived class, executes when a Start command is sent to the service by the Service Control Manager (SCM) or when the operating system starts (for a service that starts automatically). Specifies actions to take when the service starts.
         /// </summary>
         /// <param name="args">Data passed by the start command.</param>
         protected override void OnStart(string[] args)
         {
-            var parms = new ParameterParser<ConsoleParameters>().Parse(args);
+            if (null == _CommandLineParameters)
+            {
+                _CommandLineParameters = new ParameterParser<ConsoleParameters>().Parse(args);
+            }
+
             try
             {
-                ServiceUtil.Start(typeof(Program).GUID, new ServerApplicationContext(parms.ConfigFile));
+                ServiceUtil.Start(typeof(Program).GUID, new ServerApplicationContext(_CommandLineParameters.ConfigFile));
             }
             catch
             {

@@ -1,6 +1,4 @@
-﻿<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Place Class Codes">
-
-  
+﻿<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Place Class Codes v3.0">
   <update insertIfNotExists="true">
     <ConceptSet xmlns="http://santedb.org/model">
       <id>3D02FB53-1133-406D-A06F-7D47A556F3BC</id>
@@ -18,5 +16,18 @@
       <concept>d9489d56-ddac-4596-b5c6-8f41d73d8dc5</concept>
     </ConceptSet>
   </update>
-  
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>A314F427-2B6D-4948-9146-A5F700973899</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>_AddressPlaceRef</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Place Reference</value>
+      </name>
+      <conceptSet>5CCA5869-8A7B-47A3-83DB-041D5AF5C9DA</conceptSet>
+    </Concept>
+  </update>
 </dataset>

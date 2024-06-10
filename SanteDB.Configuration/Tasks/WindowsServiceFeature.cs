@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  *
@@ -16,7 +16,7 @@
  * the License.
  *
  * User: fyfej
- * Date: 2023-3-10
+ * Date: 2023-6-21
  */
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Diagnostics;
@@ -204,7 +204,7 @@ namespace SanteDB.Configuration.Tasks
                             this.m_options.User,
                             this.m_options.Password,
                             this.m_options.StartBehavior);
-                        configuration.GetSection<ApplicationServiceContextConfigurationSection>().InstanceName =  this.m_options.ServiceName;
+                        configuration.GetSection<ApplicationServiceContextConfigurationSection>().InstanceName = this.m_options.ServiceName;
                     }
                     this.ProgressChanged?.Invoke(this, new SanteDB.Core.Services.ProgressChangedEventArgs(nameof(InstallTask), 1.0f, null));
                     return true;

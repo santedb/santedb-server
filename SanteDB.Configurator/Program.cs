@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (C) 2021 - 2023, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
  * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  *
@@ -16,7 +16,7 @@
  * the License.
  *
  * User: fyfej
- * Date: 2023-3-10
+ * Date: 2023-6-21
  */
 using SanteDB.Configuration;
 using SanteDB.Core.Attributes;
@@ -202,14 +202,14 @@ namespace SanteDB.Configurator
             }
 
             var asmFile = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), asmName) + ".dll";
-            if(File.Exists(asmFile))
+            if (File.Exists(asmFile))
             {
                 try
                 {
-                    
+
                     var reflectionOnly = Assembly.ReflectionOnlyLoadFrom(asmFile);
                     var reflectionVersion = reflectionOnly.GetName().Version;
-                    if(asmVersion.Major == reflectionVersion.Major && asmVersion.Minor == reflectionVersion.Minor)
+                    if (asmVersion.Major == reflectionVersion.Major && asmVersion.Minor == reflectionVersion.Minor)
                     {
                         return Assembly.LoadFrom(asmFile);
                     }

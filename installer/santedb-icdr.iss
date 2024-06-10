@@ -231,7 +231,7 @@ Source: ..\bin\Release\SanteDB.PakMan.Common.dll; DestDir: {app}; Components: de
 
 
 ; Common BRE
-Source: ..\bin\Release\Antlr3.Runtime.dll; DestDir: {app}; Components: core\bre core\protocol core
+Source: ..\bin\Release\Antlr*.dll; DestDir: {app}; Components: core\bre core\protocol core
 Source: ..\bin\Release\DynamicExpresso.Core.dll; DestDir: {app}; Components: core\bre core\protocol                              
 Source: ..\bin\Release\Jint.dll; DestDir: {app}; Components: core\bre
 Source: ..\bin\Release\Esprima.dll; DestDir: {app}; Components: core\bre
@@ -323,7 +323,7 @@ Source: "..\bin\Release\config\template\SanteDB MDM.xml"; DestDir: {app}\config\
 Source: ..\bin\Release\Microsoft.Data.Sqlite.dll; DestDir: {app}; Components: db\sqlite
 Source: ..\bin\Release\runtimes\*; DestDir: {app}\runtimes; Flags: recursesubdirs; Components: db\sqlite
 Source: ..\Solution Items\spellfix.dll; DestDir: {app}; Components: db\sqlite
-Source: ..\bin\Release\SQLitePCLRaw.batteries_v2.dll; DestDir: {app}; Components: db\sqlite
+;Source: ..\bin\Release\SQLitePCLRaw.batteries_v2.dll; DestDir: {app}; Components: db\sqlite
 Source: ..\bin\Release\SQLitePCLRaw.core.dll; DestDir: {app}; Components: db\sqlite
 Source: ..\bin\Release\SQLitePCLRaw.provider.dynamic_cdecl.dll; DestDir: {app}; Components: db\sqlite
 

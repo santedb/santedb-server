@@ -6,7 +6,6 @@
       <language>en</language>
       <value>Birth</value>
     </ConceptName>
-
   </update>
   <update skipIfError="true" insertIfNotExists="true">
     <ConceptName xmlns="http://santedb.org/model">
@@ -14,7 +13,6 @@
       <language>en</language>
       <value>Country of Origin</value>
     </ConceptName>
-
   </update>
   <update skipIfError="true" insertIfNotExists="true">
     <ConceptName xmlns="http://santedb.org/model">
@@ -22,7 +20,6 @@
       <language>en</language>
       <value>Residence at Birth</value>
     </ConceptName>
-
   </update>
   <update skipIfError="true" insertIfNotExists="true">
     <ConceptName xmlns="http://santedb.org/model">
@@ -30,7 +27,6 @@
       <language>en</language>
       <value>Birth Delivery Location</value>
     </ConceptName>
-
   </update>
   <update skipIfError="true" insertIfNotExists="true">
     <ConceptName xmlns="http://santedb.org/model">
@@ -38,7 +34,6 @@
       <language>en</language>
       <value>Temporary Address / Temporarily Living At</value>
     </ConceptName>
-
   </update>
   <update skipIfError="true" insertIfNotExists="true">
     <ConceptName xmlns="http://santedb.org/model">
@@ -46,7 +41,6 @@
       <language>en</language>
       <value>Mailing Address</value>
     </ConceptName>
-
   </update>
   <update skipIfError="true" insertIfNotExists="true">
     <ConceptName xmlns="http://santedb.org/model">
@@ -54,7 +48,6 @@
       <language>en</language>
       <value>Physical Location Address (for Visiting)</value>
     </ConceptName>
-
   </update>
   <update skipIfError="true" insertIfNotExists="true">
     <ConceptName xmlns="http://santedb.org/model">
@@ -62,7 +55,6 @@
       <language>en</language>
       <value>Bad Address (Don't Use)</value>
     </ConceptName>
-
   </update>
   <update skipIfError="true" insertIfNotExists="true">
     <ConceptName xmlns="http://santedb.org/model">
@@ -70,7 +62,6 @@
       <language>en</language>
       <value>Public Address (Listed in Public Directory)</value>
     </ConceptName>
-
   </update>
   <update skipIfError="true" insertIfNotExists="true">
     <ConceptName xmlns="http://santedb.org/model">
@@ -78,7 +69,6 @@
       <language>en</language>
       <value>Direct Address</value>
     </ConceptName>
-
   </update>
   <update skipIfError="true" insertIfNotExists="true">
     <ConceptName xmlns="http://santedb.org/model">
@@ -86,7 +76,6 @@
       <language>en</language>
       <value>Workplace Address</value>
     </ConceptName>
-
   </update>
   <update skipIfError="true" insertIfNotExists="true">
     <ConceptName xmlns="http://santedb.org/model">
@@ -94,7 +83,6 @@
       <language>en</language>
       <value>Vacation / Secondary Residence</value>
     </ConceptName>
-
   </update>
   <update skipIfError="true" insertIfNotExists="true">
     <ConceptName xmlns="http://santedb.org/model">
@@ -102,7 +90,6 @@
       <language>en</language>
       <value>Primary Residence</value>
     </ConceptName>
-
   </update>
   <update skipIfError="true" insertIfNotExists="true">
     <ConceptName xmlns="http://santedb.org/model">
@@ -110,7 +97,6 @@
       <language>en</language>
       <value>Home Address</value>
     </ConceptName>
-
   </update>
   <update skipIfError="true" insertIfNotExists="true">
     <ConceptName xmlns="http://santedb.org/model">
@@ -118,7 +104,6 @@
       <language>en</language>
       <value>Non-Latin / Phonetic</value>
     </ConceptName>
-
   </update>
   <update skipIfError="true" insertIfNotExists="true">
     <ConceptName xmlns="http://santedb.org/model">
@@ -126,7 +111,6 @@
       <language>en</language>
       <value>Sound-Based Matching</value>
     </ConceptName>
-
   </update>
   <update skipIfError="true" insertIfNotExists="true">
     <ConceptName xmlns="http://santedb.org/model">
