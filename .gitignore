@@ -294,3 +294,6 @@ Help/
 /SanteDB/santedb.config.user.*.xml
 **/Version.cs
 Directory.Build.props
+
+#Ignore VSCode
+.vscode/
