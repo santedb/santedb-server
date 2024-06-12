@@ -78,6 +78,7 @@ namespace SanteDB.Configuration.Tasks
             typeof(CachedResourceCheckoutService),
             typeof(AppletDatasetProvider),
             typeof(AppletClinicalProtocolInstaller),
+            typeof(AppletTemplateDefinitionInstaller),
             typeof(FileSystemDatasetProvider),
             typeof(DataInitializationService)
         };
