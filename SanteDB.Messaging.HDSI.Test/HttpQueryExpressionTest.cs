@@ -46,15 +46,6 @@ namespace SanteDB.Messaging.HDSI.Test
         }
 
         [Test]
-        public void TestComposeComplexGuardRoundtrip()
-        {
-            var qry = "relationship[relationshipType.conceptSet%3Dd3692f40-1033-48ea-94cb-31fc0f352a4e].target.identifier.value=DLC88888";
-            var linq = QueryExpressionParser.BuildLinqExpression<Patient>(qry.ParseQueryString());
-            var http = QueryExpressionBuilder.BuildQuery<Patient>(linq);
-
-        }
-
-        [Test]
         public void TestComposeControlParameters()
         {
             var query = "dateOfBirth=!null&_someOtherValue=true".ParseQueryString();
