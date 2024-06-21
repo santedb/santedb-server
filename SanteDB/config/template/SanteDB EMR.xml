@@ -1,0 +1,119 @@
+<?xml version="1.0"?>
+<!--
+ - Copyright 2021-2024 SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ - Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
+ - Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
+ -
+ - Licensed under the Apache License, Version 2.0 (the "License"); you
+ - may not use this file except in compliance with the License. You may
+ - obtain a copy of the License at
+ -
+ - http://www.apache.org/licenses/LICENSE-2.0
+ -
+ - Unless required by applicable law or agreed to in writing, software
+ - distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ - WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ - License for the specific language governing permissions and limitations under
+ - the License.
+ -
+ - User: fyfej
+ - Date: 2023-6-21
+ -->
+<SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.9.1.23074" xmlns:santempi="http://santedb.org/configuration/santempi" xmlns:santeguard="http://santedb.org/configuration/santeguard" xmlns="http://santedb.org/configuration">
+  <sections>
+    <add type="SanteDB.Core.Configuration.ApplicationServiceContextConfigurationSection, SanteDB.Core.Api" />
+    <add type="SanteDB.Core.Configuration.FileSystemDispatcherQueueConfigurationSection, SanteDB.Core.Api" />
+  </sections>
+  <include>config\santedb.audit_accountability.config.xml</include>
+  <include>config\santedb.email_notification.config.xml</include>
+  <include>config\santedb.match.file_configuration.config.xml</include>
+  <include>config\santedb.oauth.config.xml</include>
+  <include>config\santedb.data.psql.config.xml</include>
+  <include>config\santedb.dataquality.config.xml</include>
+  <include>config\santedb.security.config.xml</include>
+  <include>config\santedb.rest.config.xml</include>
+  <include>config\santedb.hl7.config.xml</include>
+  <include>config\santedb.resource_merge.config.xml</include>
+  <include>config\santedb.diagnostics.config.xml</include>
+  <include>config\santedb.fhir.config.xml</include>
+  <include>config\santedb.caching.memory.config.xml</include>
+  <include>config\santedb.applets.config.xml</include>
+  <include>config\santedb.jobs.config.xml</include>
+  <include>config\santedb.openapi.config.xml</include>
+  <include>config\santedb.apis.config.xml</include>
+  <include>config\santedb.atna.config.xml</include>
+  <include>config\santedb.privacy_filter.config.xml</include>
+
+  <section xsi:type="FileSystemDispatcherQueueConfigurationSection" queueRoot="queue" />
+  <section xsi:type="ApplicationServiceContextConfigurationSection">
+    <serviceProviders>
+      <add type="SanteDB.Core.Security.DefaultPolicyEnforcementService, SanteDB.Core.Api" />
+      <add type="SanteDB.Core.Services.Impl.DefaultOperatingSystemInfoService, SanteDB.Core.Api" />
+      <add type="SanteDB.Core.Services.Impl.DefaultThreadPoolService, SanteDB.Core.Api" />
+      <add type="SanteDB.Core.Services.Impl.DefaultNetworkInformationService, SanteDB.Core.Api" />
+      <add type="SanteDB.Rest.Common.RestServiceFactory, SanteDB.Rest.Common" />
+      <add type="SanteDB.Core.Services.Impl.Repository.LocalRepositoryFactory, SanteDB.Core.Api" />
+      <add type="SanteDB.Core.Services.Impl.LocalTagPersistenceService, SanteDB.Core.Api" />
+      <add type="SanteDB.Core.PubSub.Broker.PubSubBroker, SanteDB.Core.Api" />
+      <add type="SanteDB.BI.Services.Impl.LocalBiRenderService, SanteDB.BI" />
+      <add type="SanteDB.Core.Notifications.DefaultNotificationService, SanteDB.Core.Api" />
+      <add type="SanteDB.Core.Security.DefaultDataSigningService, SanteDB.Core.Api" />
+      <add type="SanteDB.Core.Security.AesSymmetricCrypographicProvider, SanteDB.Core.Api" />
+      <add type="SanteDB.Core.Security.Tfa.Rfc4226TfaCodeProvider, SanteDB.Core.Api" />
+      <add type="SanteDB.Core.Applets.Services.Impl.AppletLocalizationService, SanteDB.Core.Applets" />
+      <add type="SanteDB.Core.Services.Impl.CachedResourceCheckoutService, SanteDB.Core.Api" />
+      <add type="SanteDB.Core.Security.DefaultPolicyEnforcementService, SanteDB.Core.Api" />
+      <add type="SanteDB.Core.Jobs.DefaultJobManagerService, SanteDB.Core.Api" />
+      <add type="SanteDB.Core.Services.Impl.FileSystemDispatcherQueueService, SanteDB.Core.Api" />
+      <add type="SanteDB.Persistence.Data.Services.AdoApplicationIdentityProvider,SanteDB.Persistence.Data" />
+      <add type="SanteDB.Persistence.Data.Services.AdoDeviceIdentityProvider, SanteDB.Persistence.Data" />
+      <add type="SanteDB.Persistence.Data.Services.AdoIdentityProvider, SanteDB.Persistence.Data" />
+      <add type="SanteDB.Persistence.Data.Services.AdoSecurityChallengeProvider, SanteDB.Persistence.Data" />
+      <add type="SanteDB.Persistence.Data.Services.AdoSessionProvider, SanteDB.Persistence.Data" />
+      <add type="SanteDB.Persistence.Data.Services.AdoRoleProvider, SanteDB.Persistence.Data" />
+      <add type="SanteDB.Core.Data.Management.SimDataManagementService, SanteDB.Core.Api" />
+      <add type="SanteDB.Persistence.Data.Services.AdoDatasetInstallerService, SanteDB.Persistence.Data" />
+      <add type="SanteDB.Persistence.Data.Services.AdoSubscriptionExecutor, SanteDB.Persistence.Data" />
+      <add type="SanteDB.Core.Security.DefaultTfaService, SanteDB.Core.Api" />
+      <add type="SanteDB.Messaging.Atna.AtnaAuditService, SanteDB.Messaging.Atna" />
+      <add type="SanteDB.Core.Security.Privacy.DataPolicyFilterService, SanteDB.Core.Api" />
+      <add type="SanteDB.Caching.Memory.MemoryCacheService, SanteDB.Caching.Memory" />
+      <add type="SanteDB.Caching.Memory.MemoryQueryPersistenceService, SanteDB.Caching.Memory" />
+      <add type="SanteDB.Caching.Memory.MemoryAdhocCacheService, SanteDB.Caching.Memory" />
+      <add type="SanteDB.BusinessRules.JavaScript.AppletDataReferenceResolver, SanteDB.BusinessRules.JavaScript" />
+      <add type="SanteDB.Core.Applets.Services.Impl.AppletSubscriptionRepository, SanteDB.Core.Applets" />
+      <add type="SanteDB.Core.Security.Audit.AuditDaemonService, SanteDB.Core.Api" />
+      <add type="SanteDB.Core.Cdss.SimpleDecisionSupportService, SanteDB.Core.Api" />
+      <add type="SanteDB.Rest.OAuth.OAuthMessageHandler, SanteDB.Rest.OAuth" />
+      <add type="SanteDB.Messaging.FHIR.FhirMessageHandler, SanteDB.Messaging.FHIR" />
+      <add type="SanteDB.Rest.HDSI.HdsiMessageHandler, SanteDB.Rest.HDSI" />
+      <add type="SanteDB.Messaging.HL7.HL7MessageHandler, SanteDB.Messaging.HL7" />
+      <add type="SanteDB.Rest.AMI.AmiMessageHandler, SanteDB.Rest.AMI" />
+      <add type="SanteDB.Messaging.Metadata.MetadataMessageHandler, SanteDB.Messaging.Metadata" />
+      <add type="SanteDB.Core.Services.Impl.SimplePatchService, SanteDB.Core.Api" />
+      <add type="SanteDB.Core.Applets.Services.Impl.FileSystemAppletManagerService, SanteDB.Core.Applets" />
+      <add type="SanteDB.BusinessRules.JavaScript.AppletBusinessRulesDaemon, SanteDB.BusinessRules.JavaScript" />
+      <add type="SanteDB.Persistence.Diagnostics.Email.DiagnosticReportPersistenceService, SanteDB.Persistence.Diagnostics.Email" />
+      <add type="SanteDB.Matcher.Services.FileMatchConfigurationProvider, SanteDB.Matcher" />
+      <add type="SanteDB.Rest.BIS.BisMessageHandler, SanteDB.Rest.BIS" />
+      <add type="SanteDB.BI.Services.Impl.InMemoryPivotProvider, SanteDB.BI" />
+      <add type="SanteDB.Persistence.MDM.Services.MdmDataManagementService, SanteDB.Persistence.MDM" />
+      <add type="SanteDB.Matcher.Matchers.WeightedRecordMatchingService, SanteDB.Matcher" />
+      <add type="SanteDB.Core.Data.Quality.DataQualityService, SanteDB.Core.Api" />
+      <add type="SanteDB.Persistence.Auditing.ADO.Services.AdoAuditRepositoryService, SanteDB.Persistence.Auditing.ADO" />
+      <add type="SanteDB.Persistence.Data.Services.AdoPersistenceService, SanteDB.Persistence.Data" />
+      <add type="SanteDB.Persistence.Data.Services.AdoFreetextSearchService, SanteDB.Persistence.Data" />
+      <add type="SanteDB.Persistence.PubSub.ADO.AdoPubSubManager, SanteDB.Persistence.PubSub.ADO, Version=2.1.3.0, Culture=neutral, PublicKeyToken=null" />
+      <add type="SanteDB.BI.Services.Impl.AppletBiRepository, SanteDB.BI" />
+      <add type="SanteDB.Core.Security.Privacy.ExemptablePolicyFilterService,SanteDB.Core.Api" />
+      <add type="SanteDB.Core.Security.SHA256PasswordHashingService,SanteDB.Core.Api" />
+      <add type="SanteDB.Core.Security.RegexPasswordValidator, SanteDB.Core.Api" />
+      <add type="SanteDB.Core.Security.DefaultPolicyDecisionService, SanteDB.Core.Api" />
+      <add type="SanteDB.Persistence.Data.Services.AdoPolicyInformationService, SanteDB.Persistence.Data" />
+      <add type="SanteDB.Security.Certs.BouncyCastle.BouncyCastleCertificateGenerator, SanteDB.Security.Certs.BouncyCastle" />
+      <add type="SanteDB.Security.Certs.BouncyCastle.BouncyCastleCertificateSigner, SanteDB.Security.Certs.BouncyCastle" />
+      <add type="SanteDB.Core.Security.RsaKeyInitializationService, SanteDB.Core.Api"/>
+      <add type="SanteDB.Core.Notifications.Email.FrameworkMailService, SanteDB.Core.Api" />
+    </serviceProviders>
+  </section>
+</SanteDBConfiguration>

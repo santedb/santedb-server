@@ -457,6 +457,9 @@
     <None Include="Data\000-Nationality.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="config\template\SanteDB EMR.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <Content Include="santedb.config.nuget.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -594,7 +597,7 @@
       <Version>2.1.8</Version>
     </PackageReference>
     <PackageReference Include="SQLiteSpellfix.lib.e_sqlite3mc">
-      <Version>2.1.8</Version>
+      <Version>2.2.1</Version>
     </PackageReference>
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe">
       <Version>6.0.0</Version>
