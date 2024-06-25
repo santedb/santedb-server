@@ -37,7 +37,7 @@
       </name>
     </Concept>
   </update>
-  <update insertIfNotExists="true">
+   <update insertIfNotExists="true">
     <ConceptSet xmlns="http://santedb.org/model">
       <id>17331147-6e27-4adb-84b4-da105bf41094</id>
       <name>Vaccine Support Materials</name>
@@ -65,6 +65,10 @@
       <compose>
         <operation>include</operation>
         <target>17331147-6e27-4adb-84b4-da105bf41094</target>
+      </compose>
+      <compose>
+        <instruction>include</instruction>
+        <target>d9e73f44-330f-11ef-9f7d-a344f6cb283f</target>
       </compose>
     </ConceptSet>
   </update>
