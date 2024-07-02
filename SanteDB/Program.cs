@@ -89,7 +89,7 @@ namespace SanteDB
                 var parameters = parser.Parse(args);
 
                 // Are there any third party libraries to load?
-                if (parameters.LoadExtensions.Count > 0)
+                if (parameters.LoadExtensions?.Count > 0)
                 {
                     foreach (var itm in parameters.LoadExtensions)
                     {
