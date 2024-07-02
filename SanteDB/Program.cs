@@ -88,6 +88,22 @@ namespace SanteDB
             {
                 var parameters = parser.Parse(args);
 
+                // Are there any third party libraries to load?
+                if (parameters.LoadExtensions.Count > 0)
+                {
+                    foreach (var itm in parameters.LoadExtensions)
+                    {
+                        if (File.Exists(itm))
+                        {
+                            Console.WriteLine("Loading {0}...", itm);
+                            Assembly.LoadFile(itm);
+                        }
+                        else
+                        {
+                            Console.WriteLine("{0} does not exist", itm);
+                        }
+                    }
+                }
                 var instanceSuffix = !String.IsNullOrEmpty(parameters.InstanceName) ? $"-{parameters.InstanceName}" : null;
                 var serviceName = $"SanteDB{instanceSuffix}";
                 // What to do?

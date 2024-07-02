@@ -19,6 +19,7 @@
  * Date: 2023-6-21
  */
 using MohawkCollege.Util.Console.Parameters;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
@@ -109,5 +110,12 @@ namespace SanteDB
         [Parameter("install-certs")]
         [Description("Install the certificiates")]
         public bool InstallCerts { get; set; }
+
+        /// <summary>
+        /// Load extensions
+        /// </summary>
+        [Parameter("load")]
+        [Description("Load extensions into the iCDR host")]
+        public StringCollection LoadExtensions { get; set; }
     }
 }

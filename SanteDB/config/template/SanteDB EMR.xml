@@ -97,7 +97,6 @@
       <add type="SanteDB.Matcher.Services.FileMatchConfigurationProvider, SanteDB.Matcher" />
       <add type="SanteDB.Rest.BIS.BisMessageHandler, SanteDB.Rest.BIS" />
       <add type="SanteDB.BI.Services.Impl.InMemoryPivotProvider, SanteDB.BI" />
-      <add type="SanteDB.Persistence.MDM.Services.MdmDataManagementService, SanteDB.Persistence.MDM" />
       <add type="SanteDB.Matcher.Matchers.WeightedRecordMatchingService, SanteDB.Matcher" />
       <add type="SanteDB.Core.Data.Quality.DataQualityService, SanteDB.Core.Api" />
       <add type="SanteDB.Persistence.Auditing.ADO.Services.AdoAuditRepositoryService, SanteDB.Persistence.Auditing.ADO" />
