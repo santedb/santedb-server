@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Duplication Relationship Codes">
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Duplication Relationship Codes v3.0">
   <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>2BBF068B-9121-4081-BF3C-AB62C01362EE</id>
-      <mnemonic>Detected-Duplicate-Record</mnemonic>
+      <mnemonic>Duplicate</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
       <conceptClass>92cdea39-b9a3-4a5b-bc88-a6646c74240d</conceptClass>
       <name>
