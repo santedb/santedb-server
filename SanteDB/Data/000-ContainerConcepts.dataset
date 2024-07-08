@@ -355,6 +355,18 @@
   </update>
   <update skipIfError="false" insertIfNotExists="true">
     <ConceptSet xmlns="http://santedb.org/model">
+      <id>0c9718b8-3d58-11ef-82a9-b34d8b5cbc54</id>
+      <name>Cold Storage Containers</name>
+      <mnemonic>ContainerTypeColdStore</mnemonic>
+      <oid>1.3.6.1.4.1.33349.3.1.5.9.3.38.1</oid>
+      <url>http://santedb.org/concept-set/container-type-cold</url>
+      <concept>6ae1f173-60fa-4540-b7cf-957775ae5986</concept>
+      <concept>9077f00c-0f9a-4030-b1db-f0c3671ad8f4</concept>
+      <concept>e2800131-c008-4d11-b8b5-e98527cf8c22</concept>
+    </ConceptSet>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <ConceptSet xmlns="http://santedb.org/model">
       <id>c56e4d50-3bca-11ef-ad82-130da1d10833</id>
       <name>Container Type</name>
       <mnemonic>ContainerType</mnemonic>
@@ -370,19 +382,6 @@
       <concept>035e63b7-854c-4ba8-a115-fb74ce4b6c8e</concept>
       <concept>03d52794-756a-4f9a-a17e-edd44f36c244</concept>
     </ConceptSet>
-    <update skipIfError="false" insertIfNotExists="true">
-      <ConceptSet xmlns="http://santedb.org/model">
-        <id>0c9718b8-3d58-11ef-82a9-b34d8b5cbc54</id>
-        <name>Cold Storage Containers</name>
-        <mnemonic>ContainerTypeColdStore</mnemonic>
-        <oid>1.3.6.1.4.1.33349.3.1.5.9.3.38.1</oid>
-        <url>http://santedb.org/concept-set/container-type-cold</url>
-        <concept>6ae1f173-60fa-4540-b7cf-957775ae5986</concept>
-        <concept>9077f00c-0f9a-4030-b1db-f0c3671ad8f4</concept>
-        <concept>e2800131-c008-4d11-b8b5-e98527cf8c22</concept>
-      </ConceptSet>
-    </update>
-
   </update>
 
 
