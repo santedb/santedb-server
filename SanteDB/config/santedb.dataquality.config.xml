@@ -24,36 +24,5 @@
   </sections>
   <!-- Data Quality Configuration Section -->
   <section xsi:type="DataQualityConfigurationSection">
-    <ruleSet enabled="true" id="default" name="My Data Quality Configuration">
-      <resources>
-        <add resource="Patient">
-          <assert id="dob.required" name="Date of Birth Required" priority="Warning">
-            <expression>dateOfBirth=!null</expression>
-          </assert>
-          <assert id="dob.future" name="Date of Birth in Future" priority="Warning">
-            <expression>dateOfBirth=&lt;$now</expression>
-          </assert>
-          <assert id="address.required" name="Address Required" priority="Warning">
-            <expression>address.component.value=!null</expression>
-          </assert>
-          <assert id="name.required" name="Name Required" priority="Warning">
-            <expression>name.component.value=!null</expression>
-          </assert>
-          <assert id="identifier.national" name="Identifier Required" evaluation="any" priority="Warning">
-            <expression>identifier[SSN].value=!null</expression>
-            <expression>identifier[DLN].value=!null</expression>
-          </assert>
-          <assert id="gender.required" name="Gender Required" priority="Warning">
-            <expression>genderConcept=!null</expression>
-          </assert>
-          <assert id="nok.required" name="Next of Kin Required" priority="Warning">
-            <expression>relationship[Mother|Father|NextOfKin]=!null</expression>
-          </assert>
-          <assert id="birthplace.required" name="Birthpplace Required" priority="Warning">
-            <expression>relationship[Birthplace]=!null</expression>
-          </assert>
-        </add>
-      </resources>
-    </ruleSet>
   </section>
 </SanteDBConfiguration>

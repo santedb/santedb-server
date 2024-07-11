@@ -295,7 +295,7 @@ namespace SanteDB.Messaging.HDSI.Test
         [Test]
         public void TestOrGuardCondition()
         {
-            String expected = "o => o.Names.Where(guard => (((guard.NameUse ?? new Concept()).Mnemonic == \"Legal\") Or ((guard.NameUse ?? new Concept()).Mnemonic == \"OfficialRecord\"))).Any(name => name.Component.Where(guard => (((guard.ComponentType ?? new Concept()).Mnemonic == \"Given\") Or ((guard.ComponentType ?? new Concept()).Mnemonic == \"Family\"))).Any(component => (component.Value == \"John\")))";
+            String expected = "o => o.Names.Where(guard => (((guard.NameUse ?? new Concept()).Mnemonic == \"Legal\") OrElse ((guard.NameUse ?? new Concept()).Mnemonic == \"OfficialRecord\"))).Any(name => name.Component.Where(guard => (((guard.ComponentType ?? new Concept()).Mnemonic == \"Given\") OrElse ((guard.ComponentType ?? new Concept()).Mnemonic == \"Family\"))).Any(component => (component.Value == \"John\")))";
             NameValueCollection httpQueryParameters = new NameValueCollection();
             httpQueryParameters.Add("name[Legal|OfficialRecord].component[Given|Family].value", "John");
             var expr = QueryExpressionParser.BuildLinqExpression<Patient>(httpQueryParameters);

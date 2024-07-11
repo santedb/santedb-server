@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Reference Relationship Types">
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Reference Relationship Types v3.0">
   <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>0FFAD58D-21B5-4C17-B3F4-9CAA0C570EF3</id>
@@ -29,35 +29,43 @@
       </referenceTerm>
     </Concept>
   </update>
+
+
   <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
-      <id>0FFAD58D-21B5-4C17-B3F4-9CAA0C570EF3</id>
-      <mnemonic>EQUIV</mnemonic>
+      <id>5D93E712-58AE-4C56-BCA9-518DB745A674</id>
+      <mnemonic>CSC</mnemonic>
       <codeSystem>ff12d77b-625d-497a-8794-c3726942b113</codeSystem>
       <name>
         <language>en</language>
-        <value>Equivalent</value>
+        <value>Community Service Centre</value>
       </name>
     </ReferenceTerm>
   </update>
   <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
-      <id>395F4EDF-5D5D-4950-9F5E-F827F72E4B32</id>
+      <id>4AA573A0-D967-493A-BEA0-8BAD060E4264</id>
       <isReadonly>false</isReadonly>
-      <mnemonic>EquivalentEntity</mnemonic>
+      <mnemonic>CommunityServiceDeliveryLocation</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <conceptSet>EE16A667-2085-440A-B1E7-4032D10B9F40</conceptSet>
       <name>
         <language>en</language>
-        <value>Equivalent Entity</value>
+        <value>Community Service Delivery Location</value>
+      </name>
+      <name>
+        <language>en</language>
+        <value>Catchment/Service Location</value>
       </name>
       <referenceTerm>
-        <term>0FFAD58D-21B5-4C17-B3F4-9CAA0C570EF3</term>
+        <term>5D93E712-58AE-4C56-BCA9-518DB745A674</term>
         <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
       </referenceTerm>
     </Concept>
   </update>
+
+
   <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>3760B686-5A03-426F-BE88-0011242DFD33</id>
@@ -181,11 +189,19 @@
 	SELECT
 		x'DF4E5F395D5D50499F5EF827F72E4B32', CD_ID, CD_ID, 'EQUIVALENT'
 	FROM CD_SET_MEM_ASSOC_TBL WHERE SET_ID = x'67A56D4E9400234F855511DA499593AF';
- -- PERSON SUBCLASSES
-INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES (x'DF4E5F395D5D50499F5EF827F72E4B32',x'46A8E29DF2DDBC4E902E84508C5089EA',x'6F9CCDBAA93F1E48963637457962804D','PERSON-[EQUIVALENT]->PATIENT') ;
-INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES (x'DF4E5F395D5D50499F5EF827F72E4B32',x'6F9CCDBAA93F1E48963637457962804D',x'46A8E29DF2DDBC4E902E84508C5089EA','PATIENT-[EQUIVALENT]->PERSON') ;
-INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES (x'DF4E5F395D5D50499F5EF827F72E4B32',x'46A8E29DF2DDBC4E902E84508C5089EA',x'D8FE046B64C19C46910BF824C2BDA4F0','PERSON-[EQUIVALENT]->PROVIDER') ;
-INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES (x'DF4E5F395D5D50499F5EF827F72E4B32',x'D8FE046B64C19C46910BF824C2BDA4F0',x'46A8E29DF2DDBC4E902E84508C5089EA','PROVIDER-[EQUIVALENT]->PERSON') ;
+-- PERSON SUBCLASSES
+INSERT OR IGNORE INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES (x'DF4E5F395D5D50499F5EF827F72E4B32',x'46A8E29DF2DDBC4E902E84508C5089EA',x'6F9CCDBAA93F1E48963637457962804D','PERSON-[EQUIVALENT]->PATIENT') ;
+INSERT OR IGNORE INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES (x'DF4E5F395D5D50499F5EF827F72E4B32',x'6F9CCDBAA93F1E48963637457962804D',x'46A8E29DF2DDBC4E902E84508C5089EA','PATIENT-[EQUIVALENT]->PERSON') ;
+INSERT OR IGNORE INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES (x'DF4E5F395D5D50499F5EF827F72E4B32',x'46A8E29DF2DDBC4E902E84508C5089EA',x'D8FE046B64C19C46910BF824C2BDA4F0','PERSON-[EQUIVALENT]->PROVIDER') ;
+INSERT OR IGNORE INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES (x'DF4E5F395D5D50499F5EF827F72E4B32',x'D8FE046B64C19C46910BF824C2BDA4F0',x'46A8E29DF2DDBC4E902E84508C5089EA','PROVIDER-[EQUIVALENT]->PERSON') ;
+]]>
+    </exec>
+    <exec invariant="sqlite">
+      <![CDATA[
+INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc)
+	SELECT
+		x'A073A54A67D93A49BEA08BAD060E4264', CD_ID, x'A7DF34FFD3C68B4FBC9F14BCDC13BA6C', 'Community Service Location'
+	FROM CD_SET_MEM_ASSOC_TBL WHERE SET_ID = x'53FB023D33116D40A06F7D47A556F3BC';
 ]]>
     </exec>
     <exec invariant="npgsql">
@@ -202,6 +218,16 @@ INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_de
 INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) VALUES ('395F4EDF-5D5D-4950-9F5E-F827F72E4B32','6b04fed8-c164-469c-910b-f824c2bda4f0','9de2a846-ddf2-4ebc-902e-84508c5089ea','PROVIDER-[EQUIVALENT]->PERSON') ON CONFLICT DO NOTHING;
 ]]>
     </exec>
+    <exec invariant="npgsql">
+      <![CDATA[
+INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc)
+	SELECT
+		'4AA573A0-D967-493A-BEA0-8BAD060E4264', CD_ID, 'ff34dfa7-c6d3-4f8b-bc9f-14bcdc13ba6c', 'CommunityServiceLocation->ServiceDeliveryLocation'
+	FROM CD_SET_MEM_ASSOC_TBL WHERE SET_ID = '3d02fb53-1133-406d-a06f-7d47a556f3bc'
+  ON CONFLICT DO NOTHING;
+]]>
+    </exec>
+    
     <exec invariant="FirebirdSQL">
       <![CDATA[
 INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc)
