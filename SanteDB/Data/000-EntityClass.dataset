@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<dataset xmlns="http://santedb.org/data" id="Entity Class Codes">
+<dataset xmlns="http://santedb.org/data" id="Entity Class Codes 3.0">
   <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>6a2b00ba-501b-4523-b57c-f96d8ae44684</id>
@@ -17,80 +17,103 @@
   <sql>
     <exec invariant="sqlite">
       <![CDATA[
-      INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+      INSERT OR IGNORE  INTO REL_VRFY_SYSTBL (REL_TYP_CD_ID, SRC_CLS_CD_ID, TRG_CLS_CD_ID, ERR_DESC) 
+    VALUES (x'D373624F2382184E8596C718AD029DEB',x'A7DF34FFD3C68B4FBC9F14BCDC13BA6C',x'24F36FB774B1B740A6ACD1FDF8E23967', 'ServiceDeliveryLocation=[LocatedEntity]=>Container');
+INSERT OR IGNORE  INTO REL_VRFY_SYSTBL (REL_TYP_CD_ID, SRC_CLS_CD_ID, TRG_CLS_CD_ID, ERR_DESC) 
+    VALUES (x'21A6029C6585B44694FFA2BD210989B1',x'A7DF34FFD3C68B4FBC9F14BCDC13BA6C',x'24F36FB774B1B740A6ACD1FDF8E23967', 'ServiceDeliveryLocation=[HeldEntity]=>Container');
+INSERT OR IGNORE  INTO REL_VRFY_SYSTBL (REL_TYP_CD_ID, SRC_CLS_CD_ID, TRG_CLS_CD_ID, ERR_DESC) 
+    VALUES (x'21A6029C6585B44694FFA2BD210989B1',x'24F36FB774B1B740A6ACD1FDF8E23967',x'86C2FEFAD5890B429085054ACA9D1EEF', 'Container=[HeldEntity]=>ManufacturedMaterial');
+INSERT OR IGNORE  INTO REL_VRFY_SYSTBL (REL_TYP_CD_ID, SRC_CLS_CD_ID, TRG_CLS_CD_ID, ERR_DESC)
+    VALUES (x'CDD8B677A0051F4B9E14B895203BF40C',x'BA002B6A1B502345B57CF96D8AE44684',x'A7DF34FFD3C68B4FBC9F14BCDC13BA6C', 'UserEntity=[MaintainedEntity]=>ServiceDeliveryLocation');
+INSERT OR IGNORE INTO REL_VRFY_SYSTBL (REL_TYP_CD_ID, SRC_CLS_CD_ID, TRG_CLS_CD_ID, ERR_DESC) 
+    VALUES (x'CDD8B677A0051F4B9E14B895203BF40C',x'55BD087C424DCD4992F86388D6C4183F',x'A7DF34FFD3C68B4FBC9F14BCDC13BA6C', 'Organization=[MaintainedEntity]=>ServiceDeliveryLocation');
+
+      INSERT OR IGNORE INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES ((randomblob(16)), (x'7F35820BE05A4345AB8EA33E9B315BAB'), null, (x'BA002B6A1B502345B57CF96D8AE44684'), '*=[Witness]=>UserEntity', 3);--#!
-INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+INSERT OR IGNORE  INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES ((randomblob(16)), (x'8757DCF94DDDC642A082AC7D11956FDA'), null, (x'BA002B6A1B502345B57CF96D8AE44684'), '*=[Verifier]=>UserEntity', 3);--#!
-INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+INSERT OR IGNORE  INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES ((randomblob(16)), (x'27753FDEC9E3EF45857400CA4495F767'), null, (x'BA002B6A1B502345B57CF96D8AE44684'), '*=[Transcriber]=>UserEntity', 3);--#!
-INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+INSERT OR IGNORE  INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES ((randomblob(16)), (x'B894C653D827DD4395A4BB318431D17C'), null, (x'BA002B6A1B502345B57CF96D8AE44684'), '*=[Receiver]=>UserEntity', 3);--#!
-INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+INSERT OR IGNORE  INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES ((randomblob(16)), (x'55923F355E76364380071D61AB09AAD6'), null, (x'BA002B6A1B502345B57CF96D8AE44684'), '*=[ReferredBy]=>UserEntity', 3);--#!
-INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+INSERT OR IGNORE  INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES ((randomblob(16)), (x'6C13F6796514E845917EE7832BC8E3B2'), null, (x'BA002B6A1B502345B57CF96D8AE44684'), '*=[PrimaryPerformer]=>UserEntity', 3);--#!
-INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+INSERT OR IGNORE  INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES ((randomblob(16)), (x'A4705EFA6EA465468A2094D4D7B86FC8'), null, (x'BA002B6A1B502345B57CF96D8AE44684'), '*=[Performer]=>UserEntity', 3);--#!
-INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+INSERT OR IGNORE  INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES ((randomblob(16)), (x'33A3160746CD9D43BFD6BF788F3885FA'), null, (x'BA002B6A1B502345B57CF96D8AE44684'), '*=[LegalAuthenticator]=>UserEntity', 3);--#!
-INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+INSERT OR IGNORE  INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES ((randomblob(16)), (x'164217A0396451439483A241A48029B7'), null, (x'BA002B6A1B502345B57CF96D8AE44684'), '*=[Admitter]=>UserEntity', 3);--#!
-INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+INSERT OR IGNORE  INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES ((randomblob(16)), (x'82BF2D1B03A5F44C9ECBA8E111B4674E'), null, (x'BA002B6A1B502345B57CF96D8AE44684'), '*=[Authenticator]=>UserEntity', 3);--#!
-INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+INSERT OR IGNORE  INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES ((randomblob(16)), (x'AF3FCBF05D4304479217B884F757BC14'), null, (x'BA002B6A1B502345B57CF96D8AE44684'), '*=[AuthorOrOriginator]=>UserEntity', 3);--#!
-INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+INSERT OR IGNORE  INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES ((randomblob(16)), (x'DF44C72889D8444ABC1A2E9E9D64AF13'), null, (x'BA002B6A1B502345B57CF96D8AE44684'), '*=[Beneficiary]=>UserEntity', 3);--#!
-INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+INSERT OR IGNORE  INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES ((randomblob(16)), (x'6E4E59A2FEE8684C82A5D3A46DBEC87D'), null, (x'BA002B6A1B502345B57CF96D8AE44684'), '*=[Discharger]=>UserEntity', 3);--#!
-INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+INSERT OR IGNORE  INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES ((randomblob(16)), (x'484260391278604BBC548CC1FFFB1DE6'), null, (x'BA002B6A1B502345B57CF96D8AE44684'), '*=[Informant]=>UserEntity', 3);--#!
-INSERT INTO rel_vrfy_systbl (rel_vrfy_id, src_cls_cd_id, rel_typ_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+INSERT OR IGNORE  INTO rel_vrfy_systbl (rel_vrfy_id, src_cls_cd_id, rel_typ_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 VALUES ((randomblob(16)), x'04FF7313EFA60A42B1D04A07465FE8E8',x'4BA0B77765C0AF4F8EC02CDAD4AE372B',x'BA002B6A1B502345B57CF96D8AE44684','Device=[AssignedEntity]=>UserEntity', 1);
-INSERT INTO rel_vrfy_systbl (rel_vrfy_id, src_cls_cd_id, rel_typ_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+INSERT OR IGNORE  INTO rel_vrfy_systbl (rel_vrfy_id, src_cls_cd_id, rel_typ_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 VALUES ((randomblob(16)), x'BA002B6A1B502345B57CF96D8AE44684',x'72175F4580F5E84786BDB5CE25D351F9',x'A7DF34FFD3C68B4FBC9F14BCDC13BA6C','UserEntity=[DedicatedServiceDeliveryLocation]=>ServiceDeliveryLocation', 1);--#!
-INSERT INTO rel_vrfy_systbl (rel_vrfy_id, src_cls_cd_id, rel_typ_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+INSERT OR IGNORE  INTO rel_vrfy_systbl (rel_vrfy_id, src_cls_cd_id, rel_typ_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 VALUES ((randomblob(16)), x'BA002B6A1B502345B57CF96D8AE44684',x'13953CB41C1CD04E92DB55A904C122E6',x'55BD087C424DCD4992F86388D6C4183F','UserEntity=[Employee]=>Organization', 1);--#!
 UPDATE ent_vrsn_tbl SET cls_cd_id = x'BA002B6A1B502345B57CF96D8AE44684' WHERE ent_id IN (SELECT ENT_ID FROM ENT_VRSN_TBL INNER JOIN USR_ENT_TBL USING (ENT_VRSN_ID));--#!
       ]]>
     </exec>
     <exec invariant="npgsql">
       <![CDATA[
+      
+INSERT INTO REL_VRFY_SYSTBL (REL_TYP_CD_ID, SRC_CLS_CD_ID, TRG_CLS_CD_ID, ERR_DESC) 
+    VALUES ('4F6273D3-8223-4E18-8596-C718AD029DEB','ff34dfa7-c6d3-4f8b-bc9f-14bcdc13ba6c','b76ff324-b174-40b7-a6ac-d1fdf8e23967', 'ServiceDeliveryLocation=[LocatedEntity]=>Container') ON CONFLICT DO NOTHING; 
+INSERT INTO REL_VRFY_SYSTBL (REL_TYP_CD_ID, SRC_CLS_CD_ID, TRG_CLS_CD_ID, ERR_DESC) 
+    VALUES ('9C02A621-8565-46B4-94FF-A2BD210989B1','ff34dfa7-c6d3-4f8b-bc9f-14bcdc13ba6c','b76ff324-b174-40b7-a6ac-d1fdf8e23967', 'ServiceDeliveryLocation=[HeldEntity]=>Container') ON CONFLICT DO NOTHING;
+INSERT INTO REL_VRFY_SYSTBL (REL_TYP_CD_ID, SRC_CLS_CD_ID, TRG_CLS_CD_ID, ERR_DESC) 
+    VALUES ('9C02A621-8565-46B4-94FF-A2BD210989B1','b76ff324-b174-40b7-a6ac-d1fdf8e23967','fafec286-89d5-420b-9085-054aca9d1eef', 'Container=[HeldEntity]=>ManufacturedMaterial') ON CONFLICT DO NOTHING;
+INSERT INTO REL_VRFY_SYSTBL (REL_TYP_CD_ID, SRC_CLS_CD_ID, TRG_CLS_CD_ID, ERR_DESC) 
+    VALUES ('77B6D8CD-05A0-4B1F-9E14-B895203BF40C','6a2b00ba-501b-4523-b57c-f96d8ae44684','ff34dfa7-c6d3-4f8b-bc9f-14bcdc13ba6c', 'UserEntity=[MaintainedEntity]=>ServiceDeliveryLocation') ON CONFLICT DO NOTHING;
+INSERT INTO REL_VRFY_SYSTBL (REL_TYP_CD_ID, SRC_CLS_CD_ID, TRG_CLS_CD_ID, ERR_DESC) 
+    VALUES ('77B6D8CD-05A0-4B1F-9E14-B895203BF40C','7c08bd55-4d42-49cd-92f8-6388d6c4183f','ff34dfa7-c6d3-4f8b-bc9f-14bcdc13ba6c', 'Organization=[MaintainedEntity]=>ServiceDeliveryLocation') ON CONFLICT DO NOTHING;
+
       	INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
-	VALUES (uuid_generate_v1(), ('0B82357F-5AE0-4543-AB8E-A33E9B315BAB'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Witness]=>UserEntity', 3);--#!
+	VALUES (uuid_generate_v1(), ('0B82357F-5AE0-4543-AB8E-A33E9B315BAB'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Witness]=>UserEntity', 3) ON CONFLICT DO NOTHING;--#!
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
-	VALUES (uuid_generate_v1(), ('F9DC5787-DD4D-42C6-A082-AC7D11956FDA'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Verifier]=>UserEntity', 3);--#!
+	VALUES (uuid_generate_v1(), ('F9DC5787-DD4D-42C6-A082-AC7D11956FDA'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Verifier]=>UserEntity', 3) ON CONFLICT DO NOTHING;--#!
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
-	VALUES (uuid_generate_v1(), ('DE3F7527-E3C9-45EF-8574-00CA4495F767'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Transcriber]=>UserEntity', 3);--#!
+	VALUES (uuid_generate_v1(), ('DE3F7527-E3C9-45EF-8574-00CA4495F767'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Transcriber]=>UserEntity', 3) ON CONFLICT DO NOTHING;--#!
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
-	VALUES (uuid_generate_v1(), ('53C694B8-27D8-43DD-95A4-BB318431D17C'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Receiver]=>UserEntity', 3);--#!
+	VALUES (uuid_generate_v1(), ('53C694B8-27D8-43DD-95A4-BB318431D17C'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Receiver]=>UserEntity', 3) ON CONFLICT DO NOTHING;--#!
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
-	VALUES (uuid_generate_v1(), ('353F9255-765E-4336-8007-1D61AB09AAD6'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[ReferredBy]=>UserEntity', 3);--#!
+	VALUES (uuid_generate_v1(), ('353F9255-765E-4336-8007-1D61AB09AAD6'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[ReferredBy]=>UserEntity', 3) ON CONFLICT DO NOTHING;--#!
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
-	VALUES (uuid_generate_v1(), ('79F6136C-1465-45E8-917E-E7832BC8E3B2'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[PrimaryPerformer]=>UserEntity', 3);--#!
+	VALUES (uuid_generate_v1(), ('79F6136C-1465-45E8-917E-E7832BC8E3B2'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[PrimaryPerformer]=>UserEntity', 3) ON CONFLICT DO NOTHING;--#!
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
-	VALUES (uuid_generate_v1(), ('FA5E70A4-A46E-4665-8A20-94D4D7B86FC8'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Performer]=>UserEntity', 3);--#!
+	VALUES (uuid_generate_v1(), ('FA5E70A4-A46E-4665-8A20-94D4D7B86FC8'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Performer]=>UserEntity', 3) ON CONFLICT DO NOTHING;--#!
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
-	VALUES (uuid_generate_v1(), ('0716A333-CD46-439D-BFD6-BF788F3885FA'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[LegalAuthenticator]=>UserEntity', 3);--#!
+	VALUES (uuid_generate_v1(), ('0716A333-CD46-439D-BFD6-BF788F3885FA'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[LegalAuthenticator]=>UserEntity', 3) ON CONFLICT DO NOTHING;--#!
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
-	VALUES (uuid_generate_v1(), ('A0174216-6439-4351-9483-A241A48029B7'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Admitter]=>UserEntity', 3);--#!
+	VALUES (uuid_generate_v1(), ('A0174216-6439-4351-9483-A241A48029B7'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Admitter]=>UserEntity', 3) ON CONFLICT DO NOTHING;--#!
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
-	VALUES (uuid_generate_v1(), ('1B2DBF82-A503-4CF4-9ECB-A8E111B4674E'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Authenticator]=>UserEntity', 3);--#!
+	VALUES (uuid_generate_v1(), ('1B2DBF82-A503-4CF4-9ECB-A8E111B4674E'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Authenticator]=>UserEntity', 3) ON CONFLICT DO NOTHING;--#!
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
-	VALUES (uuid_generate_v1(), ('F0CB3FAF-435D-4704-9217-B884F757BC14'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[AuthorOrOriginator]=>UserEntity', 3);--#!
+	VALUES (uuid_generate_v1(), ('F0CB3FAF-435D-4704-9217-B884F757BC14'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[AuthorOrOriginator]=>UserEntity', 3) ON CONFLICT DO NOTHING;--#!
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
-	VALUES (uuid_generate_v1(), ('28C744DF-D889-4A44-BC1A-2E9E9D64AF13'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Beneficiary]=>UserEntity', 3);--#!
+	VALUES (uuid_generate_v1(), ('28C744DF-D889-4A44-BC1A-2E9E9D64AF13'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Beneficiary]=>UserEntity', 3) ON CONFLICT DO NOTHING;--#!
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
-	VALUES (uuid_generate_v1(), ('A2594E6E-E8FE-4C68-82A5-D3A46DBEC87D'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Discharger]=>UserEntity', 3);--#!
+	VALUES (uuid_generate_v1(), ('A2594E6E-E8FE-4C68-82A5-D3A46DBEC87D'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Discharger]=>UserEntity', 3) ON CONFLICT DO NOTHING;--#!
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
-	VALUES (uuid_generate_v1(), ('39604248-7812-4B60-BC54-8CC1FFFB1DE6'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Informant]=>UserEntity', 3);--#!
-UPDATE ent_vrsn_tbl SET cls_cd_id = '6a2b00ba-501b-4523-b57c-f96d8ae44684' WHERE ent_id IN (SELECT ENT_ID FROM ENT_VRSN_TBL INNER JOIN USR_ENT_TBL USING (ENT_VRSN_ID));--#!
+	VALUES (uuid_generate_v1(), ('39604248-7812-4B60-BC54-8CC1FFFB1DE6'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Informant]=>UserEntity', 3) ON CONFLICT DO NOTHING;--#!
+UPDATE ent_vrsn_tbl SET cls_cd_id = '6a2b00ba-501b-4523-b57c-f96d8ae44684' WHERE ent_id IN (SELECT ENT_ID FROM ENT_VRSN_TBL INNER JOIN USR_ENT_TBL USING (ENT_VRSN_ID)) ON CONFLICT DO NOTHING;--#!
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
-	VALUES (uuid_generate_v1(), 'B43C9513-1C1C-4ED0-92DB-55A904C122E6', '6a2b00ba-501b-4523-b57c-f96d8ae44684', '7c08bd55-4d42-49cd-92f8-6388d6c4183f', 'UserEntity=[Employee]=>Organization', 3);--#!
+	VALUES (uuid_generate_v1(), 'B43C9513-1C1C-4ED0-92DB-55A904C122E6', '6a2b00ba-501b-4523-b57c-f96d8ae44684', '7c08bd55-4d42-49cd-92f8-6388d6c4183f', 'UserEntity=[Employee]=>Organization', 3) ON CONFLICT DO NOTHING;--#!
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
-	VALUES (uuid_generate_v1(), '455F1772-F580-47E8-86BD-B5CE25D351F9', '6a2b00ba-501b-4523-b57c-f96d8ae44684', 'ff34dfa7-c6d3-4f8b-bc9f-14bcdc13ba6c', 'UserEntity=[DedicatedServiceDeliveryLocation]=>ServiceDeliveryLocation', 3);--#!
+	VALUES (uuid_generate_v1(), '455F1772-F580-47E8-86BD-B5CE25D351F9', '6a2b00ba-501b-4523-b57c-f96d8ae44684', 'ff34dfa7-c6d3-4f8b-bc9f-14bcdc13ba6c', 'UserEntity=[DedicatedServiceDeliveryLocation]=>ServiceDeliveryLocation', 3 ON CONFLICT DO NOTHING);--#!
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
-	VALUES (uuid_generate_v1(), '77B7A04B-C065-4FAF-8EC0-2CDAD4AE372B', '1373ff04-a6ef-420a-b1d0-4a07465fe8e8', '6a2b00ba-501b-4523-b57c-f96d8ae44684', 'Device=[AssignedEntity]=>UserEntity', 3);--#!
+	VALUES (uuid_generate_v1(), '77B7A04B-C065-4FAF-8EC0-2CDAD4AE372B', '1373ff04-a6ef-420a-b1d0-4a07465fe8e8', '6a2b00ba-501b-4523-b57c-f96d8ae44684', 'Device=[AssignedEntity]=>UserEntity', 3) ON CONFLICT DO NOTHING;--#!
       ]]>
     </exec>
     <exec invariant="FirebirdSQL">
