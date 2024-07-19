@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<dataset xmlns="http://santedb.org/data" id="Entity Class Codes 3.0">
+<dataset xmlns="http://santedb.org/data" id="Entity Class Codes 3.02">
   <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>6a2b00ba-501b-4523-b57c-f96d8ae44684</id>
@@ -63,6 +63,11 @@ VALUES ((randomblob(16)), x'BA002B6A1B502345B57CF96D8AE44684',x'72175F4580F5E847
 INSERT OR IGNORE  INTO rel_vrfy_systbl (rel_vrfy_id, src_cls_cd_id, rel_typ_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 VALUES ((randomblob(16)), x'BA002B6A1B502345B57CF96D8AE44684',x'13953CB41C1CD04E92DB55A904C122E6',x'55BD087C424DCD4992F86388D6C4183F','UserEntity=[Employee]=>Organization', 1);--#!
 UPDATE ent_vrsn_tbl SET cls_cd_id = x'BA002B6A1B502345B57CF96D8AE44684' WHERE ent_id IN (SELECT ENT_ID FROM ENT_VRSN_TBL INNER JOIN USR_ENT_TBL USING (ENT_VRSN_ID));--#!
+INSERT OR IGNORE INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+	VALUES ((randomblob(16)), x'72175F4580F5E84786BDB5CE25D351F9', x'BA002B6A1B502345B57CF96D8AE44684', x'A7DF34FFD3C68B4FBC9F14BCDC13BA6C', 'UserEntity=[DedicatedServiceDeliveryLocation]=>ServiceDeliveryLocation', 1);--#!
+INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+	VALUES ((randomblob(16)), x'3BDF8067BDAFA3448627CBB3DC2F02F6', x'A7DF34FFD3C68B4FBC9F14BCDC13BA6C', x'24F36FB774B1B740A6ACD1FDF8E23967', 'ServiceDeliveryLocation=[LocatedEntity]=>Container', 1) ON CONFLICT DO NOTHING;--#!
+
       ]]>
     </exec>
     <exec invariant="npgsql">
@@ -107,14 +112,20 @@ INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_
 	VALUES (uuid_generate_v1(), ('A2594E6E-E8FE-4C68-82A5-D3A46DBEC87D'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Discharger]=>UserEntity', 3) ON CONFLICT DO NOTHING;--#!
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES (uuid_generate_v1(), ('39604248-7812-4B60-BC54-8CC1FFFB1DE6'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Informant]=>UserEntity', 3) ON CONFLICT DO NOTHING;--#!
-UPDATE ent_vrsn_tbl SET cls_cd_id = '6a2b00ba-501b-4523-b57c-f96d8ae44684' WHERE ent_id IN (SELECT ENT_ID FROM ENT_VRSN_TBL INNER JOIN USR_ENT_TBL USING (ENT_VRSN_ID)) ON CONFLICT DO NOTHING;--#!
+UPDATE ent_vrsn_tbl SET cls_cd_id = '6a2b00ba-501b-4523-b57c-f96d8ae44684' WHERE ent_id IN (SELECT ENT_ID FROM ENT_VRSN_TBL INNER JOIN USR_ENT_TBL USING (ENT_VRSN_ID));--#!
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
-	VALUES (uuid_generate_v1(), 'B43C9513-1C1C-4ED0-92DB-55A904C122E6', '6a2b00ba-501b-4523-b57c-f96d8ae44684', '7c08bd55-4d42-49cd-92f8-6388d6c4183f', 'UserEntity=[Employee]=>Organization', 3) ON CONFLICT DO NOTHING;--#!
+	VALUES (uuid_generate_v1(), 'B43C9513-1C1C-4ED0-92DB-55A904C122E6', '6a2b00ba-501b-4523-b57c-f96d8ae44684', '7c08bd55-4d42-49cd-92f8-6388d6c4183f', 'UserEntity=[Employee]=>Organization', 1) ON CONFLICT DO NOTHING;--#!
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
-	VALUES (uuid_generate_v1(), '455F1772-F580-47E8-86BD-B5CE25D351F9', '6a2b00ba-501b-4523-b57c-f96d8ae44684', 'ff34dfa7-c6d3-4f8b-bc9f-14bcdc13ba6c', 'UserEntity=[DedicatedServiceDeliveryLocation]=>ServiceDeliveryLocation', 3 ON CONFLICT DO NOTHING);--#!
+	VALUES (uuid_generate_v1(), '455F1772-F580-47E8-86BD-B5CE25D351F9', '6a2b00ba-501b-4523-b57c-f96d8ae44684', 'ff34dfa7-c6d3-4f8b-bc9f-14bcdc13ba6c', 'UserEntity=[DedicatedServiceDeliveryLocation]=>ServiceDeliveryLocation', 1) ON CONFLICT DO NOTHING;--#!
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
-	VALUES (uuid_generate_v1(), '77B7A04B-C065-4FAF-8EC0-2CDAD4AE372B', '1373ff04-a6ef-420a-b1d0-4a07465fe8e8', '6a2b00ba-501b-4523-b57c-f96d8ae44684', 'Device=[AssignedEntity]=>UserEntity', 3) ON CONFLICT DO NOTHING;--#!
-      ]]>
+	VALUES (uuid_generate_v1(), '77B7A04B-C065-4FAF-8EC0-2CDAD4AE372B', '1373ff04-a6ef-420a-b1d0-4a07465fe8e8', '6a2b00ba-501b-4523-b57c-f96d8ae44684', 'Device=[AssignedEntity]=>UserEntity', 1) ON CONFLICT DO NOTHING;--#!
+INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+	VALUES (uuid_generate_v1(), '455F1772-F580-47E8-86BD-B5CE25D351F9', '6a2b00ba-501b-4523-b57c-f96d8ae44684', 'ff34dfa7-c6d3-4f8b-bc9f-14bcdc13ba6c', 'UserEntity=[DedicatedServiceDeliveryLocation]=>ServiceDeliveryLocation', 1) ON CONFLICT DO NOTHING;--#!
+INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+	VALUES (uuid_generate_v1(), '6780df3b-afbd-44a3-8627-cbb3dc2f02f6', 'ff34dfa7-c6d3-4f8b-bc9f-14bcdc13ba6c', 'b76ff324-b174-40b7-a6ac-d1fdf8e23967', 'ServiceDeliveryLocation=[LocatedEntity]=>Container', 1) ON CONFLICT DO NOTHING;--#!
+
+
+]]>
     </exec>
     <exec invariant="FirebirdSQL">
       <![CDATA[	
