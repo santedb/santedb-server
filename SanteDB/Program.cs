@@ -198,7 +198,7 @@ namespace SanteDB
                 {
                     Console.WriteLine("SanteDB (SanteDB) {0} ({1})", entryAsm.GetName().Version, entryAsm.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion);
                     Console.WriteLine("{0}", entryAsm.GetCustomAttribute<AssemblyCopyrightAttribute>().Copyright);
-                    Console.WriteLine("Complete Copyright information available at http://SanteDB.codeplex.com/wikipage?title=Contributions");
+                    Console.WriteLine("Complete Copyright information available at https://github.com/santedb/santedb/blob/master/NOTICE.md");
 
                     // Detect platform
                     if (System.Environment.OSVersion.Platform != PlatformID.Win32NT)
