@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Reference Relationship Types v3.0">
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Reference Relationship Types v3.01">
   <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>0FFAD58D-21B5-4C17-B3F4-9CAA0C570EF3</id>
@@ -185,7 +185,7 @@
   <sql>
     <exec invariant="sqlite">
       <![CDATA[
-      INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc)
+      INSERT OR IGNORE INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc)
 	SELECT
 		x'DF4E5F395D5D50499F5EF827F72E4B32', CD_ID, CD_ID, 'EQUIVALENT'
 	FROM CD_SET_MEM_ASSOC_TBL WHERE SET_ID = x'67A56D4E9400234F855511DA499593AF';
@@ -198,12 +198,19 @@ INSERT OR IGNORE INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_
     </exec>
     <exec invariant="sqlite">
       <![CDATA[
-INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc)
+INSERT OR IGNORE  INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc)
 	SELECT
 		x'A073A54A67D93A49BEA08BAD060E4264', CD_ID, x'A7DF34FFD3C68B4FBC9F14BCDC13BA6C', 'Community Service Location'
 	FROM CD_SET_MEM_ASSOC_TBL WHERE SET_ID = x'53FB023D33116D40A06F7D47A556F3BC';
 ]]>
     </exec>
+    <exec invariant="sqlite">
+      <![CDATA[
+INSERT OR IGNORE INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) 
+  VALUES (x'CDD8B677A0051F4B9E14B895203BF40C',x'BA002B6A1B502345B57CF96D8AE44684',x'A7DF34FFD3C68B4FBC9F14BCDC13BA6C','UserEntity=>[MaintainedEntity]=>ServiceDeliveryLocation');
+      ]]>
+    </exec>
+
     <exec invariant="npgsql">
       <![CDATA[
 INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc)
@@ -226,6 +233,12 @@ INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_de
 	FROM CD_SET_MEM_ASSOC_TBL WHERE SET_ID = '3d02fb53-1133-406d-a06f-7d47a556f3bc'
   ON CONFLICT DO NOTHING;
 ]]>
+    </exec>
+    <exec invariant="npgsql">
+      <![CDATA[
+INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) 
+  VALUES ('77B6D8CD-05A0-4B1F-9E14-B895203BF40C','6a2b00ba-501b-4523-b57c-f96d8ae44684','ff34dfa7-c6d3-4f8b-bc9f-14bcdc13ba6c','UserEntity=>[MaintainedEntity]=>ServiceDeliveryLocation') ON CONFLICT DO NOTHING;
+      ]]>
     </exec>
     
     <exec invariant="FirebirdSQL">
