@@ -15,12 +15,17 @@
     </Concept>
   </update>
   <sql>
-    <exec invariant="sqlite"><![CDATA[
+    <exec invariant="sqlite">
+        <![CDATA[
       -- FOR PROBABLE RELATIONSHIP TYPE
       INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc)
       SELECT
       x'8B06BF2B21918140BF3CAB62C01362EE', CD_ID, CD_ID, 'PROBABLE DUPLICATE / DUPLICATE'
-      FROM CD_SET_MEM_ASSOC_TBL WHERE SET_ID = x'67A56D4E9400234F855511DA499593AF';
+        FROM CD_SET_MEM_ASSOC_TBL 
+        WHERE SET_ID = x'67A56D4E9400234F855511DA499593AF'
+          AND NOT EXISTS(SELECT 1 FROM rel_vrfy_systbl WHERE rel_typ_cd_id = x'8B06BF2B21918140BF3CAB62C01362EE'
+        AND src_cls_cd_id = CD_ID AND trg_cls_cd_id = CD_ID);
+      
 ]]>
     </exec>
     <exec invariant="npgsql">
