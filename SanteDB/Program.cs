@@ -95,7 +95,7 @@ namespace SanteDB
                     {
                         if (File.Exists(itm))
                         {
-                            Console.WriteLine("Loading {0}...", itm);
+                            Console.WriteLine("Loading {0}...", itm); // TODO: Use System.Diagnostics.Tracer
                             Assembly.LoadFile(itm);
                         }
                         else
@@ -104,6 +104,7 @@ namespace SanteDB
                         }
                     }
                 }
+
                 var instanceSuffix = !String.IsNullOrEmpty(parameters.InstanceName) ? $"-{parameters.InstanceName}" : null;
                 var serviceName = $"SanteDB{instanceSuffix}";
                 // What to do?
