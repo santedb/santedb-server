@@ -131,43 +131,43 @@
     <exec invariant="sqlite">
         <![CDATA[
 -- DOCUMENT HAS COMPONENT DOCUMENT SECTION
-INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
+INSERT OR IGNORE INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
 	VALUES((randomblob(16)), (x'0F54B9788B436F4B8D83AAF4979DBC64'), (x'F744697A3789984EAE0D452B1D8124F4'), (x'35A76EE843F2F441BF33AA78EB2E8466'), 'Document=[HasComponent]=>DocumentSection', 2);--#!
 -- DOCUMENT DOCUMENTS ANY ACT
-INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
+INSERT OR IGNORE INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
 	VALUES ((randomblob(16)), (x'34A64B0F0751AB4E965825BE293CD831'), (x'F744697A3789984EAE0D452B1D8124F4'), null, 'Document=[Documents]=>*', 2);--#!
 -- DOCUMENT SECTION DOCUMENTS ANY ACT
-INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
+INSERT OR IGNORE INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
 	VALUES((randomblob(16)), (x'34A64B0F0751AB4E965825BE293CD831'), (x'35A76EE843F2F441BF33AA78EB2E8466'), NULL, 'DocumentSection=[Documents]=>*', 2);--#!
 -- DOCUMENT SECTION IS DERIVED FROM 
-INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
+INSERT OR IGNORE INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
 	VALUES((randomblob(16)), (x'F8A0B6816AB85F499D5D8A4073FDD882'), (x'35A76EE843F2F441BF33AA78EB2E8466'), NULL, 'DocumentSection=[IsDerivedFrom]=>*', 2);--#!
 -- DOCUMENT SECTION IS EXCERPT OF ANY
-INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
+INSERT OR IGNORE INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
 	VALUES((randomblob(16)), (x'05E9C6FF1D160B4C8CDEA04E9E9D0CD5'), (x'35A76EE843F2F441BF33AA78EB2E8466'), NULL, 'DocumentSection=[IsExcerptOf]=>*', 2);--#!
 -- CARE PLAN HAS COMPONENT ANY
-INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
+INSERT OR IGNORE INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
 	VALUES((randomblob(16)), (x'0F54B9788B436F4B8D83AAF4979DBC64'), (x'B932220494A6E0429708F387393A6C80'), null, 'CarePlan=[HasComponent]=>*', 2);--#!
 -- LIST HAS COMPONENT ANY
-INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
+INSERT OR IGNORE INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
 	VALUES((randomblob(16)), (x'0F54B9788B436F4B8D83AAF4979DBC64'), (x'893432B0099A1A41BB55FF283830EA1A'), NULL, 'List=[HasComponent]=>*', 2);--#!
   
   
   -- CONTAINER CAN BE A RECORD TARGET
-INSERT INTO OR IGNORE rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
+INSERT  OR IGNORE INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
 	VALUES((randomblob(16)), (x'EEDB923F5EA64F4398CE841FEEB02E3F'), NULL, x'24F36FB774B1B740A6ACD1FDF8E23967', '*=[RecordTarget]=>Container', 3);--#!
 
    -- SUBSTANCE ADMINISTRATION 
-INSERT OR IGNORE INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
+INSERT  OR IGNORE INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
 	VALUES((randomblob(16)), x'F7C7CAA5B7E3D84D872CDB0E7FCC2D84', x'7E3C2A9377AD0A458A1F030FC2855450', x'86C2FEFAD5890B429085054ACA9D1EEF', 'SubstanceAdministration=[Consumable]=>ManufacturedMaterial', 3);--#!
  -- SUPPLY
-INSERT OR IGNORE INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
+INSERT  OR IGNORE INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
 	VALUES((randomblob(16)), x'F7C7CAA5B7E3D84D872CDB0E7FCC2D84', x'4F9864A0479880448BEADDDF64B3C77C', x'86C2FEFAD5890B429085054ACA9D1EEF', 'Supply=[Consumable]=>ManufacturedMaterial', 3);--#!
  -- ACCM
-INSERT OR IGNORE INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
+INSERT  OR IGNORE INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
 	VALUES((randomblob(16)), x'F7C7CAA5B7E3D84D872CDB0E7FCC2D84', x'69A444CAD78184449189CA1D55AFECBC', x'86C2FEFAD5890B429085054ACA9D1EEF', 'AccountManagement=[Consumable]=>ManufacturedMaterial', 3);--#!
  -- SUPPLY PRODUCT
-INSERT OR IGNORE INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
+INSERT  OR IGNORE INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
 	VALUES((randomblob(16)), x'8872E79909CB5040A8CF385513F32F0A', x'4F9864A0479880448BEADDDF64B3C77C', x'BE7390D38F0F0E44B8C87034CC138A95', 'Supply=[Product]=>Material', 3);--#!
   
       ]]>
