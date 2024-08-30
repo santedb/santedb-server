@@ -67,6 +67,32 @@
   </update>
   <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
+      <id>32fedb45-f6c4-4a49-a527-a74893dbcf4a</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>ActType-OrderDespatch</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Order Despatch</value>
+      </name>
+    </Concept>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>34b3e45f-f6c4-4a49-a527-a74893dbcf4a</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>ActType-OrderReceipt</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Order Receipt</value>
+      </name>
+    </Concept>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
       <id>fed69b32-f6c4-4a49-a527-a74893dbcfff</id>
       <isReadonly>false</isReadonly>
       <mnemonic>ActType-PatientRegistration</mnemonic>

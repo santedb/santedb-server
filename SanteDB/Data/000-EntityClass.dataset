@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<dataset xmlns="http://santedb.org/data" id="Entity Class Codes 3.03">
+<dataset xmlns="http://santedb.org/data" id="Entity Class Codes 3.04">
   <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>6a2b00ba-501b-4523-b57c-f96d8ae44684</id>
@@ -65,10 +65,10 @@ VALUES ((randomblob(16)), x'BA002B6A1B502345B57CF96D8AE44684',x'13953CB41C1CD04E
 UPDATE ent_vrsn_tbl SET cls_cd_id = x'BA002B6A1B502345B57CF96D8AE44684' WHERE ent_id IN (SELECT ENT_ID FROM ENT_VRSN_TBL INNER JOIN USR_ENT_TBL USING (ENT_VRSN_ID));--#!
 INSERT OR IGNORE INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES ((randomblob(16)), x'72175F4580F5E84786BDB5CE25D351F9', x'BA002B6A1B502345B57CF96D8AE44684', x'A7DF34FFD3C68B4FBC9F14BCDC13BA6C', 'UserEntity=[DedicatedServiceDeliveryLocation]=>ServiceDeliveryLocation', 1);--#!
-INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
-	VALUES ((randomblob(16)), x'3BDF8067BDAFA3448627CBB3DC2F02F6', x'A7DF34FFD3C68B4FBC9F14BCDC13BA6C', x'24F36FB774B1B740A6ACD1FDF8E23967', 'ServiceDeliveryLocation=[LocatedEntity]=>Container', 1) ON CONFLICT DO NOTHING;--#!
-INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
-  VALUES (x'4BA0B77765C0AF4F8EC02CDAD4AE372B', x'04FF7313EFA60A42B1D04A07465FE8E8',x'BA002B6A1B502345B57CF96D8AE44684','Device=[AssignedEntity]=>UserEntity', 1) ON CONFLICT DO NOTHING;
+INSERT OR IGNORE INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
+	VALUES ((randomblob(16)), x'3BDF8067BDAFA3448627CBB3DC2F02F6', x'A7DF34FFD3C68B4FBC9F14BCDC13BA6C', x'24F36FB774B1B740A6ACD1FDF8E23967', 'ServiceDeliveryLocation=[LocatedEntity]=>Container', 1);--#!
+INSERT OR IGNORE INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
+  VALUES (x'4BA0B77765C0AF4F8EC02CDAD4AE372B', x'04FF7313EFA60A42B1D04A07465FE8E8',x'BA002B6A1B502345B57CF96D8AE44684','Device=[AssignedEntity]=>UserEntity', 1);
 
       ]]>
     </exec>
