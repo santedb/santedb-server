@@ -98,6 +98,14 @@ namespace SanteDB
                             Console.WriteLine("Loading {0}...", itm); // TODO: Use System.Diagnostics.Tracer
                             Assembly.LoadFile(itm);
                         }
+                        else if (itm.Contains("*"))
+                        {
+                            foreach (var fil in Directory.GetFiles(Path.GetDirectoryName(Path.GetDirectoryName(itm)), Path.GetFileName(itm)))
+                            {
+                                Console.WriteLine("Loading {0}...", fil); // TODO: Use System.Diagnostics.Tracer
+                                Assembly.LoadFile(fil);
+                            }
+                        }
                         else
                         {
                             Console.WriteLine("{0} does not exist", itm);
