@@ -15,8 +15,6 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  *
- * User: fyfej
- * Date: 2023-6-21
  */
 using NUnit.Framework;
 using SanteDB.Core.Model.Constants;
@@ -38,6 +36,36 @@ namespace SanteDB.Messaging.HDSI.Test
     [TestFixture(Category = "REST API")]
     public class HttpQueryExpressionTest
     {
+
+        [Test]
+        public void TestExplicitOrFilterParameter()
+        {
+            // This query semantically should be interpreted as 
+            //  - The community service delivery location for the object name is FOO_BAR
+            //  OR
+            //  - The community service delivery location for the object's parent is FOO_BAR
+            var query = "relationship[CommunityServiceDeliveryLocation].source.name.component.value||relationship[Parent].source.relationship[CommunityServiceDeliveryLocation].source.name.component.value=FOO_BAR";
+            var linq = QueryExpressionParser.BuildLinqExpression<Patient>(query.ParseQueryString());
+            var roundtrip = QueryExpressionBuilder.BuildQuery<Patient>(linq).ToHttpString();
+            Assert.IsTrue(roundtrip.Contains("||"), "Expected OR operator on query");
+            Assert.AreEqual(query, roundtrip);
+        }
+
+
+        [Test]
+        public void TestExplicitOrComplexFilterParameter()
+        {
+            // This query semantically should be interpreted as 
+            //  - The community service delivery location for the object name is FOO_BAR
+            //  OR
+            //  - The community service delivery location for the object's parent is FOO_BAR
+            var query = "relationship[CommunityServiceDeliveryLocation|DedicatedServiceDeliveryLocation].source.name.component.value||relationship[Parent|Child].source.relationship[CommunityServiceDeliveryLocation|DedicatedServiceDeliveryLocation].source.name.component.value=FOO_BAR";
+            var linq = QueryExpressionParser.BuildLinqExpression<Patient>(query.ParseQueryString());
+            var roundtrip = QueryExpressionBuilder.BuildQuery<Patient>(linq).ToHttpString();
+            Assert.IsTrue(roundtrip.Contains("||"), "Expected OR operator on query");
+            Assert.AreEqual(query, roundtrip);
+        }
+
         [Test]
         public void TestComposeComplexGuards()
         {

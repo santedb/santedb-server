@@ -15,8 +15,6 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  *
- * User: fyfej
- * Date: 2023-8-9
  */
 using SanteDB.Core.Model.Serialization;
 using SanteDB.OrmLite.Attributes;
