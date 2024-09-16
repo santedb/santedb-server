@@ -15,9 +15,6 @@
  - WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
  - License for the specific language governing permissions and limitations under
  - the License.
- -
- - User: fyfej
- - Date: 2023-6-21
  -->
 <SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.9.1.23074" xmlns:santempi="http://santedb.org/configuration/santempi" xmlns:santeguard="http://santedb.org/configuration/santeguard" xmlns="http://santedb.org/configuration">
   <sections>
