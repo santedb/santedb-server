@@ -5,7 +5,8 @@ IF [%1] == [] (
 )
 	ECHO WILL PULL SUBMODULES
 	SET cwd = %cd%
-	FOR /D %%G IN (.\*) DO (
+	FOR /D %%G IN (*) DO (
+		git submodule set-branch --branch version/3.0 %%G
 		PUSHD %%G
 		IF EXIST ".git" (
 			ECHO Pulling %1 on %%G

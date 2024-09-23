@@ -1,19 +1,19 @@
 [submodule "santedb-api"]
 	path = santedb-api
 	url = https://github.com/santedb/santedb-api
-	branch = master
+	branch = version/3.0
 [submodule "santedb-model"]
 	path = santedb-model
 	url = https://github.com/santedb/santedb-model
-	branch = master
+	branch = version/3.0
 [submodule "santedb-applets"]
 	path = santedb-applets
 	url = https://github.com/santedb/santedb-applets
-	branch = master
+	branch = version/3.0
 [submodule "santedb-bre-js"]
 	path = santedb-bre-js
 	url = https://github.com/santedb/santedb-bre-js.git
-	branch = master
+	branch = version/3.0
 [submodule "santedb-orm"]
 	path = santedb-orm
 	url = https://github.com/santedb/santedb-orm.git
@@ -21,66 +21,87 @@
 [submodule "santedb-cdss"]
 	path = santedb-cdss
 	url = https://github.com/santedb/santedb-cdss
+	branch = version/3.0
 [submodule "restsrvr"]
 	path = restsrvr
 	url = https://github.com/santedb/restsrvr
+	branch = version/3.0
 [submodule "santedb-restsvc"]
 	path = santedb-restsvc
 	url = https://github.com/santedb/santedb-restsvc
+	branch = version/3.0
 [submodule "santedb-match"]
 	path = santedb-match
 	url = https://github.com/santedb/santedb-match
+	branch = version/3.0
 [submodule "santedb-bis"]
 	path = santedb-bis
 	url = https://github.com/santedb/santedb-bis
+	branch = version/3.0
 [submodule "santedb-mdm"]
 	path = santedb-mdm
 	url = https://github.com/santedb/santedb-mdm.git
+	branch = version/3.0
 [submodule "santedb-hl7"]
 	path = santedb-hl7
 	url = https://github.com/santedb/santedb-hl7
+	branch = version/3.0
 [submodule "santedb-gs1"]
 	path = santedb-gs1
 	url = https://github.com/santedb/santedb-gs1
+	branch = version/3.0
 [submodule "santedb-fhir"]
 	path = santedb-fhir
 	url = https://github.com/santedb/santedb-fhir
+	branch = version/3.0
 [submodule "santedb-openapi"]
 	path = santedb-openapi
 	url = https://github.com/santedb/santedb-openapi
+	branch = version/3.0
 [submodule "santedb-cache-memory"]
 	path = santedb-cache-memory
 	url = https://github.com/santedb/santedb-cache-memory
+	branch = version/3.0
 [submodule "santedb-cache-redis"]
 	path = santedb-cache-redis
 	url = https://github.com/santedb/santedb-cache-redis
+	branch = version/3.0
 [submodule "santedb-docker"]
 	path = santedb-docker
 	url = https://github.com/santedb/santedb-docker
+	branch = version/3.0
 [submodule "santedb-i18n"]
 	path = santedb-i18n
 	url = https://github.com/santedb/santedb-i18n
+	branch = version/3.0
 [submodule "santedb-client"]
 	path = santedb-client
 	url = https://github.com/santedb/santedb-client
+	branch = version/3.0
 [submodule "santedb-msmq"]
 	path = santedb-msmq
 	url = https://github.com/santedb/santedb-msmq.git
+	branch = version/3.0
 [submodule "santedb-rabbitmq"]
 	path = santedb-rabbitmq
 	url = https://github.com/santedb/santedb-rabbitmq.git
+	branch = version/3.0
 [submodule "santedb-data"]
 	path = santedb-data
 	url = https://github.com/santedb/santedb-data
+	branch = version/3.0
 [submodule "santedb-dc-core"]
 	path = santedb-dc-core
 	url = https://github.com/santedb/santedb-dc-core
+	branch = version/3.0
 [submodule "santedb-tools"]
 	path = santedb-tools
 	url = https://github.com/santedb/santedb-tools
+	branch = version/3.0
 [submodule "santedb-certs-bc"]
 	path = santedb-certs-bc
 	url = https://github.com/santedb/santedb-certs-bc.git
 
+	branch = version/3.0
 [submodule "*"]
 	branch = version/3.0
