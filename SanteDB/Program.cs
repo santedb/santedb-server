@@ -98,7 +98,12 @@ namespace SanteDB
                         }
                         else if (itm.Contains("*"))
                         {
-                            foreach (var fil in Directory.GetFiles(Path.GetDirectoryName(Path.GetDirectoryName(itm)), Path.GetFileName(itm)))
+                            var directoryName = Path.GetDirectoryName(itm);
+                            if(!Directory.Exists(directoryName))
+                            {
+                                directoryName = Path.GetDirectoryName(directoryName);
+                            }
+                            foreach (var fil in Directory.GetFiles(directoryName, Path.GetFileName(itm)))
                             {
                                 Console.WriteLine("Loading {0}...", fil); // TODO: Use System.Diagnostics.Tracer
                                 Assembly.LoadFile(fil);
