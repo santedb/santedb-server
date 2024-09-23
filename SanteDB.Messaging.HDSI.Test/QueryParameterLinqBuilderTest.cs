@@ -419,7 +419,7 @@ namespace SanteDB.Messaging.HDSI.Test
             }
             else // mono represent convert with type
             {
-                expected = "o => ((o.DateOfBirth != null) AndAlso (o.DateOfBirth.Value.TestExpressionEx((Invoke(__xinstance => ((((__xinstance.LoadCollection(\"Relationships\", False).Where(guard => ((guard.LoadProperty(\"RelationshipType\", False) ?? new Concept()).Mnemonic == \"Mother\")).FirstOrDefault() ?? new EntityRelationship()).LoadProperty(\"TargetEntity\", False) ?? new Entity()) As Patient) ?? new Patient()).DateOfBirth, Convert(value(SanteDB.Messaging.HDSI.Test.QueryParameterLinqBuilderTest+<>c).<TestExtendedQueryFilterWithParameterVariableComplexPathParse>b__23_0()), Patient) ?? default(DateTime))) > 730.12:00:00))";
+                expected = "o => ((o.DateOfBirth != null) AndAlso (o.DateOfBirth.Value.TestExpressionEx((Invoke(__xinstance => ((((__xinstance.LoadCollection(\"Relationships\", False).Where(guard => ((guard.LoadProperty(\"RelationshipType\", False) ?? new Concept()).Mnemonic == \"Mother\")).FirstOrDefault() ?? new EntityRelationship()).LoadProperty(\"TargetEntity\", False) ?? new Entity()) As Patient) ?? new Patient()).DateOfBirth, Convert(value(SanteDB.Messaging.HDSI.Test.QueryParameterLinqBuilderTest+<>c).<TestExtendedQueryFilterWithParameterVariableComplexPathParse>b__23_0(), Patient)) ?? default(DateTime))) > 730.12:00:00))";
 
             }
             QueryFilterExtensions.AddExtendedFilter(new SimpleQueryExtensionEx());
