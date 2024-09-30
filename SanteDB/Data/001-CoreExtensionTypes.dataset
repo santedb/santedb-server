@@ -16,7 +16,7 @@
  - License for the specific language governing permissions and limitations under 
  - the License.
  -->
-<dataset xmlns="http://santedb.org/data" id="Core Extension Types v3.3">
+<dataset xmlns="http://santedb.org/data" id="Core Extension Types v3.4">
   <update insertIfNotExists="true">
     <ExtensionType xmlns="http://santedb.org/model">
       <id>77B53CBA-C32F-442B-B7A7-ED08184A0FA5</id>
@@ -83,4 +83,12 @@
       <uri>http://santedb.org/extensions/core/targetCondition</uri>
     </ExtensionType>
   </update>
+	<update insertIfNotExists="true">
+		<ExtensionType xmlns="http://santedb.org/model">
+			<id>30471318-D9B7-46DF-9927-61B7438A581D</id>
+			<handlerClass>SanteDB.Core.Extensions.DateExtensionHandler, SanteDB.Core.Model</handlerClass>
+			<name>Birth Time</name>
+			<uri>http://santedb.org/extensions/core/birthTime</uri>
+		</ExtensionType>
+	</update>
 </dataset>
