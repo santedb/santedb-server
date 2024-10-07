@@ -1,5 +1,22 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<dataset xmlns="http://santedb.org/data" id="Core Extension Types v3.3">
+<!--
+ - Copyright 2021-2024 SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ - Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
+ - Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
+ - 
+ - Licensed under the Apache License, Version 2.0 (the "License"); you 
+ - may not use this file except in compliance with the License. You may 
+ - obtain a copy of the License at 
+ - 
+ - http://www.apache.org/licenses/LICENSE-2.0 
+ - 
+ - Unless required by applicable law or agreed to in writing, software
+ - distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ - WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
+ - License for the specific language governing permissions and limitations under 
+ - the License.
+ -->
+<dataset xmlns="http://santedb.org/data" id="Core Extension Types v3.4">
   <update insertIfNotExists="true">
     <ExtensionType xmlns="http://santedb.org/model">
       <id>77B53CBA-C32F-442B-B7A7-ED08184A0FA5</id>
@@ -66,4 +83,12 @@
       <uri>http://santedb.org/extensions/core/targetCondition</uri>
     </ExtensionType>
   </update>
+	<update insertIfNotExists="true">
+		<ExtensionType xmlns="http://santedb.org/model">
+			<id>30471318-D9B7-46DF-9927-61B7438A581D</id>
+			<handlerClass>SanteDB.Core.Extensions.DateExtensionHandler, SanteDB.Core.Model</handlerClass>
+			<name>Birth Time</name>
+			<uri>http://santedb.org/extensions/core/birthTime</uri>
+		</ExtensionType>
+	</update>
 </dataset>

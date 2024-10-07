@@ -1,0 +1,405 @@
+﻿<?xml version="1.0"?>
+<!--
+ - Copyright 2021-2024 SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ - Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
+ - Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
+ - 
+ - Licensed under the Apache License, Version 2.0 (the "License"); you 
+ - may not use this file except in compliance with the License. You may 
+ - obtain a copy of the License at 
+ - 
+ - http://www.apache.org/licenses/LICENSE-2.0 
+ - 
+ - Unless required by applicable law or agreed to in writing, software
+ - distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ - WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
+ - License for the specific language governing permissions and limitations under 
+ - the License.
+ -->
+  <dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Container Concepts v3.01">
+  <update skipIfError="false" insertIfNotExists="true">
+    <CodeSystem xmlns="http://santedb.org/model">
+      <id>98f068a8-0e48-4298-820f-34e00fc50953</id>
+      <name>Container Separator</name>
+      <oid>2.16.840.1.113883.5.27</oid>
+      <authority>ContainerSeparator</authority>
+      <url>http://terminology.hl7.org/ValueSet/v3-ContainerSeparator</url>
+    </CodeSystem>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <CodeSystem xmlns="http://santedb.org/model">
+      <id>5541093d-bcca-4613-88b2-10f96a4765f7</id>
+      <name>Container Cap Type</name>
+      <oid>2.16.840.1.113883.5.26</oid>
+      <authority>ContainerCap</authority>
+      <url>http://terminology.hl7.org/CodeSystem/v3-ContainerCap</url>
+    </CodeSystem>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>fd0e48af-7480-434b-adec-5b99bfae0df1</id>
+      <mnemonic>CHILD</mnemonic>
+      <codeSystem>5541093d-bcca-4613-88b2-10f96a4765f7</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Child Proof</value>
+      </name>
+    </ReferenceTerm>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>e2194629-fad0-4125-8209-1dd55ee95e60</id>
+      <mnemonic>EASY</mnemonic>
+      <codeSystem>5541093d-bcca-4613-88b2-10f96a4765f7</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Easy Open</value>
+      </name>
+    </ReferenceTerm>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>d22aa3a0-03fd-4cdd-a9d2-7aba2a02fc57</id>
+      <mnemonic>FILM</mnemonic>
+      <codeSystem>5541093d-bcca-4613-88b2-10f96a4765f7</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Film</value>
+      </name>
+    </ReferenceTerm>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>41e08834-71eb-43ae-bbb1-a234c1ccfb2e</id>
+      <mnemonic>FOIL</mnemonic>
+      <codeSystem>5541093d-bcca-4613-88b2-10f96a4765f7</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Foil</value>
+      </name>
+    </ReferenceTerm>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>865cd403-79fa-407f-b0eb-f42c16971043</id>
+      <mnemonic>PUSH</mnemonic>
+      <codeSystem>5541093d-bcca-4613-88b2-10f96a4765f7</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Push Cap</value>
+      </name>
+    </ReferenceTerm>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>264fb89d-a7c6-434b-ae7e-63b282e147eb</id>
+      <mnemonic>SCR</mnemonic>
+      <codeSystem>5541093d-bcca-4613-88b2-10f96a4765f7</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Screw Cap</value>
+      </name>
+    </ReferenceTerm>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>b75205ea-ce1e-42c9-b4ad-41a7a0742d59</id>
+      <mnemonic>GEL</mnemonic>
+      <codeSystem>98f068a8-0e48-4298-820f-34e00fc50953</codeSystem>
+      <name>
+        <language>en</language>
+        <value>Gel</value>
+      </name>
+    </ReferenceTerm>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <ReferenceTerm xmlns="http://santedb.org/model">
+      <id>ee6ef894-c716-4fba-b813-fe433c6f8dfc</id>
+      <mnemonic>NONE</mnemonic>
+      <codeSystem>98f068a8-0e48-4298-820f-34e00fc50953</codeSystem>
+      <name>
+        <language>en</language>
+        <value>None</value>
+      </name>
+    </ReferenceTerm>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>f027c70e-9c69-4d71-b45f-2aea67b4b186</id>
+      <sequence xsi:nil="true" />
+      <mnemonic>ContainerSeparator-None</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>None</value>
+      </name>
+    </Concept>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>3965ce94-c0d6-4e07-acc8-5999da4b673f</id>
+      <sequence xsi:nil="true" />
+      <mnemonic>ContainerSeparator-Gel</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Gel</value>
+      </name>
+    </Concept>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <id>9f28d784-3bc8-11ef-ad7d-f36d85a05486</id>
+      <source>3965ce94-c0d6-4e07-acc8-5999da4b673f</source>
+      <term>b75205ea-ce1e-42c9-b4ad-41a7a0742d59</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <id>a83a983a-3bc8-11ef-9ecc-fb05d4541b50</id>
+      <source>f027c70e-9c69-4d71-b45f-2aea67b4b186</source>
+      <term>ee6ef894-c716-4fba-b813-fe433c6f8dfc</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>ee2b76db-85e9-412f-90bb-47a94f8e4c30</id>
+      <sequence xsi:nil="true" />
+      <mnemonic>Foil</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>dc9cbc32-b8ea-4144-bef1-dc618e28f4d7</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Foil Cap</value>
+      </name>
+    </Concept>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>6470a9be-fcb4-463d-bb0c-894d0cddd4c2</id>
+      <sequence xsi:nil="true" />
+      <mnemonic>PushCap</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>dc9cbc32-b8ea-4144-bef1-dc618e28f4d7</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Push Cap</value>
+      </name>
+    </Concept>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>266a20fe-dffb-4c8d-9ead-fdc7cd86c552</id>
+      <sequence xsi:nil="true" />
+      <mnemonic>Film</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>dc9cbc32-b8ea-4144-bef1-dc618e28f4d7</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Film Cover</value>
+      </name>
+    </Concept>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>1e630924-ce10-4a8a-a91d-e319f517a6ec</id>
+      <sequence xsi:nil="true" />
+      <mnemonic>EasyOpen</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>dc9cbc32-b8ea-4144-bef1-dc618e28f4d7</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Easy Open</value>
+      </name>
+    </Concept>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>05695b7c-6bf7-4af7-a0c9-a5c8b2e63e05</id>
+      <sequence xsi:nil="true" />
+      <mnemonic>ScrewCap</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>dc9cbc32-b8ea-4144-bef1-dc618e28f4d7</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Screw/Twist Cap</value>
+      </name>
+    </Concept>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>5a209555-fb3a-437d-b043-0190685a4284</id>
+      <sequence xsi:nil="true" />
+      <mnemonic>ChildProof</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>dc9cbc32-b8ea-4144-bef1-dc618e28f4d7</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Child Proof</value>
+      </name>
+    </Concept>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <id>813d7e8a-3bca-11ef-a458-931de9a0a777</id>
+      <source>266a20fe-dffb-4c8d-9ead-fdc7cd86c552</source>
+      <term>d22aa3a0-03fd-4cdd-a9d2-7aba2a02fc57</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <id>8801a5f2-3bca-11ef-ad7f-373ba9aa903a</id>
+      <source>1e630924-ce10-4a8a-a91d-e319f517a6ec</source>
+      <term>e2194629-fad0-4125-8209-1dd55ee95e60</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <id>8dcdff44-3bca-11ef-ad81-1749a40d4114</id>
+      <source>5a209555-fb3a-437d-b043-0190685a4284</source>
+      <term>fd0e48af-7480-434b-adec-5b99bfae0df1</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <id>783c4014-3bca-11ef-89f6-937590e0bd40</id>
+      <source>6470a9be-fcb4-463d-bb0c-894d0cddd4c2</source>
+      <term>865cd403-79fa-407f-b0eb-f42c16971043</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <id>6ffc5fb0-3bca-11ef-9fc8-eb63d2c488a4</id>
+      <source>05695b7c-6bf7-4af7-a0c9-a5c8b2e63e05</source>
+      <term>264fb89d-a7c6-434b-ae7e-63b282e147eb</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <ConceptReferenceTerm xmlns="http://santedb.org/model">
+      <id>7c8681b6-3bca-11ef-9fca-6388053e9474</id>
+      <source>ee2b76db-85e9-412f-90bb-47a94f8e4c30</source>
+      <term>41e08834-71eb-43ae-bbb1-a234c1ccfb2e</term>
+      <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+    </ConceptReferenceTerm>
+  </update>
+
+  <update skipIfError="false" insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>035e63b7-854c-4ba8-a115-fb74ce4b6c8e</id>
+      <sequence xsi:nil="true" />
+      <mnemonic>ContainerType-Vial</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Vial</value>
+      </name>
+    </Concept>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>03d52794-756a-4f9a-a17e-edd44f36c244</id>
+      <sequence xsi:nil="true" />
+      <mnemonic>ContainerType-Box</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Box / Crate Container</value>
+      </name>
+    </Concept>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>6AE1F173-60FA-4540-B7CF-957775AE5986</id>
+      <sequence xsi:nil="true" />
+      <mnemonic>ContainerType-ColdBoxOrFlask</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Cold Box / Vaccine Flask</value>
+      </name>
+    </Concept>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>9077f00c-0f9a-4030-b1db-f0c3671ad8f4</id>
+      <sequence xsi:nil="true" />
+      <mnemonic>ContainerType-Refrigerator</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Refrigerator</value>
+      </name>
+    </Concept>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>e2800131-c008-4d11-b8b5-e98527cf8c22</id>
+      <sequence xsi:nil="true" />
+      <mnemonic>ContainerType-Freezer</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Freezer</value>
+      </name>
+    </Concept>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>e2a19772-5c11-4af9-aa5c-68206040b72b</id>
+      <sequence xsi:nil="true" />
+      <mnemonic>ContainerType-Pantry</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <name>
+        <language>en</language>
+        <value>Pantry / Stock Room</value>
+      </name>
+    </Concept>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <ConceptSet xmlns="http://santedb.org/model">
+      <id>0c9718b8-3d58-11ef-82a9-b34d8b5cbc54</id>
+      <name>Cold Storage Containers</name>
+      <mnemonic>ContainerTypeColdStore</mnemonic>
+      <oid>1.3.6.1.4.1.33349.3.1.5.9.3.27.1</oid>
+      <url>http://santedb.org/concept-set/container-type-cold</url>
+      <concept>6ae1f173-60fa-4540-b7cf-957775ae5986</concept>
+      <concept>9077f00c-0f9a-4030-b1db-f0c3671ad8f4</concept>
+      <concept>e2800131-c008-4d11-b8b5-e98527cf8c22</concept>
+    </ConceptSet>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <ConceptSet xmlns="http://santedb.org/model">
+      <id>c56e4d50-3bca-11ef-ad82-130da1d10833</id>
+      <name>Container Type</name>
+      <mnemonic>ContainerType</mnemonic>
+      <oid>1.3.6.1.4.1.33349.3.1.5.9.3.27</oid>
+      <url>http://santedb.org/concept-set/container-type</url>
+      <compose>
+        <id>2d919dd6-3d58-11ef-82aa-07898030c7b7</id>
+        <source>c56e4d50-3bca-11ef-ad82-130da1d10833</source>
+        <instruction>include</instruction>
+        <target>0c9718b8-3d58-11ef-82a9-b34d8b5cbc54</target>
+      </compose>
+      <concept>e2a19772-5c11-4af9-aa5c-68206040b72b</concept>
+      <concept>035e63b7-854c-4ba8-a115-fb74ce4b6c8e</concept>
+      <concept>03d52794-756a-4f9a-a17e-edd44f36c244</concept>
+    </ConceptSet>
+  </update>
+
+
+</dataset>

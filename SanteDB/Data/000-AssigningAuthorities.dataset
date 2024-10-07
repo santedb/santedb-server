@@ -1,11 +1,29 @@
 <?xml version="1.0"?>
-<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Core Assigning Authorities v3.0">
+<!--
+ - Copyright 2021-2024 SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ - Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
+ - Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
+ - 
+ - Licensed under the Apache License, Version 2.0 (the "License"); you 
+ - may not use this file except in compliance with the License. You may 
+ - obtain a copy of the License at 
+ - 
+ - http://www.apache.org/licenses/LICENSE-2.0 
+ - 
+ - Unless required by applicable law or agreed to in writing, software
+ - distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ - WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
+ - License for the specific language governing permissions and limitations under 
+ - the License.
+ -->
+   <dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Core Assigning Authorities v3.1">
   <update insertIfNotExists="true">
     <IdentityDomain xmlns="http://santedb.org/model">
       <id>ce5990db-2e2a-467d-a376-2a7b53481e84</id>
       <name>GS1 Global Trade Identification Number (GTIN)</name>
       <domainName>GTIN</domainName>
       <oid>1.3.160</oid>
+		<validation>^\d{12,14}$</validation>
       <scope>d39073be-0f8f-440e-b8c8-7034cc138a95</scope>
       <scope>fafec286-89d5-420b-9085-054aca9d1eef</scope>
     </IdentityDomain>

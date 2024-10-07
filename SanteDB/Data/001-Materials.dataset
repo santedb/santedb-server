@@ -1,5 +1,22 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<dataset xmlns="http://santedb.org/data" id="Core Materials List v3.1">
+<!--
+ - Copyright 2021-2024 SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ - Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
+ - Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
+ - 
+ - Licensed under the Apache License, Version 2.0 (the "License"); you 
+ - may not use this file except in compliance with the License. You may 
+ - obtain a copy of the License at 
+ - 
+ - http://www.apache.org/licenses/LICENSE-2.0 
+ - 
+ - Unless required by applicable law or agreed to in writing, software
+ - distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ - WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
+ - License for the specific language governing permissions and limitations under 
+ - the License.
+ -->
+<dataset xmlns="http://santedb.org/data" id="Core Materials List v3.14">
   <update insertIfNotExists="true">
     <Material xmlns="http://santedb.org/model">
       <id>790be5ca-d07d-46c6-8fa0-9d4f5adf388c</id>
@@ -304,11 +321,15 @@
   <sql>
     <exec invariant="sqlite">
       <![CDATA[
-      -- MATERIAL GENERALIZATION
-INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) 
+-- MATERIAL GENERALIZATION
+INSERT OR IGNORE INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) 
   VALUES (x'9A929FBFEBE75B4EB82ECF44384F0A3B',x'BE7390D38F0F0E44B8C87034CC138A95',x'BE7390D38F0F0E44B8C87034CC138A95','Material=[HasGeneralization]=>Material');
-INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) 
+INSERT OR IGNORE INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) 
   VALUES (x'9A929FBFEBE75B4EB82ECF44384F0A3B',x'86C2FEFAD5890B429085054ACA9D1EEF',x'BE7390D38F0F0E44B8C87034CC138A95','ManufacturedMaterial=[HasGeneralization]=>Material');
+INSERT OR IGNORE INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) 
+  VALUES (x'40A745ACC7B0254484D8B3F8A41FEF9F',x'86C2FEFAD5890B429085054ACA9D1EEF',x'86C2FEFAD5890B429085054ACA9D1EEF','ManufacturedMaterial=[Instance]=>ManufacturedMaterial');    
+INSERT OR IGNORE INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) 
+  VALUES (x'3BDF8067BDAFA3448627CBB3DC2F02F6',x'55BD087C424DCD4992F86388D6C4183F',x'24F36FB774B1B740A6ACD1FDF8E23967','Organization=[ManufacturedProduct]=>Container');
 
      ]]>
     </exec>
@@ -319,6 +340,10 @@ INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_de
   VALUES ('BF9F929A-E7EB-4E5B-B82E-CF44384F0A3B','d39073be-0f8f-440e-b8c8-7034cc138a95','d39073be-0f8f-440e-b8c8-7034cc138a95','Material=[HasGeneralization]=>Material') ON CONFLICT DO NOTHING;
 INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) 
   VALUES ('BF9F929A-E7EB-4E5B-B82E-CF44384F0A3B','fafec286-89d5-420b-9085-054aca9d1eef','d39073be-0f8f-440e-b8c8-7034cc138a95','ManufacturedMaterial=[HasGeneralization]=>Material') ON CONFLICT DO NOTHING;
+INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) 
+  VALUES ('AC45A740-B0C7-4425-84D8-B3F8A41FEF9F','fafec286-89d5-420b-9085-054aca9d1eef','fafec286-89d5-420b-9085-054aca9d1eef','ManufacturedMaterial=[Instance]=>ManufacturedMaterial') ON CONFLICT DO NOTHING;
+INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) 
+  VALUES ('6780df3b-afbd-44a3-8627-cbb3dc2f02f6','7c08bd55-4d42-49cd-92f8-6388d6c4183f','b76ff324-b174-40b7-a6ac-d1fdf8e23967','Organization=[ManufacturedProduct]=>Container') ON CONFLICT DO NOTHING;
       ]]>
     </exec>
     <exec invariant="FirebirdSQL">
@@ -328,6 +353,8 @@ INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_de
   VALUES (char_to_uuid('BF9F929A-E7EB-4E5B-B82E-CF44384F0A3B'),char_to_uuid('d39073be-0f8f-440e-b8c8-7034cc138a95'),char_to_uuid('d39073be-0f8f-440e-b8c8-7034cc138a95'),'Material=[HasGeneralization]=>Material');
 INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) 
   VALUES (char_to_uuid('BF9F929A-E7EB-4E5B-B82E-CF44384F0A3B'),char_to_uuid('fafec286-89d5-420b-9085-054aca9d1eef'),char_to_uuid('d39073be-0f8f-440e-b8c8-7034cc138a95'),'ManufacturedMaterial=[HasGeneralization]=>Material');
+INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) 
+  VALUES (char_to_uuid('AC45A740-B0C7-4425-84D8-B3F8A41FEF9F'),char_to_uuid('fafec286-89d5-420b-9085-054aca9d1eef'),char_to_uuid('fafec286-89d5-420b-9085-054aca9d1eef'),'ManufacturedMaterial=[Instance]=>ManufacturedMaterial') ON CONFLICT DO NOTHING;
       ]]>
     </exec>
   </sql>

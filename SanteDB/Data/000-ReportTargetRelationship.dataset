@@ -16,48 +16,37 @@
  - License for the specific language governing permissions and limitations under 
  - the License.
  -->
-  <dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Scoping Organization Relationships">
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Reporting Target Relationships">
   <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
-      <id>FCD37959-5BC2-48DB-BBB5-36AFD9EDF19A</id>
+      <id>34D144E0-4F3B-4555-8F0B-BEE370D05719</id>
       <isReadonly>false</isReadonly>
-      <mnemonic>Scoper</mnemonic>
+      <mnemonic>ReportTarget</mnemonic>
       <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
       <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
       <conceptSet>EE16A667-2085-440A-B1E7-4032D10B9F40</conceptSet>
       <name>
         <language>en</language>
-        <value>Scoping Entity</value>
+        <value>Reporting Target</value>
       </name>
     </Concept>
   </update>
   <sql>
     <exec invariant="sqlite">
       <![CDATA[
-      -- FOR MASTER RELATIONSHIP TYPE
 INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) 
-	SELECT 
-		x'5979D3FCC25BDB48BBB536AFD9EDF19A', CD_ID, x'55BD087C424DCD4992F86388D6C4183F', 'SCOPING ORGANIZATION'
-	FROM CD_SET_MEM_ASSOC_TBL WHERE SET_ID = x'67A56D4E9400234F855511DA499593AF']]>
+		VALUES (x'E044D1343B4F55458F0BBEE370D05719', null, null, '*=[ReportTarget]=>*');]]>
     </exec>
     <exec invariant="npgsql">
       <![CDATA[
--- FOR MASTER RELATIONSHIP TYPE
 INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) 
-	SELECT 
-		'FCD37959-5BC2-48DB-BBB5-36AFD9EDF19A', CD_ID, '7c08bd55-4d42-49cd-92f8-6388d6c4183f', 'SCOPING ORGANIZATION'
-	FROM CD_SET_MEM_ASSOC_TBL WHERE SET_ID = '4E6DA567-0094-4F23-8555-11DA499593AF'
-  ON CONFLICT DO NOTHING;
+		VALUES ('34D144E0-4F3B-4555-8F0B-BEE370D05719', null, null, '*=[ReportTarget]=>*');
       ]]>
     </exec>
     <exec invariant="FirebirdSQL">
       <![CDATA[
--- FOR MASTER RELATIONSHIP TYPE
 INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) 
-	SELECT 
-		char_to_uuid('FCD37959-5BC2-48DB-BBB5-36AFD9EDF19A'), CD_ID, char_to_uuid('7c08bd55-4d42-49cd-92f8-6388d6c4183f'), 'SCOPING ORGANIZATION'
-	FROM CD_SET_MEM_ASSOC_TBL WHERE SET_ID = char_to_uuid('4e6da567-0094-4f23-8555-11da499593af')
- ;
+		VALUES (char_to_uuid('34D144E0-4F3B-4555-8F0B-BEE370D05719'), null, null, '*=[ReportTarget]=>*');
       ]]>
     </exec>
   </sql>
