@@ -94,7 +94,7 @@
 	</update>
 	<update insertIfNotExists="true">
 		<ExtensionType xmlns="http://santedb.org/model">
-			<id>9407A38-8C34-4067-B3A0-21BEC9B188BF</id>
+			<id>CE6689C1-C48E-40C8-9ECD-3CD7734635DA</id>
 			<handlerClass>SanteDB.Core.Extensions.BooleanExtensionHandler, SanteDB.Core.Model</handlerClass>
 			<name>Birth Details Validated</name>
 			<uri>http://santedb.org/extensions/core/birthValidated</uri>
