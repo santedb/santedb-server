@@ -89,6 +89,25 @@
 			<handlerClass>SanteDB.Core.Extensions.DateExtensionHandler, SanteDB.Core.Model</handlerClass>
 			<name>Birth Time</name>
 			<uri>http://santedb.org/extensions/core/birthTime</uri>
+			<scope>bacd9c6f-3fa9-481e-9636-37457962804d</scope>
+		</ExtensionType>
+	</update>
+	<update insertIfNotExists="true">
+		<ExtensionType xmlns="http://santedb.org/model">
+			<id>9407A38-8C34-4067-B3A0-21BEC9B188BF</id>
+			<handlerClass>SanteDB.Core.Extensions.BooleanExtensionHandler, SanteDB.Core.Model</handlerClass>
+			<name>Birth Details Validated</name>
+			<uri>http://santedb.org/extensions/core/birthValidated</uri>
+			<scope>bacd9c6f-3fa9-481e-9636-37457962804d</scope>
+		</ExtensionType>
+	</update>
+	<update insertIfNotExists="true">
+		<ExtensionType xmlns="http://santedb.org/model">
+			<id>D71A56C3-5E74-4929-9AD3-BA24DE56590A</id>
+			<handlerClass>SanteDB.Core.Extensions.BooleanExtensionHandler, SanteDB.Core.Model</handlerClass>
+			<name>Death Details Validated</name>
+			<uri>http://santedb.org/extensions/core/deathValidated</uri>
+			<scope>bacd9c6f-3fa9-481e-9636-37457962804d</scope>
 		</ExtensionType>
 	</update>
 </dataset>
