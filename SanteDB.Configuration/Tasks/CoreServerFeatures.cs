@@ -59,7 +59,6 @@ namespace SanteDB.Configuration.Tasks
             typeof(RolloverLogManagerService),
             typeof(ExemptablePolicyFilterService),
             typeof(LocalMailMessageService),
-            typeof(LocalStockManagementRepositoryService),
             typeof(PubSubBroker),
             typeof(AppletBiRepository),
             typeof(LocalBiRenderService),
