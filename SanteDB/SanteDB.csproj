@@ -372,7 +372,7 @@
     <None Include="Data\000-AssigningAuthorities.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Data\000-ActType.dataset">
+    <None Include="Data\001-ActType.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </None>
