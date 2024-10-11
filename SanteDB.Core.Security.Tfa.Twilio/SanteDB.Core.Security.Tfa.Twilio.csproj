@@ -34,7 +34,7 @@
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="RestSharp" Version="109.0.1" />
+    <PackageReference Include="RestSharp" Version="112.0.0" />
     <PackageReference Include="Twilio" Version="6.3.0" />
 
   </ItemGroup>
