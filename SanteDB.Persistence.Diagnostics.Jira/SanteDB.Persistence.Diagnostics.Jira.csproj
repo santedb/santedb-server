@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SanteDB.Persistence.Diagnostics.Jira</RootNamespace>
     <AssemblyName>SanteDB.Persistence.Diagnostics.Jira</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -80,7 +80,6 @@
           <Project>{65ef51c6-5cb8-43b8-ae65-4a68f0b44ad2}</Project>
           <Name>SanteDB.Core.Model.AMI</Name>
         </ProjectReference>
-
       </ItemGroup>
     </When>
     <Otherwise>
@@ -91,7 +90,6 @@
       </ItemGroup>
     </Otherwise>
   </Choose>
-
   <ItemGroup>
     <ProjectReference Include="..\SanteDB.Core\SanteDB.Core.csproj">
       <Project>{db9bc05e-45f1-4f96-a161-f36bdecaf566}</Project>
