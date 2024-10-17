@@ -348,14 +348,21 @@ INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_de
     </exec>
     <exec invariant="FirebirdSQL">
       <![CDATA[
--- MATERIAL GENERALIZATION
 INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) 
-  VALUES (char_to_uuid('BF9F929A-E7EB-4E5B-B82E-CF44384F0A3B'),char_to_uuid('d39073be-0f8f-440e-b8c8-7034cc138a95'),char_to_uuid('d39073be-0f8f-440e-b8c8-7034cc138a95'),'Material=[HasGeneralization]=>Material');
-INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) 
-  VALUES (char_to_uuid('BF9F929A-E7EB-4E5B-B82E-CF44384F0A3B'),char_to_uuid('fafec286-89d5-420b-9085-054aca9d1eef'),char_to_uuid('d39073be-0f8f-440e-b8c8-7034cc138a95'),'ManufacturedMaterial=[HasGeneralization]=>Material');
-INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) 
-  VALUES (char_to_uuid('AC45A740-B0C7-4425-84D8-B3F8A41FEF9F'),char_to_uuid('fafec286-89d5-420b-9085-054aca9d1eef'),char_to_uuid('fafec286-89d5-420b-9085-054aca9d1eef'),'ManufacturedMaterial=[Instance]=>ManufacturedMaterial') ON CONFLICT DO NOTHING;
+  VALUES (char_to_uuid('BF9F929A-E7EB-4E5B-B82E-CF44384F0A3B'),char_to_uuid('d39073be-0f8f-440e-b8c8-7034cc138a95'),char_to_uuid('d39073be-0f8f-440e-b8c8-7034cc138a95'),'Material=[HasGeneralization]=>Material')
       ]]>
     </exec>
+	  <exec invariant="FirebirdSQL">
+		  <![CDATA[
+INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) 
+  VALUES (char_to_uuid('BF9F929A-E7EB-4E5B-B82E-CF44384F0A3B'),char_to_uuid('fafec286-89d5-420b-9085-054aca9d1eef'),char_to_uuid('d39073be-0f8f-440e-b8c8-7034cc138a95'),'ManufacturedMaterial=[HasGeneralization]=>Material')
+      ]]>
+	  </exec>
+	  <exec invariant="FirebirdSQL">
+		  <![CDATA[
+INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc) 
+  VALUES (char_to_uuid('AC45A740-B0C7-4425-84D8-B3F8A41FEF9F'),char_to_uuid('fafec286-89d5-420b-9085-054aca9d1eef'),char_to_uuid('fafec286-89d5-420b-9085-054aca9d1eef'),'ManufacturedMaterial=[Instance]=>ManufacturedMaterial')
+      ]]>
+	  </exec>
   </sql>
 </dataset>
