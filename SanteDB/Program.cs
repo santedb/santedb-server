@@ -89,8 +89,14 @@ namespace SanteDB
                 // Are there any third party libraries to load?
                 if (parameters.LoadExtensions?.Count > 0)
                 {
-                    foreach (var itm in parameters.LoadExtensions)
+                    foreach (var ext in parameters.LoadExtensions)
                     {
+                        var itm = ext;
+                        if(!Path.IsPathRooted(itm))
+                        {
+                            itm = Path.Combine(Path.GetDirectoryName(typeof(Program).Assembly.Location), itm);
+                        }
+
                         if (File.Exists(itm))
                         {
                             Console.WriteLine("Loading {0}...", itm); // TODO: Use System.Diagnostics.Tracer

@@ -85,21 +85,7 @@ Source: ..\santedb-tools\bin\Release\SanteDB.Rest.OAuth.dll; DestDir: {app}
 Source: ..\santedb-tools\bin\Release\sdbac.exe; DestDir: {app}
 Source: ..\santedb-tools\bin\Release\sdbac.exe.config; DestDir: {app}
 Source: ..\santedb-tools\bin\Release\SharpCompress.dll; DestDir: {app}
-Source: ..\santedb-tools\bin\Release\System.Buffers.dll; DestDir: {app}
-Source: ..\santedb-tools\bin\Release\System.CodeDom.dll; DestDir: {app}
-Source: ..\santedb-tools\bin\Release\System.Configuration.ConfigurationManager.dll; DestDir: {app}
-Source: ..\santedb-tools\bin\Release\System.Drawing.Common.dll; DestDir: {app}
-Source: ..\santedb-tools\bin\Release\System.IO.Packaging.dll; DestDir: {app}
-Source: ..\santedb-tools\bin\Release\System.Memory.dll; DestDir: {app}
-Source: ..\santedb-tools\bin\Release\System.Numerics.Vectors.dll; DestDir: {app}
-Source: ..\santedb-tools\bin\Release\System.Runtime.CompilerServices.Unsafe.dll; DestDir: {app}
-Source: ..\santedb-tools\bin\Release\System.Security.Permissions.dll; DestDir: {app}
-Source: ..\santedb-tools\bin\Release\System.Security.Principal.Windows.dll; DestDir: {app}
-Source: ..\santedb-tools\bin\Release\System.Text.Encoding.CodePages.dll; DestDir: {app}
-Source: ..\santedb-tools\bin\Release\System.Text.Encodings.Web.dll; DestDir: {app}
-Source: ..\santedb-tools\bin\Release\System.Text.Json.dll; DestDir: {app}
-Source: ..\santedb-tools\bin\Release\System.Threading.Tasks.Extensions.dll; DestDir: {app}
-Source: ..\santedb-tools\bin\Release\System.ValueTuple.dll; DestDir: {app}
+Source: ..\santedb-tools\bin\Release\System.*.dll; DestDir: {app}
 
 
 [Languages]
