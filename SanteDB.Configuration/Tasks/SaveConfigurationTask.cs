@@ -78,7 +78,7 @@ namespace SanteDB.Configuration.Tasks
             {
                 try
                 {
-                    using (var store = new X509Store(StoreName.My, StoreLocation.CurrentUser))
+                    using (var store = new X509Store(StoreName.My, StoreLocation.LocalMachine))
                     {
                         store.Open(OpenFlags.ReadOnly);
                         X509Certificate2Collection collection = new X509Certificate2Collection();
