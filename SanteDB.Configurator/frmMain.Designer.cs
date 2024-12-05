@@ -344,10 +344,10 @@ namespace SanteDB.Configurator
             // 
             // pgConfiguration
             // 
+            this.pgConfiguration.CommandsVisibleIfAvailable = false;
             this.pgConfiguration.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pgConfiguration.Location = new System.Drawing.Point(3, 3);
             this.pgConfiguration.Name = "pgConfiguration";
-            this.pgConfiguration.CommandsVisibleIfAvailable = false;
             this.pgConfiguration.PropertySort = System.Windows.Forms.PropertySort.Categorized;
             this.pgConfiguration.Size = new System.Drawing.Size(761, 189);
             this.pgConfiguration.TabIndex = 1;
@@ -466,7 +466,7 @@ namespace SanteDB.Configurator
             this.tpAdvanced.Padding = new System.Windows.Forms.Padding(3);
             this.tpAdvanced.Size = new System.Drawing.Size(1060, 354);
             this.tpAdvanced.TabIndex = 1;
-            this.tpAdvanced.Text = "Setting Editor";
+            this.tpAdvanced.Text = "Advanced Settings";
             this.tpAdvanced.UseVisualStyleBackColor = true;
             // 
             // spEditor
@@ -512,11 +512,11 @@ namespace SanteDB.Configurator
             // 
             // pbEditor
             // 
+            this.pbEditor.CommandsVisibleIfAvailable = false;
             this.pbEditor.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pbEditor.Location = new System.Drawing.Point(0, 0);
             this.pbEditor.Name = "pbEditor";
             this.pbEditor.PropertySort = System.Windows.Forms.PropertySort.Categorized;
-            this.pbEditor.CommandsVisibleIfAvailable = false;
             this.pbEditor.Size = new System.Drawing.Size(700, 322);
             this.pbEditor.TabIndex = 0;
             this.pbEditor.ToolbarVisible = false;
