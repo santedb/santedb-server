@@ -63,7 +63,11 @@ namespace SanteDB.Configurator
                 lvi.Tag = tsk;
             }
 
-            lsvStatus.Items.OfType<ListViewItem>().FirstOrDefault(o => o.Tag == ConfigurationContext.Current.ConfigurationTasks.First()).ImageIndex = 0; ;
+            var itm = lsvStatus.Items.OfType<ListViewItem>().FirstOrDefault(o => o.Tag == ConfigurationContext.Current.ConfigurationTasks.First());
+            if(itm != null)
+            {
+                itm.ImageIndex = 0;
+            }
             ConfigurationContext.Current.ConfigurationTasks.CollectionChanged += ConfigurationTasks_CollectionChanged;
         }
 

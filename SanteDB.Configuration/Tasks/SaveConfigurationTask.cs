@@ -78,7 +78,7 @@ namespace SanteDB.Configuration.Tasks
             {
                 try
                 {
-                    using (var store = new X509Store(StoreName.My, StoreLocation.CurrentUser))
+                    using (var store = new X509Store(StoreName.My, StoreLocation.LocalMachine))
                     {
                         store.Open(OpenFlags.ReadOnly);
                         X509Certificate2Collection collection = new X509Certificate2Collection();
@@ -91,7 +91,7 @@ namespace SanteDB.Configuration.Tasks
                         }
 
                         configuration.ProtectedSectionKey = new Core.Security.Configuration.X509ConfigurationElement(
-                            StoreLocation.CurrentUser, StoreName.My, X509FindType.FindByThumbprint, X509Certificate2UI.SelectFromCollection(
+                            StoreLocation.LocalMachine, StoreName.My, X509FindType.FindByThumbprint, X509Certificate2UI.SelectFromCollection(
                                 collection,
                                 "Select Certificate",
                                 "Please select the X.509 to protect the configuration file",
