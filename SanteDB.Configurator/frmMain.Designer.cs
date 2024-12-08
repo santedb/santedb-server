@@ -568,6 +568,7 @@ namespace SanteDB.Configurator
             this.btnRestartService.Name = "btnRestartService";
             this.btnRestartService.Size = new System.Drawing.Size(103, 20);
             this.btnRestartService.Text = "Restart Service";
+            this.btnRestartService.Click += new System.EventHandler(this.btnRestartService_Click);
             // 
             // btnOpenConfig
             // 
