@@ -107,7 +107,7 @@ namespace SanteDB.Configuration.Tasks
         /// </summary>
         public bool VerifyState(SanteDBConfiguration configuration)
         {
-            return ServiceTools.ServiceInstaller.ServiceIsInstalled(this.m_configuration.ServiceName);
+            return false; //  return ServiceTools.ServiceInstaller.ServiceIsInstalled(this.m_configuration.ServiceName);
         }
     }
 }
