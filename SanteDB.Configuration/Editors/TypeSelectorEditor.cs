@@ -103,6 +103,13 @@ namespace SanteDB.Configuration.Editors
                                     Tag = new TypeReferenceConfiguration(o)
                                 })
                                 .ToArray());
+                            list.Items.AddRange(listValue.Where(v => !bind.Binding.IsAssignableFrom(v.Type)).Select(o =>
+                                new ListViewItem(new TypeSelectionWrapper(o.Type).ToString())
+                                {
+                                    Checked = true,
+                                    Tag = o
+                                }
+                            ).ToArray());
                         }
                         else
                         {

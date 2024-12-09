@@ -55,7 +55,7 @@ namespace SanteDB.Configurator
             var rstr = new RestartServiceTask();
             if (rstr.VerifyState(me.Configuration))
             {
-                me.ConfigurationTasks.Add(new RestartServiceTask());
+                me.ConfigurationTasks.Add(rstr);
             }
 
             var confirmDlg = new frmTaskList();

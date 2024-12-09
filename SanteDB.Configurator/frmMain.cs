@@ -472,5 +472,18 @@ namespace SanteDB.Configurator
             // Force changed
             this.m_configHash = new byte[0];
         }
+
+        private void btnRestartService_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                var f = new RestartServiceTask();
+                f.Execute(ConfigurationContext.Current.Configuration);
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.ToHumanReadableString());
+            }
+        }
     }
 }

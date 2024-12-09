@@ -16,7 +16,7 @@
  - License for the specific language governing permissions and limitations under 
  - the License.
  -->
-  <dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Login Policies">
+  <dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Login Policies v3.0">
   <update insertIfNotExists="true">
     <SecurityPolicy xmlns="http://santedb.org/model">
       <id>0E3EA1D8-926A-4276-8EDE-85EC3571C482</id>
@@ -26,7 +26,21 @@
       <canOverride>false</canOverride>
     </SecurityPolicy>
   </update>
-  <exec>
+	  <sql>
+		  <exec invariant="npgsql">
+			  <![CDATA[
+			  INSERT INTO SEC_ROL_POL_ASSOC_TBL (ROL_ID, POL_ID, POL_ACT) VALUES ('f6d2ba1d-5bb5-41e3-b7fb-2ec32418b2e1', '0E3EA1D8-926A-4276-8EDE-85EC3571C482', 2) ON CONFLICT DO NOTHING;
+			  ]]>
+		  </exec>
+	  </sql>
+	  <sql>
+		  <exec invariant="sqlite">
+			  <![CDATA[
+			  INSERT OR IGNORE INTO SEC_ROL_POL_ASSOC_TBL (ROL_ID, POL_ID, POL_ACT) VALUES (x'1DBAD2F6B55BE341B7FB2EC32418B2E1', x'D8A13E0E6A9276428EDE85EC3571C482', 2);
+			  ]]>
+		  </exec>
+	  </sql>
+	  <exec>
     <service type="SanteDB.Core.Security.Services.IPolicyDecisionService, SanteDB.Core.Api" method="ClearCache">
       <args>
         <string>SYSTEM</string>
