@@ -40,7 +40,6 @@
   <update insertIfNotExists="true">
     <IdentityDomain xmlns="http://santedb.org/model">
       <id>ff6e7402-8545-48e1-8a70-ebf06f3ee4b8</id>
-      <creationTime>2018-08-15T19:35:40.8915561-04:00</creationTime>
       <name>ISO-3166 Country Identifiers</name>
       <domainName>ISO3166</domainName>
       <oid>1.0.3166.1.2.3</oid>

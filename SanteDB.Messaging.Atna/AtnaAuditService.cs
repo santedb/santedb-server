@@ -146,7 +146,7 @@ namespace SanteDB.Messaging.Atna
                             var refTerm = icpcr.GetConceptReferenceTerm(concept.Key.Value, "DCM");
                             if (refTerm != null)
                             {
-                                ad.EventTypeCode = new AuditCode(refTerm.Mnemonic, "DCM") { DisplayName = refTerm.LoadCollection<ReferenceTermName>("DisplayNames")?.FirstOrDefault()?.Name };
+                                ad.EventTypeCode = new SdbAudit.AuditCode(refTerm.Mnemonic, "DCM") { DisplayName = refTerm.LoadCollection<ReferenceTermName>("DisplayNames")?.FirstOrDefault()?.Name };
                             }
                             else
                             {
