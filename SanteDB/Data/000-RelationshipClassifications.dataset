@@ -1,5 +1,22 @@
 <?xml version="1.0"?>
-<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Relationship Classifications &amp; Roles">
+<!--
+ - Copyright 2021-2024 SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ - Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
+ - Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
+ - 
+ - Licensed under the Apache License, Version 2.0 (the "License"); you 
+ - may not use this file except in compliance with the License. You may 
+ - obtain a copy of the License at 
+ - 
+ - http://www.apache.org/licenses/LICENSE-2.0 
+ - 
+ - Unless required by applicable law or agreed to in writing, software
+ - distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ - WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
+ - License for the specific language governing permissions and limitations under 
+ - the License.
+ -->
+  <dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Relationship Classifications &amp; Roles v3.0">
   <update insertIfNotExists="true">
     <ConceptSet xmlns="http://santedb.org/model">
       <id>F4045AF6-5295-482F-BAB3-C5F2C3738703</id>
@@ -65,5 +82,32 @@
       </name>
     </Concept>
   </update>
-  
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>C0F80D5E-911A-456E-97F4-D341E420181A</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>AutomatedLinkClass</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <conceptSet>F4045AF6-5295-482F-BAB3-C5F2C3738703</conceptSet>
+      <name>
+        <language>en</language>
+        <value>Auto-Generated Link</value>
+      </name>
+    </Concept>
+  </update>
+  <update insertIfNotExists="true">
+    <Concept xmlns="http://santedb.org/model">
+      <id>AEF80D5E-911A-456E-97F4-D341E420181A</id>
+      <isReadonly>false</isReadonly>
+      <mnemonic>ConfirmedRoleLinkClass</mnemonic>
+      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+      <conceptSet>F4045AF6-5295-482F-BAB3-C5F2C3738703</conceptSet>
+      <name>
+        <language>en</language>
+        <value>Confirmed Link</value>
+      </name>
+    </Concept>
+  </update>
 </dataset>

@@ -15,8 +15,6 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  *
- * User: fyfej
- * Date: 2023-6-21
  */
 using AtnaApi.Model;
 using AtnaApi.Transport;
@@ -148,7 +146,7 @@ namespace SanteDB.Messaging.Atna
                             var refTerm = icpcr.GetConceptReferenceTerm(concept.Key.Value, "DCM");
                             if (refTerm != null)
                             {
-                                ad.EventTypeCode = new AuditCode(refTerm.Mnemonic, "DCM") { DisplayName = refTerm.LoadCollection<ReferenceTermName>("DisplayNames")?.FirstOrDefault()?.Name };
+                                ad.EventTypeCode = new SdbAudit.AuditCode(refTerm.Mnemonic, "DCM") { DisplayName = refTerm.LoadCollection<ReferenceTermName>("DisplayNames")?.FirstOrDefault()?.Name };
                             }
                             else
                             {

@@ -15,9 +15,6 @@
  - WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
  - License for the specific language governing permissions and limitations under
  - the License.
- -
- - User: fyfej
- - Date: 2023-6-21
  -->
 <SanteDBConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.9.1.23074" xmlns:santempi="http://santedb.org/configuration/santempi" xmlns:santeguard="http://santedb.org/configuration/santeguard" xmlns="http://santedb.org/configuration">
   <sections>
@@ -97,7 +94,6 @@
       <add type="SanteDB.Matcher.Services.FileMatchConfigurationProvider, SanteDB.Matcher" />
       <add type="SanteDB.Rest.BIS.BisMessageHandler, SanteDB.Rest.BIS" />
       <add type="SanteDB.BI.Services.Impl.InMemoryPivotProvider, SanteDB.BI" />
-      <add type="SanteDB.Persistence.MDM.Services.MdmDataManagementService, SanteDB.Persistence.MDM" />
       <add type="SanteDB.Matcher.Matchers.WeightedRecordMatchingService, SanteDB.Matcher" />
       <add type="SanteDB.Core.Data.Quality.DataQualityService, SanteDB.Core.Api" />
       <add type="SanteDB.Persistence.Auditing.ADO.Services.AdoAuditRepositoryService, SanteDB.Persistence.Auditing.ADO" />

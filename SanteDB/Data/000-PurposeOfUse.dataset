@@ -1,297 +1,319 @@
 <?xml version="1.0"?>
+<!--
+ - Copyright 2021-2024 SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ - Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
+ - Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
+ - 
+ - Licensed under the Apache License, Version 2.0 (the "License"); you 
+ - may not use this file except in compliance with the License. You may 
+ - obtain a copy of the License at 
+ - 
+ - http://www.apache.org/licenses/LICENSE-2.0 
+ - 
+ - Unless required by applicable law or agreed to in writing, software
+ - distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ - WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
+ - License for the specific language governing permissions and limitations under 
+ - the License.
+ -->
 <dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Privacy Purpose of Use Concepts v2">
-  <update insertIfNotExists="true">
-    <CodeSystem xmlns="http://santedb.org/model">
-      <id>05410d0c-9169-11ea-bb37-0242ac130002</id>
-      <name>Purpose of Use</name>
-      <description>Describes the purposes of use for clinical information (HL7v3)</description>
-      <oid>2.16.840.1.113883.1.11.20448</oid>
-      <authority>PurposeOfUse</authority>
-      <url>http://terminology.hl7.org/ValueSet/v3-GeneralPurposeOfUse</url>
-    </CodeSystem>
-  </update>
-  <update insertIfNotExists="true">
-    <ConceptSet xmlns="http://santedb.org/model">
-      <id>c5089f3c-916a-11ea-bb37-0242ac130002</id>
-      <name>Purposes of Use</name>
-      <mnemonic>PurposeOfUse</mnemonic>
-      <oid>1.3.6.1.4.1.33349.3.1.5.9.3.69</oid>
-      <url>http://santedb.org/conceptset/PurposeOfUse</url>
-    </ConceptSet>
-  </update>
-  <update insertIfNotExists="true">
-    <ReferenceTerm xmlns="http://santedb.org/model">
-      <id>6af98034-9169-11ea-bb37-0242ac130002</id>
-      <mnemonic>COVERAGE</mnemonic>
-      <codeSystem>05410d0c-9169-11ea-bb37-0242ac130002</codeSystem>
-      <name>
-        <language>en</language>
-        <value>Coverage under policy</value>
-      </name>
-    </ReferenceTerm>
-  </update>
-  <update insertIfNotExists="true">
-    <Concept xmlns="http://santedb.org/model">
-      <id>6af98142-9169-11ea-bb37-0242ac130002</id>
-      <isReadonly>false</isReadonly>
-      <mnemonic>PurposeOfUse-Coverage</mnemonic>
-      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
-      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
-      <referenceTerm>
-        <term>6af98034-9169-11ea-bb37-0242ac130002</term>
-        <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
-      </referenceTerm>
-      <conceptSet>c5089f3c-916a-11ea-bb37-0242ac130002</conceptSet>
-      <name>
-        <language>en</language>
-        <value>Coverage under policy</value>
-      </name>
-    </Concept>
-  </update>
-  <update insertIfNotExists="true">
-    <ReferenceTerm xmlns="http://santedb.org/model">
-      <id>6af9821e-9169-11ea-bb37-0242ac130002</id>
-      <mnemonic>ETREAT</mnemonic>
-      <codeSystem>05410d0c-9169-11ea-bb37-0242ac130002</codeSystem>
-      <name>
-        <language>en</language>
-        <value>Emergency Treatment</value>
-      </name>
-    </ReferenceTerm>
-  </update>
-  <update insertIfNotExists="true">
-    <Concept xmlns="http://santedb.org/model">
-      <id>6af982f0-9169-11ea-bb37-0242ac130002</id>
-      <isReadonly>false</isReadonly>
-      <mnemonic>PurposeOfUse-EmergencyTreatment</mnemonic>
-      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
-      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
-      <conceptSet>c5089f3c-916a-11ea-bb37-0242ac130002</conceptSet>
-      <referenceTerm>
-        <term>6af9821e-9169-11ea-bb37-0242ac130002</term>
-        <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
-      </referenceTerm>
-      <name>
-        <language>en</language>
-        <value>Emergency Treatment</value>
-      </name>
-    </Concept>
-  </update>
-  <update insertIfNotExists="true">
-    <ReferenceTerm xmlns="http://santedb.org/model">
-      <id>6af983cc-9169-11ea-bb37-0242ac130002</id>
-      <mnemonic>HMARKT</mnemonic>
-      <codeSystem>05410d0c-9169-11ea-bb37-0242ac130002</codeSystem>
-      <name>
-        <language>en</language>
-        <value>Healthcare Marketing</value>
-      </name>
-    </ReferenceTerm>
-  </update>
-  <update insertIfNotExists="true">
-    <Concept xmlns="http://santedb.org/model">
-      <id>6af98494-9169-11ea-bb37-0242ac130002</id>
-      <isReadonly>false</isReadonly>
-      <mnemonic>PurposeOfUse-Marketing</mnemonic>
-      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
-      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
-      <conceptSet>c5089f3c-916a-11ea-bb37-0242ac130002</conceptSet>
-      <referenceTerm>
-        <term>6af983cc-9169-11ea-bb37-0242ac130002</term>
-        <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
-      </referenceTerm>
-      <name>
-        <language>en</language>
-        <value>Marketing</value>
-      </name>
-    </Concept>
-  </update>
-  <update insertIfNotExists="true">
-    <ReferenceTerm xmlns="http://santedb.org/model">
-      <id>6af988fd-9169-11ea-bb37-0242ac130002</id>
-      <mnemonic>HOPERAT</mnemonic>
-      <codeSystem>05410d0c-9169-11ea-bb37-0242ac130002</codeSystem>
-      <name>
-        <language>en</language>
-        <value>Healthcare Operations</value>
-      </name>
-    </ReferenceTerm>
-  </update>
-  <update insertIfNotExists="true">
-    <Concept xmlns="http://santedb.org/model">
-      <id>6af988fe-9169-11ea-bb37-0242ac130002</id>
-      <isReadonly>false</isReadonly>
-      <mnemonic>PurposeOfUse-Operations</mnemonic>
-      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
-      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
-      <conceptSet>c5089f3c-916a-11ea-bb37-0242ac130002</conceptSet>
-      <referenceTerm>
-        <term>6af988fd-9169-11ea-bb37-0242ac130002</term>
-        <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
-      </referenceTerm>
-      <name>
-        <language>en</language>
-        <value>Operations</value>
-      </name>
-    </Concept>
-  </update>
-  <update insertIfNotExists="true">
-    <ReferenceTerm xmlns="http://santedb.org/model">
-      <id>6af989d0-9169-11ea-bb37-0242ac130002</id>
-      <mnemonic>HPAYMT</mnemonic>
-      <codeSystem>05410d0c-9169-11ea-bb37-0242ac130002</codeSystem>
-      <name>
-        <language>en</language>
-        <value>Healthcare Payment</value>
-      </name>
-    </ReferenceTerm>
-  </update>
-  <update insertIfNotExists="true">
-    <Concept xmlns="http://santedb.org/model">
-      <id>8b18bd66-916a-11ea-bb37-0242ac130002</id>
-      <isReadonly>false</isReadonly>
-      <mnemonic>PurposeOfUse-Payment</mnemonic>
-      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
-      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
-      <conceptSet>c5089f3c-916a-11ea-bb37-0242ac130002</conceptSet>
-      <referenceTerm>
-        <term>6af989d0-9169-11ea-bb37-0242ac130002</term>
-        <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
-      </referenceTerm>
-      <name>
-        <language>en</language>
-        <value>Payment</value>
-      </name>
-    </Concept>
-  </update>
-  <update insertIfNotExists="true">
-    <ReferenceTerm xmlns="http://santedb.org/model">
-      <id>8b18c02c-916a-11ea-bb37-0242ac130002</id>
-      <mnemonic>HRESCH</mnemonic>
-      <codeSystem>05410d0c-9169-11ea-bb37-0242ac130002</codeSystem>
-      <name>
-        <language>en</language>
-        <value>Healthcare Research</value>
-      </name>
-    </ReferenceTerm>
-  </update>
-  <update insertIfNotExists="true">
-    <Concept xmlns="http://santedb.org/model">
-      <id>8b18c126-916a-11ea-bb37-0242ac130002</id>
-      <isReadonly>false</isReadonly>
-      <mnemonic>PurposeOfUse-Research</mnemonic>
-      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
-      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
-      <conceptSet>c5089f3c-916a-11ea-bb37-0242ac130002</conceptSet>
-      <referenceTerm>
-        <term>8b18c02c-916a-11ea-bb37-0242ac130002</term>
-        <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
-      </referenceTerm>
-      <name>
-        <language>en</language>
-        <value>Reasearch</value>
-      </name>
-    </Concept>
-  </update>
-  <update insertIfNotExists="true">
-    <ReferenceTerm xmlns="http://santedb.org/model">
-      <id>8b18c1ee-916a-11ea-bb37-0242ac130002</id>
-      <mnemonic>PATRQT</mnemonic>
-      <codeSystem>05410d0c-9169-11ea-bb37-0242ac130002</codeSystem>
-      <name>
-        <language>en</language>
-        <value>Patient Requested</value>
-      </name>
-    </ReferenceTerm>
-  </update>
-  <update insertIfNotExists="true">
-    <Concept xmlns="http://santedb.org/model">
-      <id>8b18c2b6-916a-11ea-bb37-0242ac130002</id>
-      <isReadonly>false</isReadonly>
-      <mnemonic>PurposeOfUse-PatientRequest</mnemonic>
-      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
-      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
-      <conceptSet>c5089f3c-916a-11ea-bb37-0242ac130002</conceptSet>
-      <referenceTerm>
-        <term>8b18c1ee-916a-11ea-bb37-0242ac130002</term>
-        <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
-      </referenceTerm>
-      <name>
-        <language>en</language>
-        <value>Patient Request</value>
-      </name>
-    </Concept>
-  </update>
-  <update insertIfNotExists="true">
-    <ReferenceTerm xmlns="http://santedb.org/model">
-      <id>8b18c586-916a-11ea-bb37-0242ac130002</id>
-      <mnemonic>PUBHLTH</mnemonic>
-      <codeSystem>05410d0c-9169-11ea-bb37-0242ac130002</codeSystem>
-      <name>
-        <language>en</language>
-        <value>Public Health</value>
-      </name>
-    </ReferenceTerm>
-  </update>
-  <update insertIfNotExists="true">
-    <Concept xmlns="http://santedb.org/model">
-      <id>8b18c694-916a-11ea-bb37-0242ac130002</id>
-      <isReadonly>false</isReadonly>
-      <mnemonic>PurposeOfUse-PublicHealth</mnemonic>
-      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
-      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
-      <conceptSet>c5089f3c-916a-11ea-bb37-0242ac130002</conceptSet>
-      <referenceTerm>
-        <term>8b18c586-916a-11ea-bb37-0242ac130002</term>
-        <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
-      </referenceTerm>
-      <name>
-        <language>en</language>
-        <value>Public Health</value>
-      </name>
-    </Concept>
-  </update>
-  <update insertIfNotExists="true">
-    <ReferenceTerm xmlns="http://santedb.org/model">
-      <id>8b18c75c-916a-11ea-bb37-0242ac130002</id>
-      <mnemonic>TREAT</mnemonic>
-      <codeSystem>05410d0c-9169-11ea-bb37-0242ac130002</codeSystem>
-      <name>
-        <language>en</language>
-        <value>Treatment</value>
-      </name>
-    </ReferenceTerm>
-  </update>
-  <update insertIfNotExists="true">
-    <Concept xmlns="http://santedb.org/model">
-      <id>8b18c81a-916a-11ea-bb37-0242ac130002</id>
-      <isReadonly>false</isReadonly>
-      <mnemonic>PurposeOfUse-Treatment</mnemonic>
-      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
-      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
-      <conceptSet>c5089f3c-916a-11ea-bb37-0242ac130002</conceptSet>
-      <referenceTerm>
-        <term>8b18c75c-916a-11ea-bb37-0242ac130002</term>
-        <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
-      </referenceTerm>
-      <name>
-        <language>en</language>
-        <value>Treatment</value>
-      </name>
-    </Concept>
-  </update>
-  <update insertIfNotExists="true">
-    <Concept xmlns="http://santedb.org/model">
-      <id>8b18c8ce-916a-11ea-bb37-0242ac130002</id>
-      <isReadonly>false</isReadonly>
-      <mnemonic>PurposeOfUse-SecurityAdmin</mnemonic>
-      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
-      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
-      <conceptSet>c5089f3c-916a-11ea-bb37-0242ac130002</conceptSet>
-      <name>
-        <language>en</language>
-        <value>Security Administration</value>
-      </name>
-    </Concept>
-  </update>
+	<update insertIfNotExists="true">
+		<CodeSystem xmlns="http://santedb.org/model">
+			<id>05410d0c-9169-11ea-bb37-0242ac130002</id>
+			<name>Purpose of Use</name>
+			<description>Describes the purposes of use for clinical information (HL7v3)</description>
+			<oid>2.16.840.1.113883.1.11.20448</oid>
+			<authority>PurposeOfUse</authority>
+			<url>http://terminology.hl7.org/ValueSet/v3-GeneralPurposeOfUse</url>
+		</CodeSystem>
+	</update>
+	<update insertIfNotExists="true">
+		<ConceptSet xmlns="http://santedb.org/model">
+			<id>c5089f3c-916a-11ea-bb37-0242ac130002</id>
+			<name>Purposes of Use</name>
+			<mnemonic>PurposeOfUse</mnemonic>
+			<oid>1.3.6.1.4.1.33349.3.1.5.9.3.69</oid>
+			<url>http://santedb.org/conceptset/PurposeOfUse</url>
+		</ConceptSet>
+	</update>
+	<update insertIfNotExists="true">
+		<ReferenceTerm xmlns="http://santedb.org/model">
+			<id>6af98034-9169-11ea-bb37-0242ac130002</id>
+			<mnemonic>COVERAGE</mnemonic>
+			<codeSystem>05410d0c-9169-11ea-bb37-0242ac130002</codeSystem>
+			<name>
+				<language>en</language>
+				<value>Coverage under policy</value>
+			</name>
+		</ReferenceTerm>
+	</update>
+	<update insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>6af98142-9169-11ea-bb37-0242ac130002</id>
+			<isReadonly>false</isReadonly>
+			<mnemonic>PurposeOfUse-Coverage</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<referenceTerm>
+				<term>6af98034-9169-11ea-bb37-0242ac130002</term>
+				<relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+			</referenceTerm>
+			<conceptSet>c5089f3c-916a-11ea-bb37-0242ac130002</conceptSet>
+			<name>
+				<language>en</language>
+				<value>Coverage under policy</value>
+			</name>
+		</Concept>
+	</update>
+	<update insertIfNotExists="true">
+		<ReferenceTerm xmlns="http://santedb.org/model">
+			<id>6af9821e-9169-11ea-bb37-0242ac130002</id>
+			<mnemonic>ETREAT</mnemonic>
+			<codeSystem>05410d0c-9169-11ea-bb37-0242ac130002</codeSystem>
+			<name>
+				<language>en</language>
+				<value>Emergency Treatment</value>
+			</name>
+		</ReferenceTerm>
+	</update>
+	<update insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>6af982f0-9169-11ea-bb37-0242ac130002</id>
+			<isReadonly>false</isReadonly>
+			<mnemonic>PurposeOfUse-EmergencyTreatment</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<conceptSet>c5089f3c-916a-11ea-bb37-0242ac130002</conceptSet>
+			<referenceTerm>
+				<term>6af9821e-9169-11ea-bb37-0242ac130002</term>
+				<relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+			</referenceTerm>
+			<name>
+				<language>en</language>
+				<value>Emergency Treatment</value>
+			</name>
+		</Concept>
+	</update>
+	<update insertIfNotExists="true">
+		<ReferenceTerm xmlns="http://santedb.org/model">
+			<id>6af983cc-9169-11ea-bb37-0242ac130002</id>
+			<mnemonic>HMARKT</mnemonic>
+			<codeSystem>05410d0c-9169-11ea-bb37-0242ac130002</codeSystem>
+			<name>
+				<language>en</language>
+				<value>Healthcare Marketing</value>
+			</name>
+		</ReferenceTerm>
+	</update>
+	<update insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>6af98494-9169-11ea-bb37-0242ac130002</id>
+			<isReadonly>false</isReadonly>
+			<mnemonic>PurposeOfUse-Marketing</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<conceptSet>c5089f3c-916a-11ea-bb37-0242ac130002</conceptSet>
+			<referenceTerm>
+				<term>6af983cc-9169-11ea-bb37-0242ac130002</term>
+				<relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+			</referenceTerm>
+			<name>
+				<language>en</language>
+				<value>Marketing</value>
+			</name>
+		</Concept>
+	</update>
+	<obsolete>
+		<ReferenceTerm xmlns="http://santedb.org/model">
+			<id>6af98494-9169-11ea-bb37-0242ac130002</id>
+		</ReferenceTerm>
+	</obsolete>
+	<update insertIfNotExists="true">
+		<ReferenceTerm xmlns="http://santedb.org/model">
+			<id>6af988fd-9169-11ea-bb37-0242ac130002</id>
+			<mnemonic>HOPERAT</mnemonic>
+			<codeSystem>05410d0c-9169-11ea-bb37-0242ac130002</codeSystem>
+			<name>
+				<language>en</language>
+				<value>Healthcare Operations</value>
+			</name>
+		</ReferenceTerm>
+	</update>
+	<update insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>6af988fe-9169-11ea-bb37-0242ac130002</id>
+			<isReadonly>false</isReadonly>
+			<mnemonic>PurposeOfUse-Operations</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<conceptSet>c5089f3c-916a-11ea-bb37-0242ac130002</conceptSet>
+			<referenceTerm>
+				<term>6af988fd-9169-11ea-bb37-0242ac130002</term>
+				<relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+			</referenceTerm>
+			<name>
+				<language>en</language>
+				<value>Operations</value>
+			</name>
+		</Concept>
+	</update>
+	<update insertIfNotExists="true">
+		<ReferenceTerm xmlns="http://santedb.org/model">
+			<id>6af989d0-9169-11ea-bb37-0242ac130002</id>
+			<mnemonic>HPAYMT</mnemonic>
+			<codeSystem>05410d0c-9169-11ea-bb37-0242ac130002</codeSystem>
+			<name>
+				<language>en</language>
+				<value>Healthcare Payment</value>
+			</name>
+		</ReferenceTerm>
+	</update>
+	<update insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>8b18bd66-916a-11ea-bb37-0242ac130002</id>
+			<isReadonly>false</isReadonly>
+			<mnemonic>PurposeOfUse-Payment</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<conceptSet>c5089f3c-916a-11ea-bb37-0242ac130002</conceptSet>
+			<referenceTerm>
+				<term>6af989d0-9169-11ea-bb37-0242ac130002</term>
+				<relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+			</referenceTerm>
+			<name>
+				<language>en</language>
+				<value>Payment</value>
+			</name>
+		</Concept>
+	</update>
+	<update insertIfNotExists="true">
+		<ReferenceTerm xmlns="http://santedb.org/model">
+			<id>8b18c02c-916a-11ea-bb37-0242ac130002</id>
+			<mnemonic>HRESCH</mnemonic>
+			<codeSystem>05410d0c-9169-11ea-bb37-0242ac130002</codeSystem>
+			<name>
+				<language>en</language>
+				<value>Healthcare Research</value>
+			</name>
+		</ReferenceTerm>
+	</update>
+	<update insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>8b18c126-916a-11ea-bb37-0242ac130002</id>
+			<isReadonly>false</isReadonly>
+			<mnemonic>PurposeOfUse-Research</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<conceptSet>c5089f3c-916a-11ea-bb37-0242ac130002</conceptSet>
+			<referenceTerm>
+				<term>8b18c02c-916a-11ea-bb37-0242ac130002</term>
+				<relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+			</referenceTerm>
+			<name>
+				<language>en</language>
+				<value>Reasearch</value>
+			</name>
+		</Concept>
+	</update>
+	<update insertIfNotExists="true">
+		<ReferenceTerm xmlns="http://santedb.org/model">
+			<id>8b18c1ee-916a-11ea-bb37-0242ac130002</id>
+			<mnemonic>PATRQT</mnemonic>
+			<codeSystem>05410d0c-9169-11ea-bb37-0242ac130002</codeSystem>
+			<name>
+				<language>en</language>
+				<value>Patient Requested</value>
+			</name>
+		</ReferenceTerm>
+	</update>
+	<update insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>8b18c2b6-916a-11ea-bb37-0242ac130002</id>
+			<isReadonly>false</isReadonly>
+			<mnemonic>PurposeOfUse-PatientRequest</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<conceptSet>c5089f3c-916a-11ea-bb37-0242ac130002</conceptSet>
+			<referenceTerm>
+				<term>8b18c1ee-916a-11ea-bb37-0242ac130002</term>
+				<relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+			</referenceTerm>
+			<name>
+				<language>en</language>
+				<value>Patient Request</value>
+			</name>
+		</Concept>
+	</update>
+	<update insertIfNotExists="true">
+		<ReferenceTerm xmlns="http://santedb.org/model">
+			<id>8b18c586-916a-11ea-bb37-0242ac130002</id>
+			<mnemonic>PUBHLTH</mnemonic>
+			<codeSystem>05410d0c-9169-11ea-bb37-0242ac130002</codeSystem>
+			<name>
+				<language>en</language>
+				<value>Public Health</value>
+			</name>
+		</ReferenceTerm>
+	</update>
+	<update insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>8b18c694-916a-11ea-bb37-0242ac130002</id>
+			<isReadonly>false</isReadonly>
+			<mnemonic>PurposeOfUse-PublicHealth</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<conceptSet>c5089f3c-916a-11ea-bb37-0242ac130002</conceptSet>
+			<referenceTerm>
+				<term>8b18c586-916a-11ea-bb37-0242ac130002</term>
+				<relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+			</referenceTerm>
+			<name>
+				<language>en</language>
+				<value>Public Health</value>
+			</name>
+		</Concept>
+	</update>
+	<update insertIfNotExists="true">
+		<ReferenceTerm xmlns="http://santedb.org/model">
+			<id>8b18c75c-916a-11ea-bb37-0242ac130002</id>
+			<mnemonic>TREAT</mnemonic>
+			<codeSystem>05410d0c-9169-11ea-bb37-0242ac130002</codeSystem>
+			<name>
+				<language>en</language>
+				<value>Treatment</value>
+			</name>
+		</ReferenceTerm>
+	</update>
+	<update insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>8b18c81a-916a-11ea-bb37-0242ac130002</id>
+			<isReadonly>false</isReadonly>
+			<mnemonic>PurposeOfUse-Treatment</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<conceptSet>c5089f3c-916a-11ea-bb37-0242ac130002</conceptSet>
+			<referenceTerm>
+				<term>8b18c75c-916a-11ea-bb37-0242ac130002</term>
+				<relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+			</referenceTerm>
+			<name>
+				<language>en</language>
+				<value>Treatment</value>
+			</name>
+		</Concept>
+	</update>
+	<update insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>8b18c8ce-916a-11ea-bb37-0242ac130002</id>
+			<isReadonly>false</isReadonly>
+			<mnemonic>PurposeOfUse-SecurityAdmin</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<conceptSet>c5089f3c-916a-11ea-bb37-0242ac130002</conceptSet>
+			<name>
+				<language>en</language>
+				<value>Security Administration</value>
+			</name>
+		</Concept>
+	</update>
 </dataset>

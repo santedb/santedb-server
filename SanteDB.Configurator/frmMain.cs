@@ -15,8 +15,6 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  *
- * User: fyfej
- * Date: 2023-6-21
  */
 using SanteDB.Configuration;
 using SanteDB.Configuration.Controls;
@@ -473,6 +471,19 @@ namespace SanteDB.Configurator
         {
             // Force changed
             this.m_configHash = new byte[0];
+        }
+
+        private void btnRestartService_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                var f = new RestartServiceTask();
+                f.Execute(ConfigurationContext.Current.Configuration);
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.ToHumanReadableString());
+            }
         }
     }
 }

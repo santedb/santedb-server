@@ -15,8 +15,6 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  *
- * User: fyfej
- * Date: 2023-6-21
  */
 using MohawkCollege.Util.Console.Parameters;
 using Mono.Unix;
@@ -87,6 +85,42 @@ namespace SanteDB
             try
             {
                 var parameters = parser.Parse(args);
+
+                // Are there any third party libraries to load?
+                if (parameters.LoadExtensions?.Count > 0)
+                {
+                    foreach (var ext in parameters.LoadExtensions)
+                    {
+                        var itm = ext;
+                        if(!Path.IsPathRooted(itm))
+                        {
+                            itm = Path.Combine(Path.GetDirectoryName(typeof(Program).Assembly.Location), itm);
+                        }
+
+                        if (File.Exists(itm))
+                        {
+                            Console.WriteLine("Loading {0}...", itm); // TODO: Use System.Diagnostics.Tracer
+                            Assembly.LoadFile(itm);
+                        }
+                        else if (itm.Contains("*"))
+                        {
+                            var directoryName = Path.GetDirectoryName(itm);
+                            if(!Directory.Exists(directoryName))
+                            {
+                                directoryName = Path.GetDirectoryName(directoryName);
+                            }
+                            foreach (var fil in Directory.GetFiles(directoryName, Path.GetFileName(itm)))
+                            {
+                                Console.WriteLine("Loading {0}...", fil); // TODO: Use System.Diagnostics.Tracer
+                                Assembly.LoadFile(fil);
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("{0} does not exist", itm);
+                        }
+                    }
+                }
 
                 var instanceSuffix = !String.IsNullOrEmpty(parameters.InstanceName) ? $"-{parameters.InstanceName}" : null;
                 var serviceName = $"SanteDB{instanceSuffix}";
@@ -182,7 +216,7 @@ namespace SanteDB
                 {
                     Console.WriteLine("SanteDB (SanteDB) {0} ({1})", entryAsm.GetName().Version, entryAsm.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion);
                     Console.WriteLine("{0}", entryAsm.GetCustomAttribute<AssemblyCopyrightAttribute>().Copyright);
-                    Console.WriteLine("Complete Copyright information available at http://SanteDB.codeplex.com/wikipage?title=Contributions");
+                    Console.WriteLine("Complete Copyright information available at https://github.com/santedb/santedb/blob/master/NOTICE.md");
 
                     // Detect platform
                     if (System.Environment.OSVersion.Platform != PlatformID.Win32NT)

@@ -15,8 +15,6 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  *
- * User: fyfej
- * Date: 2023-6-21
  */
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -29,7 +27,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("SanteSuite Contributors")]
 [assembly: AssemblyProduct("SanteDB iCDR Server")]
-[assembly: AssemblyCopyright("Copyright (C) 2022 SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md)")]
+[assembly: AssemblyCopyright("Copyright (C) 2015-2024 SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md)")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

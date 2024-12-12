@@ -15,8 +15,6 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  *
- * User: fyfej
- * Date: 2023-6-21
  */
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Services;
@@ -109,7 +107,7 @@ namespace SanteDB.Configuration.Tasks
         /// </summary>
         public bool VerifyState(SanteDBConfiguration configuration)
         {
-            return ServiceTools.ServiceInstaller.ServiceIsInstalled(this.m_configuration.ServiceName);
+            return false; //  return ServiceTools.ServiceInstaller.ServiceIsInstalled(this.m_configuration.ServiceName);
         }
     }
 }

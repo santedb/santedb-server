@@ -15,8 +15,6 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  *
- * User: fyfej
- * Date: 2023-6-21
  */
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Model.Attributes;
@@ -105,6 +103,13 @@ namespace SanteDB.Configuration.Editors
                                     Tag = new TypeReferenceConfiguration(o)
                                 })
                                 .ToArray());
+                            list.Items.AddRange(listValue.Where(v => !bind.Binding.IsAssignableFrom(v.Type)).Select(o =>
+                                new ListViewItem(new TypeSelectionWrapper(o.Type).ToString())
+                                {
+                                    Checked = true,
+                                    Tag = o
+                                }
+                            ).ToArray());
                         }
                         else
                         {

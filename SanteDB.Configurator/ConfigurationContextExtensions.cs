@@ -15,8 +15,6 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  *
- * User: fyfej
- * Date: 2023-6-21
  */
 using SanteDB.Configuration;
 using SanteDB.Configuration.Tasks;
@@ -57,7 +55,7 @@ namespace SanteDB.Configurator
             var rstr = new RestartServiceTask();
             if (rstr.VerifyState(me.Configuration))
             {
-                me.ConfigurationTasks.Add(new RestartServiceTask());
+                me.ConfigurationTasks.Add(rstr);
             }
 
             var confirmDlg = new frmTaskList();

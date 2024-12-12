@@ -6,7 +6,7 @@
       <Version>9.1.1</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Data.Sqlite.Core">
-      <Version>7.0.20</Version>
+      <Version>8.0.10</Version>
     </PackageReference>
     <PackageReference Include="Mono.Posix-4.5">
       <Version>4.5.0</Version>
@@ -174,7 +174,19 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="config\config.skel" />
-    <None Include="Data\000-ActClass.dataset">
+    <None Include="Data\000-AdminActPolicies.dataset">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\000-LoginPolicies.dataset">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\000-ReportTargetRelationship.dataset">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\001-ActClass.dataset">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\000-ContainerConcepts.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Data\000-FamilyMemberSet.dataset">
@@ -187,6 +199,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Data\009-HIVStatus.dataset">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Data\010-StatusFlow.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Data\099-ActEncounterCode.dataset">
@@ -366,7 +381,7 @@
     <None Include="Data\000-AssigningAuthorities.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Data\000-ActType.dataset">
+    <None Include="Data\001-ActType.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </None>
@@ -591,7 +606,10 @@
       <Version>13.0.3</Version>
     </PackageReference>
     <PackageReference Include="Npgsql">
-      <Version>7.0.7</Version>
+      <Version>8.0.5</Version>
+    </PackageReference>
+    <PackageReference Include="RabbitMQ.Client">
+      <Version>6.8.1</Version>
     </PackageReference>
     <PackageReference Include="SQLitePCLRaw.provider.dynamic_cdecl">
       <Version>2.1.8</Version>

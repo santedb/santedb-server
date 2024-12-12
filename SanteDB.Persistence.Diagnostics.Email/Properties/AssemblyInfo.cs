@@ -15,8 +15,6 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  *
- * User: fyfej
- * Date: 2023-6-21
  */
 using SanteDB.Core.Attributes;
 using SanteDB.Core.Configuration;
@@ -31,7 +29,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("SanteDB.Persistence.Diagnostics.Email")]
-[assembly: AssemblyCopyright("Copyright (C) 2023 SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md)")]
+[assembly: AssemblyCopyright("Copyright (C)  2015 - 2024 the SanteSuite Contributors (See NOTICE.md)")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

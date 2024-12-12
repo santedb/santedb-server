@@ -1,0 +1,171 @@
+﻿<?xml version="1.0"?>
+<dataset xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Export ConceptSet - 202411191147SS" xmlns="http://santedb.org/data">
+  <update skipIfError="false" insertIfNotExists="true">
+    <ConceptRelationship xmlns="http://santedb.org/model">
+      <id>43889372-a696-11ef-8c39-7731d12f8bdd</id>
+      <source>afc33800-8225-4061-b168-bacc09cdbae3</source>
+      <targetConcept>bdef5f90-5497-4f26-956c-8f818cce2bd2</targetConcept>
+      <relationshipType>3e1fef9d-dd8e-4b9d-8462-ce5a52213743</relationshipType>
+    </ConceptRelationship>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <ConceptRelationship xmlns="http://santedb.org/model">
+      <id>47fcc338-a696-11ef-8eff-8751c3678bec</id>
+      <source>afc33800-8225-4061-b168-bacc09cdbae3</source>
+      <targetConcept>39995c08-0a5c-4549-8ba7-d187f9b3c4fd</targetConcept>
+      <relationshipType>3e1fef9d-dd8e-4b9d-8462-ce5a52213743</relationshipType>
+    </ConceptRelationship>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <ConceptRelationship xmlns="http://santedb.org/model">
+      <id>570eba16-a696-11ef-8fa0-ffcffc0fba6c</id>
+      <source>afc33800-8225-4061-b168-bacc09cdbae3</source>
+      <targetConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</targetConcept>
+      <relationshipType>3e1fef9d-dd8e-4b9d-8462-ce5a52213743</relationshipType>
+    </ConceptRelationship>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <ConceptRelationship xmlns="http://santedb.org/model">
+      <id>5e90610e-a696-11ef-8c3a-93281c8272ed</id>
+      <source>afc33800-8225-4061-b168-bacc09cdbae3</source>
+      <targetConcept>0bbec253-21a1-49cb-b376-7fe4d0592cda</targetConcept>
+      <relationshipType>3e1fef9d-dd8e-4b9d-8462-ce5a52213743</relationshipType>
+    </ConceptRelationship>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <ConceptRelationship xmlns="http://santedb.org/model">
+      <id>aa022772-a695-11ef-b371-fb82f94cbbb1</id>
+      <source>0bbec253-21a1-49cb-b376-7fe4d0592cda</source>
+      <targetConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</targetConcept>
+      <relationshipType>3e1fef9d-dd8e-4b9d-8462-ce5a52213743</relationshipType>
+    </ConceptRelationship>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <ConceptRelationship xmlns="http://santedb.org/model">
+      <id>b2f24830-a695-11ef-b372-a374851a069e</id>
+      <source>0bbec253-21a1-49cb-b376-7fe4d0592cda</source>
+      <targetConcept>3efd3b6e-02d5-4cc9-9088-ef8f31e321c5</targetConcept>
+      <relationshipType>3e1fef9d-dd8e-4b9d-8462-ce5a52213743</relationshipType>
+    </ConceptRelationship>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <ConceptRelationship xmlns="http://santedb.org/model">
+      <id>b83e4cbc-a695-11ef-b373-17e613ca3766</id>
+      <source>0bbec253-21a1-49cb-b376-7fe4d0592cda</source>
+      <targetConcept>39995c08-0a5c-4549-8ba7-d187f9b3c4fd</targetConcept>
+      <relationshipType>3e1fef9d-dd8e-4b9d-8462-ce5a52213743</relationshipType>
+    </ConceptRelationship>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <ConceptRelationship xmlns="http://santedb.org/model">
+      <id>bf037068-a695-11ef-8cc7-d3fefeabf431</id>
+      <source>0bbec253-21a1-49cb-b376-7fe4d0592cda</source>
+      <targetConcept>bdef5f90-5497-4f26-956c-8f818cce2bd2</targetConcept>
+      <relationshipType>3e1fef9d-dd8e-4b9d-8462-ce5a52213743</relationshipType>
+    </ConceptRelationship>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <ConceptRelationship xmlns="http://santedb.org/model">
+      <id>53b03076-a695-11ef-a88d-1b33e6bf5eed</id>
+      <source>c34fcbf1-e0fe-4989-90fd-0dc49e1b9685</source>
+      <targetConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</targetConcept>
+      <relationshipType>3e1fef9d-dd8e-4b9d-8462-ce5a52213743</relationshipType>
+    </ConceptRelationship>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <ConceptRelationship xmlns="http://santedb.org/model">
+      <id>59c2fa84-a695-11ef-907c-276ed7c46ac9</id>
+      <source>c34fcbf1-e0fe-4989-90fd-0dc49e1b9685</source>
+      <targetConcept>3efd3b6e-02d5-4cc9-9088-ef8f31e321c5</targetConcept>
+      <relationshipType>3e1fef9d-dd8e-4b9d-8462-ce5a52213743</relationshipType>
+    </ConceptRelationship>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <ConceptRelationship xmlns="http://santedb.org/model">
+      <id>5f6b0f6c-a695-11ef-8f9b-4701dfba4b3f</id>
+      <source>c34fcbf1-e0fe-4989-90fd-0dc49e1b9685</source>
+      <targetConcept>bdef5f90-5497-4f26-956c-8f818cce2bd2</targetConcept>
+      <relationshipType>3e1fef9d-dd8e-4b9d-8462-ce5a52213743</relationshipType>
+    </ConceptRelationship>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <ConceptRelationship xmlns="http://santedb.org/model">
+      <id>8436656c-a695-11ef-8cc4-6fe198ba8703</id>
+      <source>c34fcbf1-e0fe-4989-90fd-0dc49e1b9685</source>
+      <targetConcept>39995c08-0a5c-4549-8ba7-d187f9b3c4fd</targetConcept>
+      <relationshipType>3e1fef9d-dd8e-4b9d-8462-ce5a52213743</relationshipType>
+    </ConceptRelationship>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <ConceptRelationship xmlns="http://santedb.org/model">
+      <id>c5a64382-a695-11ef-b374-37667fd69b58</id>
+      <source>bdef5f90-5497-4f26-956c-8f818cce2bd2</source>
+      <targetConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</targetConcept>
+      <relationshipType>3e1fef9d-dd8e-4b9d-8462-ce5a52213743</relationshipType>
+    </ConceptRelationship>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <ConceptRelationship xmlns="http://santedb.org/model">
+      <id>e347d0cc-a695-11ef-8f9f-77c4ecd86b02</id>
+      <source>bdef5f90-5497-4f26-956c-8f818cce2bd2</source>
+      <targetConcept>39995c08-0a5c-4549-8ba7-d187f9b3c4fd</targetConcept>
+      <relationshipType>3e1fef9d-dd8e-4b9d-8462-ce5a52213743</relationshipType>
+    </ConceptRelationship>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <ConceptRelationship xmlns="http://santedb.org/model">
+      <id>d5f2dd68-a695-11ef-8f9d-b7ebdf8d81a2</id>
+      <source>3efd3b6e-02d5-4cc9-9088-ef8f31e321c5</source>
+      <targetConcept>bdef5f90-5497-4f26-956c-8f818cce2bd2</targetConcept>
+      <relationshipType>3e1fef9d-dd8e-4b9d-8462-ce5a52213743</relationshipType>
+    </ConceptRelationship>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <ConceptRelationship xmlns="http://santedb.org/model">
+      <id>db4de3c0-a695-11ef-8f9e-c79f0390dfe5</id>
+      <source>3efd3b6e-02d5-4cc9-9088-ef8f31e321c5</source>
+      <targetConcept>39995c08-0a5c-4549-8ba7-d187f9b3c4fd</targetConcept>
+      <relationshipType>3e1fef9d-dd8e-4b9d-8462-ce5a52213743</relationshipType>
+    </ConceptRelationship>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <ConceptRelationship xmlns="http://santedb.org/model">
+      <id>66fa52d8-a695-11ef-907d-43b5a5146ab4</id>
+      <source>c8064cbd-fa06-4530-b430-1a52f1530c27</source>
+      <targetConcept>bdef5f90-5497-4f26-956c-8f818cce2bd2</targetConcept>
+      <relationshipType>3e1fef9d-dd8e-4b9d-8462-ce5a52213743</relationshipType>
+    </ConceptRelationship>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <ConceptRelationship xmlns="http://santedb.org/model">
+      <id>6c392d64-a695-11ef-8f9c-9f7b7258790b</id>
+      <source>c8064cbd-fa06-4530-b430-1a52f1530c27</source>
+      <targetConcept>afc33800-8225-4061-b168-bacc09cdbae3</targetConcept>
+      <relationshipType>3e1fef9d-dd8e-4b9d-8462-ce5a52213743</relationshipType>
+    </ConceptRelationship>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <ConceptRelationship xmlns="http://santedb.org/model">
+      <id>71fc9498-a695-11ef-a88e-2fb83624c216</id>
+      <source>c8064cbd-fa06-4530-b430-1a52f1530c27</source>
+      <targetConcept>3efd3b6e-02d5-4cc9-9088-ef8f31e321c5</targetConcept>
+      <relationshipType>3e1fef9d-dd8e-4b9d-8462-ce5a52213743</relationshipType>
+    </ConceptRelationship>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <ConceptRelationship xmlns="http://santedb.org/model">
+      <id>9760ed4c-a695-11ef-8cc5-ef9294ddc728</id>
+      <source>c8064cbd-fa06-4530-b430-1a52f1530c27</source>
+      <targetConcept>0bbec253-21a1-49cb-b376-7fe4d0592cda</targetConcept>
+      <relationshipType>3e1fef9d-dd8e-4b9d-8462-ce5a52213743</relationshipType>
+    </ConceptRelationship>
+  </update>
+  <update skipIfError="false" insertIfNotExists="true">
+    <ConceptRelationship xmlns="http://santedb.org/model">
+      <id>a1807f4a-a695-11ef-8cc6-c3bb7c68ab44</id>
+      <source>c8064cbd-fa06-4530-b430-1a52f1530c27</source>
+      <targetConcept>39995c08-0a5c-4549-8ba7-d187f9b3c4fd</targetConcept>
+      <relationshipType>3e1fef9d-dd8e-4b9d-8462-ce5a52213743</relationshipType>
+    </ConceptRelationship>
+  </update>
+</dataset>

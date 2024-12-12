@@ -15,8 +15,6 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  *
- * User: fyfej
- * Date: 2023-6-21
  */
 using SanteDB.BI.Services.Impl;
 using SanteDB.Cdss.Xml;
@@ -61,7 +59,6 @@ namespace SanteDB.Configuration.Tasks
             typeof(RolloverLogManagerService),
             typeof(ExemptablePolicyFilterService),
             typeof(LocalMailMessageService),
-            typeof(LocalStockManagementRepositoryService),
             typeof(PubSubBroker),
             typeof(AppletBiRepository),
             typeof(LocalBiRenderService),
