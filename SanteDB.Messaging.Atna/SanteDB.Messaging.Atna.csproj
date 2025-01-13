@@ -100,7 +100,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <PackageReference Include="AtnaApi.NetStandard">
-      <Version>1.2.1</Version>
+      <Version>1.2.2</Version>
     </PackageReference>
     <PackageReference Include="MSBuildTasks" Version="1.5.0.235">
       <PrivateAssets>all</PrivateAssets>
