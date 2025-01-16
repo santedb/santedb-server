@@ -16,244 +16,408 @@
  - License for the specific language governing permissions and limitations under 
  - the License.
  -->
-  <dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Birth Delivery Outcomes">
-  <update insertIfNotExists="true">
-    <ConceptSet xmlns="http://santedb.org/model">
-      <id>02385374-1867-11eb-adc1-0242ac120002</id>
-      <name>Delivery Outcome Codes</name>
-      <mnemonic>DeliveryOutcome</mnemonic>
-      <oid>1.3.6.1.4.1.33349.3.1.5.9.3.72</oid>
-      <url>http://santedb.org/conceptsets/contrib/DeliveryOutcome</url>
-    </ConceptSet>
-  </update>
-  <update insertIfNotExists="true">
-    <Concept xmlns="http://santedb.org/model">
-      <id>0238590a-1867-11eb-adc1-0242ac120002</id>
-      <isReadonly>false</isReadonly>
-      <mnemonic>DeliveryOutcome-Live</mnemonic>
-      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
-      <conceptSet>02385374-1867-11eb-adc1-0242ac120002</conceptSet>
-      <conceptClass>92cdea39-b9a3-4a5b-bc88-a6646c74240d</conceptClass>
-      <name>
-        <language>en</language>
-        <value>Live Birth</value>
-      </name>
-    </Concept>
-  </update>
-  <update insertIfNotExists="true">
-    <Concept xmlns="http://santedb.org/model">
-      <id>023859e6-1867-11eb-adc1-0242ac120002</id>
-      <isReadonly>false</isReadonly>
-      <mnemonic>DeliveryOutcome-Stillborn</mnemonic>
-      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
-      <conceptSet>02385374-1867-11eb-adc1-0242ac120002</conceptSet>
-      <conceptClass>92cdea39-b9a3-4a5b-bc88-a6646c74240d</conceptClass>
-      <name>
-        <language>en</language>
-        <value>Stillbirth</value>
-      </name>
-    </Concept>
-  </update>
-  <update insertIfNotExists="true">
-    <ConceptSet xmlns="http://santedb.org/model">
-      <id>023855d6-1867-11eb-adc1-0242ac120002</id>
-      <name>Delivery Method Codes</name>
-      <mnemonic>DeliveryMethod</mnemonic>
-      <oid>1.3.6.1.4.1.33349.3.1.5.9.3.73</oid>
-      <url>http://santedb.org/conceptsets/contrib/DeliveryMethod</url>
-    </ConceptSet>
-  </update>
-  <update insertIfNotExists="true">
-    <Concept xmlns="http://santedb.org/model">
-      <id>023863dc-1867-11eb-adc1-0242ac120002</id>
-      <isReadonly>false</isReadonly>
-      <mnemonic>DeliveryMethod-VaginalBirth</mnemonic>
-      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
-      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
-      <conceptSet>023855d6-1867-11eb-adc1-0242ac120002</conceptSet>
-      <name>
-        <language>en</language>
-        <value>Vaginal Birth</value>
-      </name>
-    </Concept>
-  </update>
-  <update insertIfNotExists="true">
-    <Concept xmlns="http://santedb.org/model">
-      <id>02386508-1867-11eb-adc1-0242ac120002</id>
-      <isReadonly>false</isReadonly>
-      <mnemonic>DeliveryMethod-Caesarean</mnemonic>
-      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
-      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
-      <conceptSet>023855d6-1867-11eb-adc1-0242ac120002</conceptSet>
-      <name>
-        <language>en</language>
-        <value>Caesarean Birth</value>
-      </name>
-    </Concept>
-  </update>
-  <update insertIfNotExists="true">
-    <ConceptSet xmlns="http://santedb.org/model">
-      <id>023856da-1867-11eb-adc1-0242ac120002</id>
-      <name>Delivery Location Codes</name>
-      <mnemonic>DeliveryLocation</mnemonic>
-      <oid>1.3.6.1.4.1.33349.3.1.5.9.3.74</oid>
-      <url>http://santedb.org/conceptsets/contrib/DeliveryLocation</url>
-    </ConceptSet>
-  </update>
-  <update insertIfNotExists="true">
-    <Concept xmlns="http://santedb.org/model">
-      <id>02386760-1867-11eb-adc1-0242ac120002</id>
-      <isReadonly>false</isReadonly>
-      <mnemonic>DeliveryLocation-Hospital</mnemonic>
-      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
-      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
-      <conceptSet>023856da-1867-11eb-adc1-0242ac120002</conceptSet>
-      <name>
-        <language>en</language>
-        <value>Born in Hospital</value>
-      </name>
-    </Concept>
-  </update>
-  <update insertIfNotExists="true">
-    <Concept xmlns="http://santedb.org/model">
-      <id>0238683c-1867-11eb-adc1-0242ac120002</id>
-      <isReadonly>false</isReadonly>
-      <mnemonic>DeliveryLocation-Home</mnemonic>
-      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
-      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
-      <conceptSet>023856da-1867-11eb-adc1-0242ac120002</conceptSet>
-      <name>
-        <language>en</language>
-        <value>Born at Home</value>
-      </name>
-    </Concept>
-  </update>
-  <update insertIfNotExists="true">
-    <Concept xmlns="http://santedb.org/model">
-      <id>023869fd-1867-11eb-adc1-0242ac120002</id>
-      <isReadonly>false</isReadonly>
-      <mnemonic>DeliveryLocation-OutsideHospital</mnemonic>
-      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
-      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
-      <conceptSet>023856da-1867-11eb-adc1-0242ac120002</conceptSet>
-      <name>
-        <language>en</language>
-        <value>Outside Hospital</value>
-      </name>
-    </Concept>
-  </update>
-  <!-- Observation Types for codified birth observations -->
-  <update insertIfNotExists="true">
-    <Concept xmlns="http://santedb.org/model">
-      <id>dddf1506-1868-11eb-adc1-0242ac120002</id>
-      <isReadonly>false</isReadonly>
-      <mnemonic>ObservationType-BirthDeliveryMethod</mnemonic>
-      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
-      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
-      <name>
-        <language>en</language>
-        <value>Delivery Method</value>
-      </name>
-    </Concept>
-  </update>
-	  <update insertIfNotExists="true">
-		  <Concept xmlns="http://santedb.org/model">
-			  <id>fdaf1790-1868-11eb-adc1-0242ac120002</id>
-			  <isReadonly>false</isReadonly>
-			  <mnemonic>ObservationType-GestationAge</mnemonic>
-			  <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
-			  <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
-			  <name>
-				  <language>en</language>
-				  <value>Weeks Gestation</value>
-			  </name>
-		  </Concept>
-	  </update>
-  <update insertIfNotExists="true">
-    <Concept xmlns="http://santedb.org/model">
-      <id>dddf1790-1868-11eb-adc1-0242ac120002</id>
-      <isReadonly>false</isReadonly>
-      <mnemonic>ObservationType-BirthDeliveryLocation</mnemonic>
-      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
-      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
-      <name>
-        <language>en</language>
-        <value>Delivery Location</value>
-      </name>
-    </Concept>
-  </update>
-  <update insertIfNotExists="true">
-    <Concept xmlns="http://santedb.org/model">
-      <id>dddf18e4-1868-11eb-adc1-0242ac120002</id>
-      <isReadonly>false</isReadonly>
-      <mnemonic>ObservationType-BirthDeliveryOutcome</mnemonic>
-      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
-      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
-      <name>
-        <language>en</language>
-        <value>Delivery Outcome</value>
-      </name>
-    </Concept>
-  </update>
-  <update insertIfNotExists="true">
-    <ReferenceTerm xmlns="http://santedb.org/model">
-      <id>d2528758-1869-11eb-adc1-0242ac120002</id>
-      <mnemonic>56092-0</mnemonic>
-      <codeSystem>08C59397-706B-456A-AEB1-9E7D5A2ADC94</codeSystem>
-      <name>
-        <language>en</language>
-        <value>Birth weight GNWCH</value>
-      </name>
-    </ReferenceTerm>
-  </update>
-  <update insertIfNotExists="true">
-    <Concept xmlns="http://santedb.org/model">
-      <id>7eb3cdb8-186a-11eb-ace0-00155d640b23</id>
-      <isReadonly>false</isReadonly>
-      <mnemonic>ObservationType-BirthWeight</mnemonic>
-      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
-      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
-      <referenceTerm>
-        <term>d2528758-1869-11eb-adc1-0242ac120002</term>
-        <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
-      </referenceTerm>
-      <name>
-        <language>en</language>
-        <value>Weight at Birth</value>
-      </name>
-    </Concept>
-  </update>
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Birth Delivery Outcomes">
+	<update insertIfNotExists="true">
+		<ConceptSet xmlns="http://santedb.org/model">
+			<id>02385374-1867-11eb-adc1-0242ac120002</id>
+			<name>Delivery Outcome Codes</name>
+			<mnemonic>DeliveryOutcome</mnemonic>
+			<oid>1.3.6.1.4.1.33349.3.1.5.9.3.72</oid>
+			<url>http://santedb.org/conceptsets/contrib/DeliveryOutcome</url>
+		</ConceptSet>
+	</update>
+	<update insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>0238590a-1867-11eb-adc1-0242ac120002</id>
+			<isReadonly>false</isReadonly>
+			<mnemonic>DeliveryOutcome-Live</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptSet>02385374-1867-11eb-adc1-0242ac120002</conceptSet>
+			<conceptClass>92cdea39-b9a3-4a5b-bc88-a6646c74240d</conceptClass>
+			<name>
+				<language>en</language>
+				<value>Live Birth</value>
+			</name>
+		</Concept>
+	</update>
+	<update insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>023859e6-1867-11eb-adc1-0242ac120002</id>
+			<isReadonly>false</isReadonly>
+			<mnemonic>DeliveryOutcome-Stillborn</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptSet>02385374-1867-11eb-adc1-0242ac120002</conceptSet>
+			<conceptClass>92cdea39-b9a3-4a5b-bc88-a6646c74240d</conceptClass>
+			<name>
+				<language>en</language>
+				<value>Stillbirth</value>
+			</name>
+		</Concept>
+	</update>
+	<update insertIfNotExists="true">
+		<ConceptSet xmlns="http://santedb.org/model">
+			<id>023855d6-1867-11eb-adc1-0242ac120002</id>
+			<name>Delivery Method Codes</name>
+			<mnemonic>DeliveryMethod</mnemonic>
+			<oid>1.3.6.1.4.1.33349.3.1.5.9.3.73</oid>
+			<url>http://santedb.org/conceptsets/contrib/DeliveryMethod</url>
+		</ConceptSet>
+	</update>
+	<update insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>023863dc-1867-11eb-adc1-0242ac120002</id>
+			<isReadonly>false</isReadonly>
+			<mnemonic>DeliveryMethod-VaginalBirth</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<conceptSet>023855d6-1867-11eb-adc1-0242ac120002</conceptSet>
+			<name>
+				<language>en</language>
+				<value>Vaginal Birth</value>
+			</name>
+		</Concept>
+	</update>
+	<update insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>02386508-1867-11eb-adc1-0242ac120002</id>
+			<isReadonly>false</isReadonly>
+			<mnemonic>DeliveryMethod-Caesarean</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<conceptSet>023855d6-1867-11eb-adc1-0242ac120002</conceptSet>
+			<name>
+				<language>en</language>
+				<value>Caesarean Birth</value>
+			</name>
+		</Concept>
+	</update>
+	<update insertIfNotExists="true">
+		<ConceptSet xmlns="http://santedb.org/model">
+			<id>023856da-1867-11eb-adc1-0242ac120002</id>
+			<name>Delivery Location Codes</name>
+			<mnemonic>DeliveryLocation</mnemonic>
+			<oid>1.3.6.1.4.1.33349.3.1.5.9.3.74</oid>
+			<url>http://santedb.org/conceptsets/contrib/DeliveryLocation</url>
+		</ConceptSet>
+	</update>
+	<update insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>02386760-1867-11eb-adc1-0242ac120002</id>
+			<isReadonly>false</isReadonly>
+			<mnemonic>DeliveryLocation-Hospital</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<conceptSet>023856da-1867-11eb-adc1-0242ac120002</conceptSet>
+			<name>
+				<language>en</language>
+				<value>Born in Hospital</value>
+			</name>
+		</Concept>
+	</update>
+	<update insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>0238683c-1867-11eb-adc1-0242ac120002</id>
+			<isReadonly>false</isReadonly>
+			<mnemonic>DeliveryLocation-Home</mnemonic>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptSet>023856da-1867-11eb-adc1-0242ac120002</conceptSet>
+			<name>
+				<language>en</language>
+				<value>Born at Home</value>
+			</name>
+		</Concept>
+	</update>
+	<update insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>023869fd-1867-11eb-adc1-0242ac120002</id>
+			<isReadonly>false</isReadonly>
+			<mnemonic>DeliveryLocation-OutsideHospital</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<conceptSet>023856da-1867-11eb-adc1-0242ac120002</conceptSet>
+			<name>
+				<language>en</language>
+				<value>Outside Hospital</value>
+			</name>
+		</Concept>
+	</update>
+	<!-- Observation Types for codified birth observations -->
+	<update insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>dddf1506-1868-11eb-adc1-0242ac120002</id>
+			<isReadonly>false</isReadonly>
+			<mnemonic>ObservationType-BirthDeliveryMethod</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<name>
+				<language>en</language>
+				<value>Delivery Method</value>
+			</name>
+		</Concept>
+	</update>
 
-	  <update insertIfNotExists="true">
-		  <ReferenceTerm xmlns="http://santedb.org/model">
-			  <id>fdab2302-1887-11eb-adc1-0242ac120002</id>
-			  <mnemonic>57062-2</mnemonic>
-			  <codeSystem>08C59397-706B-456A-AEB1-9E7D5A2ADC94</codeSystem>
-			  <name>
-				  <language>en</language>
-				  <value>[#] Births.stillborn</value>
-			  </name>
-		  </ReferenceTerm>
-	  </update>
-	  <update insertIfNotExists="true">
-		  <Concept xmlns="http://santedb.org/model">
-			  <id>fdab26a4-1887-11eb-adc1-0242ac120002</id>
-			  <isReadonly>false</isReadonly>
-			  <mnemonic>ObservationType-NumberOfStillbirths</mnemonic>
-			  <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
-			  <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
-			  <referenceTerm>
-				  <term>fdab2302-1887-11eb-adc1-0242ac120002</term>
-				  <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
-			  </referenceTerm>
-			  <name>
-				  <language>en</language>
-				  <value># of Stillbirths</value>
-			  </name>
-		  </Concept>
-	  </update>
+	<update insertIfNotExists="true">
+		<ReferenceTerm xmlns="http://santedb.org/model">
+			<id>99528758-1869-11eb-adc1-0242ac120002</id>
+			<mnemonic>76516-4</mnemonic>
+			<codeSystem>08C59397-706B-456A-AEB1-9E7D5A2ADC94</codeSystem>
+			<name>
+				<language>en</language>
+				<value>Gestational Age at Birth</value>
+			</name>
+		</ReferenceTerm>
+	</update>
+
+	<update insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>99af1790-1868-11eb-adc1-0242ac120002</id>
+			<isReadonly>false</isReadonly>
+			<mnemonic>ObservationType-GestationalAgeAtBirth</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<referenceTerm>
+				<term>99528758-1869-11eb-adc1-0242ac120002</term>
+				<relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+			</referenceTerm>
+			<name>
+				<language>en</language>
+				<value>Gestational Age at Birth</value>
+			</name>
+		</Concept>
+	</update>
+
+	
+	<update insertIfNotExists="true">
+		<ReferenceTerm xmlns="http://santedb.org/model">
+			<id>87528758-1869-11eb-adc1-0242ac120002</id>
+			<mnemonic>18185-9</mnemonic>
+			<codeSystem>08C59397-706B-456A-AEB1-9E7D5A2ADC94</codeSystem>
+			<name>
+				<language>en</language>
+				<value>Gestational Age</value>
+			</name>
+		</ReferenceTerm>
+	</update>
+	
+	<update insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>87af1790-1868-11eb-adc1-0242ac120002</id>
+			<isReadonly>false</isReadonly>
+			<mnemonic>ObservationType-GestationalAge</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<referenceTerm>
+				<term>87528758-1869-11eb-adc1-0242ac120002</term>
+				<relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+			</referenceTerm>
+			<name>
+				<language>en</language>
+				<value>Gestational Age</value>
+			</name>
+		</Concept>
+	</update>
+	
+	<update insertIfNotExists="true">
+		<ReferenceTerm xmlns="http://santedb.org/model">
+			<id>45528758-1869-11eb-adc1-0242ac120002</id>
+			<mnemonic>11885-1</mnemonic>
+			<codeSystem>08C59397-706B-456A-AEB1-9E7D5A2ADC94</codeSystem>
+			<name>
+				<language>en</language>
+				<value>Gestational Age estimated from last menstrual period</value>
+			</name>
+		</ReferenceTerm>
+	</update>
+	<update insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>fdaf1790-1868-11eb-adc1-0242ac120002</id>
+			<isReadonly>false</isReadonly>
+			<mnemonic>ObservationType-GestationalAgeFromLMP</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<referenceTerm>
+				<term>45528758-1869-11eb-adc1-0242ac120002</term>
+				<relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+			</referenceTerm>
+			<name>
+				<language>en</language>
+				<value>Gestational Age (from Last Menstrual Period)</value>
+			</name>
+		</Concept>
+	</update>
+	<update insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>dddf1790-1868-11eb-adc1-0242ac120002</id>
+			<isReadonly>false</isReadonly>
+			<mnemonic>ObservationType-BirthDeliveryLocation</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<name>
+				<language>en</language>
+				<value>Delivery Location</value>
+			</name>
+		</Concept>
+	</update>
+	<update insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>dddf18e4-1868-11eb-adc1-0242ac120002</id>
+			<isReadonly>false</isReadonly>
+			<mnemonic>ObservationType-BirthDeliveryOutcome</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<name>
+				<language>en</language>
+				<value>Delivery Outcome</value>
+			</name>
+		</Concept>
+	</update>
+	<update insertIfNotExists="true">
+		<ReferenceTerm xmlns="http://santedb.org/model">
+			<id>d2528758-1869-11eb-adc1-0242ac120002</id>
+			<mnemonic>56092-0</mnemonic>
+			<codeSystem>08C59397-706B-456A-AEB1-9E7D5A2ADC94</codeSystem>
+			<name>
+				<language>en</language>
+				<value>Birth weight GNWCH</value>
+			</name>
+		</ReferenceTerm>
+	</update>
+	<update insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>7eb3cdb8-186a-11eb-ace0-00155d640b23</id>
+			<isReadonly>false</isReadonly>
+			<mnemonic>ObservationType-BirthWeight</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<referenceTerm>
+				<term>d2528758-1869-11eb-adc1-0242ac120002</term>
+				<relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+			</referenceTerm>
+			<name>
+				<language>en</language>
+				<value>Weight at Birth</value>
+			</name>
+		</Concept>
+	</update>
+
+	<update insertIfNotExists="true">
+		<ReferenceTerm xmlns="http://santedb.org/model">
+			<id>fdab2302-1887-11eb-adc1-0242ac120002</id>
+			<mnemonic>57062-2</mnemonic>
+			<codeSystem>08C59397-706B-456A-AEB1-9E7D5A2ADC94</codeSystem>
+			<name>
+				<language>en</language>
+				<value>[#] Births.stillborn</value>
+			</name>
+		</ReferenceTerm>
+	</update>
+	<update insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>fdab26a4-1887-11eb-adc1-0242ac120002</id>
+			<isReadonly>false</isReadonly>
+			<mnemonic>ObservationType-NumberOfStillbirths</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<referenceTerm>
+				<term>fdab2302-1887-11eb-adc1-0242ac120002</term>
+				<relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+			</referenceTerm>
+			<name>
+				<language>en</language>
+				<value># of Stillbirths</value>
+			</name>
+		</Concept>
+	</update>
 
 
+<<<<<<< HEAD
+	<update insertIfNotExists="true">
+		<ReferenceTerm xmlns="http://santedb.org/model">
+			<id>a2ab2302-1887-11eb-adc1-0242ac120002</id>
+			<mnemonic>11996-6</mnemonic>
+			<codeSystem>08C59397-706B-456A-AEB1-9E7D5A2ADC94</codeSystem>
+			<name>
+				<language>en</language>
+				<value>[#] Pregnancies</value>
+			</name>
+		</ReferenceTerm>
+	</update>
+	<update insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>a2ab26a4-1887-11eb-adc1-0242ac120002</id>
+			<isReadonly>false</isReadonly>
+			<mnemonic>ObservationType-NumberOfPregnancies</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<referenceTerm>
+				<term>a2ab2302-1887-11eb-adc1-0242ac120002</term>
+				<relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+			</referenceTerm>
+			<name>
+				<language>en</language>
+				<value># of Pregnancies</value>
+			</name>
+		</Concept>
+	</update>
+	<update insertIfNotExists="true">
+		<ReferenceTerm xmlns="http://santedb.org/model">
+			<id>fde06eaa-1889-11eb-adc1-0242ac120002</id>
+			<mnemonic>11977-6</mnemonic>
+			<codeSystem>08C59397-706B-456A-AEB1-9E7D5A2ADC94</codeSystem>
+			<name>
+				<language>en</language>
+				<value>[#] Parity</value>
+			</name>
+		</ReferenceTerm>
+	</update>
+	<update insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>fea070d0-1889-11eb-adc1-0242ac120002</id>
+			<isReadonly>false</isReadonly>
+			<mnemonic>ObservationType-PregnancyParity</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<referenceTerm>
+				<term>fde06eaa-1889-11eb-adc1-0242ac120002</term>
+				<relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+			</referenceTerm>
+			<name>
+				<language>en</language>
+				<value># Parity (Pregnancy)</value>
+			</name>
+		</Concept>
+	</update>
+
+	<update insertIfNotExists="true">
+		<ReferenceTerm xmlns="http://santedb.org/model">
+			<id>54906eaa-1889-11eb-adc1-0242ac120002</id>
+			<mnemonic>11636-8</mnemonic>
+			<codeSystem>08C59397-706B-456A-AEB1-9E7D5A2ADC94</codeSystem>
+			<name>
+				<language>en</language>
+				<value>[#] Births.live</value>
+			</name>
+		</ReferenceTerm>
+	</update>
+	<update insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>549070d0-1889-11eb-adc1-0242ac120002</id>
+			<isReadonly>false</isReadonly>
+			<mnemonic>ObservationType-NumberOfLiveBirths</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<referenceTerm>
+				<term>54906eaa-1889-11eb-adc1-0242ac120002</term>
+				<relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+			</referenceTerm>
+			<name>
+				<language>en</language>
+				<value># of Live Births</value>
+			</name>
+		</Concept>
+	</update>
+=======
 	  <update insertIfNotExists="true">
     <ReferenceTerm xmlns="http://santedb.org/model">
       <id>a2ab2302-1887-11eb-adc1-0242ac120002</id>
@@ -339,4 +503,5 @@
       </name>
     </Concept>
   </update>
+>>>>>>> fa39f754ec9c1a7a2562e366185ebc48c7e41790
 </dataset>
