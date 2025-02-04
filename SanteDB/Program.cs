@@ -368,7 +368,9 @@ namespace SanteDB
                     var processedConnections = new List<String>();
                     foreach (var ormConfiguration in configuration.Sections.OfType<OrmConfigurationBase>())
                     {
-
+                        if (ormConfiguration?.AleConfiguration?.AleEnabled != true)
+                            continue;
+                        
 
                         processedConnections.Add(ormConfiguration.ReadWriteConnectionString);
 
