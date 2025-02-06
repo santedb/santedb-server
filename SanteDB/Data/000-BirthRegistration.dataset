@@ -16,7 +16,9 @@
  - License for the specific language governing permissions and limitations under 
  - the License.
  -->
-<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Birth Delivery Outcomes">
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data"
+	id="Birth Delivery Outcomes">
 	<update insertIfNotExists="true">
 		<ConceptSet xmlns="http://santedb.org/model">
 			<id>02385374-1867-11eb-adc1-0242ac120002</id>
@@ -156,7 +158,6 @@
 			</name>
 		</Concept>
 	</update>
-
 	<update insertIfNotExists="true">
 		<ReferenceTerm xmlns="http://santedb.org/model">
 			<id>99528758-1869-11eb-adc1-0242ac120002</id>
@@ -168,7 +169,6 @@
 			</name>
 		</ReferenceTerm>
 	</update>
-
 	<update insertIfNotExists="true">
 		<Concept xmlns="http://santedb.org/model">
 			<id>99af1790-1868-11eb-adc1-0242ac120002</id>
@@ -186,8 +186,6 @@
 			</name>
 		</Concept>
 	</update>
-
-	
 	<update insertIfNotExists="true">
 		<ReferenceTerm xmlns="http://santedb.org/model">
 			<id>87528758-1869-11eb-adc1-0242ac120002</id>
@@ -199,7 +197,6 @@
 			</name>
 		</ReferenceTerm>
 	</update>
-	
 	<update insertIfNotExists="true">
 		<Concept xmlns="http://santedb.org/model">
 			<id>87af1790-1868-11eb-adc1-0242ac120002</id>
@@ -217,7 +214,6 @@
 			</name>
 		</Concept>
 	</update>
-	
 	<update insertIfNotExists="true">
 		<ReferenceTerm xmlns="http://santedb.org/model">
 			<id>45528758-1869-11eb-adc1-0242ac120002</id>
@@ -300,7 +296,6 @@
 			</name>
 		</Concept>
 	</update>
-
 	<update insertIfNotExists="true">
 		<ReferenceTerm xmlns="http://santedb.org/model">
 			<id>fdab2302-1887-11eb-adc1-0242ac120002</id>
@@ -329,9 +324,6 @@
 			</name>
 		</Concept>
 	</update>
-
-
-<<<<<<< HEAD
 	<update insertIfNotExists="true">
 		<ReferenceTerm xmlns="http://santedb.org/model">
 			<id>a2ab2302-1887-11eb-adc1-0242ac120002</id>
@@ -375,7 +367,7 @@
 		<Concept xmlns="http://santedb.org/model">
 			<id>fea070d0-1889-11eb-adc1-0242ac120002</id>
 			<isReadonly>false</isReadonly>
-			<mnemonic>ObservationType-PregnancyParity</mnemonic>
+			<mnemonic>ObservationType-NumberOfPregnanciesParity</mnemonic>
 			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
 			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
 			<referenceTerm>
@@ -388,7 +380,6 @@
 			</name>
 		</Concept>
 	</update>
-
 	<update insertIfNotExists="true">
 		<ReferenceTerm xmlns="http://santedb.org/model">
 			<id>54906eaa-1889-11eb-adc1-0242ac120002</id>
@@ -417,91 +408,4 @@
 			</name>
 		</Concept>
 	</update>
-=======
-	  <update insertIfNotExists="true">
-    <ReferenceTerm xmlns="http://santedb.org/model">
-      <id>a2ab2302-1887-11eb-adc1-0242ac120002</id>
-      <mnemonic>11996-6</mnemonic>
-      <codeSystem>08C59397-706B-456A-AEB1-9E7D5A2ADC94</codeSystem>
-      <name>
-        <language>en</language>
-        <value>[#] Pregnancies</value>
-      </name>
-    </ReferenceTerm>
-  </update>
-  <update insertIfNotExists="true">
-    <Concept xmlns="http://santedb.org/model">
-      <id>a2ab26a4-1887-11eb-adc1-0242ac120002</id>
-      <isReadonly>false</isReadonly>
-      <mnemonic>ObservationType-NumberOfPregnancies</mnemonic>
-      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
-      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
-      <referenceTerm>
-        <term>a2ab2302-1887-11eb-adc1-0242ac120002</term>
-        <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
-      </referenceTerm>
-      <name>
-        <language>en</language>
-        <value># of Pregnancies</value>
-      </name>
-    </Concept>
-  </update>
-	  <update insertIfNotExists="true">
-		  <ReferenceTerm xmlns="http://santedb.org/model">
-			  <id>fde06eaa-1889-11eb-adc1-0242ac120002</id>
-			  <mnemonic>11977-6</mnemonic>
-			  <codeSystem>08C59397-706B-456A-AEB1-9E7D5A2ADC94</codeSystem>
-			  <name>
-				  <language>en</language>
-				  <value>[#] Parity</value>
-			  </name>
-		  </ReferenceTerm>
-	  </update>
-	  <update insertIfNotExists="true">
-		  <Concept xmlns="http://santedb.org/model">
-			  <id>fea070d0-1889-11eb-adc1-0242ac120002</id>
-			  <isReadonly>false</isReadonly>
-			  <mnemonic>ObservationType-NumberOfPregnanciesParity</mnemonic>
-			  <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
-			  <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
-			  <referenceTerm>
-				  <term>fde06eaa-1889-11eb-adc1-0242ac120002</term>
-				  <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
-			  </referenceTerm>
-			  <name>
-				  <language>en</language>
-				  <value># Parity (Pregnancy)</value>
-			  </name>
-		  </Concept>
-	  </update>
-	  
-  <update insertIfNotExists="true">
-    <ReferenceTerm xmlns="http://santedb.org/model">
-      <id>54906eaa-1889-11eb-adc1-0242ac120002</id>
-      <mnemonic>11636-8</mnemonic>
-      <codeSystem>08C59397-706B-456A-AEB1-9E7D5A2ADC94</codeSystem>
-      <name>
-        <language>en</language>
-        <value>[#] Births.live</value>
-      </name>
-    </ReferenceTerm>
-  </update>
-  <update insertIfNotExists="true">
-    <Concept xmlns="http://santedb.org/model">
-      <id>549070d0-1889-11eb-adc1-0242ac120002</id>
-      <isReadonly>false</isReadonly>
-      <mnemonic>ObservationType-NumberOfLiveBirths</mnemonic>
-      <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
-      <conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
-      <referenceTerm>
-        <term>54906eaa-1889-11eb-adc1-0242ac120002</term>
-        <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
-      </referenceTerm>
-      <name>
-        <language>en</language>
-        <value># of Live Births</value>
-      </name>
-    </Concept>
-  </update>
->>>>>>> fa39f754ec9c1a7a2562e366185ebc48c7e41790
 </dataset>
