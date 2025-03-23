@@ -415,11 +415,11 @@ namespace SanteDB.Messaging.HDSI.Test
             var expected = String.Empty;
             if (Environment.OSVersion.Platform == PlatformID.Win32NT)
             {
-                expected = "o => ((o.DateOfBirth != null) AndAlso (o.DateOfBirth.Value.TestExpressionEx((Invoke(__xinstance => ((((__xinstance.LoadCollection(\"Relationships\", False).Where(guard => ((guard.LoadProperty(\"RelationshipType\", False) ?? new Concept()).Mnemonic == \"Mother\")).FirstOrDefault() ?? new EntityRelationship()).LoadProperty(\"TargetEntity\", False) ?? new Entity()) As Patient) ?? new Patient()).DateOfBirth, Convert(value(SanteDB.Messaging.HDSI.Test.QueryParameterLinqBuilderTest+<>c).<TestExtendedQueryFilterWithParameterVariableComplexPathParse>b__23_0())) ?? default(DateTime))) > 730.12:00:00))";
+                expected = "o => ((o.DateOfBirth != null) AndAlso (o.DateOfBirth.Value.TestExpressionEx((Invoke(__xinstance => ((((__xinstance.LoadCollection(\"Relationships\", False, Convert(null)).Where(guard => ((guard.LoadProperty(\"RelationshipType\", False, Convert(null)) ?? new Concept()).Mnemonic == \"Mother\")).FirstOrDefault() ?? new EntityRelationship()).LoadProperty(\"TargetEntity\", False, Convert(null)) ?? new Entity()) As Patient) ?? new Patient()).DateOfBirth, Convert(value(SanteDB.Messaging.HDSI.Test.QueryParameterLinqBuilderTest+<>c).<TestExtendedQueryFilterWithParameterVariableComplexPathParse>b__23_0())) ?? default(DateTime))) > 730.12:00:00))";
             }
             else // mono represent convert with type
             {
-                expected = "o => ((o.DateOfBirth != null) AndAlso (o.DateOfBirth.Value.TestExpressionEx((Invoke(__xinstance => ((((__xinstance.LoadCollection(\"Relationships\", False).Where(guard => ((guard.LoadProperty(\"RelationshipType\", False) ?? new Concept()).Mnemonic == \"Mother\")).FirstOrDefault() ?? new EntityRelationship()).LoadProperty(\"TargetEntity\", False) ?? new Entity()) As Patient) ?? new Patient()).DateOfBirth, Convert(value(SanteDB.Messaging.HDSI.Test.QueryParameterLinqBuilderTest+<>c).<TestExtendedQueryFilterWithParameterVariableComplexPathParse>b__23_0(), Patient)) ?? default(DateTime))) > 730.12:00:00))";
+                expected = "o => ((o.DateOfBirth != null) AndAlso (o.DateOfBirth.Value.TestExpressionEx((Invoke(__xinstance => ((((__xinstance.LoadCollection(\"Relationships\", False, Convert(null)).Where(guard => ((guard.LoadProperty(\"RelationshipType\", False, Convert(null)) ?? new Concept()).Mnemonic == \"Mother\")).FirstOrDefault() ?? new EntityRelationship()).LoadProperty(\"TargetEntity\", False, Convert(null)) ?? new Entity()) As Patient) ?? new Patient()).DateOfBirth, Convert(value(SanteDB.Messaging.HDSI.Test.QueryParameterLinqBuilderTest+<>c).<TestExtendedQueryFilterWithParameterVariableComplexPathParse>b__23_0(), Patient)) ?? default(DateTime))) > 730.12:00:00))";
 
             }
             QueryFilterExtensions.AddExtendedFilter(new SimpleQueryExtensionEx());
@@ -438,7 +438,7 @@ namespace SanteDB.Messaging.HDSI.Test
         [Test]
         public void TestExtendedQueryFilterWithParameterVariableCrossReference()
         {
-            var expected = "o => ((o.DateOfBirth != null) AndAlso (o.DateOfBirth.Value.TestExpressionEx((Invoke(__xinstance => ((((__xinstance.LoadCollection(\"Relationships\", False).Where(guard => ((guard.LoadProperty(\"RelationshipType\", False) ?? new Concept()).Mnemonic == \"Mother\")).FirstOrDefault() ?? new EntityRelationship()).LoadProperty(\"TargetEntity\", False) ?? new Entity()) As Patient) ?? new Patient()).DateOfBirth, o) ?? default(DateTime))) > 7300.00:00:00))";
+            var expected = "o => ((o.DateOfBirth != null) AndAlso (o.DateOfBirth.Value.TestExpressionEx((Invoke(__xinstance => ((((__xinstance.LoadCollection(\"Relationships\", False, Convert(null)).Where(guard => ((guard.LoadProperty(\"RelationshipType\", False, Convert(null)) ?? new Concept()).Mnemonic == \"Mother\")).FirstOrDefault() ?? new EntityRelationship()).LoadProperty(\"TargetEntity\", False, Convert(null)) ?? new Entity()) As Patient) ?? new Patient()).DateOfBirth, o) ?? default(DateTime))) > 7300.00:00:00))";
             QueryFilterExtensions.AddExtendedFilter(new SimpleQueryExtensionEx());
             NameValueCollection httpQueryParameters = new NameValueCollection();
             httpQueryParameters.Add("dateOfBirth", ":(testEx|$_.relationship[Mother].target@Patient.dateOfBirth)>P20Y");
