@@ -2,7 +2,7 @@
 extensions: .cs .cpp .h .js
 /*
  * Copyright (C) 2021 - %CurrentYear%, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
- * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
+ * Portions Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
@@ -22,7 +22,7 @@ extensions: .aspx .ascx
 extensions:  .xml .config .xsd .xslt .dataset
 <!--
  - Copyright 2021-%CurrentYear% SanteSuite Contributors (See NOTICE.md for full copyright notices)
- - Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
+ - Portions Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  - Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  -
  - Licensed under the Apache License, Version 2.0 (the "License"); you

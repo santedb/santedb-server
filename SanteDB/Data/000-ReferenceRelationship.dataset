@@ -71,10 +71,6 @@
         <language>en</language>
         <value>Community Service Delivery Location</value>
       </name>
-      <name>
-        <language>en</language>
-        <value>Catchment/Service Location</value>
-      </name>
       <referenceTerm>
         <term>5D93E712-58AE-4C56-BCA9-518DB745A674</term>
         <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
