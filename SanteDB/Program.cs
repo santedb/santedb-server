@@ -39,6 +39,7 @@ using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.ServiceProcess;
+using System.Text;
 using System.Threading;
 using System.Xml.Serialization;
 
@@ -59,6 +60,19 @@ namespace SanteDB
             // Trace copyright information
             Assembly entryAsm = Assembly.GetEntryAssembly();
 
+            if (null == entryAsm)
+            {
+                entryAsm = typeof(Program).Assembly;
+            }
+
+            var workdirectory = Path.GetDirectoryName(entryAsm.Location);
+            var datadirectory = Path.GetDirectoryName(typeof(Program).Assembly.Location);
+
+            if (null == datadirectory || (datadirectory.Equals(workdirectory, StringComparison.OrdinalIgnoreCase) == false))
+            {
+                Trace.TraceWarning("Warning entry assembly location is not the same as detected data directory.");
+            }
+
             // Dump some info
             Trace.TraceInformation("SanteDB Startup : v{0}", entryAsm.GetName().Version);
             Trace.TraceInformation("SanteDB Working Directory : {0}", entryAsm.Location);
@@ -66,7 +80,7 @@ namespace SanteDB
             Trace.TraceInformation("CLI Version: {0}", Environment.Version);
             AppDomain.CurrentDomain.SetData(
                "DataDirectory",
-               Path.GetDirectoryName(typeof(Program).Assembly.Location)
+               datadirectory
             );
 
             // Handle Unahndled exception
@@ -87,40 +101,7 @@ namespace SanteDB
                 var parameters = parser.Parse(args);
 
                 // Are there any third party libraries to load?
-                if (parameters.LoadExtensions?.Count > 0)
-                {
-                    foreach (var ext in parameters.LoadExtensions)
-                    {
-                        var itm = ext;
-                        if(!Path.IsPathRooted(itm))
-                        {
-                            itm = Path.Combine(Path.GetDirectoryName(typeof(Program).Assembly.Location), itm);
-                        }
-
-                        if (File.Exists(itm))
-                        {
-                            Console.WriteLine("Loading {0}...", itm); // TODO: Use System.Diagnostics.Tracer
-                            Assembly.LoadFile(itm);
-                        }
-                        else if (itm.Contains("*"))
-                        {
-                            var directoryName = Path.GetDirectoryName(itm);
-                            if(!Directory.Exists(directoryName))
-                            {
-                                directoryName = Path.GetDirectoryName(directoryName);
-                            }
-                            foreach (var fil in Directory.GetFiles(directoryName, Path.GetFileName(itm)))
-                            {
-                                Console.WriteLine("Loading {0}...", fil); // TODO: Use System.Diagnostics.Tracer
-                                Assembly.LoadFile(fil);
-                            }
-                        }
-                        else
-                        {
-                            Console.WriteLine("{0} does not exist", itm);
-                        }
-                    }
-                }
+                LoadExtensions(parameters);
 
                 var instanceSuffix = !String.IsNullOrEmpty(parameters.InstanceName) ? $"-{parameters.InstanceName}" : null;
                 var serviceName = $"SanteDB{instanceSuffix}";
@@ -153,24 +134,45 @@ namespace SanteDB
                     if (!ServiceTools.ServiceInstaller.ServiceIsInstalled(serviceName))
                     {
                         Console.WriteLine("Installing Service...");
+                        var displayname = "SanteDB Host Process"; //Default display name when no name specified.
+
+                        var configFile = parameters.ConfigFile;
+
+                        if (String.IsNullOrEmpty(configFile))
+                        {
+                            configFile = Path.Combine(Path.GetDirectoryName(entryAsm.Location), $"santedb.config.{parameters.InstanceName}.xml");
+                        }
+                        else if (!Path.IsPathRooted(configFile))
+                        {
+                            configFile = Path.Combine(Path.GetDirectoryName(entryAsm.Location), configFile);
+                        }
+
                         if (!String.IsNullOrEmpty(instanceSuffix))
                         {
-                            var configFile = parameters.ConfigFile;
-                            if (String.IsNullOrEmpty(configFile))
-                            {
-                                configFile = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), $"santedb.config.{parameters.InstanceName}.xml");
-                            }
-                            else if (!Path.IsPathRooted(configFile))
-                            {
-                                configFile = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), configFile);
-                            }
+                            displayname = $"SanteDB Host Process - {parameters.InstanceName}";
+                        }
 
-                            ServiceTools.ServiceInstaller.Install(serviceName, $"SanteDB Host Process - {parameters.InstanceName}", $"{Assembly.GetEntryAssembly().Location} --name={parameters.InstanceName} --config={configFile}", null, null, ServiceTools.ServiceBootFlag.AutoStart);
-                        }
-                        else
+                        StringBuilder servicecommandline = new StringBuilder(64);
+
+                        servicecommandline.Append('"');
+                        servicecommandline.Append(entryAsm.Location);
+                        servicecommandline.Append('"');
+
+                        if (!string.IsNullOrWhiteSpace(parameters.InstanceName))
+                            servicecommandline.AppendFormat(" --name={0}", parameters.InstanceName);
+
+                        servicecommandline.AppendFormat(" --config={0}", configFile);
+
+                        if (null != parameters.LoadExtensions && parameters.LoadExtensions.Count > 0)
                         {
-                            ServiceTools.ServiceInstaller.Install($"SanteDB", "SanteDB Host Process", $"{Assembly.GetEntryAssembly().Location}", null, null, ServiceTools.ServiceBootFlag.AutoStart);
+                            //TODO: Handle wildcards and fix loads for service for security against malicious plugins.
+                            foreach (var loadparm in parameters.LoadExtensions)
+                            {
+                                servicecommandline.AppendFormat(" --load=\"{0}\"", loadparm);
+                            }
                         }
+
+                        ServiceTools.ServiceInstaller.Install(serviceName, displayname, servicecommandline.ToString(), null, null, ServiceTools.ServiceBootFlag.AutoStart);
                     }
                 }
                 else if (parameters.UnInstall)
@@ -277,11 +279,11 @@ namespace SanteDB
                             // Gracefully shutdown
                             ServiceUtil.Stop();
 
-                            try // remove the lock file
-                            {
-                                File.Delete("/tmp/SanteDB.exe.lock");
-                            }
-                            catch { }
+                            //try // remove the lock file
+                            //{
+                            //    File.Delete("/tmp/SanteDB.exe.lock");
+                            //}
+                            //catch { }
                         }
                     }
 
@@ -323,6 +325,54 @@ namespace SanteDB
                     Trace.TraceWarning("Could not emit the error to the EventLog - {0}", e1);
                 }
                 Environment.Exit(911);
+            }
+        }
+
+        /// <summary>
+        /// Loads extensions specified in the command line.
+        /// </summary>
+        /// <param name="parameters">The parsed command line parameters with the extensions.</param>
+        private static bool LoadExtensions(ConsoleParameters parameters)
+        {
+            if (parameters.LoadExtensions?.Count > 0)
+            {
+                foreach (var ext in parameters.LoadExtensions)
+                {
+                    var itm = ext;
+                    if (!Path.IsPathRooted(itm))
+                    {
+                        itm = Path.Combine(Path.GetDirectoryName(typeof(Program).Assembly.Location), itm);
+                    }
+
+                    if (File.Exists(itm))
+                    {
+                        Console.WriteLine("Loading {0}...", itm); // TODO: Use System.Diagnostics.Tracer
+                        Assembly.LoadFile(itm);
+                    }
+                    else if (itm.Contains("*"))
+                    {
+                        var directoryName = Path.GetDirectoryName(itm);
+                        if (!Directory.Exists(directoryName))
+                        {
+                            directoryName = Path.GetDirectoryName(directoryName);
+                        }
+                        foreach (var fil in Directory.GetFiles(directoryName, Path.GetFileName(itm)))
+                        {
+                            Console.WriteLine("Loading {0}...", fil); // TODO: Use System.Diagnostics.Tracer
+                            Assembly.LoadFile(fil);
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("{0} does not exist", itm);
+                    }
+                }
+
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
@@ -370,7 +420,7 @@ namespace SanteDB
                     {
                         if (ormConfiguration?.AleConfiguration?.AleEnabled != true)
                             continue;
-                        
+
 
                         processedConnections.Add(ormConfiguration.ReadWriteConnectionString);
 

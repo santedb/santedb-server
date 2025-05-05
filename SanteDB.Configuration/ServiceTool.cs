@@ -279,6 +279,7 @@ namespace ServiceTools
     [ExcludeFromCodeCoverage]
     public class ServiceInstaller
     {
+        //TODO: Clean this up.
         private const int STANDARD_RIGHTS_REQUIRED = 0xF0000;
         private const int SERVICE_WIN32_OWN_PROCESS = 0x00000010;
 
