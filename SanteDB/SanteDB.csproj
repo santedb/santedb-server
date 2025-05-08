@@ -618,7 +618,7 @@
       <Version>2.2.1</Version>
     </PackageReference>
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe">
-      <Version>6.0.0</Version>
+      <Version>6.1.1</Version>
     </PackageReference>
     <ProjectReference Include="..\santedb-cache-memory\SanteDB.Caching.Memory\SanteDB.Caching.Memory.csproj">
       <Project>{8553abc7-abfa-4a21-b0e8-68b7de76129d}</Project>
