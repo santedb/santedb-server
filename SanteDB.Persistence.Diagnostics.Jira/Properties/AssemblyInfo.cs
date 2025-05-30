@@ -50,7 +50,7 @@ using System.Runtime.InteropServices;
 //
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
-// [assembly: AssemblyVersion("2.1.3.*")][assembly: AssemblyInformationalVersion("Alberta")]
-[assembly: AssemblyInformationalVersion("Alberta")]
+// [assembly: AssemblyVersion("2.1.3.*")][assembly: AssemblyInformationalVersion("Bluenose")]
+[assembly: AssemblyInformationalVersion("Bluenose")]
 [assembly: Plugin(Group = FeatureGroup.Diagnostics, Environment = PluginEnvironment.Server, EnableByDefault = false)]
 [assembly: PluginTraceSource("SanteDB.Persistence.Diagnostics.Jira")]
