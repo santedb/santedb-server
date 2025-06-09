@@ -303,7 +303,7 @@
     <None Include="Data\000-RelationshipClassifications.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Data\000-TelecomTypeCodes.dataset">
+    <None Include="Data\002-TelecomTypeCodes.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Data\000-Countries.dataset">
