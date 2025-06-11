@@ -183,6 +183,9 @@
     <None Include="Data\000-AdminActPolicies.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Data\000-ToolingPolicies.dataset">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Data\000-LoginPolicies.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
