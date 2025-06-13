@@ -16,7 +16,7 @@
  - License for the specific language governing permissions and limitations under 
  - the License.
  -->
-<dataset xmlns="http://santedb.org/data" id="Entity Class Codes 3.05">
+<dataset xmlns="http://santedb.org/data" id="Entity Class Codes 3.06">
   <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>6a2b00ba-501b-4523-b57c-f96d8ae44684</id>
@@ -89,6 +89,10 @@ INSERT OR IGNORE INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id
 	VALUES ((randomblob(16)), x'3BDF8067BDAFA3448627CBB3DC2F02F6', x'A7DF34FFD3C68B4FBC9F14BCDC13BA6C', x'24F36FB774B1B740A6ACD1FDF8E23967', 'ServiceDeliveryLocation=[LocatedEntity]=>Container', 1);--#!
 INSERT OR IGNORE INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
   VALUES (x'4BA0B77765C0AF4F8EC02CDAD4AE372B', x'04FF7313EFA60A42B1D04A07465FE8E8',x'BA002B6A1B502345B57CF96D8AE44684','Device=[AssignedEntity]=>UserEntity', 1);
+  
+INSERT OR IGNORE INTO REL_VRFY_SYSTBL (REL_TYP_CD_ID, SRC_CLS_CD_ID, TRG_CLS_CD_ID, ERR_DESC, REL_CLS) 
+  VALUES (x'34238E3BCC4C244F8AAE37341EA03D3E',x'46A8E29DF2DDBC4E902E84508C5089EA', x'6F9CCDBAA93F1E48963637457962804D', 'Person=[Guardian]=>Patient', 1);
+  
 
       ]]>
     </exec>
@@ -105,6 +109,9 @@ INSERT INTO REL_VRFY_SYSTBL (REL_TYP_CD_ID, SRC_CLS_CD_ID, TRG_CLS_CD_ID, ERR_DE
     VALUES ('77B6D8CD-05A0-4B1F-9E14-B895203BF40C','6a2b00ba-501b-4523-b57c-f96d8ae44684','ff34dfa7-c6d3-4f8b-bc9f-14bcdc13ba6c', 'UserEntity=[MaintainedEntity]=>ServiceDeliveryLocation') ON CONFLICT DO NOTHING;
 INSERT INTO REL_VRFY_SYSTBL (REL_TYP_CD_ID, SRC_CLS_CD_ID, TRG_CLS_CD_ID, ERR_DESC) 
     VALUES ('77B6D8CD-05A0-4B1F-9E14-B895203BF40C','7c08bd55-4d42-49cd-92f8-6388d6c4183f','ff34dfa7-c6d3-4f8b-bc9f-14bcdc13ba6c', 'Organization=[MaintainedEntity]=>ServiceDeliveryLocation') ON CONFLICT DO NOTHING;
+
+INSERT INTO REL_VRFY_SYSTBL (REL_TYP_CD_ID, SRC_CLS_CD_ID, TRG_CLS_CD_ID, ERR_DESC, REL_CLS) 
+  VALUES ('3b8e2334-4ccc-4f24-8aae-37341ea03d3e','9de2a846-ddf2-4ebc-902e-84508c5089ea', 'bacd9c6f-3fa9-481e-9636-37457962804d', 'Person=[Guardian]=>Patient', 1) ON CONFLICT DO NOTHING;
 
       	INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls)
 	VALUES (uuid_generate_v1(), ('0B82357F-5AE0-4543-AB8E-A33E9B315BAB'), null, ('6a2b00ba-501b-4523-b57c-f96d8ae44684'), '*=[Witness]=>UserEntity', 3) ON CONFLICT DO NOTHING;--#!
