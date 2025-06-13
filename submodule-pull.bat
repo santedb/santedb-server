@@ -11,7 +11,7 @@ IF [%1] == [] (
 		IF EXIST ".git" (
 			ECHO Pulling %1 on %%G
 			git checkout %1
-			git pull
+			git pull --no-edit
 		)
 		POPD
 	)
