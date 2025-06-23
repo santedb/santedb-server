@@ -484,6 +484,9 @@
     <None Include="config\template\SanteDB EMR.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="config\santedb.rapidpro.config.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <Content Include="santedb.config.nuget.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
