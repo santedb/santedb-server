@@ -22,8 +22,8 @@ fi;
 git checkout $2
 git pull
 ./submodule-pull.sh $2
-msbuild /p:Configuration=$3 /t:clean /t:restore santedb-server-ext.sln /p:VersionNumber=$1 || exit 911
-msbuild /t:build /p:Configuration=$3 santedb-server-ext.sln /p:VersionNumber=$1 /p:NoFirebird=1 || exit 911
+msbuild /p:Configuration=$3 /t:clean /t:restore santedb-server-linux-ext.sln /p:VersionNumber=$1 || exit 911
+msbuild /t:build /p:Configuration=$3 santedb-server-linux-ext.sln /p:VersionNumber=$1 /p:NoFirebird=1 || exit 911
 
 if [ "$3" == "Release" ]; then
 	./sign-release.sh

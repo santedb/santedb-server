@@ -16,7 +16,7 @@
  - License for the specific language governing permissions and limitations under 
  - the License.
  -->
-  <dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Telecommnications Address Types v3.01">
+  <dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Telecommnications Address Types v3.02">
   <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>c1c0a4e9-4238-4044-b89b-9c9798995b99</id>
@@ -28,6 +28,10 @@
         <language>en</language>
         <value>Telephone</value>
       </name>
+		<extension>
+			<extensionType>7948BDB9-0700-4945-A39B-23522801F8E3</extensionType>
+			<value>dGVsOg</value>
+		</extension>
     </Concept>
   </update>
   <update insertIfNotExists="true">
@@ -41,7 +45,11 @@
         <language>en</language>
         <value>Cellphone</value>
       </name>
-    </Concept>
+		<extension>
+			<extensionType>7948BDB9-0700-4945-A39B-23522801F8E3</extensionType>
+			<value>c21zOg</value>
+		</extension>
+	</Concept>
   </update>
   <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
@@ -80,6 +88,10 @@
         <language>en</language>
         <value>Internet Address</value>
       </name>
+		<extension>
+			<extensionType>7948BDB9-0700-4945-A39B-23522801F8E3</extensionType>
+			<value>aHR0cDo</value>
+		</extension>
     </Concept>
   </update>
   <update insertIfNotExists="true">
@@ -93,7 +105,11 @@
         <language>en</language>
         <value>Email</value>
       </name>
-    </Concept>
+		<extension>
+			<extensionType>7948BDB9-0700-4945-A39B-23522801F8E3</extensionType>
+			<value>bWFpbHRvOg</value>
+		</extension>
+	</Concept>
   </update>
   <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
@@ -106,7 +122,11 @@
         <language>en</language>
         <value>Viber</value>
       </name>
-    </Concept>
+		<extension>
+			<extensionType>7948BDB9-0700-4945-A39B-23522801F8E3</extensionType>
+			<value>dmliZXI6</value>
+		</extension>
+	</Concept>
   </update>
   <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
@@ -119,7 +139,12 @@
         <language>en</language>
         <value>WhatsApp</value>
       </name>
-    </Concept>
+		<extension>
+			<extensionType>7948BDB9-0700-4945-A39B-23522801F8E3</extensionType>
+			<value>d2hhdHNhcHA6</value>
+		</extension>
+
+	</Concept>
   </update>
   <update insertIfNotExists="true">
     <ConceptSet xmlns="http://santedb.org/model">

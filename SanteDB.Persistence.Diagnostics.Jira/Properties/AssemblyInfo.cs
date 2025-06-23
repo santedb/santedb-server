@@ -1,6 +1,6 @@
 ﻿/*
- * Copyright (C) 2021 - 2024, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
- * Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
+ * Copyright (C) 2021 - 2025, SanteSuite Inc. and the SanteSuite Contributors (See NOTICE.md for full copyright notices)
+ * Portions Copyright (C) 2019 - 2021, Fyfe Software Inc. and the SanteSuite Contributors
  * Portions Copyright (C) 2015-2018 Mohawk College of Applied Arts and Technology
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you
@@ -50,7 +50,7 @@ using System.Runtime.InteropServices;
 //
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
-// [assembly: AssemblyVersion("2.1.3.*")][assembly: AssemblyInformationalVersion("Alberta")]
-[assembly: AssemblyInformationalVersion("Alberta")]
+// [assembly: AssemblyVersion("2.1.3.*")][assembly: AssemblyInformationalVersion("Bluenose")]
+[assembly: AssemblyInformationalVersion("Bluenose")]
 [assembly: Plugin(Group = FeatureGroup.Diagnostics, Environment = PluginEnvironment.Server, EnableByDefault = false)]
 [assembly: PluginTraceSource("SanteDB.Persistence.Diagnostics.Jira")]
