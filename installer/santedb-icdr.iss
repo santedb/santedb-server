@@ -105,6 +105,8 @@ Name: tools; Description: Management Tooling; Types: full demo
 Name: dev; Description: Development Tooling; Types: full demo
 Name: demo; Description: Elbonia Quickstart; Types: demo
 
+[InstallDelete]
+Type: files; Name: "{app}\Hl7.Fhir.R4.Core.dll"
 [Files]
 
 ; Microsoft .NET Framework 4.5 Installation

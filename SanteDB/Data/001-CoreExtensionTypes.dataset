@@ -16,7 +16,7 @@
  - License for the specific language governing permissions and limitations under 
  - the License.
  -->
-<dataset xmlns="http://santedb.org/data" id="Core Extension Types v3.4">
+<dataset xmlns="http://santedb.org/data" id="Core Extension Types v3.5">
   <update insertIfNotExists="true">
     <ExtensionType xmlns="http://santedb.org/model">
       <id>77B53CBA-C32F-442B-B7A7-ED08184A0FA5</id>
@@ -108,6 +108,15 @@
 			<name>Death Details Validated</name>
 			<uri>http://santedb.org/extensions/core/deathValidated</uri>
 			<scope>bacd9c6f-3fa9-481e-9636-37457962804d</scope>
+		</ExtensionType>
+	</update>
+	<update insertIfNotExists="true">
+		<ExtensionType xmlns="http://santedb.org/model">
+			<id>7948BDB9-0700-4945-A39B-23522801F8E3</id>
+			<handlerClass>SanteDB.Core.Extensions.StringExtensionHandler, SanteDB.Core.Model</handlerClass>
+			<name>Concept URI Scheme</name>
+			<description>Defines the URI scheme to use on an object with this concept</description>
+			<uri>http://santedb.org/extensions/core/itef/rfc3986/scheme</uri>
 		</ExtensionType>
 	</update>
 </dataset>

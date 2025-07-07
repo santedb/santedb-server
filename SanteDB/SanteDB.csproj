@@ -183,6 +183,9 @@
     <None Include="Data\000-AdminActPolicies.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Data\000-ToolingPolicies.dataset">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Data\000-LoginPolicies.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -303,7 +306,7 @@
     <None Include="Data\000-RelationshipClassifications.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Data\000-TelecomTypeCodes.dataset">
+    <None Include="Data\002-TelecomTypeCodes.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Data\000-Countries.dataset">
@@ -479,6 +482,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="config\template\SanteDB EMR.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="config\santedb.rapidpro.config.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <Content Include="santedb.config.nuget.xml">
