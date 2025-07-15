@@ -214,8 +214,8 @@ Source: ..\bin\Release\BouncyCastle.Crypto.dll; DestDir: {app}; Components: serv
 Source: ..\bin\Release\SanteDB.Security.Certs.BouncyCastle.dll; DestDir: {app}; Components: server core
 Source: ..\bin\Release\SanteDB.Core.i18n.dll; DestDir: {app}; Components: server core
 Source: ..\bin\Release\zxing.dll; DestDir: {app}; Components: server core
-Source: ..\bin\Release\zxing.presentation.dll; DestDir: {app}; Components: server core
-Source: ..\bin\Release\ZXing.Windows.Compatibility.dll; DestDir: {app}; Components: server core
+Source: ..\bin\Release\ZXing.*.dll; DestDir: {app}; Components: server core
+Source: ..\bin\Release\SixLabors.*.dll; DestDir: {app}; Components: server core
 ;Source: ..\bin\Release\fr\*; DestDir: {app}\fr; Components: server core
 
 ; Client Services
