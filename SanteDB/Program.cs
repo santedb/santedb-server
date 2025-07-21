@@ -86,6 +86,14 @@ namespace SanteDB
             // Handle Unahndled exception
             AppDomain.CurrentDomain.UnhandledException += (o, e) =>
             {
+                try
+                {
+                    ApplicationServiceContext.Current.Stop();
+                }
+                catch(Exception ex)
+                {
+                    Trace.TraceError("Could not stop application service context");
+                }
                 Trace.TraceError("++++++ FATAL APPLICATION ERROR ++++++++\r\n{0}", e.ExceptionObject);
                 EventLog.WriteEntry("SanteDB Host Process", $"++++++ FATAL APPLICATION ERROR ++++++++\r\n{e.ExceptionObject}", EventLogEntryType.Error, 999);
                 Environment.Exit(999);
