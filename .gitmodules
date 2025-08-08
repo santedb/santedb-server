@@ -108,3 +108,4 @@
 [submodule "santedb-madx"]
 	path = santedb-madx
 	url = https://github.com/santedb/santedb-madx.git
+	branch = version/3.0
