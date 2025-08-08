@@ -324,7 +324,7 @@ Source: "..\bin\Release\config\template\SanteDB MDM.xml"; DestDir: {app}\config\
 ; SQLIte
 Source: ..\bin\Release\Microsoft.Data.Sqlite.dll; DestDir: {app}; Components: db\sqlite
 Source: ..\bin\Release\runtimes\*; DestDir: {app}\runtimes; Flags: recursesubdirs; Components: db\sqlite
-Source: ..\Solution Items\spellfix.dll; DestDir: {app}; Components: db\sqlite
+;Source: ..\Solution Items\spellfix.dll; DestDir: {app}; Components: db\sqlite
 ;Source: ..\bin\Release\SQLitePCLRaw.batteries_v2.dll; DestDir: {app}; Components: db\sqlite
 Source: ..\bin\Release\SQLitePCLRaw.core.dll; DestDir: {app}; Components: db\sqlite
 Source: ..\bin\Release\SQLitePCLRaw.provider.dynamic_cdecl.dll; DestDir: {app}; Components: db\sqlite
