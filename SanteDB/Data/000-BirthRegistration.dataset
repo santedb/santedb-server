@@ -93,6 +93,40 @@
 			</name>
 		</Concept>
 	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<ReferenceTerm xmlns="http://santedb.org/model">
+			<id>ee600cb1-50db-4fee-9601-983fc1423875</id>
+			<mnemonic>76689-9</mnemonic>
+			<codeSystem>08c59397-706b-456a-aeb1-9e7d5a2adc94</codeSystem>
+			<name>
+				<id>7116b468-8836-11f0-81e2-fb8cd8e83c4c</id>
+				<language>en</language>
+				<value>SEX AT BIRTH</value>
+				<source>ee600cb1-50db-4fee-9601-983fc1423875</source>
+			</name>
+		</ReferenceTerm>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>e1cf0ea0-63bf-4a8c-9e41-bbd542d3479c</id>
+			<sequence xsi:nil="true" />
+			<mnemonic>ObservationType-BirthSex</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<referenceTerm>
+				<id>711c0c2e-8836-11f0-81e4-c3a9f488ba90</id>
+				<source>e1cf0ea0-63bf-4a8c-9e41-bbd542d3479c</source>
+				<term>ee600cb1-50db-4fee-9601-983fc1423875</term>
+				<relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+			</referenceTerm>
+			<name>
+				<id>7a0e0daa-8836-11f0-9743-a73d86ce2830</id>
+				<source>e1cf0ea0-63bf-4a8c-9e41-bbd542d3479c</source>
+				<language>en</language>
+				<value>Sex (At Birth)</value>
+			</name>
+		</Concept>
+	</update>
 	<update insertIfNotExists="true">
 		<ConceptSet xmlns="http://santedb.org/model">
 			<id>023856da-1867-11eb-adc1-0242ac120002</id>
