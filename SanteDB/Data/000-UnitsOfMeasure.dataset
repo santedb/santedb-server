@@ -16,7 +16,7 @@
  - License for the specific language governing permissions and limitations under 
  - the License.
  -->
-  <dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Units of Measure Concepts v3.04">
+  <dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Units of Measure Concepts v3.05">
   <update skipIfError="false" insertIfNotExists="true">
     <CodeSystem xmlns="http://santedb.org/model">
       <id>4853a702-fff3-4efb-8dd7-54aacca53664</id>
@@ -571,7 +571,77 @@
       <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
     </ConceptReferenceTerm>
   </update>
-  <update skipIfError="false" insertIfNotExists="true">
+	  <update skipIfError="false" insertIfNotExists="true">
+		  <ReferenceTerm xmlns="http://santedb.org/model">
+			  <id>c87bdc8b-3764-4cda-9ffc-fcfc30923523</id>
+			  <mnemonic>wk</mnemonic>
+			  <codeSystem>4853a702-fff3-4efb-8dd7-54aacca53664</codeSystem>
+			  <name>
+				  <id>fc4c2426-8914-11f0-9efc-27a37be8b53b</id>
+				  <language>en</language>
+				  <value>Weeks</value>
+				  <source>c87bdc8b-3764-4cda-9ffc-fcfc30923523</source>
+			  </name>
+		  </ReferenceTerm>
+	  </update>
+	  <update skipIfError="false" insertIfNotExists="true">
+		  <Concept xmlns="http://santedb.org/model">
+			  <id>a0ef1084-2158-42f2-933b-f81aa78ca4d2</id>
+			  <sequence xsi:nil="true" />
+			  <mnemonic>UnitOfMeasure-Week</mnemonic>
+			  <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			  <conceptClass>1ef69347-ef03-4ff7-b3c5-6334448845e6</conceptClass>
+			  <referenceTerm>
+				  <id>fc4f70b8-8914-11f0-9efe-6308207921fb</id>
+				  <source>a0ef1084-2158-42f2-933b-f81aa78ca4d2</source>
+				  <term>c87bdc8b-3764-4cda-9ffc-fcfc30923523</term>
+				  <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+			  </referenceTerm>
+			  <name>
+				  <id>20e7c542-8915-11f0-aa60-1fc19f79b6ec</id>
+				  <source>a0ef1084-2158-42f2-933b-f81aa78ca4d2</source>
+				  <language>en</language>
+				  <value>Weeks</value>
+			  </name>
+		  </Concept>
+	  </update>
+
+	  <update skipIfError="false" insertIfNotExists="true">
+		  <ReferenceTerm xmlns="http://santedb.org/model">
+			  <id>77c9ba63-8571-4eea-9c71-1ed444ccf58b</id>
+			  <mnemonic>d</mnemonic>
+			  <codeSystem>4853a702-fff3-4efb-8dd7-54aacca53664</codeSystem>
+			  <name>
+				  <id>05f73a56-8915-11f0-9bec-0b31c5d3002f</id>
+				  <language>en</language>
+				  <value>Day</value>
+				  <source>77c9ba63-8571-4eea-9c71-1ed444ccf58b</source>
+			  </name>
+		  </ReferenceTerm>
+	  </update>
+	  <update skipIfError="false" insertIfNotExists="true">
+		  <Concept xmlns="http://santedb.org/model">
+			  <id>68c6722d-df78-455c-bf1a-dcb89585dbcb</id>
+			  <sequence xsi:nil="true" />
+			  <mnemonic>UnitOfMeasure-Day</mnemonic>
+			  <statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			  <conceptClass>1ef69347-ef03-4ff7-b3c5-6334448845e6</conceptClass>
+			  <referenceTerm>
+				  <id>05fa1f50-8915-11f0-9bee-c73ff8f86b01</id>
+				  <source>68c6722d-df78-455c-bf1a-dcb89585dbcb</source>
+				  <term>77c9ba63-8571-4eea-9c71-1ed444ccf58b</term>
+				  <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+			  </referenceTerm>
+			  <name>
+				  <id>266d642c-8915-11f0-9bb6-13e854331b02</id>
+				  <source>68c6722d-df78-455c-bf1a-dcb89585dbcb</source>
+				  <language>en</language>
+				  <value>Day</value>
+			  </name>
+			  
+		  </Concept>
+	  </update>
+	  <update skipIfError="false" insertIfNotExists="true">
     <ConceptSet xmlns="http://santedb.org/model">
       <id>329535eb-d6cf-4a62-aeb8-43e959f1ad09</id>
       <name>Units of Measure</name>
@@ -593,6 +663,8 @@
       <concept>b4fc5c93-31c2-4f87-990e-c5a4e5ea2e76</concept>
       <concept>49974584-7c48-457e-a79c-031cdd62714a</concept>
       <concept>93424b4a-36f2-4376-b374-1c086c5ebf52</concept>
+		<concept>68c6722d-df78-455c-bf1a-dcb89585dbcb</concept>
+		<concept>a0ef1084-2158-42f2-933b-f81aa78ca4d2</concept>
     </ConceptSet>
   </update>
   <update skipIfError="false" insertIfNotExists="true">
@@ -653,4 +725,5 @@
       <concept>83792d73-6a3a-4a72-b13a-ba95ef4a83ea</concept>
     </ConceptSet>
   </update>
+	
 </dataset>
