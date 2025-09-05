@@ -18,7 +18,7 @@
  -->
 <dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data"
-	id="Birth Registration Concepts">
+	id="Birth / Newborn Registration Concepts">
 	<update insertIfNotExists="true">
 		<ConceptSet xmlns="http://santedb.org/model">
 			<id>02385374-1867-11eb-adc1-0242ac120002</id>
@@ -415,7 +415,7 @@
 		</Concept>
 	</update>
 	<update insertIfNotExists="true">
-		<ReferenceTerm xmlns="http://santedb.org/model">
+		<ReferenceTerm xmlns="http://santedb.org/model">APGAR
 			<id>54906eaa-1889-11eb-adc1-0242ac120002</id>
 			<mnemonic>11636-8</mnemonic>
 			<codeSystem>08C59397-706B-456A-AEB1-9E7D5A2ADC94</codeSystem>
@@ -442,4 +442,91 @@
 			</name>
 		</Concept>
 	</update>
+	<update insertIfNotExists="true">
+		<ReferenceTerm xmlns="http://santedb.org/model">
+			<id>E9E06424-3F65-4371-9A49-7591419845DD</id>
+			<mnemonic>107309-7</mnemonic>
+			<codeSystem>08C59397-706B-456A-AEB1-9E7D5A2ADC94</codeSystem>
+			<name>
+				<language>en</language>
+				<value>Body weight Newborn Measured at discharge</value>
+			</name>
+		</ReferenceTerm>
+	</update>
+	<update insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>3D955C66-7031-435A-9D26-CC192A032B38</id>
+			<isReadonly>false</isReadonly>
+			<mnemonic>ObservationType-NewbornWeightAtDischarge</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<referenceTerm>
+				<term>E9E06424-3F65-4371-9A49-7591419845DD</term>
+				<relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+			</referenceTerm>
+			<name>
+				<language>en</language>
+				<value>Newborn Weight (Discharge)</value>
+			</name>
+		</Concept>
+	</update>
+	<update insertIfNotExists="true">
+		<ReferenceTerm xmlns="http://santedb.org/model">
+			<id>1D8FB5F4-3288-4184-A7EA-772A649C069C</id>
+			<mnemonic>63895-7</mnemonic>
+			<codeSystem>08C59397-706B-456A-AEB1-9E7D5A2ADC94</codeSystem>
+			<name>
+				<language>en</language>
+				<value>Breastfeeding status</value>
+			</name>
+		</ReferenceTerm>
+	</update>
+	<update insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>36C93880-E5A0-40BC-A271-CE7DFF9A90FD</id>
+			<isReadonly>false</isReadonly>
+			<mnemonic>ObservationType-InfantFeedingStatus</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<referenceTerm>
+				<term>1D8FB5F4-3288-4184-A7EA-772A649C069C</term>
+				<relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+			</referenceTerm>
+			<name>
+				<language>en</language>
+				<value>Infant Feeding</value>
+			</name>
+		</Concept>
+	</update>
+
+	<update insertIfNotExists="true">
+		<ReferenceTerm xmlns="http://santedb.org/model">
+			<id>075681D1-95B5-4A24-A654-02D569D736BD</id>
+			<mnemonic>21112-8</mnemonic>
+			<codeSystem>08C59397-706B-456A-AEB1-9E7D5A2ADC94</codeSystem>
+			<name>
+				<language>en</language>
+				<value>Birth Date</value>
+			</name>
+		</ReferenceTerm>
+	</update>
+	<update insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>409538DF-26E0-4FFA-B9FC-11A244EAE0E5</id>
+			<isReadonly>false</isReadonly>
+			<mnemonic>ObservationType-BirthDateAndTime</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<referenceTerm>
+				<term>075681D1-95B5-4A24-A654-02D569D736BD</term>
+				<relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+			</referenceTerm>
+			<name>
+				<language>en</language>
+				<value>Birth Date &amp; Time</value>
+			</name>
+		</Concept>
+	</update>
+
+	
 </dataset>
