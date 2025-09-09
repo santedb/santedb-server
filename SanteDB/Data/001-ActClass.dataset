@@ -16,7 +16,7 @@
  - License for the specific language governing permissions and limitations under 
  - the License.
  -->
-<dataset xmlns="http://santedb.org/data" id="SanteDB Core ActClass Codes v3.02">
+<dataset xmlns="http://santedb.org/data" id="SanteDB Core ActClass Codes v3.03">
 	<update insertIfNotExists="true">
 		<CodeSystem xmlns="http://santedb.org/model">
 			<id>BAB1D66A-1E98-4BFD-9B4A-7C4BE88F35D1</id>
@@ -150,10 +150,12 @@
 		<exec invariant="sqlite">
 			<![CDATA[
 			
-			
 -- CLUSTER HAS COMPONENT ANY
 INSERT OR IGNORE INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
 	VALUES((randomblob(16)), (x'0F54B9788B436F4B8D83AAF4979DBC64'), (x'B59180D3659021478A1FBFBB3B4BF447'), null, 'Cluster=[HasComponent]=>*', 2);--#!
+
+INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
+	VALUES((randomblob(16)), (x'0F54B9788B436F4B8D83AAF4979DBC64'), (x'C622D0288B8AC4479E6A2BC67308739E'), x'B59180D3659021478A1FBFBB3B4BF447', 'Observation=[HasComponent]=>Cluster', 2) ON CONFLICT DO NOTHING;--#!
 
 -- DOCUMENT HAS COMPONENT DOCUMENT SECTION
 INSERT OR IGNORE INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
@@ -215,6 +217,9 @@ INSERT OR IGNORE INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id
 -- CLUSTER HAS COMPONENT ANY
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
 	VALUES(uuid_generate_v1(), ('78B9540F-438B-4B6F-8D83-AAF4979DBC64'), ('d38091b5-9065-4721-8a1f-bfbb3b4bf447'), null, 'Cluster=[HasComponent]=>*', 2) ON CONFLICT DO NOTHING;--#!
+-- OBSERVATION HAS COMPONENT CLUSTER
+INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
+	VALUES(uuid_generate_v1(), ('78B9540F-438B-4B6F-8D83-AAF4979DBC64'), ('28d022c6-8a8b-47c4-9e6a-2bc67308739e'), 'd38091b5-9065-4721-8a1f-bfbb3b4bf447', 'Observation=[HasComponent]=>Cluster', 2) ON CONFLICT DO NOTHING;--#!
 
 -- DOCUMENT HAS COMPONENT DOCUMENT SECTION
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
