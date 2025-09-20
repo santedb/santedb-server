@@ -210,10 +210,21 @@ INSERT OR IGNORE  INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_i
 	VALUES((randomblob(16)), x'124C476478B9B64BA58446DADEC2D952', null, x'55BD087C424DCD4992F86388D6C4183F', '*=[ResponsibleParty]=>Organization', 3);--#!
 INSERT OR IGNORE INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
 	VALUES((randomblob(16)), x'3A01BEC3C520204C840CD9DBB15D040E', x'893432B0099A1A41BB55FF283830EA1A', x'24F36FB774B1B740A6ACD1FDF8E23967', 'List=[Tracker]=>Container', 3);--#!
+	
+-- EPISODE LINKS BETWEEN ANY
+INSERT OR IGNORE INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
+	VALUES((randomblob(16)), (x'10ACF9EBC9B57A4091A4360BFB7E0FB9'), null, null, '*=[EpisodeLink]=>*', 2);--#!
+		
       ]]>
 		</exec>
 		<exec invariant="npgsql">
 			<![CDATA[
+
+-- EPISODE LINKS BETWEEN ANY
+INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
+	VALUES(uuid_generate_v1(), ('EBF9AC10-B5C9-407A-91A4-360BFB7E0FB9'), null, null, '*=[EpisodeLink]=>*', 2) ON CONFLICT DO NOTHING;--#!
+
+			
 -- CLUSTER HAS COMPONENT ANY
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
 	VALUES(uuid_generate_v1(), ('78B9540F-438B-4B6F-8D83-AAF4979DBC64'), ('d38091b5-9065-4721-8a1f-bfbb3b4bf447'), null, 'Cluster=[HasComponent]=>*', 2) ON CONFLICT DO NOTHING;--#!
