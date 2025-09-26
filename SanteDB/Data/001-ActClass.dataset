@@ -16,7 +16,7 @@
  - License for the specific language governing permissions and limitations under 
  - the License.
  -->
-<dataset xmlns="http://santedb.org/data" id="SanteDB Core ActClass Codes v3.03">
+<dataset xmlns="http://santedb.org/data" id="SanteDB Core ActClass Codes v3.04">
 	<update insertIfNotExists="true">
 		<CodeSystem xmlns="http://santedb.org/model">
 			<id>BAB1D66A-1E98-4BFD-9B4A-7C4BE88F35D1</id>
@@ -214,6 +214,13 @@ INSERT OR IGNORE INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id
 -- EPISODE LINKS BETWEEN ANY
 INSERT OR IGNORE INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
 	VALUES((randomblob(16)), (x'10ACF9EBC9B57A4091A4360BFB7E0FB9'), null, null, '*=[EpisodeLink]=>*', 2);--#!
+	
+-- HAS MANIFSTATION
+INSERT OR IGNORE INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
+	VALUES((randomblob(16)), x'178D9122DCD33541A0034C1C52E57E75', null, x'C622D0288B8AC4479E6A2BC67308739E', '*=[HasManifestation]=>CodedObservation', 2);--#!
+			
+INSERT OR IGNORE INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
+	VALUES((randomblob(16)), x'BCC371987AB59D47A0317B56CB06FA84', null, null, '*=[HasSubject]=>*', 2);--#!
 		
       ]]>
 		</exec>
@@ -224,7 +231,14 @@ INSERT OR IGNORE INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
 	VALUES(uuid_generate_v1(), ('EBF9AC10-B5C9-407A-91A4-360BFB7E0FB9'), null, null, '*=[EpisodeLink]=>*', 2) ON CONFLICT DO NOTHING;--#!
 
+-- HAS MANIFSTATION
+INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
+	VALUES(uuid_generate_v1(), '22918d17-d3dc-4135-a003-4c1c52e57e75', null, '28d022c6-8a8b-47c4-9e6a-2bc67308739e', '*=[HasManifestation]=>CodedObservation', 2) ON CONFLICT DO NOTHING;--#!
 			
+-- HAS SUBJECT			
+INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
+	VALUES(uuid_generate_v1(), '9871c3bc-b57a-479d-a031-7b56cb06fa84', null, null, '*=[HasSubject]=>*', 2) ON CONFLICT DO NOTHING;--#!
+
 -- CLUSTER HAS COMPONENT ANY
 INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
 	VALUES(uuid_generate_v1(), ('78B9540F-438B-4B6F-8D83-AAF4979DBC64'), ('d38091b5-9065-4721-8a1f-bfbb3b4bf447'), null, 'Cluster=[HasComponent]=>*', 2) ON CONFLICT DO NOTHING;--#!
