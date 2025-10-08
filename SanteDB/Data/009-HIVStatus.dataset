@@ -74,20 +74,20 @@
         <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
       </referenceTerm>
       <name>
-        <id>fe786c46-ed2f-11ee-a2e2-f3d97990f900</id>
-        <source>dd3a4ad8-ec64-44a5-a3aa-8dad28a49d25</source>
-        <effectiveVersionSequence>2974</effectiveVersionSequence>
-        <language>en</language>
-        <value>Human immunodeficiency virus not detected</value>
-      </name>
-      <name>
         <id>fe786c47-ed2f-11ee-a2e3-df783a1f3785</id>
         <source>dd3a4ad8-ec64-44a5-a3aa-8dad28a49d25</source>
         <effectiveVersionSequence>2974</effectiveVersionSequence>
         <language>en</language>
         <value>HIV Negative</value>
       </name>
-      <conceptSet>9e1834ca-ed30-11ee-9771-7fbb587ec725</conceptSet>
+	<name>
+		<id>fe786c46-ed2f-11ee-a2e2-f3d97990f900</id>
+		<source>dd3a4ad8-ec64-44a5-a3aa-8dad28a49d25</source>
+		<effectiveVersionSequence>2974</effectiveVersionSequence>
+		<language>en</language>
+		<value>Human immunodeficiency virus not detected</value>
+	</name>
+	<conceptSet>9e1834ca-ed30-11ee-9771-7fbb587ec725</conceptSet>
     </Concept>
   </update>
   
@@ -141,6 +141,13 @@
         <term>40673c08-82cf-4912-bc93-c26d08e6f499</term>
         <relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
       </referenceTerm>
+		<name>
+			<id>1d865fbf-ed30-11ee-9839-4b1baa3c3b29</id>
+			<source>f36f692d-798b-4883-8d83-3ecf6c1571d0</source>
+			<effectiveVersionSequence>2975</effectiveVersionSequence>
+			<language>en</language>
+			<value>HIV Positive</value>
+		</name>
       <name>
         <id>1d865fbe-ed30-11ee-9838-0f7fd0a535ae</id>
         <source>f36f692d-798b-4883-8d83-3ecf6c1571d0</source>
@@ -148,13 +155,7 @@
         <language>en</language>
         <value>Human immunodeficiency virus detected</value>
       </name>
-      <name>
-        <id>1d865fbf-ed30-11ee-9839-4b1baa3c3b29</id>
-        <source>f36f692d-798b-4883-8d83-3ecf6c1571d0</source>
-        <effectiveVersionSequence>2975</effectiveVersionSequence>
-        <language>en</language>
-        <value>HIV Positive</value>
-      </name>
+      
       <name>
         <id>1d865fc0-ed30-11ee-983a-3fd76be1ae53</id>
         <source>f36f692d-798b-4883-8d83-3ecf6c1571d0</source>
