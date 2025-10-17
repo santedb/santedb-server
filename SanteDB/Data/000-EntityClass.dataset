@@ -16,7 +16,7 @@
  - License for the specific language governing permissions and limitations under 
  - the License.
  -->
-<dataset xmlns="http://santedb.org/data" id="Entity Class Codes 3.06">
+<dataset xmlns="http://santedb.org/data" id="Entity Class Codes 3.07">
   <update insertIfNotExists="true">
     <Concept xmlns="http://santedb.org/model">
       <id>6a2b00ba-501b-4523-b57c-f96d8ae44684</id>
@@ -92,8 +92,11 @@ INSERT OR IGNORE INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_
   
 INSERT OR IGNORE INTO REL_VRFY_SYSTBL (REL_TYP_CD_ID, SRC_CLS_CD_ID, TRG_CLS_CD_ID, ERR_DESC, REL_CLS) 
   VALUES (x'34238E3BCC4C244F8AAE37341EA03D3E',x'46A8E29DF2DDBC4E902E84508C5089EA', x'6F9CCDBAA93F1E48963637457962804D', 'Person=[Guardian]=>Patient', 1);
-  
 
+-- PATIENT REPLACES PERSON
+INSERT OR IGNORE INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
+  VALUES (x'378657D1CBE15E41B3194011DA033813', x'6F9CCDBAA93F1E48963637457962804D',x'46A8E29DF2DDBC4E902E84508C5089EA','Patient=[Replaces]=>Person', 1);
+  
       ]]>
     </exec>
     <exec invariant="npgsql">
@@ -157,6 +160,10 @@ INSERT INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_
 	VALUES (uuid_generate_v1(), '6780df3b-afbd-44a3-8627-cbb3dc2f02f6', 'ff34dfa7-c6d3-4f8b-bc9f-14bcdc13ba6c', 'b76ff324-b174-40b7-a6ac-d1fdf8e23967', 'ServiceDeliveryLocation=[LocatedEntity]=>Container', 1) ON CONFLICT DO NOTHING;--#!
 INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
   VALUES ('77b7a04b-c065-4faf-8ec0-2cdad4ae372b', '1373ff04-a6ef-420a-b1d0-4a07465fe8e8','6a2b00ba-501b-4523-b57c-f96d8ae44684','Device=[AssignedEntity]=>UserEntity', 1) ON CONFLICT DO NOTHING;
+
+-- PATIENT REPLACES PERSON
+INSERT INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
+  VALUES ('d1578637-e1cb-415e-b319-4011da033813', 'bacd9c6f-3fa9-481e-9636-37457962804d','9de2a846-ddf2-4ebc-902e-84508c5089ea','Patient=[Replaces]=>Person', 1) ON CONFLICT DO NOTHING;
 
 ]]>
     </exec>
