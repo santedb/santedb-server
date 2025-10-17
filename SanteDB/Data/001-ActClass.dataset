@@ -224,11 +224,11 @@ INSERT OR IGNORE INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id
 	
 	
 -- ATTENDER CAN BE A PERSON / USER ENTITY / PROVIDER
-INSERT INTO OR IGNORE rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
+INSERT OR IGNORE INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
 	VALUES((randomblob(16)), x'AD29BF6C51ACC948885ACFE3026ECF6E', null, x'BA002B6A1B502345B57CF96D8AE44684', '*=[Attender]=>UserEntity', 3);--#!
-INSERT INTO OR IGNORE  rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
+INSERT OR IGNORE INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
 	VALUES((randomblob(16)), x'AD29BF6C51ACC948885ACFE3026ECF6E', null, x'46A8E29DF2DDBC4E902E84508C5089EA', '*=[Attender]=>Person', 3);--#!
-INSERT INTO OR IGNORE  rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
+INSERT OR IGNORE INTO rel_vrfy_systbl (rel_vrfy_id, rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_id, err_desc, rel_cls) 
 	VALUES((randomblob(16)), x'AD29BF6C51ACC948885ACFE3026ECF6E', null, x'D8FE046B64C19C46910BF824C2BDA4F0', '*=[Attender]=>Provider', 3);--#!
 		
       ]]>
