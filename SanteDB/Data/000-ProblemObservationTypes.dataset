@@ -361,7 +361,7 @@
 		</Concept>
 	</update>
 	<update insertIfNotExists="true">
-		<ReferenceTerm xmls="http://santedb.org/model">
+		<ReferenceTerm xmlns="http://santedb.org/model">
 			<id>4f38f1c2-695c-43df-a8ed-b9723d4a35b3</id>
 			<mnemonic>81956-5</mnemonic>
 			<codeSystem>08C59397-706B-456A-AEB1-9E7D5A2ADC94</codeSystem>
@@ -374,6 +374,7 @@
 	<update insertIfNotExists="true">
 		<Concept xmlns="http://santedb.org/model">
 			<id>51140974-adbe-4e56-bb38-66719f7945c9</id>
+			<isReadOnly>false</isReadOnly>
 			<mnemonic>ObservationType-DateTimeOfDeath</mnemonic>
 			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
 			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
