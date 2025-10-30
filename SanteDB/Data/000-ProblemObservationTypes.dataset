@@ -16,7 +16,7 @@
  - License for the specific language governing permissions and limitations under 
  - the License.
  -->
-<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Problem Observation Concepts v2">
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Problem Observation Concepts v3.06">
 	<update insertIfNotExists="true">
 		<CodeSystem xmlns="http://santedb.org/model">
 			<id>B3030751-D4DB-420B-B765-E837607820CD</id>
@@ -56,6 +56,7 @@
 			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
 			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
 			<referenceTerm>
+				<id>6bf61afa-88ef-11f0-a235-633704427ebc</id>
 				<term>402d2720-495a-4908-b2b3-00fb021c82a8</term>
 				<relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
 			</referenceTerm>
@@ -323,6 +324,7 @@
 			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
 			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
 			<referenceTerm>
+				<id>6c02cfe8-88ef-11f0-a252-b3d50723d95e</id>
 				<term>7c7a3e02-6e86-424b-857c-561fc133675f</term>
 				<relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
 			</referenceTerm>
