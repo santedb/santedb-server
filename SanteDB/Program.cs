@@ -155,6 +155,11 @@ namespace SanteDB
                             configFile = Path.Combine(Path.GetDirectoryName(entryAsm.Location), configFile);
                         }
 
+                        if (configFile.IndexOf(' ') > -1) //Check for spaces and add quotes
+                        {
+                            configFile = $"\"{configFile}\"";
+                        }
+
                         if (!String.IsNullOrEmpty(instanceSuffix))
                         {
                             displayname = $"SanteDB Host Process - {parameters.InstanceName}";
