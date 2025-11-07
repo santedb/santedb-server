@@ -16,13 +16,13 @@
  - License for the specific language governing permissions and limitations under 
  - the License.
  -->
-  <dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Publish/Subscribe Policies">
+  <dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Publish/Subscribe Policies v3.0">
   <update insertIfNotExists="true">
     <SecurityPolicy xmlns="http://santedb.org/model">
       <id>34D7E78C-2C48-48AB-A31A-1C50A9F8D20C</id>
       <name>Unrestricted PubSub Administration</name>
       <oid>1.3.6.1.4.1.33349.3.1.5.9.2.0.14</oid>
-      <isPublic>true</isPublic>
+      <isPublic>false</isPublic>
       <canOverride>false</canOverride>
     </SecurityPolicy>
   </update>
@@ -31,7 +31,7 @@
       <id>35D7E78C-2C48-48AB-A31A-1C50A9F8D20C</id>
       <name>Create/Alter PubSub Subscriptions</name>
       <oid>1.3.6.1.4.1.33349.3.1.5.9.2.0.14.1</oid>
-      <isPublic>true</isPublic>
+      <isPublic>false</isPublic>
       <canOverride>false</canOverride>
     </SecurityPolicy>
   </update>
@@ -40,7 +40,7 @@
       <id>36D7E78C-2C48-48AB-A31A-1C50A9F8D20C</id>
       <name>Disable/Enable PubSub Subscriptions</name>
       <oid>1.3.6.1.4.1.33349.3.1.5.9.2.0.14.2</oid>
-      <isPublic>true</isPublic>
+      <isPublic>false</isPublic>
       <canOverride>false</canOverride>
     </SecurityPolicy>
   </update>
@@ -49,7 +49,7 @@
       <id>37D7E78C-2C48-48AB-A31A-1C50A9F8D20C</id>
       <name>Delete PubSub Subscriptions</name>
       <oid>1.3.6.1.4.1.33349.3.1.5.9.2.0.14.3</oid>
-      <isPublic>true</isPublic>
+      <isPublic>false</isPublic>
       <canOverride>false</canOverride>
     </SecurityPolicy>
   </update>
@@ -58,7 +58,7 @@
       <id>38D7E78C-2C48-48AB-A31A-1C50A9F8D20C</id>
       <name>Read PubSub Subscriptions</name>
       <oid>1.3.6.1.4.1.33349.3.1.5.9.2.0.14.4</oid>
-      <isPublic>true</isPublic>
+      <isPublic>false</isPublic>
       <canOverride>false</canOverride>
     </SecurityPolicy>
   </update>

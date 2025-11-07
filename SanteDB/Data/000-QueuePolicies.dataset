@@ -16,13 +16,13 @@
  - License for the specific language governing permissions and limitations under 
  - the License.
  -->
-  <dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Queue Management Policies">
+  <dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Queue Management Policies v3.0">
   <update insertIfNotExists="true">
     <SecurityPolicy xmlns="http://santedb.org/model">
       <id>598c0e00-82fb-11eb-8dcd-0242ac130003</id>
       <name>Unrestricted Dispatcher Queue</name>
       <oid>1.3.6.1.4.1.33349.3.1.5.9.2.0.16</oid>
-      <isPublic>true</isPublic>
+      <isPublic>false</isPublic>
       <canOverride>false</canOverride>
     </SecurityPolicy>
   </update>
