@@ -16,13 +16,13 @@
  - License for the specific language governing permissions and limitations under 
  - the License.
  -->
-<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Protocol Administration Policies v3.1">
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Protocol Administration Policies v3.10">
   <update insertIfNotExists="true">
     <SecurityPolicy xmlns="http://santedb.org/model">
       <id>A325038C-5781-4FC9-A9DA-340E07E98AC0</id>
       <name>Unrestricted Clinical Protocol Configuration</name>
       <oid>1.3.6.1.4.1.33349.3.1.5.9.2.0.15.2</oid>
-      <isPublic>true</isPublic>
+      <isPublic>false</isPublic>
       <canOverride>false</canOverride>
     </SecurityPolicy>
   </update>
@@ -31,7 +31,7 @@
       <id>D325038C-5781-4FC9-A9DA-340E07E98AC1</id>
       <name>Create Clinical Protocol</name>
       <oid>1.3.6.1.4.1.33349.3.1.5.9.2.0.15.2.0</oid>
-      <isPublic>true</isPublic>
+      <isPublic>false</isPublic>
       <canOverride>false</canOverride>
     </SecurityPolicy>
   </update>
@@ -40,7 +40,7 @@
       <id>A325038C-5781-4FC9-A9DA-340E07E98AC1</id>
       <name>Alter Clinical Protocol</name>
       <oid>1.3.6.1.4.1.33349.3.1.5.9.2.0.15.2.1</oid>
-      <isPublic>true</isPublic>
+      <isPublic>false</isPublic>
       <canOverride>false</canOverride>
     </SecurityPolicy>
   </update>
@@ -49,7 +49,7 @@
       <id>A325038C-5781-4FC9-A9DA-340E07E98AC2</id>
       <name>Delete Clinical Protocol</name>
       <oid>1.3.6.1.4.1.33349.3.1.5.9.2.0.15.2.2</oid>
-      <isPublic>true</isPublic>
+      <isPublic>false</isPublic>
       <canOverride>false</canOverride>
     </SecurityPolicy>
   </update>
@@ -58,7 +58,7 @@
       <id>FEAF038C-5781-4FC9-A9DA-340E07E98AC2</id>
       <name>Alter Clinical Data Templates</name>
       <oid>1.3.6.1.4.1.33349.3.1.5.9.2.0.15.3</oid>
-      <isPublic>true</isPublic>
+      <isPublic>false</isPublic>
       <canOverride>false</canOverride>
     </SecurityPolicy>
   </update>
