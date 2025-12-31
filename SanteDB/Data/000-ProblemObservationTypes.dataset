@@ -16,7 +16,7 @@
  - License for the specific language governing permissions and limitations under 
  - the License.
  -->
-<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Problem Observation Concepts v3.06">
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Problem Observation Concepts v3.07">
 	<update insertIfNotExists="true">
 		<CodeSystem xmlns="http://santedb.org/model">
 			<id>B3030751-D4DB-420B-B765-E837607820CD</id>
@@ -423,5 +423,175 @@
 			<concept>260ffe90-7882-4b38-a7af-d2110e91e752</concept>
 			<concept>d5e0a5be-d227-413a-a752-b7d79d7d4ef3</concept>
 		</ConceptSet>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<ReferenceTerm xmlns="http://santedb.org/model">
+			<id>3e2904ad-2588-4f97-80f1-a957aff9ed75</id>
+			<mnemonic>63931-0</mnemonic>
+			<codeSystem>08c59397-706b-456a-aeb1-9e7d5a2adc94</codeSystem>
+			<name>
+				<id>d3b8104e-e42f-11f0-808d-33fbd4b952c0</id>
+				<language>en</language>
+				<value>Date of Diagnosis</value>
+				<source>3e2904ad-2588-4f97-80f1-a957aff9ed75</source>
+			</name>
+		</ReferenceTerm>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>a61d93db-2020-4b14-b8ce-b131783d631d</id>
+			<sequence xsi:nil="true" />
+			<mnemonic>ObservationType-DateOfDiagnosis</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<referenceTerm>
+				<id>d3bcbdc4-e42f-11f0-808f-43b8b4abfb27</id>
+				<source>a61d93db-2020-4b14-b8ce-b131783d631d</source>
+				<term>3e2904ad-2588-4f97-80f1-a957aff9ed75</term>
+				<relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+			</referenceTerm>
+			<name>
+				<id>d3bc659a-e42f-11f0-808e-f7c7fb33f006</id>
+				<source>a61d93db-2020-4b14-b8ce-b131783d631d</source>
+				<language>en</language>
+				<value>Date of Diagnosis</value>
+			</name>
+		</Concept>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<ReferenceTerm xmlns="http://santedb.org/model">
+			<id>bde0c0cf-fe1a-476d-8d62-cf5108856195</id>
+			<mnemonic>76425-8</mnemonic>
+			<codeSystem>08c59397-706b-456a-aeb1-9e7d5a2adc94</codeSystem>
+			<name>
+				<id>c5e1642a-e42f-11f0-b1ac-632768891b92</id>
+				<language>en</language>
+				<value>Date of Onset</value>
+				<source>bde0c0cf-fe1a-476d-8d62-cf5108856195</source>
+			</name>
+		</ReferenceTerm>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>99e13c67-0987-4f19-a9a3-e64e61ce1642</id>
+			<sequence xsi:nil="true" />
+			<mnemonic>ObservationType-DateOfOnset</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<referenceTerm>
+				<id>c5e8c03a-e42f-11f0-b1ae-cb55d5dc15a2</id>
+				<source>99e13c67-0987-4f19-a9a3-e64e61ce1642</source>
+				<term>bde0c0cf-fe1a-476d-8d62-cf5108856195</term>
+				<relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+			</referenceTerm>
+			<name>
+				<id>c5e7c874-e42f-11f0-b1ad-27b108e35c45</id>
+				<source>99e13c67-0987-4f19-a9a3-e64e61ce1642</source>
+				<language>en</language>
+				<value>Date of Onset</value>
+			</name>
+		</Concept>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<ReferenceTerm xmlns="http://santedb.org/model">
+			<id>75899828-7f45-449e-b691-30bf1c721ed0</id>
+			<mnemonic>104919-6</mnemonic>
+			<codeSystem>08c59397-706b-456a-aeb1-9e7d5a2adc94</codeSystem>
+			<name>
+				<id>6b227546-e430-11f0-8b87-af45a31ab799</id>
+				<language>en</language>
+				<value>Date of Condition Resolution</value>
+				<source>75899828-7f45-449e-b691-30bf1c721ed0</source>
+			</name>
+		</ReferenceTerm>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>aaf71c41-cca3-4a39-9dc9-3f685fc34c4d</id>
+			<sequence xsi:nil="true" />
+			<mnemonic>ObservationType-DateOfResolution</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<referenceTerm>
+				<id>6b26247a-e430-11f0-8b89-dfb536afb499</id>
+				<source>aaf71c41-cca3-4a39-9dc9-3f685fc34c4d</source>
+				<term>75899828-7f45-449e-b691-30bf1c721ed0</term>
+				<relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+			</referenceTerm>
+			<name>
+				<id>6b25cf52-e430-11f0-8b88-13d3a080b0a2</id>
+				<source>aaf71c41-cca3-4a39-9dc9-3f685fc34c4d</source>
+				<language>en</language>
+				<value>Date of Condition Resolution</value>
+			</name>
+		</Concept>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<ReferenceTerm xmlns="http://santedb.org/model">
+			<id>a987edc6-ec6d-4941-b209-ccefd7cb8d95</id>
+			<mnemonic>63936-9</mnemonic>
+			<codeSystem>08c59397-706b-456a-aeb1-9e7d5a2adc94</codeSystem>
+			<name>
+				<id>3b4dc2c8-e433-11f0-97b0-b7248a87d12b</id>
+				<language>en</language>
+				<value>Start date of treatment or therapy</value>
+				<source>a987edc6-ec6d-4941-b209-ccefd7cb8d95</source>
+			</name>
+		</ReferenceTerm>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>629c2d19-f72a-4821-8a3b-1c0278b30f43</id>
+			<sequence xsi:nil="true" />
+			<mnemonic>ObservationType-StartDateOfTreatment</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<referenceTerm>
+				<id>3b504e62-e433-11f0-97b2-9b5d4bc84122</id>
+				<source>629c2d19-f72a-4821-8a3b-1c0278b30f43</source>
+				<term>a987edc6-ec6d-4941-b209-ccefd7cb8d95</term>
+				<relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+			</referenceTerm>
+			<name>
+				<id>3b500272-e433-11f0-97b1-d34697bbdd45</id>
+				<source>629c2d19-f72a-4821-8a3b-1c0278b30f43</source>
+				<language>en</language>
+				<value>Start date of treatment or therapy</value>
+			</name>
+		</Concept>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<ReferenceTerm xmlns="http://santedb.org/model">
+			<id>ec4d49e0-c807-4b03-af12-924561835436</id>
+			<mnemonic>99493-9</mnemonic>
+			<codeSystem>08c59397-706b-456a-aeb1-9e7d5a2adc94</codeSystem>
+			<name>
+				<id>a1d8603e-e433-11f0-8d73-ff35b115e8c3</id>
+				<language>en</language>
+				<value>Condition Clinical Status</value>
+				<source>ec4d49e0-c807-4b03-af12-924561835436</source>
+			</name>
+		</ReferenceTerm>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>656251ec-21bc-4594-9914-ca971c9defcc</id>
+			<sequence xsi:nil="true" />
+			<mnemonic>ObservationType-ConditionClinicalStatus</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<referenceTerm>
+				<id>a1dcd100-e433-11f0-8d75-ebbf8a18d062</id>
+				<source>656251ec-21bc-4594-9914-ca971c9defcc</source>
+				<term>ec4d49e0-c807-4b03-af12-924561835436</term>
+				<relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+			</referenceTerm>
+			<name>
+				<id>a1dc65a8-e433-11f0-8d74-ff05075e951d</id>
+				<source>656251ec-21bc-4594-9914-ca971c9defcc</source>
+				<language>en</language>
+				<value>Condition Clinical Status</value>
+			</name>
+		</Concept>
 	</update>
 </dataset>
