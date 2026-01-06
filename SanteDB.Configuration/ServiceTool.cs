@@ -20,6 +20,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
+// Inspired from: https://gist.github.com/FusRoDah061/d04dc0bbed890ba0e93166da2b62451e
 namespace ServiceTools
 {
     /// <summary>
