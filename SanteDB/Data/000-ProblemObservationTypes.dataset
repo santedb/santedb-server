@@ -488,7 +488,7 @@
 				<id>c5e7c874-e42f-11f0-b1ad-27b108e35c45</id>
 				<source>99e13c67-0987-4f19-a9a3-e64e61ce1642</source>
 				<language>en</language>
-				<value>Date of Onset</value>
+				<value>Date of Symptom Onset</value>
 			</name>
 		</Concept>
 	</update>
