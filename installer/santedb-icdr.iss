@@ -44,7 +44,7 @@ Compression = none
 #else
 Compression = lzma
 #endif
-AppCopyright = Copyright (C) 2015-2021 SanteSuite Contributors
+AppCopyright = Copyright (C) 2015-2026 SanteSuite Contributors
 ArchitecturesInstallIn64BitMode = x64
 ArchitecturesAllowed =  x64
 WizardStyle=modern
