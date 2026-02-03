@@ -4,7 +4,7 @@ The SanteDB leverages several third party artifacts to do its job. This file lis
 
 ## 1.1 Primary Copyright Notices
 
-+ SanteDB, Copyright (C) 2023-2022 SanteSuite Inc. and the SanteSuite Contributors.
++ SanteDB, Copyright (C) 2021 - 2026 SanteSuite Inc. and the SanteSuite Contributors.
 + Portions Copyright (C) 2019 - 2021 Fyfe Software Inc.
 + Portions Copyright (C) 2015 - 2018 Mohawk College of Applied Arts and Technology
 
