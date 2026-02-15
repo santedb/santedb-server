@@ -34,6 +34,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
@@ -64,6 +65,9 @@ namespace SanteDB
             {
                 entryAsm = typeof(Program).Assembly;
             }
+
+            // Service Point Manager 
+            ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
 
             var workdirectory = Path.GetDirectoryName(entryAsm.Location);
             var datadirectory = Path.GetDirectoryName(typeof(Program).Assembly.Location);
