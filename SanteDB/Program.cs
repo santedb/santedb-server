@@ -66,8 +66,8 @@ namespace SanteDB
                 entryAsm = typeof(Program).Assembly;
             }
 
-            // Service Point Manager 
-            ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
+            // Service Point Manager for MONO - Required for some services such as SMTP
+            ServicePointManager.SecurityProtocol |= SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12 | SecurityProtocolType.Tls13;
 
             var workdirectory = Path.GetDirectoryName(entryAsm.Location);
             var datadirectory = Path.GetDirectoryName(typeof(Program).Assembly.Location);
