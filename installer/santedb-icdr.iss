@@ -147,8 +147,8 @@ Source: ..\SanteDB\Data\Demo\*.dataset; DestDir: {app}\data; Components: demo
 
 ; Config Samples
 Source: ..\SanteDB\santedb.config.fbsql.xml; DestDir: {app}; DestName: santedb.config.fbsql.xml; Components: db\fbsql
-Source: ..\SanteDB\Data\SDB_BASE.FDB; DestDir: {app}; Components: db\fbsql demo; Flags: confirmoverwrite
-Source: ..\SanteDB\Data\SDB_AUDIT.FDB; DestDir: {app}; Components: db\fbsql demo; Flags: confirmoverwrite
+Source: ..\SanteDB\Data\SDB_BASE.FDB; DestDir: {app}; Components: db\fbsql demo;
+Source: ..\SanteDB\Data\SDB_AUDIT.FDB; DestDir: {app}; Components: db\fbsql demo;
 
 Source: ..\SanteDB\santedb.config.psql.xml; DestDir: {app}; DestName: santedb.config.psql.xml; Components: db\psql; 
 ; Security AMI stuff
