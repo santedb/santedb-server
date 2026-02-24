@@ -203,10 +203,14 @@ namespace SanteDB.Security.Tfa.Twilio
         {
             var userentity = _SecurityRepository.GetUser(user);
             userentity.PhoneNumberConfirmed = isPhoneValidated;
+            userentity.TwoFactorEnabled = enableMechanism;
             if (enableMechanism)
             {
-                userentity.TwoFactorEnabled = true;
                 userentity.TwoFactorMechnaismKey = this.Id;
+            }
+            else
+            {
+                userentity.TwoFactorMechnaismKey = Guid.Empty;
             }
             _SecurityUserRepository.Save(userentity);
         }
