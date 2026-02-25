@@ -17,11 +17,13 @@
  *
  */
 using SanteDB.Core;
+using SanteDB.Core.Model.Security;
 using SanteDB.Core.Notifications;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Claims;
 using SanteDB.Core.Security.Services;
 using SanteDB.Core.Security.Tfa;
+using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -41,15 +43,23 @@ namespace SanteDB.Security.Tfa.Twilio
         readonly INotificationService _NotificationService;
         readonly ITfaCodeProvider _TfaCodeProvider;
         readonly ITfaSecretManager _TfaSecretManager;
+        private readonly ISecurityRepositoryService _SecurityRepository;
+        private readonly IRepositoryService<SecurityUser> _SecurityUserRepository;
 
         /// <summary>
         /// DI constructor
         /// </summary>
-        public TfaSmsMechanism(INotificationService notificationService, ITfaCodeProvider tfaCodeProvider, ITfaSecretManager secretManager)
+        public TfaSmsMechanism(INotificationService notificationService, 
+            ITfaCodeProvider tfaCodeProvider, 
+            ITfaSecretManager secretManager,
+            ISecurityRepositoryService securityRepository,
+            IRepositoryService<SecurityUser> securityUserRepository)
         {
             _NotificationService = notificationService;
             _TfaCodeProvider = tfaCodeProvider;
             _TfaSecretManager = secretManager;
+            _SecurityRepository = securityRepository;
+            _SecurityUserRepository = securityUserRepository;
         }
 
         /// <inheritdoc/>
@@ -158,6 +168,7 @@ namespace SanteDB.Security.Tfa.Twilio
                 this._TfaSecretManager.RemoveTfaRegistration(ci, AuthenticationContext.Current.Principal);
                 var telephone = this.GetTelephoneNumberOrThrow(ci);
                 var secret = _TfaSecretManager.StartTfaRegistration(ci, 6, Rfc4226Mode.TotpTenMinuteInterval, AuthenticationContext.SystemPrincipal);
+                this.SetPhoneNumberValidated(user, false, false);
                 return this.SendNotification(telephone, secret, ci.Name);
             }
             else
@@ -172,12 +183,33 @@ namespace SanteDB.Security.Tfa.Twilio
             if (user is IClaimsIdentity ci)
             {
                 var telephone = this.GetTelephoneNumberOrThrow(ci);
-                return _TfaSecretManager.FinishTfaRegistration(ci, verificationCode, AuthenticationContext.SystemPrincipal);
+                var result = _TfaSecretManager.FinishTfaRegistration(ci, verificationCode, AuthenticationContext.SystemPrincipal);
+                this.SetPhoneNumberValidated(user, result, result);
+                return result;
             }
             else
             {
                 throw new InvalidOperationException("Cannot send notification to non-claims identity.");
             }
+        }
+
+        /// <summary>
+        /// Sets the number is validated flag
+        /// </summary>
+        private void SetPhoneNumberValidated(IIdentity user, bool isPhoneValidated, bool enableMechanism)
+        {
+            var userentity = _SecurityRepository.GetUser(user);
+            userentity.PhoneNumberConfirmed = isPhoneValidated;
+            userentity.TwoFactorEnabled = enableMechanism;
+            if (enableMechanism)
+            {
+                userentity.TwoFactorMechnaismKey = this.Id;
+            }
+            else
+            {
+                userentity.TwoFactorMechnaismKey = Guid.Empty;
+            }
+            _SecurityUserRepository.Save(userentity);
         }
     }
 }
