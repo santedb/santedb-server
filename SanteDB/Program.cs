@@ -77,6 +77,21 @@ namespace SanteDB
                 Trace.TraceWarning("Warning entry assembly location is not the same as detected data directory.");
             }
 
+            if (System.Environment.OSVersion.Platform == PlatformID.Win32NT)
+            {
+                try
+                {
+                    if (!EventLog.SourceExists("SanteDB Host Process"))
+                    {
+                        EventLog.CreateEventSource("SanteDB Host Process", "santedb");
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("WARN: Error creating EventLog source. Not running as admin? {0}", e);
+                }
+            }
+
             // Dump some info
             Trace.TraceInformation("SanteDB Startup : v{0}", entryAsm.GetName().Version);
             Trace.TraceInformation("SanteDB Working Directory : {0}", entryAsm.Location);
@@ -241,20 +256,6 @@ namespace SanteDB
                     if (System.Environment.OSVersion.Platform != PlatformID.Win32NT)
                     {
                         Console.WriteLine("Not running on WindowsNT, some features may not function correctly");
-                    }
-                    else
-                    {
-                        try
-                        {
-                            if (!EventLog.SourceExists("SanteDB Host Process"))
-                            {
-                                EventLog.CreateEventSource("SanteDB Host Process", "santedb");
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine("WARN: Error creating EventLog source. Not running as admin? {0}", e);
-                        }
                     }
 
                     ServiceUtil.Start(typeof(Program).GUID, new ServerApplicationContext(parameters.ConfigFile));
