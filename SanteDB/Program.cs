@@ -58,6 +58,8 @@ namespace SanteDB
         /// </summary>
         private static void Main(String[] args)
         {
+            AppContext.SetSwitch("Switch.System.Xml.IgnoreObsoleteMembers", true);
+
             // Trace copyright information
             Assembly entryAsm = Assembly.GetEntryAssembly();
 
@@ -82,6 +84,7 @@ namespace SanteDB
             Trace.TraceInformation("SanteDB Working Directory : {0}", entryAsm.Location);
             Trace.TraceInformation("Operating System: {0} {1}", Environment.OSVersion.Platform, Environment.OSVersion.VersionString);
             Trace.TraceInformation("CLI Version: {0}", Environment.Version);
+            
             AppDomain.CurrentDomain.SetData(
                "DataDirectory",
                datadirectory
@@ -124,12 +127,14 @@ namespace SanteDB
                 }
                 else if (parameters.ReEncrypt)
                 {
+#if NETFRAMEWORK
                     if (ServiceTools.ServiceInstaller.ServiceIsInstalled(serviceName) &&
                         ServiceTools.ServiceInstaller.GetServiceStatus(serviceName) != ServiceTools.ServiceState.Stop)
                     {
                         Console.WriteLine("Stopping {0}...", serviceName);
                         ServiceTools.ServiceInstaller.StopService(serviceName);
                     }
+#endif
                     ReEncrypt(parameters.ConfigFile);
                 }
                 else if (parameters.ConfigTest)
@@ -143,6 +148,7 @@ namespace SanteDB
                 }
                 else if (parameters.Install)
                 {
+#if NETFRAMEWORK
                     if (!ServiceTools.ServiceInstaller.ServiceIsInstalled(serviceName))
                     {
                         Console.WriteLine("Installing Service...");
@@ -191,15 +197,22 @@ namespace SanteDB
 
                         ServiceTools.ServiceInstaller.Install(serviceName, displayname, servicecommandline.ToString(), null, null, ServiceTools.ServiceBootFlag.AutoStart);
                     }
+#else
+                    Console.WriteLine("Service installation is only supported in the .NET Framework Build of SanteDB.");
+#endif
                 }
                 else if (parameters.UnInstall)
                 {
+#if NETFRAMEWORK
                     if (ServiceTools.ServiceInstaller.ServiceIsInstalled(serviceName))
                     {
                         Console.WriteLine("Un-Installing Service...");
                         ServiceTools.ServiceInstaller.StopService(serviceName);
                         ServiceTools.ServiceInstaller.Uninstall(serviceName);
                     }
+#else
+                    Console.WriteLine("Service uninstallation is only supported in the .NET Framework Build of SanteDB.");
+#endif
                 }
                 else if (parameters.GenConfig)
                 {
@@ -236,6 +249,7 @@ namespace SanteDB
                     Console.WriteLine("SanteDB (SanteDB) {0} ({1})", entryAsm.GetName().Version, entryAsm.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion);
                     Console.WriteLine("{0}", entryAsm.GetCustomAttribute<AssemblyCopyrightAttribute>().Copyright);
                     Console.WriteLine("Complete Copyright information available at https://github.com/santedb/santedb/blob/master/NOTICE.md");
+                    Console.WriteLine("Current Directory: {0}", Environment.CurrentDirectory);
 
                     // Detect platform
                     if (System.Environment.OSVersion.Platform != PlatformID.Win32NT)
