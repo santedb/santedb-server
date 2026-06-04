@@ -227,7 +227,9 @@ namespace SanteDB.Configuration
             {
                 if (this.m_providers == null)
                 {
-                    this.m_providers = DataConfigurationSection.GetDataConfigurationProviders();
+                    this.m_providers = DataConfigurationSection.GetDataConfigurationProviders()
+                        .Where(provider => provider.GetType().GetCustomAttribute<SanteDB.OrmLite.Attributes.HideProviderInConfigToolAttribute>() == null)
+                        ;
                 }
 
                 return this.m_providers;

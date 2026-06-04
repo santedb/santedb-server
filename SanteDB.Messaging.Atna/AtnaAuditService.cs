@@ -230,7 +230,7 @@ namespace SanteDB.Messaging.Atna
                             LifecycleTypeSpecified = aoPtctpt.LifecycleType != SdbAudit.AuditableObjectLifecycle.NotSet && aoPtctpt.LifecycleType.HasValue,
                             ObjectId = aoPtctpt.ObjectId,
                             Role = aoPtctpt.Role.HasValue ? (AtnaApi.Model.AuditableObjectRole)Enum.Parse(typeof(AtnaApi.Model.AuditableObjectRole), aoPtctpt.Role.ToString()) : 0,
-                            RoleSpecified = aoPtctpt.Role != 0,
+                            RoleSpecified = aoPtctpt.Role.GetValueOrDefault() != 0,
                             Type = aoPtctpt.Type == SdbAudit.AuditableObjectType.NotSpecified ? AtnaApi.Model.AuditableObjectType.Other : (AtnaApi.Model.AuditableObjectType)Enum.Parse(typeof(AtnaApi.Model.AuditableObjectType), aoPtctpt.Type.ToString()),
                             TypeSpecified = aoPtctpt.Type != SdbAudit.AuditableObjectType.NotSpecified,
                             ObjectSpec = aoPtctpt.QueryData ?? aoPtctpt.NameData,
