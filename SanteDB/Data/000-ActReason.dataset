@@ -16,7 +16,7 @@
  - the License.
  -->
 <dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" 
-		 id="Act Reason Codes v3.0" processingFlags="overwrite.relationships">
+		 id="Act Reason Codes v3.2" processingFlags="overwrite.relationships">
 	<update insertIfNotExists="true">
 		<CodeSystem xmlns="http://santedb.org/model">
 			<id>1137d89e-6c9d-4a30-8edf-891b1ad85fa2</id>
@@ -497,18 +497,32 @@
 	</update>
 	<update insertIfNotExists="true">
 		<ConceptSet xmlns="http://santedb.org/model">
+			<id>33dfbfae-e3bc-41c1-badc-d9d46fb1dd24</id>
+			<name>Stock Act Excluded Reason Codes</name>
+			<mnemonic>StockExcludedReasonCodes</mnemonic>
+			<oid>1.3.6.1.4.1.33349.3.1.5.9.3.38.3</oid>
+			<url>http://santedb.org/conceptsets/StockExcludedReasonCodes</url>
+			<concept>5EDB55A1-723C-46E4-9FEE-2C94DB20B7AB</concept>
+		</ConceptSet>
+	</update>
+	<update insertIfNotExists="true">
+		<ConceptSet xmlns="http://santedb.org/model">
 			<id>b487cd3e-531c-46ce-85bc-f7ca2e07666d</id>
 			<name>Stock Adjustment Reasons</name>
 			<mnemonic>StockAdjustmentReason</mnemonic>
 			<oid>1.3.6.1.4.1.33349.3.1.5.9.3.38</oid>
 			<url>http://santedb.org/conceptsets/StockAdjustmentReasons</url>
 			<compose>
-				<operation>include</operation>
+				<instruction>include</instruction>
 				<target>23FED43F-1133-406D-A06F-7D47A556F3BC</target>
 			</compose>
 			<compose>
-				<operation>include</operation>
+				<instruction>include</instruction>
 				<target>FD34FE3F-1133-406D-A06F-7D47A556F3BC</target>
+			</compose>
+			<compose>
+				<instruction>exclude</instruction>
+				<target>33dfbfae-e3bc-41c1-badc-d9d46fb1dd24</target>
 			</compose>
 		</ConceptSet>
 	</update>
