@@ -1,4 +1,15 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".gitignore" />
+    <File Path=".gitmodules" />
+    <File Path="Directory.Build.props" />
+    <File Path="INSTALL.md" />
+    <File Path="LICENSE" />
+    <File Path="NOTICE.md" />
+    <File Path="README.md" />
+    <File Path="release-version" />
+    <File Path="SanteDB.licenseheader" />
+  </Folder>
   <Folder Name="/Test/">
     <Project Path="santedb-certs-bc/SanteDB.Security.Certs.BouncyCastle.Test/SanteDB.Security.Certs.BouncyCastle.Test.csproj" />
   </Folder>

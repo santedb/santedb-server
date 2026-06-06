@@ -155,15 +155,14 @@
 		</None>
 	</ItemGroup>
 	<ItemGroup>
-		<None Include="Data\*.dataset" />
+		<None Include="Data\*.dataset">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
 	</ItemGroup>
 	<ItemGroup>
 		<EmbeddedResource Include="License.rtf">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</EmbeddedResource>
 		<Content Include="icon.ico" />
-		<None Include="App.config">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
 	</ItemGroup>
 </Project>

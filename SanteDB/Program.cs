@@ -262,7 +262,8 @@ namespace SanteDB
                 else if (parameters.ConsoleMode)
                 {
                     Console.WriteLine("SanteDB (SanteDB) {0} ({1})", entryAsm.GetName().Version, entryAsm.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion);
-                    Console.WriteLine("{0}", entryAsm.GetCustomAttribute<AssemblyCopyrightAttribute>().Copyright);
+                    Console.WriteLine(entryAsm.GetCustomAttribute<AssemblyCopyrightAttribute>().Copyright);
+                    Console.WriteLine("Runtime {0}", System.Runtime.InteropServices.RuntimeEnvironment.GetSystemVersion());
                     Console.WriteLine("Complete Copyright information available at https://github.com/santedb/santedb/blob/master/NOTICE.md");
                     Console.WriteLine("Current Directory: {0}", Environment.CurrentDirectory);
 
