@@ -1,0 +1,30 @@
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="System User Entities">
+	<update insertIfNotExists="true">
+		<UserEntity xmlns="http://santedb.org/model">
+			<id>C96859F0-043C-4480-8DAB-F69D6E86696C</id>
+			<securityUser>C96859F0-043C-4480-8DAB-F69D6E86696C</securityUser>
+			<name>
+				<id>EA532B86-A120-4BD0-A6C5-B21D7AA56E8A</id>
+				<use>1EC9583A-B019-4BAA-B856-B99CAF368656</use>
+				<component>
+					<id>595A6024-69F9-4492-8EA0-9277EA8FDEA5</id>
+					<value>ANONYMOUS</value>
+				</component>
+			</name>
+		</UserEntity>
+	</update>
+	<update insertIfNotExists="true">
+		<UserEntity xmlns="http://santedb.org/model">
+			<id>fadca076-3690-4a6e-af9e-f1cd68e8c7e8</id>
+			<securityUser>fadca076-3690-4a6e-af9e-f1cd68e8c7e8</securityUser>
+			<name>
+				<id>90D2DB0C-8AF9-4821-8CB7-0B1D1115BE8F</id>
+				<use>1EC9583A-B019-4BAA-B856-B99CAF368656</use>
+				<component>
+					<id>{F4CAFFBC-3A51-424A-8110-CD01B3EDB315}</id>
+					<value>SYSTEM</value>
+				</component>
+			</name>
+		</UserEntity>
+	</update>
+</dataset>
