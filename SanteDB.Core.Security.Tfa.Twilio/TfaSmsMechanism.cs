@@ -167,7 +167,7 @@ namespace SanteDB.Security.Tfa.Twilio
             {
                 this._TfaSecretManager.RemoveTfaRegistration(ci, AuthenticationContext.Current.Principal);
                 var telephone = this.GetTelephoneNumberOrThrow(ci);
-                var secret = _TfaSecretManager.StartTfaRegistration(ci, 6, Rfc4226Mode.TotpTenMinuteInterval, AuthenticationContext.SystemPrincipal);
+                var secret = _TfaSecretManager.StartTfaRegistration(ci, 6, Rfc4226Mode.HotpIncrementOnGenerate, AuthenticationContext.SystemPrincipal);
                 this.SetPhoneNumberValidated(user, false, false);
                 return this.SendNotification(telephone, secret, ci.Name);
             }
@@ -183,7 +183,7 @@ namespace SanteDB.Security.Tfa.Twilio
             if (user is IClaimsIdentity ci)
             {
                 var telephone = this.GetTelephoneNumberOrThrow(ci);
-                var result = _TfaSecretManager.FinishTfaRegistration(ci, verificationCode, AuthenticationContext.SystemPrincipal);
+                var result = _TfaSecretManager.FinishTfaRegistration(ci, verificationCode, AuthenticationContext.SystemPrincipal, DateTimeOffset.UtcNow);
                 this.SetPhoneNumberValidated(user, result, result);
                 return result;
             }

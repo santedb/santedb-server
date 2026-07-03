@@ -434,11 +434,14 @@ namespace SanteDB
 
                     // If ALE is enabled then we want to recrypt
                     var processedConnections = new List<String>();
-                    foreach (var ormConfiguration in configuration.Sections.OfType<OrmConfigurationBase>())
+                    foreach (var ormConfiguration in configuration.Sections.OfType<OrmAleConfigurationBase>())
                     {
-                        if (ormConfiguration?.AleConfiguration?.AleEnabled != true)
+                        if(ormConfiguration.AleConfiguration == null)
+                        {
                             continue;
+                        }
 
+                        Console.WriteLine("Processing ALE for {0}", ormConfiguration.GetType().Name);
 
                         processedConnections.Add(ormConfiguration.ReadWriteConnectionString);
 
@@ -457,8 +460,11 @@ namespace SanteDB
 
                             provider.ConnectionString = connectionString.ToString();
 
+                            var oldCertificate = ormConfiguration.AleConfiguration?.Certificate;
+
                             // Decrypt - 
-                            Console.WriteLine("Rotating keys for {0} (this may take several hours)...", ormConfiguration.GetType().Name);
+                            Console.WriteLine("Rotating keys from '{0}' to '{1}' for {2} (this may take several hours)...", oldCertificate?.Certificate.Thumbprint, configuration.ProtectedSectionKey?.Certificate.Thumbprint, ormConfiguration.GetType().Name);
+
                             provider.SetEncryptionSettings(ormConfiguration.AleConfiguration);
 
                             provider.GetEncryptionProvider();
@@ -467,9 +473,12 @@ namespace SanteDB
                             {
                                 AleEnabled = configuration.ProtectedSectionKey != null,
                                 Certificate = configuration.ProtectedSectionKey,
-                                EnableFields = ormConfiguration.AleConfiguration.EnableFields,
+                                EnableFields = ormConfiguration.AleConfiguration.EnableFields?.Any() == true ? ormConfiguration.AleConfiguration.EnableFields :
+                                new List<OrmFieldConfiguration>(ormConfiguration.GetDefaultAleFields()),
                                 SaltSeed = ormConfiguration.AleConfiguration.SaltSeed
                             };
+
+                            // Has this connection string already been migrated? 
                             provider.MigrateEncryption(ormConfiguration.AleConfiguration);
                         }
                         catch (Exception e)
