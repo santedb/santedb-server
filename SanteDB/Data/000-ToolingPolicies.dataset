@@ -16,7 +16,7 @@
  - License for the specific language governing permissions and limitations under 
  - the License.
  -->
-<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Tooling Access Policies v3.0">
+<dataset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://santedb.org/data" id="Tooling Access Policies v3.02">
 	<update insertIfNotExists="true">
 		<SecurityPolicy xmlns="http://santedb.org/model">
 			<id>FA3A5D18-E92E-4812-881B-2DEC565950BE</id>
@@ -40,6 +40,15 @@
 			<id>FD3A5D18-E92E-4812-881B-2DEC565950BE</id>
 			<name>Access SanteEMR Clinical Interface</name>
 			<oid>1.3.6.1.4.1.33349.3.1.5.9.2.100.2</oid>
+			<isPublic>false</isPublic>
+			<canOverride>false</canOverride>
+		</SecurityPolicy>
+	</update>
+	<update insertIfNotExists="true">
+		<SecurityPolicy xmlns="http://santedb.org/model">
+			<id>D134DD8D-5EE3-4B1B-9611-AF5BABFA4637</id>
+			<name>Access All Experimental Features</name>
+			<oid>1.3.6.1.4.1.52820.5.10</oid>
 			<isPublic>false</isPublic>
 			<canOverride>false</canOverride>
 		</SecurityPolicy>
