@@ -1,0 +1,579 @@
+<?xml version="1.0"?>
+<dataset xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Security Policy Classification Codes - 3.0" processingFlags="" xmlns="http://santedb.org/data">
+	<update skipIfError="false" insertIfNotExists="true">
+		<CodeSystem xmlns="http://santedb.org/model">
+			<id>51efecba-966f-11f1-bdd7-00155d9bc838</id>
+			<name>v3Confidentiality</name>
+			<oid>2.16.840.1.113883.5.25</oid>
+			<authority>Confidentiality</authority>
+			<url>http://terminology.hl7.org/CodeSystem/v3-Confidentiality</url>
+			<version>5.0.0</version>
+			<description>A set of codes specifying the security classification of acts and roles in accordance with the definition for concept domain "Confidentiality".</description>
+		</CodeSystem>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<ConceptSet xmlns="http://santedb.org/model">
+			<id>ca156520-9670-11f1-9055-00155d9bc838</id>
+			<name>Security Policy Classification Codes</name>
+			<mnemonic>SecurityPolicyClassification</mnemonic>
+			<oid>1.3.6.1.4.1.33349.3.1.5.9.3.119</oid>
+			<url>http://santedb.org/conceptset/security-policy-class</url>
+		</ConceptSet>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>6cbb861a-7919-4dcb-9c52-e632c7e7ae44</id>
+			<sequence xsi:nil="true" />
+			<mnemonic>SecurityPolicyClassification-SubstanceAbuse</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<name>
+				<id>a459f9b4-966f-11f1-9840-00155d9bc838</id>
+				<source>6cbb861a-7919-4dcb-9c52-e632c7e7ae44</source>
+				<language>en</language>
+				<value>Substance Abuse Related</value>
+			</name>
+			<conceptSet>ca156520-9670-11f1-9055-00155d9bc838</conceptSet>
+		</Concept>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>d2dbd7d2-e2b9-4a18-89a1-ec1c876713ba</id>
+			<sequence xsi:nil="true" />
+			<mnemonic>SecurityPolicyClassification-Normal</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<name>
+				<id>72061a1a-966f-11f1-9864-00155d9bc838</id>
+				<source>d2dbd7d2-e2b9-4a18-89a1-ec1c876713ba</source>
+				<language>en</language>
+				<value>Normal</value>
+			</name>
+			<conceptSet>ca156520-9670-11f1-9055-00155d9bc838</conceptSet>
+		</Concept>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>b675d70f-a6b3-46b5-8fa5-dcea01306fd6</id>
+			<sequence xsi:nil="true" />
+			<mnemonic>SecurityPolicyClassification-MentalHealth</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<name>
+				<id>78461636-9670-11f1-aa0f-00155d9bc838</id>
+				<source>b675d70f-a6b3-46b5-8fa5-dcea01306fd6</source>
+				<language>en</language>
+				<value>Mental Health Information Sensitivity</value>
+			</name>
+			<conceptSet>ca156520-9670-11f1-9055-00155d9bc838</conceptSet>
+		</Concept>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>686c4790-97aa-482b-9ddc-59bdd5baa1e5</id>
+			<sequence xsi:nil="true" />
+			<mnemonic>SecurityPolicyClassification-SexualHealth</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<name>
+				<id>5f400868-9670-11f1-8706-00155d9bc838</id>
+				<source>686c4790-97aa-482b-9ddc-59bdd5baa1e5</source>
+				<language>en</language>
+				<value>Sexuality and Reproductive Health Sensitivity</value>
+			</name>
+			<conceptSet>ca156520-9670-11f1-9055-00155d9bc838</conceptSet>
+		</Concept>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>bf8014fb-c684-4ab7-8f5b-fe8eaeaf6ad9</id>
+			<sequence xsi:nil="true" />
+			<mnemonic>SecurityPolicyClassification-PsychiatryRelated</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<name>
+				<id>b9a7ab0e-966f-11f1-a98e-00155d9bc838</id>
+				<source>bf8014fb-c684-4ab7-8f5b-fe8eaeaf6ad9</source>
+				<language>en</language>
+				<value>Psychiatry Related</value>
+			</name>
+			<conceptSet>ca156520-9670-11f1-9055-00155d9bc838</conceptSet>
+		</Concept>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>1110782b-4727-421f-b29f-4d7e635f153b</id>
+			<sequence xsi:nil="true" />
+			<mnemonic>SecurityPolicyClassification-Restricted</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<name>
+				<id>7a58e9fe-966f-11f1-bddc-00155d9bc838</id>
+				<source>1110782b-4727-421f-b29f-4d7e635f153b</source>
+				<language>en</language>
+				<value>Restricted</value>
+			</name>
+			<conceptSet>ca156520-9670-11f1-9055-00155d9bc838</conceptSet>
+		</Concept>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>92137ce8-1e9d-4e0b-9c56-752083fb23b3</id>
+			<sequence xsi:nil="true" />
+			<mnemonic>SecurityPolicyClassification-Moderate</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<name>
+				<id>68bf160a-966f-11f1-bdd9-00155d9bc838</id>
+				<source>92137ce8-1e9d-4e0b-9c56-752083fb23b3</source>
+				<language>en</language>
+				<value>Moderate</value>
+			</name>
+			<conceptSet>ca156520-9670-11f1-9055-00155d9bc838</conceptSet>
+		</Concept>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>322d822a-d4ff-4e02-bbfa-35d48ce9731f</id>
+			<sequence xsi:nil="true" />
+			<mnemonic>SecurityPolicyClassification-VeryRestricted</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<name>
+				<id>931a093c-966f-11f1-a98b-00155d9bc838</id>
+				<source>322d822a-d4ff-4e02-bbfa-35d48ce9731f</source>
+				<language>en</language>
+				<value>Very Restricted</value>
+			</name>
+			<conceptSet>ca156520-9670-11f1-9055-00155d9bc838</conceptSet>
+		</Concept>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>cb46a409-3059-4aad-8b86-6abeea2993fe</id>
+			<sequence xsi:nil="true" />
+			<mnemonic>SecurityPolicyClassification-HIVRelated</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<name>
+				<id>ab8d6612-966f-11f1-9867-00155d9bc838</id>
+				<source>cb46a409-3059-4aad-8b86-6abeea2993fe</source>
+				<language>en</language>
+				<value>HIV Related</value>
+			</name>
+			<conceptSet>ca156520-9670-11f1-9055-00155d9bc838</conceptSet>
+		</Concept>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>da368a8e-316a-44fc-a24b-ec16f2de015d</id>
+			<sequence xsi:nil="true" />
+			<mnemonic>SecurityPolicyClassification-DevelopmentalDisabilities</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<name>
+				<id>6c216a7c-9670-11f1-9414-00155d9bc838</id>
+				<source>da368a8e-316a-44fc-a24b-ec16f2de015d</source>
+				<language>en</language>
+				<value>Developmental Disability Information Sensitivity</value>
+			</name>
+			<conceptSet>ca156520-9670-11f1-9055-00155d9bc838</conceptSet>
+		</Concept>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>319bf817-859c-4df3-8a8c-b68abc3dc0e6</id>
+			<sequence xsi:nil="true" />
+			<mnemonic>SecurityPolicyClassification-MilitaryTrauma</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<name>
+				<id>36f31288-9670-11f1-8371-00155d9bc838</id>
+				<source>319bf817-859c-4df3-8a8c-b68abc3dc0e6</source>
+				<language>en</language>
+				<value>Military Sexual Trauma Information Senstivity</value>
+			</name>
+			<conceptSet>ca156520-9670-11f1-9055-00155d9bc838</conceptSet>
+		</Concept>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>7cb5b697-63ee-4859-ac7d-5f9953ec0b1f</id>
+			<sequence xsi:nil="true" />
+			<mnemonic>SecurityPolicyClassification-Unrestricted</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<name>
+				<id>98dd7ca0-966f-11f1-bddf-00155d9bc838</id>
+				<source>7cb5b697-63ee-4859-ac7d-5f9953ec0b1f</source>
+				<language>en</language>
+				<value>Unrestricted</value>
+			</name>
+			<conceptSet>ca156520-9670-11f1-9055-00155d9bc838</conceptSet>
+		</Concept>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>dbd915a4-56de-43aa-8639-e9268fc5d21a</id>
+			<sequence xsi:nil="true" />
+			<mnemonic>SecurityPolicyClassification-SexuallyTransmittedInfection</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<name>
+				<id>9b68a728-9670-11f1-b260-00155d9bc838</id>
+				<source>dbd915a4-56de-43aa-8639-e9268fc5d21a</source>
+				<language>en</language>
+				<value>Sexually Transmitted Disease Information</value>
+			</name>
+			<conceptSet>ca156520-9670-11f1-9055-00155d9bc838</conceptSet>
+		</Concept>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>434695d6-8d1b-48ab-8c44-94c744553fbd</id>
+			<sequence xsi:nil="true" />
+			<mnemonic>SecurityPolicyClassification-Low</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<name>
+				<id>61b20fde-966f-11f1-9861-00155d9bc838</id>
+				<source>434695d6-8d1b-48ab-8c44-94c744553fbd</source>
+				<language>en</language>
+				<value>Low</value>
+			</name>
+			<conceptSet>ca156520-9670-11f1-9055-00155d9bc838</conceptSet>
+		</Concept>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>8bcd989f-25df-4c9a-98a8-e970c79ead54</id>
+			<sequence xsi:nil="true" />
+			<mnemonic>SecurityPolicyClassification-SexualOrDomesticViolence</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<name>
+				<id>ca5e2d24-966f-11f1-9843-00155d9bc838</id>
+				<source>8bcd989f-25df-4c9a-98a8-e970c79ead54</source>
+				<language>en</language>
+				<value>Sexual and Domestic Violence Related</value>
+			</name>
+			<conceptSet>ca156520-9670-11f1-9055-00155d9bc838</conceptSet>
+		</Concept>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<ConceptReferenceTerm xmlns="http://santedb.org/model">
+			<id>12bf6e34-9670-11f1-ab84-00155d9bc838</id>
+			<source>6cbb861a-7919-4dcb-9c52-e632c7e7ae44</source>
+			<term>98a8d043-b11e-4019-abaf-8847e34651be</term>
+			<relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+		</ConceptReferenceTerm>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<ConceptReferenceTerm xmlns="http://santedb.org/model">
+			<id>78463d5a-9670-11f1-aa10-00155d9bc838</id>
+			<source>b675d70f-a6b3-46b5-8fa5-dcea01306fd6</source>
+			<term>5ac727d2-aca0-4bdd-a11b-c49ff76d305b</term>
+			<relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+		</ConceptReferenceTerm>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<ConceptReferenceTerm xmlns="http://santedb.org/model">
+			<id>7206412a-966f-11f1-9865-00155d9bc838</id>
+			<source>d2dbd7d2-e2b9-4a18-89a1-ec1c876713ba</source>
+			<term>c5108a93-b05f-46f1-aca8-4291ec82a37f</term>
+			<relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+		</ConceptReferenceTerm>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<ConceptReferenceTerm xmlns="http://santedb.org/model">
+			<id>5f400869-9670-11f1-8707-00155d9bc838</id>
+			<source>686c4790-97aa-482b-9ddc-59bdd5baa1e5</source>
+			<term>64c0368a-acfb-4a49-b990-72fc17fc5e0c</term>
+			<relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+		</ConceptReferenceTerm>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<ConceptReferenceTerm xmlns="http://santedb.org/model">
+			<id>7a58e9ff-966f-11f1-bddd-00155d9bc838</id>
+			<source>1110782b-4727-421f-b29f-4d7e635f153b</source>
+			<term>ef3f613f-f506-4ace-9c0f-223d12c915ab</term>
+			<relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+		</ConceptReferenceTerm>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<ConceptReferenceTerm xmlns="http://santedb.org/model">
+			<id>86b7662a-9670-11f1-a61e-00155d9bc838</id>
+			<source>bf8014fb-c684-4ab7-8f5b-fe8eaeaf6ad9</source>
+			<term>69691b7c-9f3d-45b6-9241-f4aae0b734f2</term>
+			<relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+		</ConceptReferenceTerm>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<ConceptReferenceTerm xmlns="http://santedb.org/model">
+			<id>931a3038-966f-11f1-a98c-00155d9bc838</id>
+			<source>322d822a-d4ff-4e02-bbfa-35d48ce9731f</source>
+			<term>f7238dd0-7e27-4632-906f-18d56f7d2102</term>
+			<relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+		</ConceptReferenceTerm>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<ConceptReferenceTerm xmlns="http://santedb.org/model">
+			<id>68bf3d10-966f-11f1-bdda-00155d9bc838</id>
+			<source>92137ce8-1e9d-4e0b-9c56-752083fb23b3</source>
+			<term>c66fe206-b243-47fa-b740-ad929733e44d</term>
+			<relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+		</ConceptReferenceTerm>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<ConceptReferenceTerm xmlns="http://santedb.org/model">
+			<id>1d73e512-9670-11f1-8704-00155d9bc838</id>
+			<source>cb46a409-3059-4aad-8b86-6abeea2993fe</source>
+			<term>995d7f58-61ff-4eca-b4aa-625cbf1f2195</term>
+			<relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+		</ConceptReferenceTerm>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<ConceptReferenceTerm xmlns="http://santedb.org/model">
+			<id>6c216a7d-9670-11f1-9415-00155d9bc838</id>
+			<source>da368a8e-316a-44fc-a24b-ec16f2de015d</source>
+			<term>a177cf97-2c66-43ea-a1c3-defab62b6fe9</term>
+			<relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+		</ConceptReferenceTerm>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<ConceptReferenceTerm xmlns="http://santedb.org/model">
+			<id>36f4e748-9670-11f1-8372-00155d9bc838</id>
+			<source>319bf817-859c-4df3-8a8c-b68abc3dc0e6</source>
+			<term>838be072-0276-4017-9269-166d87046953</term>
+			<relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+		</ConceptReferenceTerm>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<ConceptReferenceTerm xmlns="http://santedb.org/model">
+			<id>98dda3a6-966f-11f1-bde0-00155d9bc838</id>
+			<source>7cb5b697-63ee-4859-ac7d-5f9953ec0b1f</source>
+			<term>da0ccde4-69fb-4314-b7d8-f615b0d0f8c0</term>
+			<relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+		</ConceptReferenceTerm>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<ConceptReferenceTerm xmlns="http://santedb.org/model">
+			<id>9b68f53e-9670-11f1-b261-00155d9bc838</id>
+			<source>dbd915a4-56de-43aa-8639-e9268fc5d21a</source>
+			<term>1a99bc44-ea85-4a0a-bd37-ceadb05e7e92</term>
+			<relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+		</ConceptReferenceTerm>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<ConceptReferenceTerm xmlns="http://santedb.org/model">
+			<id>61b2ac14-966f-11f1-9862-00155d9bc838</id>
+			<source>434695d6-8d1b-48ab-8c44-94c744553fbd</source>
+			<term>bdb692a2-5cf2-4ccc-b597-cb30065f968e</term>
+			<relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+		</ConceptReferenceTerm>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<ConceptReferenceTerm xmlns="http://santedb.org/model">
+			<id>4b674856-9670-11f1-9412-00155d9bc838</id>
+			<source>8bcd989f-25df-4c9a-98a8-e970c79ead54</source>
+			<term>0e9351d2-1a3f-46da-ad3f-5b98edfa9e84</term>
+			<relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+		</ConceptReferenceTerm>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<ReferenceTerm xmlns="http://santedb.org/model">
+			<id>ef3f613f-f506-4ace-9c0f-223d12c915ab</id>
+			<mnemonic>R</mnemonic>
+			<codeSystem>51efecba-966f-11f1-bdd7-00155d9bc838</codeSystem>
+			<name>
+				<id>7a58607e-966f-11f1-bddb-00155d9bc838</id>
+				<language>en</language>
+				<value>Restricted</value>
+				<source>ef3f613f-f506-4ace-9c0f-223d12c915ab</source>
+			</name>
+		</ReferenceTerm>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<ReferenceTerm xmlns="http://santedb.org/model">
+			<id>98a8d043-b11e-4019-abaf-8847e34651be</id>
+			<mnemonic>ETH</mnemonic>
+			<codeSystem>02823b47-c315-4366-8883-442e646d34be</codeSystem>
+			<name>
+				<id>12bc87fa-9670-11f1-ab83-00155d9bc838</id>
+				<language>en</language>
+				<value>Substance Abuse Information Sensitivity</value>
+				<source>98a8d043-b11e-4019-abaf-8847e34651be</source>
+			</name>
+		</ReferenceTerm>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<ReferenceTerm xmlns="http://santedb.org/model">
+			<id>f7238dd0-7e27-4632-906f-18d56f7d2102</id>
+			<mnemonic>V</mnemonic>
+			<codeSystem>51efecba-966f-11f1-bdd7-00155d9bc838</codeSystem>
+			<name>
+				<id>9318a998-966f-11f1-a98a-00155d9bc838</id>
+				<language>en</language>
+				<value>Very Restricted</value>
+				<source>f7238dd0-7e27-4632-906f-18d56f7d2102</source>
+			</name>
+		</ReferenceTerm>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<ReferenceTerm xmlns="http://santedb.org/model">
+			<id>69691b7c-9f3d-45b6-9241-f4aae0b734f2</id>
+			<mnemonic>PSY</mnemonic>
+			<codeSystem>02823b47-c315-4366-8883-442e646d34be</codeSystem>
+			<name>
+				<id>86b6030c-9670-11f1-a61d-00155d9bc838</id>
+				<language>en</language>
+				<value>Psychiatry Disorder Information Sensitivity</value>
+				<source>69691b7c-9f3d-45b6-9241-f4aae0b734f2</source>
+			</name>
+		</ReferenceTerm>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<ReferenceTerm xmlns="http://santedb.org/model">
+			<id>64c0368a-acfb-4a49-b990-72fc17fc5e0c</id>
+			<mnemonic>SEX</mnemonic>
+			<codeSystem>02823b47-c315-4366-8883-442e646d34be</codeSystem>
+			<name>
+				<id>5f3f1778-9670-11f1-8705-00155d9bc838</id>
+				<language>en</language>
+				<value>Sexuality and Reproductive Health Sensitivity</value>
+				<source>64c0368a-acfb-4a49-b990-72fc17fc5e0c</source>
+			</name>
+		</ReferenceTerm>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<ReferenceTerm xmlns="http://santedb.org/model">
+			<id>a177cf97-2c66-43ea-a1c3-defab62b6fe9</id>
+			<mnemonic>DVD</mnemonic>
+			<codeSystem>02823b47-c315-4366-8883-442e646d34be</codeSystem>
+			<name>
+				<id>6c20743c-9670-11f1-9413-00155d9bc838</id>
+				<language>en</language>
+				<value>Developmental Disability Information Sensitivity</value>
+				<source>a177cf97-2c66-43ea-a1c3-defab62b6fe9</source>
+			</name>
+		</ReferenceTerm>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<ReferenceTerm xmlns="http://santedb.org/model">
+			<id>da0ccde4-69fb-4314-b7d8-f615b0d0f8c0</id>
+			<mnemonic>U</mnemonic>
+			<codeSystem>51efecba-966f-11f1-bdd7-00155d9bc838</codeSystem>
+			<name>
+				<id>98dd0766-966f-11f1-bdde-00155d9bc838</id>
+				<language>en</language>
+				<value>Unrestricted</value>
+				<source>da0ccde4-69fb-4314-b7d8-f615b0d0f8c0</source>
+			</name>
+		</ReferenceTerm>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<ReferenceTerm xmlns="http://santedb.org/model">
+			<id>c66fe206-b243-47fa-b740-ad929733e44d</id>
+			<mnemonic>M</mnemonic>
+			<codeSystem>51efecba-966f-11f1-bdd7-00155d9bc838</codeSystem>
+			<name>
+				<id>68be0490-966f-11f1-bdd8-00155d9bc838</id>
+				<language>en</language>
+				<value>Moderate</value>
+				<source>c66fe206-b243-47fa-b740-ad929733e44d</source>
+			</name>
+		</ReferenceTerm>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<ReferenceTerm xmlns="http://santedb.org/model">
+			<id>838be072-0276-4017-9269-166d87046953</id>
+			<mnemonic>MST</mnemonic>
+			<codeSystem>02823b47-c315-4366-8883-442e646d34be</codeSystem>
+			<name>
+				<id>36eea5cc-9670-11f1-8370-00155d9bc838</id>
+				<language>en</language>
+				<value>Military Sexual Trauma Information Senstivity</value>
+				<source>838be072-0276-4017-9269-166d87046953</source>
+			</name>
+		</ReferenceTerm>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<ReferenceTerm xmlns="http://santedb.org/model">
+			<id>995d7f58-61ff-4eca-b4aa-625cbf1f2195</id>
+			<mnemonic>HIV</mnemonic>
+			<codeSystem>02823b47-c315-4366-8883-442e646d34be</codeSystem>
+			<name>
+				<id>1d7348dc-9670-11f1-8703-00155d9bc838</id>
+				<language>en</language>
+				<value>HIV/AIDS Information Sensitivity</value>
+				<source>995d7f58-61ff-4eca-b4aa-625cbf1f2195</source>
+			</name>
+		</ReferenceTerm>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<ReferenceTerm xmlns="http://santedb.org/model">
+			<id>1a99bc44-ea85-4a0a-bd37-ceadb05e7e92</id>
+			<mnemonic>STD</mnemonic>
+			<codeSystem>02823b47-c315-4366-8883-442e646d34be</codeSystem>
+			<name>
+				<id>9b66ab6c-9670-11f1-b25f-00155d9bc838</id>
+				<language>en</language>
+				<value>Sexually Transmitted Disease Information</value>
+				<source>1a99bc44-ea85-4a0a-bd37-ceadb05e7e92</source>
+			</name>
+		</ReferenceTerm>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<ReferenceTerm xmlns="http://santedb.org/model">
+			<id>c5108a93-b05f-46f1-aca8-4291ec82a37f</id>
+			<mnemonic>N</mnemonic>
+			<codeSystem>51efecba-966f-11f1-bdd7-00155d9bc838</codeSystem>
+			<name>
+				<id>7205a346-966f-11f1-9863-00155d9bc838</id>
+				<language>en</language>
+				<value>Normal</value>
+				<source>c5108a93-b05f-46f1-aca8-4291ec82a37f</source>
+			</name>
+		</ReferenceTerm>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<ReferenceTerm xmlns="http://santedb.org/model">
+			<id>bdb692a2-5cf2-4ccc-b597-cb30065f968e</id>
+			<mnemonic>L</mnemonic>
+			<codeSystem>51efecba-966f-11f1-bdd7-00155d9bc838</codeSystem>
+			<name>
+				<id>61acdf8c-966f-11f1-9860-00155d9bc838</id>
+				<language>en</language>
+				<value>Low</value>
+				<source>bdb692a2-5cf2-4ccc-b597-cb30065f968e</source>
+			</name>
+		</ReferenceTerm>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<ReferenceTerm xmlns="http://santedb.org/model">
+			<id>0e9351d2-1a3f-46da-ad3f-5b98edfa9e84</id>
+			<mnemonic>SDV</mnemonic>
+			<codeSystem>02823b47-c315-4366-8883-442e646d34be</codeSystem>
+			<name>
+				<id>4b665dd8-9670-11f1-9411-00155d9bc838</id>
+				<language>en</language>
+				<value>Sexual Assault, Abuse, or Domestic Violence Information Sensitivity</value>
+				<source>0e9351d2-1a3f-46da-ad3f-5b98edfa9e84</source>
+			</name>
+		</ReferenceTerm>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<ReferenceTerm xmlns="http://santedb.org/model">
+			<id>5ac727d2-aca0-4bdd-a11b-c49ff76d305b</id>
+			<mnemonic>MH</mnemonic>
+			<codeSystem>02823b47-c315-4366-8883-442e646d34be</codeSystem>
+			<name>
+				<id>78452be0-9670-11f1-aa0e-00155d9bc838</id>
+				<language>en</language>
+				<value>Mental Health Information Sensitivity</value>
+				<source>5ac727d2-aca0-4bdd-a11b-c49ff76d305b</source>
+			</name>
+		</ReferenceTerm>
+	</update>
+
+</dataset>
