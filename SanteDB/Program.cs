@@ -58,7 +58,9 @@ namespace SanteDB
         /// </summary>
         private static void Main(String[] args)
         {
-            AppContext.SetSwitch("Switch.System.Xml.IgnoreObsoleteMembers", true);
+#if NET10_0_OR_GREATER
+            AppContext.SetSwitch("Switch.System.Xml.IgnoreObsoleteMembers", true); //See https://learn.microsoft.com/en-us/dotnet/core/compatibility/serialization/10/xmlserializer-obsolete-properties
+#endif
 
             // Trace copyright information
             Assembly entryAsm = Assembly.GetEntryAssembly();
@@ -99,7 +101,7 @@ namespace SanteDB
             Trace.TraceInformation("SanteDB Working Directory : {0}", entryAsm.Location);
             Trace.TraceInformation("Operating System: {0} {1}", Environment.OSVersion.Platform, Environment.OSVersion.VersionString);
             Trace.TraceInformation("CLI Version: {0}", Environment.Version);
-            
+
             AppDomain.CurrentDomain.SetData(
                "DataDirectory",
                datadirectory
@@ -112,7 +114,7 @@ namespace SanteDB
                 {
                     ApplicationServiceContext.Current.Stop();
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     Trace.TraceError("Could not stop application service context");
                 }
@@ -263,7 +265,7 @@ namespace SanteDB
                 {
                     Console.WriteLine("SanteDB (SanteDB) {0} ({1})", entryAsm.GetName().Version, entryAsm.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion);
                     Console.WriteLine(entryAsm.GetCustomAttribute<AssemblyCopyrightAttribute>().Copyright);
-                    Console.WriteLine("Runtime {0}", System.Runtime.InteropServices.RuntimeEnvironment.GetSystemVersion());
+                    Console.WriteLine(".NET Runtime {0}", System.Runtime.InteropServices.RuntimeEnvironment.GetSystemVersion());
                     Console.WriteLine("Complete Copyright information available at https://github.com/santedb/santedb/blob/master/NOTICE.md");
                     Console.WriteLine("Current Directory: {0}", Environment.CurrentDirectory);
 
