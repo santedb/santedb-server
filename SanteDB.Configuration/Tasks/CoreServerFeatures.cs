@@ -20,8 +20,10 @@ using SanteDB.BI.Services.Impl;
 using SanteDB.Cdss.Xml;
 using SanteDB.Core.Applets.Services.Impl;
 using SanteDB.Core.Configuration;
+using SanteDB.Core.Configuration.Http;
 using SanteDB.Core.Data.Initialization;
 using SanteDB.Core.Diagnostics.Tracing;
+using SanteDB.Core.Http;
 using SanteDB.Core.Notifications;
 using SanteDB.Core.PubSub.Broker;
 using SanteDB.Core.Security;
@@ -35,6 +37,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace SanteDB.Configuration.Tasks
 {
@@ -187,6 +190,14 @@ namespace SanteDB.Configuration.Tasks
             /// </summary>
             public bool Execute(SanteDBConfiguration configuration)
             {
+                if(configuration.GetSection<RestClientConfigurationSection>() == null)
+                {
+                    configuration.AddSection(new RestClientConfigurationSection()
+                    {
+                        RestClientType = new TypeReferenceConfiguration(typeof(RestClient))
+                    });
+                }
+
                 var appSection = configuration.GetSection<ApplicationServiceContextConfigurationSection>();
                 int i = 0;
                 foreach (var svc in SERVICE_TYPES.Reverse())

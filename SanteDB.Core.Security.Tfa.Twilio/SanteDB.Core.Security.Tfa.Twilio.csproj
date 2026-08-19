@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup Condition="'$(VersionNumber)' == ''">
-		<VersionNumber>3.0-debug</VersionNumber>
+		<VersionNumber>3.1-debug</VersionNumber>
 	</PropertyGroup>
 
   <PropertyGroup>
@@ -24,7 +24,7 @@
     <IncludeSymbols>true</IncludeSymbols>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <Product>SanteDB</Product>
-    <Copyright>Copyright (C) 2022 SanteSuite Contributors (See: NOTICES)</Copyright>
+    <Copyright>Copyright (C) 2022-2026 SanteSuite Contributors (See: NOTICES)</Copyright>
     <Company>SanteSuite Contributors</Company>
     <PackageIconUrl>http://santesuite.org/assets/img/logo.png</PackageIconUrl>
     <PackageProjectUrl>http://santesuite.org</PackageProjectUrl>

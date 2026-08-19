@@ -124,7 +124,7 @@ namespace SanteDB.Security.Tfa.Twilio
             {
                 this._TfaSecretManager.RemoveTfaRegistration(ci, AuthenticationContext.Current.Principal);
                 var telephone = this.GetTelephoneNumberOrThrow(ci);
-                var secret = _TfaSecretManager.StartTfaRegistration(ci, 6, Rfc4226Mode.TotpTenMinuteInterval, AuthenticationContext.SystemPrincipal);
+                var secret = _TfaSecretManager.StartTfaRegistration(ci, 6, Rfc4226Mode.HotpIncrementOnGenerate, AuthenticationContext.SystemPrincipal);
                 this.SetPhoneNumberValidated(user, false, false);
                 return this.SendNotification(telephone, secret, ci.Name);
             }
