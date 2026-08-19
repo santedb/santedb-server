@@ -127,7 +127,7 @@
 		<PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="9.1.1" />
 		<PackageReference Include="Microsoft.Data.Sqlite.Core" Version="[9.0.0,10)" />
 		<PackageReference Include="Mono.Posix" Version="7.1.0-final.1.21458.1" />
-		<PackageReference Include="SharpCompress" Version="[0.40.0,0.41)" />
+		<PackageReference Include="SharpCompress" Version="0.50.4" />
 		<PackageReference Include="System.Text.Json" Version="[9.0.0,10)" />
 		<PackageReference Include="Newtonsoft.Json" Version="[13.0.4,13.1)" />
 		<PackageReference Include="Npgsql" Version="[8.0.6,9)" />
