@@ -127,10 +127,6 @@ Source: ..\bin\Release\SanteDB.Queue.Msmq.dll; DestDir: {app}; Components: inter
 ; Demo Data
 Source: ..\SanteDB\Data\Demo\*.dataset; DestDir: {app}\data; Components: demo
 
-; Config Samples
-Source: ..\SanteDB\Data\SDB_BASE.FDB; DestDir: {app}; Components: db\fbsql demo;
-Source: ..\SanteDB\Data\SDB_AUDIT.FDB; DestDir: {app}; Components: db\fbsql demo;
-
 Source: ..\SanteDB\santedb.config.psql.xml; DestDir: {app}; DestName: santedb.config.psql.xml; Components: db\psql; 
 ; Security AMI stuff
 Source: ..\bin\Release\SanteDB.Core.Model.AMI.dll; DestDir: {app}; Components: msg\ami
