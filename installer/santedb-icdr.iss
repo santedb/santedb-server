@@ -96,7 +96,6 @@ Name: tfa\email; Description: Email TFA Adapter; Types: full
 Name: mdm; Description: Master Data Management (MDM); Types: full 
 Name: match; Description: Record Matcher (SanteMatch); Types: full 
 Name: db; Description: Data Persistence; Types: full demo 
-Name: db\fbsql; Description: FirebirdSQL Persistence Services; Types: full demo 
 Name: db\sqlite; Description: SQLite Persistence Services; Types: full demo 
 Name: db\psql; Description: PostgreSQL Persistence Services; Types: full 
 Name: cache; Description: Memory Caching Services; Types: full demo 
@@ -116,24 +115,7 @@ Source: .\netfx.exe; DestDir: {tmp} ; Flags: dontcopy
 Source: .\vc_redist.x64.exe; DestDir: {tmp} ; Flags: dontcopy
 
 ; LIcenses
-Source: ..\bin\Release\IDPLicense.txt; DestDir: {app}\licenses; Components: db\fbsql
-Source: ..\bin\Release\IPLicense.txt; DestDir: {app}\licenses; Components: db\fbsql
 Source: ..\bin\Release\License.rtf; DestDir: {app}\licenses
-
-; Firebird SQL 
-Source: ..\bin\Release\fbclient.dll; DestDir: {app}; Components: db\fbsql
-Source: ..\bin\Release\firebird.conf; DestDir: {app}; Components: db\fbsql
-; Source: ..\bin\Release\fbembed.dll; DestDir: {app}; Components: db\fbsql
-Source: ..\bin\Release\FirebirdSql.Data.FirebirdClient.dll; DestDir: {app}; Components: db\fbsql
-Source: ..\bin\Release\ib_util.dll; DestDir: {app}; Components: db\fbsql
-Source: ..\bin\Release\icudt52.dll; DestDir: {app}; Components: db\fbsql
-Source: ..\bin\Release\icuin52.dll; DestDir: {app}; Components: db\fbsql
-Source: ..\bin\Release\icuuc52.dll; DestDir: {app}; Components: db\fbsql
-Source: ..\bin\Release\plugins\engine12.dll; DestDir: {app}\plugins; Components: db\fbsql
-Source: ..\bin\Release\icudt52l.dat; DestDir: {app}; Components: db\fbsql
-Source: ..\bin\Release\firebird.msg; DestDir: {app}; Components: db\fbsql
-;Source: ..\bin\Release\fbembed.dll; DestDir: {app}; Components: db\fbsql
-Source: ..\bin\Release\fbclient.dll; DestDir: {app}; Components: db\fbsql
 
 ; RabbitMQ 
 Source: ..\bin\Release\RabbitMQ.Client.dll; DestDir: {app}; Components: interop\rabbitmq
@@ -146,7 +128,6 @@ Source: ..\bin\Release\SanteDB.Queue.Msmq.dll; DestDir: {app}; Components: inter
 Source: ..\SanteDB\Data\Demo\*.dataset; DestDir: {app}\data; Components: demo
 
 ; Config Samples
-Source: ..\SanteDB\santedb.config.fbsql.xml; DestDir: {app}; DestName: santedb.config.fbsql.xml; Components: db\fbsql
 Source: ..\SanteDB\Data\SDB_BASE.FDB; DestDir: {app}; Components: db\fbsql demo;
 Source: ..\SanteDB\Data\SDB_AUDIT.FDB; DestDir: {app}; Components: db\fbsql demo;
 
@@ -271,10 +252,8 @@ Source: ..\bin\Release\SanteDB.Messaging.HL7.dll; DestDir: {app}; Components: in
 ; NPSQL
 Source: ..\bin\Release\Npgsql.dll; DestDir: {app}; Components: db\psql
 Source: ..\santedb-data\bin\Release\netstandard2.0\SQL\PSQL\*.sql; Flags: recursesubdirs; DestDir: {app}\data\sql\psql; Components: db\psql; 
-Source: ..\santedb-data\bin\Release\netstandard2.0\SQL\FBSQL\*.sql; Flags: recursesubdirs; DestDir: {app}\data\sql\fbsql; Components: db\fbsql;
 Source: ..\santedb-data\bin\Release\netstandard2.0\SQL\SQLite\*.sql; Flags: recursesubdirs; DestDir: {app}\data\sql\sqlite; Components: db\sqlite;
 Source: ..\santedb-data\SanteDB.Persistence.Auditing.ADO\bin\Release\netstandard2.0\Data\SQL\AuditDB\PSQL\*.sql; DestDir: {app}\data\sql\psql\auditdb; Components: db\psql;
-Source: ..\santedb-data\SanteDB.Persistence.Auditing.ADO\bin\Release\netstandard2.0\Data\SQL\AuditDB\FBSQL\*.sql; DestDir: {app}\data\sql\fbsql\auditdb; Components: db\fbsql;
 Source: ..\santedb-data\SanteDB.Persistence.Auditing.ADO\bin\Release\netstandard2.0\Data\SQL\AuditDB\SQLITE\*.sql; DestDir: {app}\data\sql\sqlite\auditdb; Components: db\sqlite;
 
 ; Matching Infrastructure
