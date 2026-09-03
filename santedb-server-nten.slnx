@@ -15,9 +15,7 @@
     <Project Path="santedb-api/SanteDB.Core.TestFramework/SanteDB.Core.TestFramework.csproj" />
     <Project Path="santedb-applets/SanteDB.Core.Applets.Test/SanteDB.Core.Applets.Test.csproj" />
     <Project Path="santedb-certs-bc/SanteDB.Security.Certs.BouncyCastle.Test/SanteDB.Security.Certs.BouncyCastle.Test.csproj" />
-    <Project Path="santedb-data/SanteDB.Core.TestFramework.FirebirdSQL/SanteDB.Core.TestFramework.FirebirdSQL.csproj" />
     <Project Path="santedb-data/SanteDB.Core.TestFramework.Sqlite/SanteDB.Core.TestFramework.Sqlite.csproj" />
-    <Project Path="santedb-data/SanteDB.Persistence.Data.Test/SanteDB.Persistence.Data.Test.csproj" />
     <Project Path="santedb-restsvc/SanteDB.Rest.OAuth.Test/SanteDB.Rest.OAuth.Test.csproj" />
     <Project Path="santedb-tools/SanteDB.DevTools.Test/SanteDB.DevTools.Test.csproj" />
   </Folder>
