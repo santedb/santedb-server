@@ -101,9 +101,6 @@
 [submodule "santedb-certs-bc"]
 	path = santedb-certs-bc
 	url = https://github.com/santedb/santedb-certs-bc.git
-
-	branch = version/3.0
-[submodule "*"]
 	branch = version/3.0
 [submodule "santedb-madx"]
 	path = santedb-madx
