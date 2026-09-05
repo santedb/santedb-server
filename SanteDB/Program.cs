@@ -58,6 +58,11 @@ namespace SanteDB
         /// </summary>
         private static void Main(String[] args)
         {
+
+            // Parser
+            ParameterParser<ConsoleParameters> parser = new ParameterParser<ConsoleParameters>();
+            var parameters = parser.Parse(args);
+
             // Trace copyright information
             Assembly entryAsm = Assembly.GetEntryAssembly();
 
@@ -71,6 +76,17 @@ namespace SanteDB
 
             var workdirectory = Path.GetDirectoryName(entryAsm.Location);
             var datadirectory = Path.GetDirectoryName(typeof(Program).Assembly.Location);
+
+            if(!String.IsNullOrEmpty(parameters.InstanceName))
+            {
+                datadirectory = Path.Combine(datadirectory, parameters.InstanceName);
+            }
+
+            if(!Directory.Exists(datadirectory))
+            {
+                Trace.TraceInformation("Creating instance data directory");
+                Directory.CreateDirectory(datadirectory);
+            }
 
             if (null == datadirectory || (datadirectory.Equals(workdirectory, StringComparison.OrdinalIgnoreCase) == false))
             {
@@ -97,6 +113,7 @@ namespace SanteDB
             Trace.TraceInformation("SanteDB Working Directory : {0}", entryAsm.Location);
             Trace.TraceInformation("Operating System: {0} {1}", Environment.OSVersion.Platform, Environment.OSVersion.VersionString);
             Trace.TraceInformation("CLI Version: {0}", Environment.Version);
+            Trace.TraceInformation("Setting Working Directory to {0}", datadirectory);
             AppDomain.CurrentDomain.SetData(
                "DataDirectory",
                datadirectory
@@ -118,14 +135,10 @@ namespace SanteDB
                 Environment.Exit(999);
             };
 
-            // Parser
-            ParameterParser<ConsoleParameters> parser = new ParameterParser<ConsoleParameters>();
-
             bool hasConsole = true;
 
             try
             {
-                var parameters = parser.Parse(args);
 
                 // Are there any third party libraries to load?
                 LoadExtensions(parameters);
