@@ -1,25 +1,107 @@
 <?xml version="1.0"?>
 <dataset xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Restricted Information Policies v3.10"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Restricted Information Policies v3.12"
   xmlns="http://santedb.org/data">
-  <update skipIfError="false" insertIfNotExists="true">
-    <SecurityPolicy xmlns="http://santedb.org/model">
-      <id>36f1ed35-552e-421a-8f59-629561ab9eb6</id>
-      <name>Restricted Information / Confidential</name>
-      <oid>1.3.6.1.4.1.33349.3.1.5.9.3</oid>
-      <isPublic>true</isPublic>
-      <canOverride>true</canOverride>
-      <classConcept>1110782b-4727-421f-b29f-4d7e635f153b</classConcept>
-    </SecurityPolicy>
-  </update>
-  <update skipIfError="false" insertIfNotExists="true">
-    <SecurityPolicy xmlns="http://santedb.org/model">
-      <id>baa227aa-224d-4859-81b3-c1eb2750069f</id>
-      <name>Assign Policy</name>
-      <oid>1.3.6.1.4.1.33349.3.1.5.9.2.0.13</oid>
-      <isPublic>false</isPublic>
-      <canOverride>true</canOverride>
-    </SecurityPolicy>
-  </update>
-  
+	<update skipIfError="false" insertIfNotExists="true">
+		<SecurityPolicy xmlns="http://santedb.org/model">
+			<id>36f1ed35-552e-421a-8f59-629561ab9eb6</id>
+			<name>Restricted / Confidential Information</name>
+			<oid>1.3.6.1.4.1.33349.3.1.5.9.3</oid>
+			<isPublic>true</isPublic>
+			<canOverride>true</canOverride>
+			<classConcept>1110782b-4727-421f-b29f-4d7e635f153b</classConcept>
+		</SecurityPolicy>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<SecurityPolicy xmlns="http://santedb.org/model">
+			<id>46f1ed35-552e-421a-8f59-629561ab9eb6</id>
+			<name>Sexual / Reproductive Health Information</name>
+			<oid>1.3.6.1.4.1.33349.3.1.5.9.3.1</oid>
+			<isPublic>true</isPublic>
+			<canOverride>true</canOverride>
+			<classConcept>686c4790-97aa-482b-9ddc-59bdd5baa1e5</classConcept>
+		</SecurityPolicy>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<SecurityPolicy xmlns="http://santedb.org/model">
+			<id>56f1ed35-552e-421a-8f59-629561ab9eb6</id>
+			<name>Sexually Transmitted Infection Information</name>
+			<oid>1.3.6.1.4.1.33349.3.1.5.9.3.1.1</oid>
+			<isPublic>true</isPublic>
+			<canOverride>true</canOverride>
+			<classConcept>dbd915a4-56de-43aa-8639-e9268fc5d21a</classConcept>
+		</SecurityPolicy>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<SecurityPolicy xmlns="http://santedb.org/model">
+			<id>66f1ed35-552e-421a-8f59-629561ab9eb6</id>
+			<name>HIV / AIDS Related Information</name>
+			<oid>1.3.6.1.4.1.33349.3.1.5.9.3.2</oid>
+			<isPublic>true</isPublic>
+			<canOverride>true</canOverride>
+			<classConcept>cb46a409-3059-4aad-8b86-6abeea2993fe</classConcept>
+		</SecurityPolicy>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<SecurityPolicy xmlns="http://santedb.org/model">
+			<id>76f1ed35-552e-421a-8f59-629561ab9eb6</id>
+			<name>Sexual or Domestic Violence Information</name>
+			<oid>1.3.6.1.4.1.33349.3.1.5.9.3.3</oid>
+			<isPublic>true</isPublic>
+			<canOverride>true</canOverride>
+			<classConcept>8bcd989f-25df-4c9a-98a8-e970c79ead54</classConcept>
+		</SecurityPolicy>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<SecurityPolicy xmlns="http://santedb.org/model">
+			<id>86f1ed35-552e-421a-8f59-629561ab9eb6</id>
+			<name>Mental Health Information</name>
+			<oid>1.3.6.1.4.1.33349.3.1.5.9.3.4</oid>
+			<isPublic>true</isPublic>
+			<canOverride>true</canOverride>
+			<classConcept>b675d70f-a6b3-46b5-8fa5-dcea01306fd6</classConcept>
+		</SecurityPolicy>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<SecurityPolicy xmlns="http://santedb.org/model">
+			<id>96f1ed35-552e-421a-8f59-629561ab9eb6</id>
+			<name>Developmental Disability Information</name>
+			<oid>1.3.6.1.4.1.33349.3.1.5.9.3.4.1</oid>
+			<isPublic>true</isPublic>
+			<canOverride>true</canOverride>
+			<classConcept>da368a8e-316a-44fc-a24b-ec16f2de015d</classConcept>
+		</SecurityPolicy>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<SecurityPolicy xmlns="http://santedb.org/model">
+			<id>a6f1ed35-552e-421a-8f59-629561ab9eb6</id>
+			<name>Psychiatry Related Information</name>
+			<oid>1.3.6.1.4.1.33349.3.1.5.9.3.4.2</oid>
+			<isPublic>true</isPublic>
+			<canOverride>true</canOverride>
+			<classConcept>bf8014fb-c684-4ab7-8f5b-fe8eaeaf6ad9</classConcept>
+		</SecurityPolicy>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<SecurityPolicy xmlns="http://santedb.org/model">
+			<id>b6f1ed35-552e-421a-8f59-629561ab9eb6</id>
+			<name>Substance Abuse Related Information</name>
+			<oid>1.3.6.1.4.1.33349.3.1.5.9.3.4.3</oid>
+			<isPublic>true</isPublic>
+			<canOverride>true</canOverride>
+			<classConcept>6cbb861a-7919-4dcb-9c52-e632c7e7ae44</classConcept>
+		</SecurityPolicy>
+	</update>
+
+	
+	<update skipIfError="false" insertIfNotExists="true">
+		<SecurityPolicy xmlns="http://santedb.org/model">
+			<id>baa227aa-224d-4859-81b3-c1eb2750069f</id>
+			<name>Assign Policy</name>
+			<oid>1.3.6.1.4.1.33349.3.1.5.9.2.0.13</oid>
+			<isPublic>false</isPublic>
+			<canOverride>true</canOverride>
+		</SecurityPolicy>
+	</update>
+
 </dataset>
