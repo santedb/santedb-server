@@ -2,6 +2,7 @@
   <Folder Name="/Solution Items/">
     <File Path=".gitignore" />
     <File Path=".gitmodules" />
+    <File Path="build.bat" />
     <File Path="Directory.Build.props" />
     <File Path="INSTALL.md" />
     <File Path="LICENSE" />

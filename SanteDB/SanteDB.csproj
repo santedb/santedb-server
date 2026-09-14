@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.Net.Sdk">
 	<PropertyGroup Condition="'$(VersionNumber)'==''">
-		<VersionNumber>3.0-debug</VersionNumber>
+		<VersionNumber>3.1-debug</VersionNumber>
 	</PropertyGroup>
 	<Choose>
 		<When Condition="$(VersionNumber.Contains('-'))">
