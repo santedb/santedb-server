@@ -27,7 +27,7 @@
 		<Copyright>Copyright (C) 2015-2026 SanteSuite Contributors (See: NOTICES)</Copyright>
 		<Company>SanteSuite Contributors</Company>
 		<Title>SanteDB iCDR</Title>
-		<Description>SanteDC Integrated Clinical Data Repository</Description>
+		<Description>SanteDB Integrated Clinical Data Repository</Description>
 	</PropertyGroup>
 	<Choose>
 		<When Condition="$(SolutionName.Contains('-nuget'))">
