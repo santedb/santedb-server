@@ -124,7 +124,6 @@
 		</Otherwise>
 	</Choose>
 	<ItemGroup>
-		<PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="9.1.1" />
 		<PackageReference Include="Microsoft.Data.Sqlite.Core" Version="[9.0.0,10)" />
 		<PackageReference Include="Mono.Posix" Version="7.1.0-final.1.21458.1" />
 		<PackageReference Include="SharpCompress" Version="0.50.4" />

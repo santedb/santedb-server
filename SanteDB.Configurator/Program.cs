@@ -27,6 +27,7 @@ using System.Linq;
 using System.Reflection;
 using System.Security.Principal;
 using System.Windows.Forms;
+using System.Collections.Generic;
 
 namespace SanteDB.Configurator
 {
@@ -72,14 +73,39 @@ namespace SanteDB.Configurator
             var splash = new frmSplash();
             splash.Show();
 
+            List<string> fileList = new List<string>();
+
+            foreach (var arg in args)
+            {
+                if (string.IsNullOrWhiteSpace(arg))
+                    continue;
+
+                var path = arg;
+
+                if (path[0] == '"')
+                {
+                    path = path.Substring(1);
+                }
+
+                if (path[path.Length-1] == '"')
+                {
+                    path = path.Substring(0, path.Length - 1);
+                }
+
+                if (File.Exists(arg))
+                    fileList.Add(arg);
+                else if (Directory.Exists(arg))
+                    fileList.AddRange(Directory.GetFiles(arg, "Sante*.dll"));
+            }
+
             // Load assemblies
-            var fileList = Directory.GetFiles(cwd, "Sante*.dll");
+            fileList.AddRange(Directory.GetFiles(cwd, "Sante*.dll"));
             int i = 0;
             foreach (var file in fileList)
             {
                 try
                 {
-                    splash.NotifyStatus($"Loading {Path.GetFileNameWithoutExtension(file)}...", ((float)(i++) / fileList.Length) * 0.5f);
+                    splash.NotifyStatus($"Loading {Path.GetFileNameWithoutExtension(file)}...", ((float)(i++) / fileList.Count) * 0.5f);
                     var asm = Assembly.LoadFile(file);
                     // Now load all plugins on the assembly
                     var pluginInfo = asm.GetCustomAttribute<PluginAttribute>();
