@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36717.8 d17.14
+VisualStudioVersion = 17.14.36717.8
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB", "SanteDB\SanteDB.csproj", "{649B7C70-EC21-4AC4-B918-C34C84753126}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -227,6 +227,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.Messaging.IHE.MADX.Test", "santedb-madx\SanteDB.Messaging.IHE.MADX.Test\SanteDB.Messaging.IHE.MADX.Test.csproj", "{B123FE6D-1784-4878-BDB5-498D588F46F2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.Messaging.IHE.MADX", "santedb-madx\SanteDB.Messaging.IHE.MADX\SanteDB.Messaging.IHE.MADX.csproj", "{C5E2A2BC-EDBB-82BC-955C-196D2CFAA778}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogViewer", "santedb-tools\SanteDB.LogViewer\LogViewer.csproj", "{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -4107,6 +4109,56 @@ Global
 		{C5E2A2BC-EDBB-82BC-955C-196D2CFAA778}.SignedRelease|x64.Build.0 = Release|Any CPU
 		{C5E2A2BC-EDBB-82BC-955C-196D2CFAA778}.SignedRelease|x86.ActiveCfg = Release|Any CPU
 		{C5E2A2BC-EDBB-82BC-955C-196D2CFAA778}.SignedRelease|x86.Build.0 = Release|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.Debug|ARM.Build.0 = Debug|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.Debug|x64.Build.0 = Debug|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.Debug|x86.Build.0 = Debug|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.MacDebug|Any CPU.ActiveCfg = Release|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.MacDebug|Any CPU.Build.0 = Release|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.MacDebug|ARM.ActiveCfg = Release|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.MacDebug|ARM.Build.0 = Release|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.MacDebug|ARM64.ActiveCfg = Release|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.MacDebug|ARM64.Build.0 = Release|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.MacDebug|x64.ActiveCfg = Release|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.MacDebug|x64.Build.0 = Release|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.MacDebug|x86.ActiveCfg = Release|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.MacDebug|x86.Build.0 = Release|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.MacRelease|Any CPU.ActiveCfg = Release|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.MacRelease|Any CPU.Build.0 = Release|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.MacRelease|ARM.ActiveCfg = Release|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.MacRelease|ARM.Build.0 = Release|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.MacRelease|ARM64.ActiveCfg = Release|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.MacRelease|ARM64.Build.0 = Release|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.MacRelease|x64.ActiveCfg = Release|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.MacRelease|x64.Build.0 = Release|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.MacRelease|x86.ActiveCfg = Release|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.MacRelease|x86.Build.0 = Release|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.Release|ARM.ActiveCfg = Release|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.Release|ARM.Build.0 = Release|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.Release|ARM64.Build.0 = Release|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.Release|x64.ActiveCfg = Release|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.Release|x64.Build.0 = Release|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.Release|x86.ActiveCfg = Release|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.Release|x86.Build.0 = Release|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.SignedRelease|Any CPU.ActiveCfg = SignedRelease|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.SignedRelease|Any CPU.Build.0 = SignedRelease|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.SignedRelease|ARM.ActiveCfg = SignedRelease|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.SignedRelease|ARM.Build.0 = SignedRelease|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.SignedRelease|ARM64.ActiveCfg = SignedRelease|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.SignedRelease|ARM64.Build.0 = SignedRelease|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.SignedRelease|x64.ActiveCfg = SignedRelease|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.SignedRelease|x64.Build.0 = SignedRelease|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.SignedRelease|x86.ActiveCfg = SignedRelease|Any CPU
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732}.SignedRelease|x86.Build.0 = SignedRelease|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -4200,6 +4252,7 @@ Global
 		{0CACEB40-A400-4F74-B827-AA125E8AE0E9} = {3A50479A-0938-40B2-825C-709E2BFAE31E}
 		{B123FE6D-1784-4878-BDB5-498D588F46F2} = {FE92CEE3-7E0D-4041-8F95-DA2855A50B7A}
 		{C5E2A2BC-EDBB-82BC-955C-196D2CFAA778} = {FE92CEE3-7E0D-4041-8F95-DA2855A50B7A}
+		{20C72E5E-CDB0-4EF8-AA88-2DB30662F732} = {B79089D5-04F4-467D-A404-5391C062AF7C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E73A1AED-8AB7-492C-A4F0-C71FCC5C393C}
