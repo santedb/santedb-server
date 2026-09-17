@@ -106,7 +106,10 @@ $SUDO cp -rf * $INSTALL_ROOT
 
 echo "Installing Certificates "
 $SUDO mono $INSTALL_ROOT/SanteDB.exe --install-certs 
-$SUDO certmgr -add -c -m CA inter.cer
+
+if [ -f "inter.cer"]; then 
+    $SUDO certmgr -add -c -m CA inter.cer
+fi
 
 read_yesno "Do you want me to install SanteDB as a daemon?" daemon
 
