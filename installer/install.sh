@@ -3,6 +3,7 @@
 
 declare INSTALL_ROOT='/opt/santesuite/santedb/server'
 declare SUDO=''
+declare AUTO_START=0
 
 exit_on_error() {
     exit_code=$1
@@ -60,6 +61,7 @@ if (( $EUID != 0 )); then
     SUDO='sudo'
 fi
 
+
 mono --version || install_mono
 psql -V || install_psql
 
@@ -98,6 +100,12 @@ then
     $INSTALL_ROOT = $installAlt
 fi
 
+if [ -f /run/santedb.pid ]; then 
+    echo "Stopping SanteDB Service"
+    $SUDO systemctl stop santedb
+    AUTO_START=1
+fi;
+
 echo "Installing at $INSTALL_ROOT"
 $SUDO mkdir -p $INSTALL_ROOT
 
@@ -111,11 +119,16 @@ if [ -f "inter.cer" ]; then
     $SUDO certmgr -add -c -m CA inter.cer
 fi
 
-read_yesno "Do you want me to install SanteDB as a daemon?" daemon
+if (( $AUTO_START != 0 )); then
+    echo "Restarting SanteDB Server"
+    $SUDO systemctl start santedb
+else 
 
-if [[ "$daemon" =~ ^[yY]$ ]]
-then 
-    cat > /tmp/santedb.service <<EOF
+    read_yesno "Do you want me to install SanteDB as a daemon?" daemon
+
+    if [[ "$daemon" =~ ^[yY]$ ]]
+    then 
+        cat > /tmp/santedb.service <<EOF
 [Unit]
 Description=SanteDB iCDR Server
 
@@ -123,46 +136,46 @@ Description=SanteDB iCDR Server
 Type=simple
 RemainAfterExit=yes
 PIDFile=/run/santedb.pid
-ExecStart=/usr/bin/mono-service -l:/run/santedb.pid -d:$INSTALL_ROOT $INSTALL_ROOT/SanteDB.exe --console 
+ExecStart=/usr/bin/mono-service -l:/run/santedb.pid -d:$INSTALL_ROOT $INSTALL_ROOT/SanteDB.exe --console --load=$INSTALL_ROOT/SanteDB*.dll
 ExecStop=kill -sHUP $MAINPID
 
 [Install]
 WantedBy=multi-user.target
 EOF
 
-    $SUDO mv /tmp/santedb.service /etc/systemd/system/santedb.service
+        $SUDO mv /tmp/santedb.service /etc/systemd/system/santedb.service
 
-    read_yesno "Do you want SanteDB to start when the system starts?" autostart
-    if [[ "$autostart" =~ ^[Yy]$ ]]
-    then 
-        $SUDO systemctl enable santedb
+        read_yesno "Do you want SanteDB to start when the system starts?" autostart
+        if [[ "$autostart" =~ ^[Yy]$ ]]
+        then 
+            $SUDO systemctl enable santedb
+        fi
+
+        echo -e "\n
+
+        SanteDB is now installed in $INSTALL_ROOT
+
+        START SANTEDB: 
+        systemctl start santedb
+
+        STOP SANTEDB: 
+        systemctl stop santedb
+        "
+    else 
+
+        echo -e "\n
+
+        SanteDB is now installed in $INSTALL_ROOT
+
+        START SANTEDB: 
+        sudo mono-service -d:$INSTALL_ROOT $INSTALL_ROOT/SanteDB.exe --console
+
+        STOP SANTEDB: 
+        kill \`cat /tmp/SanteDB.exe.lock\`
+        "
+
     fi
-
-    echo -e "\n
-
-    SanteDB is now installed in $INSTALL_ROOT
-
-    START SANTEDB: 
-    systemctl start santedb
-
-    STOP SANTEDB: 
-    systemctl stop santedb
-    "
-else 
-
-    echo -e "\n
-
-    SanteDB is now installed in $INSTALL_ROOT
-
-    START SANTEDB: 
-    sudo mono-service -d:$INSTALL_ROOT $INSTALL_ROOT/SanteDB.exe --console
-
-    STOP SANTEDB: 
-    kill \`cat /tmp/SanteDB.exe.lock\`
-    "
-
 fi
-
 
 
 read_yesno "Do you want to configure your SanteDB instance? " config
