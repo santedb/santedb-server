@@ -183,6 +183,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="config\config.skel" />
+    <None Include="Data\000-ObservationContentClasses.dataset">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Data\000-AdminActPolicies.dataset">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

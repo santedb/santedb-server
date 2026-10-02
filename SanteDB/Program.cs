@@ -308,6 +308,7 @@ namespace SanteDB
                             };
                             int signal = UnixSignal.WaitAny(signals);
                             // Gracefully shutdown
+
                             ServiceUtil.Stop();
 
                             //try // remove the lock file
