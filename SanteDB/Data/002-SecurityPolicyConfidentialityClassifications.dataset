@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<dataset xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Security Policy Classification Codes - 3.0" processingFlags="" xmlns="http://santedb.org/data">
+<dataset xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Security Policy Classification Codes - 3.1" processingFlags="" xmlns="http://santedb.org/data">
 	<update skipIfError="false" insertIfNotExists="true">
 		<CodeSystem xmlns="http://santedb.org/model">
 			<id>51efecba-966f-11f1-bdd7-00155d9bc838</id>
@@ -261,6 +261,30 @@
 		</Concept>
 	</update>
 	<update skipIfError="false" insertIfNotExists="true">
+		<Concept xmlns="http://santedb.org/model">
+			<id>f5260af9-bc4e-42a1-b6c4-a71483adc4a0</id>
+			<sequence xsi:nil="true" />
+			<mnemonic>SecurityPolicyClassification-VeryImportantPerson</mnemonic>
+			<statusConcept>c8064cbd-fa06-4530-b430-1a52f1530c27</statusConcept>
+			<conceptClass>0d6b3439-c9be-4480-af39-eeb457c052d0</conceptClass>
+			<name>
+				<id>d9413343-a385-4ec0-a6d5-a901b25fc875</id>
+				<language>en</language>
+				<value>Very Important Person Information Sensitivity</value>
+			</name>
+			<conceptSet>ca156520-9670-11f1-9055-00155d9bc838</conceptSet>
+		</Concept>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<ConceptReferenceTerm xmlns="http://santedb.org/model">
+			<id>12bf6e34-9670-11f1-ab84-00155d9bc838</id>
+			<source>f5260af9-bc4e-42a1-b6c4-a71483adc4a0</source>
+			<term>ba0ef8c0-c989-4d4a-892e-8037353751af</term>
+			<relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
+		</ConceptReferenceTerm>
+	</update>
+
+	<update skipIfError="false" insertIfNotExists="true">
 		<ConceptReferenceTerm xmlns="http://santedb.org/model">
 			<id>12bf6e34-9670-11f1-ab84-00155d9bc838</id>
 			<source>6cbb861a-7919-4dcb-9c52-e632c7e7ae44</source>
@@ -379,6 +403,17 @@
 			<term>0e9351d2-1a3f-46da-ad3f-5b98edfa9e84</term>
 			<relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
 		</ConceptReferenceTerm>
+	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<ReferenceTerm xmlns="http://santedb.org/model">
+			<id>ba0ef8c0-c989-4d4a-892e-8037353751af</id>
+			<mnemonic>VIP</mnemonic>
+			<codeSystem>51efecba-966f-11f1-bdd7-00155d9bc838</codeSystem>
+			<name>
+				<language>en</language>
+				<value>Very Important Person Sensitivity</value>
+			</name>
+		</ReferenceTerm>
 	</update>
 	<update skipIfError="false" insertIfNotExists="true">
 		<ReferenceTerm xmlns="http://santedb.org/model">

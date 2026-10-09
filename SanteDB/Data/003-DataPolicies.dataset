@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <dataset xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Restricted Information Policies v3.12"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Restricted Information Policies v3.13"
   xmlns="http://santedb.org/data">
 	<update skipIfError="false" insertIfNotExists="true">
 		<SecurityPolicy xmlns="http://santedb.org/model">
@@ -12,6 +12,8 @@
 			<classConcept>1110782b-4727-421f-b29f-4d7e635f153b</classConcept>
 		</SecurityPolicy>
 	</update>
+	
+	
 	<update skipIfError="false" insertIfNotExists="true">
 		<SecurityPolicy xmlns="http://santedb.org/model">
 			<id>46f1ed35-552e-421a-8f59-629561ab9eb6</id>
@@ -92,7 +94,18 @@
 			<classConcept>6cbb861a-7919-4dcb-9c52-e632c7e7ae44</classConcept>
 		</SecurityPolicy>
 	</update>
+	<update skipIfError="false" insertIfNotExists="true">
+		<SecurityPolicy xmlns="http://santedb.org/model">
+			<id>D957CCB8-F756-42F9-9F9D-9B7344A70727</id>
+			<name>Very Important Person Information</name>
+			<oid>1.3.6.1.4.1.33349.3.1.5.9.3.5</oid>
+			<isPublic>true</isPublic>
+			<canOverride>true</canOverride>
+			<classConcept>f5260af9-bc4e-42a1-b6c4-a71483adc4a0</classConcept>
+		</SecurityPolicy>
+	</update>
 
+	
 	
 	<update skipIfError="false" insertIfNotExists="true">
 		<SecurityPolicy xmlns="http://santedb.org/model">
@@ -104,4 +117,5 @@
 		</SecurityPolicy>
 	</update>
 
+	
 </dataset>
