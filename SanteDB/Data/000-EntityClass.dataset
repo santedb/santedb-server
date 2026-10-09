@@ -101,7 +101,11 @@ INSERT OR IGNORE INTO rel_vrfy_systbl (rel_typ_cd_id, src_cls_cd_id, trg_cls_cd_
     </exec>
     <exec invariant="npgsql">
       <![CDATA[
-      
+
+INSERT INTO REL_VRFY_SYSTBL (REL_TYP_CD_ID, SRC_CLS_CD_ID, TRG_CLS_CD_ID, ERR_DESC) 
+    VALUES ('20e98d17-e24d-4c64-b09e-521a177ccd05','7c08bd55-4d42-49cd-92f8-6388d6c4183f', 'd39073be-0f8f-440e-b8c8-7034cc138a95', 'Organization=[RegulatedProduct]=>Material') ON CONFLICT DO NOTHING; 
+
+	 
 INSERT INTO REL_VRFY_SYSTBL (REL_TYP_CD_ID, SRC_CLS_CD_ID, TRG_CLS_CD_ID, ERR_DESC) 
     VALUES ('4F6273D3-8223-4E18-8596-C718AD029DEB','ff34dfa7-c6d3-4f8b-bc9f-14bcdc13ba6c','b76ff324-b174-40b7-a6ac-d1fdf8e23967', 'ServiceDeliveryLocation=[LocatedEntity]=>Container') ON CONFLICT DO NOTHING; 
 INSERT INTO REL_VRFY_SYSTBL (REL_TYP_CD_ID, SRC_CLS_CD_ID, TRG_CLS_CD_ID, ERR_DESC) 
