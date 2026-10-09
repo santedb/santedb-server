@@ -277,7 +277,7 @@
 	</update>
 	<update skipIfError="false" insertIfNotExists="true">
 		<ConceptReferenceTerm xmlns="http://santedb.org/model">
-			<id>12bf6e34-9670-11f1-ab84-00155d9bc838</id>
+			<id>12bf6e34-fd70-11f1-ab84-00155d9bc838</id>
 			<source>f5260af9-bc4e-42a1-b6c4-a71483adc4a0</source>
 			<term>ba0ef8c0-c989-4d4a-892e-8037353751af</term>
 			<relationshipType>2c4dafc2-566a-41ae-9ebc-3097d7d22f4a</relationshipType>
@@ -408,7 +408,7 @@
 		<ReferenceTerm xmlns="http://santedb.org/model">
 			<id>ba0ef8c0-c989-4d4a-892e-8037353751af</id>
 			<mnemonic>VIP</mnemonic>
-			<codeSystem>51efecba-966f-11f1-bdd7-00155d9bc838</codeSystem>
+			<codeSystem>02823b47-c315-4366-8883-442e646d34be</codeSystem>
 			<name>
 				<language>en</language>
 				<value>Very Important Person Sensitivity</value>
