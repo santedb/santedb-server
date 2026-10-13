@@ -175,12 +175,12 @@ EOF
         "
 
     fi
+
+    read_yesno "Do you want to configure your SanteDB instance? " config
+    
+    if [[ "$config" =~ ^[yY]$ ]] 
+    then 
+        $SUDO mono $INSTALL_ROOT/ConfigTool.exe
+    fi;
+
 fi
-
-
-read_yesno "Do you want to configure your SanteDB instance? " config
- 
-if [[ "$config" =~ ^[yY]$ ]] 
-then 
-	$SUDO mono $INSTALL_ROOT/ConfigTool.exe
-fi;
