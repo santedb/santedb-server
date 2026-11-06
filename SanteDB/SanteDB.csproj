@@ -733,6 +733,10 @@
       <Project>{18a9f102-023e-4e17-8a70-a91365e1510d}</Project>
       <Name>SanteDB.Persistence.Diagnostics.Jira</Name>
     </ProjectReference>
+    <ProjectReference Include="..\SanteDB.Persistence.Diagnostics.Trello\SanteDB.Persistence.Diagnostics.Trello.csproj">
+      <Project>{c0798c56-1f8d-4585-acaf-21380ca71b45}</Project>
+      <Name>SanteDB.Persistence.Diagnostics.Trello</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Services\" />
